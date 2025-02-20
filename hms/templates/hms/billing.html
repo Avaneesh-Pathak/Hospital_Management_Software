@@ -1,0 +1,10 @@
+{% extends 'hms/base.html' %}
+
+{% block content %}
+<h2 class="text-2xl font-bold">Billing</h2>
+<ul>
+    {% for bill in bills %}
+        <li>{{ bill.patient.user.username }} - ₹{{ bill.total_amount }} - {{ bill.status }}</li>
+    {% endfor %}
+</ul>
+{% endblock %}

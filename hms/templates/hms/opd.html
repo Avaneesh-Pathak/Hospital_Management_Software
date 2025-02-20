@@ -1,0 +1,10 @@
+{% extends 'hms/base.html' %}
+
+{% block content %}
+<h2 class="text-2xl font-bold">OPD Records</h2>
+<ul>
+    {% for opd in opds %}
+        <li>{{ opd.patient.user.username }} - Dr. {{ opd.doctor.user.username }} - {{ opd.visit_date }}</li>
+    {% endfor %}
+</ul>
+{% endblock %}

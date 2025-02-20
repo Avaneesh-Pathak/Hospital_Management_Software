@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hospital Management System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 flex h-screen">
+
+    <!-- Sidebar -->
+    <aside class="w-64 bg-blue-700 text-white h-full p-6 fixed left-0 top-0 bottom-0">
+        <h2 class="text-xl font-bold mb-6">Hospital Management</h2>
+        <ul class="space-y-4">
+            <li><a href="{% url 'dashboard' %}" class="block p-2 hover:bg-blue-500 rounded">Dashboard</a></li>
+            <li><a href="{% url 'patients' %}" class="block p-2 hover:bg-blue-500 rounded">Patients</a></li>
+            <li><a href="{% url 'doctors' %}" class="block p-2 hover:bg-blue-500 rounded">Doctors</a></li>
+            <li><a href="{% url 'appointments' %}" class="block p-2 hover:bg-blue-500 rounded">Appointments</a></li>
+            <li><a href="{% url 'billing' %}" class="block p-2 hover:bg-blue-500 rounded">Billing</a></li>
+            <li><a href="{% url 'emergency' %}" class="block p-2 hover:bg-blue-500 rounded">Emergency</a></li>
+            <li><a href="{% url 'ipd' %}" class="block p-2 hover:bg-blue-500 rounded">IPD</a></li>
+            <li><a href="{% url 'opd' %}" class="block p-2 hover:bg-blue-500 rounded">OPD</a></li>
+        </ul>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="flex-1 ml-64">
+        <nav class="bg-blue-600 p-4 text-white flex justify-between">
+            <h1 class="text-2xl font-bold">Hospital Management</h1>
+        </nav>
+
+        <div class="container mx-auto p-6">
+            {% block content %}
+            {% endblock %}
+        </div>
+
+        <footer class="bg-blue-600 p-4 text-white text-center mt-6">
+            &copy; 2025 Hospital Management System
+        </footer>
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,10 @@
+{% extends 'hms/base.html' %}
+
+{% block content %}
+<h2 class="text-2xl font-bold">Appointments</h2>
+<ul>
+    {% for appointment in appointments %}
+        <li>{{ appointment.patient.user.username }} with Dr. {{ appointment.doctor.user.username }} on {{ appointment.date }}</li>
+    {% endfor %}
+</ul>
+{% endblock %}

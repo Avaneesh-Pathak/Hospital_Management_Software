@@ -1,0 +1,10 @@
+{% extends 'hms/base.html' %}
+
+{% block content %}
+<h2 class="text-2xl font-bold">Doctors</h2>
+<ul>
+    {% for doctor in doctors %}
+        <li>Dr. {{ doctor.user.username }} - {{ doctor.specialization }}</li>
+    {% endfor %}
+</ul>
+{% endblock %}

@@ -1,0 +1,51 @@
+{% extends 'hms/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="grid grid-cols-3 gap-4 p-6">
+    <div class="bg-white shadow-lg p-4 rounded-lg">
+        <h2 class="text-xl font-bold">Total Patients</h2>
+        <p class="text-3xl">{{ total_patients }}</p>
+    </div>
+    <div class="bg-white shadow-lg p-4 rounded-lg">
+        <h2 class="text-xl font-bold">Total Doctors</h2>
+        <p class="text-3xl">{{ total_doctors }}</p>
+    </div>
+    <div class="bg-white shadow-lg p-4 rounded-lg">
+        <h2 class="text-xl font-bold">Total Appointments</h2>
+        <p class="text-3xl">{{ total_appointments }}</p>
+    </div>
+    <div class="bg-white shadow-lg p-4 rounded-lg">
+        <h2 class="text-xl font-bold">Total Revenue</h2>
+        <p class="text-3xl">₹{{ total_revenue }}</p>
+    </div>
+    <div class="bg-white shadow-lg p-4 rounded-lg">
+        <h2 class="text-xl font-bold">Emergency Cases Today</h2>
+        <p class="text-3xl">{{ emergency_cases_today }}</p>
+    </div>
+</div>
+
+<div class="p-6">
+    <h2 class="text-2xl font-bold mb-4">Upcoming Appointments</h2>
+    <table class="w-full bg-white shadow-md rounded-lg">
+        <tr class="bg-blue-500 text-white">
+            <th class="p-2">Patient</th>
+            <th class="p-2">Doctor</th>
+            <th class="p-2">Date</th>
+            <th class="p-2">Time</th>
+        </tr>
+        {% for appointment in upcoming_appointments %}
+        <tr class="border-b">
+            <td class="p-2">{{ appointment.patient.full_name }}</td>
+            <td class="p-2">{{ appointment.doctor.full_name }}</td>
+            <td class="p-2">{{ appointment.date }}</td>
+            <td class="p-2">{{ appointment.time }}</td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="4" class="p-4 text-center">No upcoming appointments</td>
+        </tr>
+        {% endfor %}
+    </table>
+</div>
+{% endblock %}
