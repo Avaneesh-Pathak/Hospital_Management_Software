@@ -31,15 +31,13 @@
         <tr class="bg-blue-500 text-white">
             <th class="p-2">Patient</th>
             <th class="p-2">Doctor</th>
-            <th class="p-2">Date</th>
-            <th class="p-2">Time</th>
+            <th class="p-2">Date and Time</th>
         </tr>
         {% for appointment in upcoming_appointments %}
-        <tr class="border-b">
-            <td class="p-2">{{ appointment.patient.full_name }}</td>
-            <td class="p-2">{{ appointment.doctor.full_name }}</td>
+        <tr class="border-b text-center">
+            <td class="p-2">{{ appointment.patient.user.full_name }}</td>
+            <td class="p-2">{{ appointment.doctor.user.full_name }}</td>
             <td class="p-2">{{ appointment.date }}</td>
-            <td class="p-2">{{ appointment.time }}</td>
         </tr>
         {% empty %}
         <tr>

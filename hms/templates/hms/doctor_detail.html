@@ -1,0 +1,20 @@
+{% extends 'hms/base.html' %}
+
+{% block content %}
+    <h2 style="font-size: 24px; font-weight: bold; margin-bottom: 20px;">Doctor Details</h2>
+
+    <div style="border: 1px solid #ddd; padding: 20px; border-radius: 5px; background-color: #f9f9f9;">
+        <p><strong>Name:</strong> {{ doctor.user.full_name }}</p>
+        <p><strong>Specialization:</strong> {{ doctor.specialization }}</p>
+        <p><strong>Phone:</strong> {{ doctor.user.contact_number }}</p>
+        <p><strong>Email:</strong> {{ doctor.user.email }}</p>
+        <p><strong>Address:</strong> {{ doctor.user.address }}</p>
+        <p><strong>Experience:</strong> {{ doctor.experience }} years</p>
+    </div>
+
+    <a href="{% url 'doctors' %}" 
+
+       style="display: inline-block; margin-top: 20px; padding: 10px 15px; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px;">
+        Back to Doctors List
+    </a>
+{% endblock %}

@@ -1,10 +1,47 @@
 {% extends 'hms/base.html' %}
 
 {% block content %}
-<h2 class="text-2xl font-bold">Appointments</h2>
-<ul>
-    {% for appointment in appointments %}
-        <li>{{ appointment.patient.user.username }} with Dr. {{ appointment.doctor.user.username }} on {{ appointment.date }}</li>
-    {% endfor %}
-</ul>
+    <h2 style="font-size: 24px; font-weight: bold; margin-bottom: 20px;">Appointments</h2>
+
+    {% if appointments %}
+        <form method="post" action="{% url 'update_appointment_status' %}">
+            {% csrf_token %}
+            <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                <thead>
+                    <tr style="background-color: #007bff; color: white;">
+                        <th style="padding: 10px; border: 1px solid #ddd;">Patient Name</th>
+                        <th style="padding: 10px; border: 1px solid #ddd;">Doctor</th>
+                        <th style="padding: 10px; border: 1px solid #ddd;">Date</th>
+                        <th style="padding: 10px; border: 1px solid #ddd;">Status</th>
+                        <th style="padding: 10px; border: 1px solid #ddd;">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for appointment in appointments %}
+                        <tr style="border-bottom: 1px solid #ddd;">
+                            <td style="padding: 10px;">{{ appointment.patient.user.full_name }}</td>
+                            <td style="padding: 10px;">Dr. {{ appointment.doctor.user.full_name }}</td>
+                            <td style="padding: 10px;">{{ appointment.date }}</td>
+                            <td style="padding: 10px;">
+                                <select name="status_{{ appointment.id }}" style="padding: 5px; border: 1px solid #ccc;">
+                                    <option value="Pending" {% if appointment.status == "Pending" %}selected{% endif %}>Pending</option>
+                                    <option value="Confirmed" {% if appointment.status == "Confirmed" %}selected{% endif %}>Confirmed</option>
+                                    <option value="Completed" {% if appointment.status == "Completed" %}selected{% endif %}>Completed</option>
+                                    <option value="Canceled" {% if appointment.status == "Canceled" %}selected{% endif %}>Canceled</option>
+                                </select>
+                            </td>
+                            <td style="padding: 10px;">
+                                <button type="submit" name="appointment_id" value="{{ appointment.id }}" 
+                                        style="background-color: #28a745; color: white; border: none; padding: 5px 10px; cursor: pointer; border-radius: 5px;">
+                                    Update
+                                </button>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </form>
+    {% else %}
+        <p style="color: red; font-weight: bold; margin-top: 20px;">No appointments available.</p>
+    {% endif %}
 {% endblock %}

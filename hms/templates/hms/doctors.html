@@ -1,10 +1,29 @@
 {% extends 'hms/base.html' %}
 
 {% block content %}
-<h2 class="text-2xl font-bold">Doctors</h2>
-<ul>
-    {% for doctor in doctors %}
-        <li>Dr. {{ doctor.user.username }} - {{ doctor.specialization }}</li>
-    {% endfor %}
-</ul>
+    <h2 style="font-size: 24px; font-weight: bold; margin-bottom: 20px;">Doctors List</h2>
+
+    <table style="width: 100%; border-collapse: collapse;">
+        <thead>
+            <tr style="background-color: #f2f2f2;">
+                <th style="padding: 10px; border: 1px solid #ddd;">Doctor Name</th>
+                <th style="padding: 10px; border: 1px solid #ddd;">Specialization</th>
+                <th style="padding: 10px; border: 1px solid #ddd;">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for doctor in doctors %}
+                <tr>
+                    <td style="padding: 10px; border: 1px solid #ddd;">{{ doctor.user.full_name }}</td>
+                    <td style="padding: 10px; border: 1px solid #ddd;">{{ doctor.specialization }}</td>
+                    <td style="padding: 10px; border: 1px solid #ddd;">
+                        <a href="{% url 'doctor_detail' doctor.id %}" 
+                           style="text-decoration: none; background-color: #007bff; color: white; padding: 5px 10px; border-radius: 5px;">
+                            View Details
+                        </a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 {% endblock %}

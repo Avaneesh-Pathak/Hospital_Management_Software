@@ -1,10 +1,30 @@
 {% extends 'hms/base.html' %}
 
 {% block content %}
-<h2 class="text-2xl font-bold">Patients</h2>
-<ul>
+<h2 style="font-size: 24px; font-weight: bold; margin-bottom: 15px;">Patients List</h2>
+
+<a href="{% url 'register_patient' %}" 
+   style="background-color: #1D4ED8; color: white; padding: 10px 15px; border-radius: 5px; text-decoration: none; display: inline-block; margin-bottom: 20px;">
+    Add New Patient
+</a>
+
+<table style="width: 100%; border-collapse: collapse; border: 1px solid #ddd; margin-top: 20px;">
+    <tr style="background-color: #f2f2f2;">
+        <th style="padding: 10px; text-align: left;">Full Name</th>
+        <th style="padding: 10px; text-align: left;">Patient Code</th>
+        <th style="padding: 10px; text-align: left;">Actions</th>
+    </tr>
     {% for patient in patients %}
-        <li>{{ patient.user.username }} - {{ patient.contact_number }}</li>
+    <tr>
+        <td style="padding: 10px;">{{ patient.user.full_name }}</td>
+        <td style="padding: 10px;">{{ patient.patient_code }}</td>
+        <td style="padding: 10px;">
+            <a href="{% url 'patient_detail' patient.patient_code %}" 
+               style="background-color: #4CAF50; color: white; padding: 5px 10px; border-radius: 3px; text-decoration: none;">
+                View Details
+            </a>
+        </td>
+    </tr>
     {% endfor %}
-</ul>
+</table>
 {% endblock %}

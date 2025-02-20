@@ -1,3 +1,4 @@
+import os
 """
 Django settings for hospital_management project.
 
@@ -41,6 +42,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -122,3 +124,45 @@ STATIC_URL = "static/"
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {message}',
+            'style': '{',
+        },
+        'simple': {
+            'format': '{levelname} {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'file': {
+            'level': 'WARNING',
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(BASE_DIR, 'logs/django.log'),
+            'formatter': 'verbose',
+        },
+        'console': {
+            'level': 'INFO',
+            'class': 'logging.StreamHandler',
+            'formatter': 'simple',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['file', 'console'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+        'django.request': {
+            'handlers': ['file'],
+            'level': 'ERROR',
+            'propagate': False,
+        },
+    },
+}
