@@ -1181,3 +1181,6 @@ Traceback (most recent call last):
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 django.db.utils.OperationalError: no such column: hms_appointment.created_at
 ERROR 2025-02-20 22:50:46,614 basehttp "GET /appointments/ HTTP/1.1" 500 202237
+WARNING 2025-02-21 13:22:17,848 basehttp "GET /favicon.ico HTTP/1.1" 404 5407
+WARNING 2025-02-21 13:22:47,514 basehttp "GET /Admin/AdminHome HTTP/1.1" 404 5419
+WARNING 2025-02-21 13:22:56,417 basehttp "GET /Admin/AdminHome HTTP/1.1" 404 5419
