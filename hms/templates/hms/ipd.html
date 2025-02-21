@@ -1,10 +1,43 @@
 {% extends 'hms/base.html' %}
 
 {% block content %}
-<h2 class="text-2xl font-bold">IPD Patients</h2>
-<ul>
-    {% for ipd in ipds %}
-        <li>{{ ipd.patient.user.username }} - Room: {{ ipd.room_number }} - Admitted on {{ ipd.admitted_on }}</li>
-    {% endfor %}
-</ul>
+<div class="container mx-auto p-6">
+    <h2 class="text-2xl font-bold mb-4">IPD Patients</h2>
+
+    {% if ipds %}
+    <div class="overflow-x-auto">
+        <table class="min-w-full bg-white border border-gray-300 shadow-lg rounded-lg">
+            <thead class="bg-gray-100">
+                <tr class="border-b">
+                    <th class="px-4 py-2 text-left">Patient Name</th>
+                    <th class="px-4 py-2 text-left">Room Number</th>
+                    <th class="px-4 py-2 text-left">Admitted On</th>
+                    <th class="px-4 py-2 text-left">Reason for Admission</th>
+                    <th class="px-4 py-2 text-left">Action</th>
+                    
+                </tr>
+            </thead>
+            <tbody>
+                {% for ipd in ipds %}
+                <tr class="border-b hover:bg-gray-50">
+                    <td class="px-4 py-2">{{ ipd.patient.user.full_name }}</td>
+                    <td class="px-4 py-2">{{ ipd.room }}</td>
+                    <td class="px-4 py-2">{{ ipd.admitted_on|date:"d M Y, H:i" }}</td>
+                    <td class="px-4 py-2">{{ ipd.reason_for_admission }}</td>
+                    <td class="px-4 py-2">
+                        <a href="{% url 'discharge_patient' ipd.id %}" 
+                           class="bg-red-500 text-white px-3 py-1 rounded-lg shadow-md hover:bg-red-700 transition duration-300">
+                            🚑 Discharge
+                        </a>
+                    </td>
+                    
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <p class="text-gray-600 mt-4">No patients currently admitted in IPD.</p>
+    {% endif %}
+</div>
 {% endblock %}

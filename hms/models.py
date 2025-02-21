@@ -1,5 +1,6 @@
 import uuid
 import logging
+from django.utils import timezone
 from django.db import models
 from django.core.exceptions import ValidationError
 from django.utils.timezone import now
@@ -116,24 +117,70 @@ class Appointment(models.Model):
         return f"{self.patient.user.full_name} - {self.doctor.user.full_name} ({self.get_status_display()})"
 
 # Emergency Ward Model
-class Emergency(models.Model):
-    created_at = models.DateTimeField(default=now)
-    patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
-    admitted_at = models.DateTimeField(auto_now_add=True)
-    condition = models.TextField()
+class EmergencyCase(models.Model):
+    EMERGENCY_TYPES = [
+        ('accident', 'Accident'),
+        ('cardiac', 'Cardiac Arrest'),
+        ('stroke', 'Stroke'),
+        ('respiratory', 'Respiratory Emergency'),
+        ('other', 'Other'),
+    ]
+
+    patient = models.OneToOneField(Patient, on_delete=models.CASCADE)
+    referred_by = models.CharField(max_length=255, null=True, blank=True)
+    referrer_contact = models.CharField(max_length=15, null=True, blank=True)
+    emergency_type = models.CharField(max_length=20, choices=EMERGENCY_TYPES)
+    case_description = models.TextField()
+    admitted_on = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"Emergency case for {self.patient.user.username}"
+        return f"Emergency Case - {self.patient.user.full_name}"
+
+
+
+#Room Model
+class Room(models.Model):
+    ROOM_TYPES = [
+        ('general', 'General Ward'),
+        ('semi-private', 'Semi-Private'),
+        ('private', 'Private'),
+        ('icu', 'ICU'),
+    ]
+    
+    room_number = models.CharField(max_length=10, unique=True)
+    room_type = models.CharField(max_length=20, choices=ROOM_TYPES)
+    is_available = models.BooleanField(default=True)
+
+    def __str__(self):
+        return f"Room {self.room_number} - {self.get_room_type_display()}"
+    
+
+
 
 # IPD Model
 class IPD(models.Model):
     patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
-    room_number = models.CharField(max_length=10)
+    room = models.ForeignKey(Room, on_delete=models.CASCADE, limit_choices_to={'is_available': True},null=True, blank=True)
     admitted_on = models.DateTimeField(auto_now_add=True)
     discharge_date = models.DateTimeField(null=True, blank=True)
+    reason_for_admission = models.TextField(null=True, blank=True)
+
+    def save(self, *args, **kwargs):
+        """ Mark room as unavailable when a patient is admitted """
+        if self.room:
+            self.room.is_available = False
+            self.room.save()
+        super().save(*args, **kwargs)
+
+    def discharge(self):
+        """ Discharge patient and mark room as available again """
+        self.discharge_date = timezone.now()
+        self.room.is_available = True
+        self.room.save()
+        self.save()
 
     def __str__(self):
-        return f"IPD - {self.patient.user.username} - Room {self.room_number}"
+        return f"IPD - {self.patient.user.full_name} - {self.room.room_number}"
 
 # OPD Model
 class OPD(models.Model):
@@ -147,11 +194,50 @@ class OPD(models.Model):
         return f"OPD Visit - {self.patient.user.username}"
 
 # Billing Model
+class Expense(models.Model):
+    CATEGORY_CHOICES = [
+        ('medicine', 'Medicine'),
+        ('injection', 'Injection'),
+        ('resource', 'Resource'),
+        ('doctor_fee', 'Doctor Fee'),
+        ('surgery', 'Surgery'),
+        ('checkup', 'Checkup'),
+        ('other', 'Other'),
+    ]
+
+    patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
+    category = models.CharField(max_length=20, choices=CATEGORY_CHOICES,null=True)
+    description = models.TextField(null=True)  # Description of the expense
+    cost = models.DecimalField(max_digits=10, decimal_places=2)
+
+    def __str__(self):
+        return f"{self.patient.patient_code} - {self.category} - ₹{self.cost}"
+
 class Billing(models.Model):
     patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
-    total_amount = models.DecimalField(max_digits=10, decimal_places=2)
+    total_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    paid_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     status = models.CharField(max_length=20, choices=[('paid', 'Paid'), ('pending', 'Pending')], default='pending')
     generated_on = models.DateTimeField(auto_now_add=True)
 
+    def update_total(self):
+        """Automatically update total amount based on expenses."""
+        self.total_amount = Expense.objects.filter(patient=self.patient).aggregate(models.Sum('cost'))['cost__sum'] or 0
+        self.save()
+
     def __str__(self):
-        return f"Billing for {self.patient.user.username} - {self.total_amount}"
+        return f"Billing for {self.patient.patient_code} - ₹{self.total_amount} (Paid: ₹{self.paid_amount})"
+
+
+
+
+
+
+class Employee(models.Model):
+    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
+    role = models.CharField(max_length=100)  # Example: Nurse, Receptionist, Admin
+    contact_number = models.CharField(max_length=15)
+    hired_date = models.DateField(default=now)
+
+    def __str__(self):
+        return f"{self.user.full_name} - {self.role}"

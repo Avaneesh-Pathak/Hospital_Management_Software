@@ -1,0 +1,33 @@
+{% extends 'hms/base.html' %}
+
+{% block content %}
+<div class="max-w-lg mx-auto bg-white p-6 rounded-lg shadow-md">
+    <h2 class="text-2xl font-bold mb-4 text-red-600">🚑 Add Emergency Patient</h2>
+
+    {% if messages %}
+        {% for message in messages %}
+            <p class="text-green-600">{{ message }}</p>
+        {% endfor %}
+    {% endif %}
+
+    <form method="POST">
+        {% csrf_token %}
+        
+        <div class="space-y-4">
+            {% for field in form %}
+                <div>
+                    <label class="block font-semibold">{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.errors %}
+                        <p class="text-red-500 text-sm">{{ field.errors.0 }}</p>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+
+        <button type="submit" class="w-full bg-red-500 text-white py-3 rounded-lg hover:bg-red-700 transition duration-300 mt-4">
+            🚨 Register Emergency Case
+        </button>
+    </form>
+</div>
+{% endblock %}
