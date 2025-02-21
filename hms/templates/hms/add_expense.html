@@ -1,0 +1,26 @@
+{% extends 'hms/base.html' %}
+{% block content %}
+<h2 class="text-2xl font-bold">Add Expense</h2>
+
+<form method="post" class="p-4 bg-white shadow-md rounded-lg">
+    {% csrf_token %}
+    <label class="block text-sm font-semibold">Patient Code:</label>
+    {{ form.patient }}
+
+    <label class="block text-sm font-semibold">Expense Type:</label>
+    {{ form.category }}
+
+    <label class="block text-sm font-semibold">Description:</label>
+    {{ form.description }}
+
+    <label class="block text-sm font-semibold">Cost (₹):</label>
+    {{ form.cost }}
+
+    <button type="submit" class="mt-4 px-4 py-2 bg-blue-600 text-white rounded">Add Expense</button>
+</form>
+
+<a href="{% url 'billing' %}" class="mt-4 inline-block px-4 py-2 bg-gray-500 text-white rounded">
+    Back to Billing
+</a>
+
+{% endblock %}

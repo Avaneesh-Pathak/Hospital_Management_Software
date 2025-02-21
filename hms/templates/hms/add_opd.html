@@ -1,0 +1,41 @@
+{% extends 'hms/base.html' %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto bg-white p-6 rounded-lg shadow-md">
+    <h2 class="text-2xl font-bold text-center mb-4">Add OPD Visit</h2>
+
+    <form method="post">
+        {% csrf_token %}
+
+        <!-- Patient Selection -->
+        <label for="patient" class="block font-semibold mt-2">Select Patient:</label>
+        <select name="patient" id="patient" required class="w-full p-2 border rounded">
+            {% for patient in patients %}
+            <option value="{{ patient.id }}">{{ patient.user.full_name }} ({{ patient.patient_code }})</option>
+            {% endfor %}
+        </select>
+
+        <!-- Doctor Selection -->
+        <label for="doctor" class="block font-semibold mt-2">Select Doctor:</label>
+        <select name="doctor" id="doctor" required class="w-full p-2 border rounded">
+            {% for doctor in doctors %}
+            <option value="{{ doctor.id }}">{{ doctor.user.full_name }} - {{ doctor.specialization}}</option>
+            {% endfor %}
+        </select>
+
+        <!-- Diagnosis -->
+        <label for="diagnosis" class="block font-semibold mt-2">Diagnosis:</label>
+        <textarea name="diagnosis" id="diagnosis" required class="w-full p-2 border rounded"></textarea>
+
+        <!-- Submit Button -->
+        <button type="submit" class="w-full bg-blue-500 text-white py-2 px-4 rounded mt-4 hover:bg-blue-700">
+            Add OPD Visit
+        </button>
+    </form>
+
+    <!-- Back to OPD List -->
+    <a href="{% url 'opd' %}" class="block text-center bg-gray-500 text-white py-2 px-4 rounded mt-2 hover:bg-gray-700">
+        Back to OPD List
+    </a>
+</div>
+{% endblock %}

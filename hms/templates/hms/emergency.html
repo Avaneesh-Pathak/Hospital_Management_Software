@@ -1,10 +1,26 @@
-{% extends 'hms/base.html' %}
+{% extends "hms/base.html" %}
 
 {% block content %}
 <h2 class="text-2xl font-bold">Emergency Cases</h2>
-<ul>
+
+<table class="w-full border-collapse border border-gray-300">
+    <tr class="bg-gray-100">
+        <th class="border p-2">Patient</th>
+        <th class="border p-2">Referred By</th>
+        <th class="border p-2">Emergency Type</th>
+        <th class="border p-2">Action</th>
+    </tr>
     {% for case in emergencies %}
-        <li>{{ case.patient.user.username }} - {{ case.condition }} - Admitted on {{ case.admitted_at }}</li>
+    <tr>
+        <td class="border p-2">{{ case.patient.user.full_name }}</td>
+        <td class="border p-2">{{ case.referred_by|default:"Self" }}</td>
+        <td class="border p-2">{{ case.get_emergency_type_display }}</td>
+        <td class="border p-2">
+            <a href="{% url 'admit_emergency_patient' case.id %}" 
+               class="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-700">Admit to IPD</a>
+        </td>
+    </tr>
     {% endfor %}
-</ul>
+</table>
+
 {% endblock %}

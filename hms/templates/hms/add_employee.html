@@ -1,0 +1,17 @@
+{% extends 'hms/base.html' %}
+
+{% block content %}
+<div class="container mx-auto p-6">
+    <h2 class="text-2xl font-bold mb-4">➕ Add New Employee</h2>
+    
+    <form method="POST">
+        {% csrf_token %}
+        <div class="space-y-4">
+            {{ form.as_p }}
+            <button type="submit" class="bg-blue-500 text-white py-2 px-4 rounded">Save Employee</button>
+        </div>
+    </form>
+
+    <a href="{% url 'employee_list' %}" class="text-blue-500 mt-4 block">👀 View Employee List</a>
+</div>
+{% endblock %}
