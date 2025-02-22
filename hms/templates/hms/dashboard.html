@@ -1,49 +1,127 @@
 {% extends 'hms/base.html' %}
 {% load static %}
-
 {% block content %}
-<div class="grid grid-cols-3 gap-4 p-6">
-    <div class="bg-white shadow-lg p-4 rounded-lg">
-        <h2 class="text-xl font-bold">Total Patients</h2>
-        <p class="text-3xl">{{ total_patients }}</p>
+{% if messages %}
+        {% for message in messages %}
+            <p style="color: red;">{{ message }}</p>
+        {% endfor %}
+    {% endif %}
+<div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; padding: 20px;">
+    <div style="background: #2c3e50; color: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); text-align: center;">
+        <h2 style="font-size: 18px; font-weight: bold;">Total Patients</h2>
+        <p style="font-size: 32px; font-weight: bold;">{{ total_patients }}</p>
     </div>
-    <div class="bg-white shadow-lg p-4 rounded-lg">
-        <h2 class="text-xl font-bold">Total Doctors</h2>
-        <p class="text-3xl">{{ total_doctors }}</p>
+    <div style="background: #34495e; color: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); text-align: center;">
+        <h2 style="font-size: 18px; font-weight: bold;">Total Doctors</h2>
+        <p style="font-size: 32px; font-weight: bold;">{{ total_doctors }}</p>
     </div>
-    <div class="bg-white shadow-lg p-4 rounded-lg">
-        <h2 class="text-xl font-bold">Total Appointments</h2>
-        <p class="text-3xl">{{ total_appointments }}</p>
+    <div style="background: #1abc9c; color: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); text-align: center;">
+        <h2 style="font-size: 18px; font-weight: bold;">Total Appointments</h2>
+        <p style="font-size: 32px; font-weight: bold;">{{ total_appointments }}</p>
     </div>
-    <div class="bg-white shadow-lg p-4 rounded-lg">
-        <h2 class="text-xl font-bold">Total Revenue</h2>
-        <p class="text-3xl">₹{{ total_revenue }}</p>
+    <div style="background: #16a085; color: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); text-align: center;">
+        <h2 style="font-size: 18px; font-weight: bold;">Total Revenue</h2>
+        <p style="font-size: 32px; font-weight: bold;">₹{{ total_revenue }}</p>
     </div>
-    <div class="bg-white shadow-lg p-4 rounded-lg">
-        <h2 class="text-xl font-bold">Emergency Cases Today</h2>
-        <p class="text-3xl">{{ emergency_cases_today }}</p>
+    <div style="background: #2980b9; color: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); text-align: center;">
+        <h2 style="font-size: 18px; font-weight: bold;">Emergency Cases Today</h2>
+        <p style="font-size: 32px; font-weight: bold;">{{ emergency_cases_today }}</p>
     </div>
 </div>
 
-<div class="p-6">
-    <h2 class="text-2xl font-bold mb-4">Upcoming Appointments</h2>
-    <table class="w-full bg-white shadow-md rounded-lg">
-        <tr class="bg-blue-500 text-white">
-            <th class="p-2">Patient</th>
-            <th class="p-2">Doctor</th>
-            <th class="p-2">Date and Time</th>
+<div style="padding: 20px;">
+    <h2 style="font-size: 24px; font-weight: bold; margin-bottom: 20px;">Upcoming Appointments</h2>
+    <table style="width: 100%; background: white; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border-radius: 10px; overflow: hidden; border-collapse: collapse;">
+        <tr style="background: #2c3e50; color: white; text-align: center;">
+            <th style="padding: 12px;">Patient</th>
+            <th style="padding: 12px;">Doctor</th>
+            <th style="padding: 12px;">Date and Time</th>
         </tr>
         {% for appointment in upcoming_appointments %}
-        <tr class="border-b text-center">
-            <td class="p-2">{{ appointment.patient.user.full_name }}</td>
-            <td class="p-2">{{ appointment.doctor.user.full_name }}</td>
-            <td class="p-2">{{ appointment.date }}</td>
+        <tr style="border-bottom: 1px solid #ddd; text-align: center;">
+            <td style="padding: 12px;">{{ appointment.patient.user.full_name }}</td>
+            <td style="padding: 12px;">{{ appointment.doctor.user.full_name }}</td>
+            <td style="padding: 12px;">{{ appointment.date }}</td>
         </tr>
         {% empty %}
         <tr>
-            <td colspan="4" class="p-4 text-center">No upcoming appointments</td>
+            <td colspan="3" style="padding: 20px; text-align: center;">No upcoming appointments</td>
         </tr>
         {% endfor %}
     </table>
 </div>
+
+<div style="padding: 20px;">
+    <h2 style="font-size: 24px; font-weight: bold; margin-bottom: 20px;">Daily Patient Trends</h2>
+    <div style="background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+        <canvas id="patientChart" style="width: 100%; max-width: 700px;"></canvas>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var ctx = document.getElementById('patientChart').getContext('2d');
+        var patientChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: {{ daily_patient_labels|safe }},
+                datasets: [{
+                    label: 'Daily New Patients',
+                    data: {{ daily_patient_data|safe }},
+                    backgroundColor: 'rgba(52, 152, 219, 0.2)',
+                    borderColor: 'rgba(52, 152, 219, 1)',
+                    borderWidth: 3,
+                    pointBackgroundColor: 'rgba(41, 128, 185, 1)',
+                    pointBorderColor: 'white',
+                    pointRadius: 5,
+                    tension: 0.4,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top',
+                        labels: {
+                            color: '#333',
+                            font: {
+                                size: 14,
+                                weight: 'bold'
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: {
+                            display: false
+                        },
+                        ticks: {
+                            color: '#2c3e50',
+                            font: {
+                                size: 12
+                            }
+                        }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: 'rgba(200, 200, 200, 0.2)'
+                        },
+                        ticks: {
+                            color: '#2c3e50',
+                            font: {
+                                size: 12
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    });
+</script>
 {% endblock %}

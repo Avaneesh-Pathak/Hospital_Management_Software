@@ -1,0 +1,89 @@
+{% extends "hms/base.html" %}
+{% block content %}
+<div class="container mx-auto p-6 bg-white shadow-md rounded-lg">
+    <h2 class="text-2xl font-bold mb-4">Patient Profile</h2>
+
+    <div class="grid grid-cols-2 gap-6">
+        <!-- Patient Info -->
+        <div class="bg-gray-100 p-4 rounded-md">
+            <h3 class="text-xl font-semibold">Personal Information</h3>
+            <p><strong>Full Name:</strong> {{ patient.user.full_name }}</p>
+            <p><strong>Patient Code:</strong> {{ patient.patient_code }}</p>
+            <p><strong>Date of Birth:</strong> {{ patient.date_of_birth }}</p>
+            <p><strong>Contact:</strong> {{ patient.contact_number }}</p>
+            <p><strong>Address:</strong> {{ patient.address }}</p>
+            <p><strong>Blood Group:</strong> {{ patient.blood_group }}</p>
+            <p><strong>Aadhar Number:</strong> {{ patient.aadhar_number }}</p>
+        </div>
+
+        <!-- Guarantor Info -->
+        <div class="bg-gray-100 p-4 rounded-md">
+            <h3 class="text-xl font-semibold">Guarantor Details</h3>
+            <p><strong>Name:</strong> {{ patient.guarantor_name }}</p>
+            <p><strong>Address:</strong> {{ patient.guarantor_address }}</p>
+            <p><strong>Mobile:</strong> {{ patient.guarantor_mobile }}</p>
+            <p><strong>Relationship:</strong> {{ patient.guarantor_relationship }}</p>
+        </div>
+    </div>
+
+    <!-- OPD & IPD Info -->
+    <div class="mt-6">
+        <h3 class="text-xl font-semibold mb-2">Medical Records</h3>
+
+        <!-- OPD Records -->
+        <div class="bg-blue-100 p-4 rounded-md mb-4">
+            <h4 class="text-lg font-semibold">OPD Visits</h4>
+            {% if opd_records %}
+                <ul>
+                    {% for opd in opd_records %}
+                        <li>📅 <strong>Date:</strong> {{ opd.visit_date }} | 🩺 <strong>Doctor:</strong> {{ opd.doctor.user.full_name }} | 🏥 <strong>Diagnosis:</strong> {{ opd.diagnosis }}</li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>No OPD visits recorded.</p>
+            {% endif %}
+        </div>
+
+        <!-- IPD Record -->
+        <div class="bg-red-100 p-4 rounded-md">
+            <h4 class="text-lg font-semibold">IPD Admission</h4>
+            {% if ipd_record %}
+                <p>🏥 <strong>Room:</strong> {{ ipd_record.room.room_number }} ({{ ipd_record.room.get_room_type_display }})</p>
+                <p>📅 <strong>Admitted On:</strong> {{ ipd_record.admitted_on }}</p>
+                <p>📝 <strong>Reason:</strong> {{ ipd_record.reason_for_admission }}</p>
+
+                <!-- Discharge Button -->
+                <a href="{% url 'discharge_patient' patient.patient_code %}" class="bg-red-500 text-white px-4 py-2 rounded-md mt-2 inline-block">Discharge Patient</a>
+            {% else %}
+                <p>Not admitted in IPD.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Expenses -->
+    <div class="mt-6 bg-yellow-100 p-4 rounded-md">
+        <h3 class="text-xl font-semibold">Hospital Resources Used</h3>
+        {% if expenses %}
+            <ul>
+                {% for expense in expenses %}
+                    <li>🛠 <strong>Category:</strong> {{ expense.get_category_display }} | 💰 <strong>Cost:</strong> ₹{{ expense.cost }}</li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>No expenses recorded.</p>
+        {% endif %}
+    </div>
+
+    <!-- Billing Details -->
+    <div class="mt-6 bg-green-100 p-4 rounded-md">
+        <h3 class="text-xl font-semibold">Billing Information</h3>
+        {% if billing %}
+            <p>💵 <strong>Total Bill:</strong> ₹{{ billing.total_amount }}</p>
+            <p>✅ <strong>Paid Amount:</strong> ₹{{ billing.paid_amount }}</p>
+            <p>📜 <strong>Status:</strong> <span class="font-bold {% if billing.status == 'paid' %}text-green-600{% else %}text-red-600{% endif %}">{{ billing.status }}</span></p>
+        {% else %}
+            <p>No billing record found.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

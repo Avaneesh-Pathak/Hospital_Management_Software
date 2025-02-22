@@ -1,0 +1,14 @@
+{% extends 'hms/base.html' %}
+{% block content %}
+{% if messages %}
+        {% for message in messages %}
+            <p style="color: red;">{{ message }}</p>
+        {% endfor %}
+    {% endif %}
+  <h2>Book an Appointment</h2>
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-primary">Book Appointment</button>
+  </form>
+{% endblock %}

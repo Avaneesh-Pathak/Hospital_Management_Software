@@ -1,8 +1,12 @@
 {% extends 'hms/base.html' %}
 
 {% block content %}
+    {% if messages %}
+    {% for message in messages %}
+        <p style="color: red;">{{ message }}</p>
+    {% endfor %}
+    {% endif %}
     <h2 style="font-size: 24px; font-weight: bold; margin-bottom: 20px;">Appointments</h2>
-
     {% if appointments %}
         <form method="post" action="{% url 'update_appointment_status' %}">
             {% csrf_token %}

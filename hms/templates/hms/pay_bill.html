@@ -2,7 +2,11 @@
 {% block content %}
 
 <h2 class="text-2xl font-bold">Make a Payment</h2>
-
+{% if messages %}
+        {% for message in messages %}
+            <p style="color: red;">{{ message }}</p>
+        {% endfor %}
+    {% endif %}
 <form method="post" class="p-4 bg-white shadow-md rounded-lg">
     {% csrf_token %}
     <label class="block text-sm font-semibold">Total Bill: ₹{{ billing.total_amount }}</label>

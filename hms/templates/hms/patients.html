@@ -3,6 +3,12 @@
 {% block content %}
 <h2 style="font-size: 24px; font-weight: bold; margin-bottom: 15px;">Patients List</h2>
 
+{% if messages %}
+    {% for message in messages %}
+        <p style="color: red;">{{ message }}</p>
+    {% endfor %}
+{% endif %}
+
 <a href="{% url 'register_patient' %}" 
    style="background-color: #1D4ED8; color: white; padding: 10px 15px; border-radius: 5px; text-decoration: none; display: inline-block; margin-bottom: 20px;">
     Add New Patient
@@ -10,19 +16,24 @@
 
 <table style="width: 100%; border-collapse: collapse; border: 1px solid #ddd; margin-top: 20px;">
     <tr style="background-color: #f2f2f2;">
-        <th style="padding: 10px; text-align: left;">Full Name</th>
-        <th style="padding: 10px; text-align: left;">Patient Code</th>
-        <th style="padding: 10px; text-align: left;">Actions</th>
+        <th style="padding: 10px; text-align: center;">Full Name</th>
+        <th style="padding: 10px; text-align: center;">Patient Code</th>
+        <th style="padding: 10px; text-align: center;">Actions</th>
+        
     </tr>
     {% for patient in patients %}
     <tr>
-        <td style="padding: 10px;">{{ patient.user.full_name }}</td>
-        <td style="padding: 10px;">{{ patient.patient_code }}</td>
-        <td style="padding: 10px;">
-            <a href="{% url 'patient_detail' patient.patient_code %}" 
-               style="background-color: #4CAF50; color: white; padding: 5px 10px; border-radius: 3px; text-decoration: none;">
-                View Details
-            </a>
+        <td style="padding: 10px; text-align: center;">{{ patient.user.full_name }}</td>
+        <td style="padding: 10px; text-align: center;">{{ patient.patient_code }}</td>
+        <td style="padding: 10px; text-align: center;">
+            
+            
+            {% if patient.patient_code %}
+                <a href="{% url 'patient_profile' patient.patient_code %}" 
+                   style="background-color: #3498db; color: white; padding: 5px 10px; border-radius: 3px; text-decoration: none; margin-left: 10px;">
+                   👤 View Details
+                </a>
+            {% endif %}
         </td>
     </tr>
     {% endfor %}

@@ -3,7 +3,11 @@
 {% block content %}
 <div class="container mx-auto p-6">
     <h2 class="text-2xl font-bold mb-4">➕ Add New Employee</h2>
-    
+    {% if messages %}
+        {% for message in messages %}
+            <p style="color: red;">{{ message }}</p>
+        {% endfor %}
+    {% endif %}
     <form method="POST">
         {% csrf_token %}
         <div class="space-y-4">

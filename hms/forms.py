@@ -1,6 +1,12 @@
 from django import forms
 from .models import CustomUser, Patient,Billing,Expense,OPD,Room, Doctor, Employee,EmergencyCase
 
+class ProfileUpdateForm(forms.ModelForm):
+    class Meta:
+        model = CustomUser
+        fields = ["full_name", "email", "contact_number", "address"]
+
+        
 class PatientRegistrationForm(forms.ModelForm):
     class Meta:
         model = CustomUser

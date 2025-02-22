@@ -2,7 +2,11 @@
 
 {% block content %}
 <h2 class="text-2xl font-bold">Emergency Cases</h2>
-
+{% if messages %}
+{% for message in messages %}
+    <p style="color: red;">{{ message }}</p>
+{% endfor %}
+{% endif %}
 <table class="w-full border-collapse border border-gray-300">
     <tr class="bg-gray-100">
         <th class="border p-2">Patient</th>

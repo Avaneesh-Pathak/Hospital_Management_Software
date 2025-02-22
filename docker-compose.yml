@@ -1,0 +1,10 @@
+version: '3.8'
+
+services:
+  web:
+    build: .
+    command: gunicorn --workers=3 --bind 0.0.0.0:8000 hospital_management.wsgi:application
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"

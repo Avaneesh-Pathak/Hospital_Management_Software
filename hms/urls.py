@@ -1,9 +1,13 @@
 from django.urls import path
 from . import views
-from .views import add_emergency_case,admit_emergency_patient, patient_detail,doctor_detail,generate_bill,add_expense,generate_bill_pdf,add_opd,update_opd,admit_patient,add_doctor,add_employee,add_room,employee_list,edit_employee,delete_employee,discharge_patient
+from .views import signup, user_login, profile_view,patient_profile,user_logout,add_emergency_case,admit_emergency_patient, patient_detail,doctor_detail,generate_bill,add_expense,generate_bill_pdf,add_opd,update_opd,admit_patient,add_doctor,add_employee,add_room,employee_list,edit_employee,delete_employee,discharge_patient
 
 urlpatterns = [
     path('', views.dashboard, name='dashboard'),
+    path('signup/', signup, name='signup'),
+    path('login/', user_login, name='login'),
+    path('logout/', user_logout, name='logout'),
+    path("profile/", profile_view, name="profile"),
     path('patients/', views.patients, name='patients'),
     path('doctors/', views.doctors, name='doctors'),
     path('appointments/', views.appointments, name='appointments'),
@@ -21,7 +25,9 @@ urlpatterns = [
     path('opd/add/', add_opd, name='add_opd'),
     path('opd/update/<int:opd_id>/', update_opd, name='update_opd'),
     path('opd/admit/<int:opd_id>/', admit_patient, name='admit_patient'),
-    path('ipd/discharge/<int:ipd_id>/', discharge_patient, name='discharge_patient'),
+    
+    path('patient/<str:patient_code>/', patient_profile, name='patient_profile'),
+    path('patient/<str:patient_code>/discharge/', discharge_patient, name='discharge_patient'),
     path('register/', views.register_patient, name='register_patient'),
     path('patients/<str:patient_code>/', patient_detail, name='patient_detail'),
     path('doctors/<int:doctor_id>/', doctor_detail, name='doctor_detail'),

@@ -2,7 +2,11 @@
 
 {% block content %}
 <h2 style="font-size: 24px; font-weight: bold; margin-bottom: 15px;">Patient Information</h2>
-
+{% if messages %}
+        {% for message in messages %}
+            <p style="color: red;">{{ message }}</p>
+        {% endfor %}
+    {% endif %}
 <a href="{% url 'patients' %}" 
    style="background-color: #1D4ED8; color: white; padding: 10px 15px; border-radius: 5px; text-decoration: none; display: inline-block; margin-bottom: 20px;">
     Back to Patients List
