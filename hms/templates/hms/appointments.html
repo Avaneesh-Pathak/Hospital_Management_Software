@@ -7,6 +7,9 @@
     {% endfor %}
     {% endif %}
     <h2 style="font-size: 24px; font-weight: bold; margin-bottom: 20px;">Appointments</h2>
+    
+
+    
     {% if appointments %}
         <form method="post" action="{% url 'update_appointment_status' %}">
             {% csrf_token %}
@@ -16,6 +19,7 @@
                         <th style="padding: 10px; border: 1px solid #ddd;">Patient Name</th>
                         <th style="padding: 10px; border: 1px solid #ddd;">Doctor</th>
                         <th style="padding: 10px; border: 1px solid #ddd;">Date</th>
+                        <th style="padding: 10px; border: 1px solid #ddd;">TIme</th>
                         <th style="padding: 10px; border: 1px solid #ddd;">Status</th>
                         <th style="padding: 10px; border: 1px solid #ddd;">Action</th>
                     </tr>
@@ -26,6 +30,7 @@
                             <td style="padding: 10px;">{{ appointment.patient.user.full_name }}</td>
                             <td style="padding: 10px;">Dr. {{ appointment.doctor.user.full_name }}</td>
                             <td style="padding: 10px;">{{ appointment.date }}</td>
+                            <td style="padding: 10px;">{{ appointment.time }}</td>
                             <td style="padding: 10px;">
                                 <select name="status_{{ appointment.id }}" style="padding: 5px; border: 1px solid #ccc;">
                                     <option value="Pending" {% if appointment.status == "Pending" %}selected{% endif %}>Pending</option>

@@ -72,7 +72,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "hospital_management.wsgi.application"
 
-
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
@@ -125,6 +124,7 @@ STATIC_URL = "static/"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
+AUTH_USER_MODEL = 'hms.CustomUser'
 
 
 LOGGING = {

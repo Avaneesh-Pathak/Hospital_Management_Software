@@ -3,11 +3,12 @@ import logging
 from decimal import Decimal
 from django.db import models
 from django.utils import timezone
-from django.db.models import Count
 from django.http import HttpResponse
 from reportlab.pdfgen import canvas
 from django.contrib import messages
 from django.utils.timezone import now
+from django.db.models import Count,Sum
+from datetime import datetime ,timedelta
 from django.contrib.auth.models import User
 from django.db.models.functions import TruncDate
 from django.contrib.auth.decorators import login_required
@@ -86,16 +87,13 @@ def dashboard(request):
     total_patients = Patient.objects.count()
     total_doctors = Doctor.objects.count()
     total_appointments = Appointment.objects.count()
-
-    total_revenue = Billing.objects.aggregate(total=models.Sum('total_amount'))['total'] or 0
-
-    today = datetime.date.today()
+    total_revenue = Billing.objects.aggregate(total=Sum('total_amount'))['total'] or 0
+    today = datetime.today()
     emergency_cases_today = EmergencyCase.objects.filter(admitted_on__date=today).count()
-
     upcoming_appointments = Appointment.objects.filter(date__gte=now()).order_by('date')
 
-    # Get the patient registration trend for the last 7 days
-    last_week = today - datetime.timedelta(days=6)
+    # Get patient registration trend for the last 7 days
+    last_week = today - timedelta(days=6)
     patient_trend = (
         Patient.objects.filter(created_at__date__gte=last_week)
         .annotate(date=TruncDate('created_at'))
@@ -108,6 +106,23 @@ def dashboard(request):
     daily_patient_labels = [entry['date'].strftime('%Y-%m-%d') for entry in patient_trend]
     daily_patient_data = [entry['count'] for entry in patient_trend]
 
+    # 🚀 Room Statistics
+    total_rooms = Room.objects.count()
+    available_rooms_count = Room.objects.filter(is_available=True).count()  # ✅ Fixed
+    booked_rooms = total_rooms - available_rooms_count  # ✅ Fixed
+
+    # Count rooms by type and available rooms by type
+    room_type_data = {}
+    room_type_counts = Room.objects.values('room_type').annotate(total=Count('id'))
+    available_rooms = Room.objects.filter(is_available=True).values('room_type').annotate(available=Count('id'))
+
+    for room in room_type_counts:
+        room_type_data[room['room_type']] = {'total': room['total'], 'available': 0}
+
+    for room in available_rooms:
+        if room['room_type'] in room_type_data:
+            room_type_data[room['room_type']]['available'] = room['available']
+
     context = {
         'total_patients': total_patients,
         'total_doctors': total_doctors,
@@ -117,6 +132,10 @@ def dashboard(request):
         'upcoming_appointments': upcoming_appointments,
         'daily_patient_labels': daily_patient_labels,
         'daily_patient_data': daily_patient_data,
+        'total_rooms': total_rooms,
+        'available_rooms_count': available_rooms_count,  # ✅ Fixed
+        'booked_rooms': booked_rooms,  # ✅ Fixed
+        'room_type_data': room_type_data,  # Dictionary of room counts & available rooms by type
     }
 
     return render(request, 'hms/dashboard.html', context)
@@ -226,17 +245,124 @@ def add_doctor(request):
         form = DoctorForm(request.POST)
         if form.is_valid():
             form.save()
-            return redirect('doctor')
+            return redirect('doctors')
     else:
         form = DoctorForm()
     return render(request, 'hms/add_doctor.html', {'form': form})
 
 
+def appointments_update(request):
+    doctors  = Doctor.objects.all()  
+    appointments = Appointment.objects.all()
+    print("Doctors in view:", doctors)  # Debugging line
+    return render(request, 'hms/appointments.html', {'appointments': appointments, 'doctors': doctors })
 
 @login_required
 def appointments(request):
+    doctors  = Doctor.objects.all()  
     appointments = Appointment.objects.all()
-    return render(request, 'hms/appointments.html', {'appointments': appointments})
+    print("Doctors in view:", doctors)  # Debugging line
+    return render(request, 'hms/appointment_list.html', {'appointments': appointments, 'doctors': doctors })
+
+@login_required
+def available_doctors(request):
+    doctors = Doctor.objects.exclude(availability="").order_by("user__full_name")  # Assuming you have an 'is_available' field
+    return render(request, 'hms/available_doctors.html', {'doctors': doctors})
+
+
+# @login_required
+# def book_appointment(request, doctor_id):
+#     doctor = get_object_or_404(Doctor, id=doctor_id)
+#     # Ensure the logged-in user is a CustomUser instance
+#     if not isinstance(request.user, CustomUser):
+#         messages.error(request, "Invalid user type. Please log in as a patient.")
+#         return redirect('appointments')
+#     try:
+#         patient = get_object_or_404(Patient, user=request.user)
+#     except Patient.DoesNotExist:
+#         messages.error(request, "Only registered patients can book an appointment.")
+#         return redirect('appointments')
+
+#     if request.method == "POST":
+#         selected_date = request.POST.get("date")
+
+#         if not selected_date:
+#             messages.error(request, "Please select a valid date.")
+#             return redirect('book_appointment', doctor_id=doctor.id)
+
+#         try:
+#             selected_date = datetime.strptime(selected_date, "%Y-%m-%d").date()
+#         except ValueError:
+#             messages.error(request, "Invalid date format.")
+#             return redirect('book_appointment', doctor_id=doctor.id)
+
+#         if selected_date < now().date():
+#             messages.error(request, "You cannot book an appointment for a past date.")
+#             return redirect('book_appointment', doctor_id=doctor.id)
+
+#         if Appointment.objects.filter(patient=patient, date=selected_date).exists():
+#             messages.error(request, "You already have an appointment booked for this date.")
+#             return redirect('book_appointment', doctor_id=doctor.id)
+
+#         appointment = Appointment(patient=patient, doctor=doctor, date=selected_date)
+#         next_slot = appointment.get_next_available_time()
+
+#         if not next_slot:
+#             messages.error(request, "No available slots for this doctor on the selected date.")
+#             return redirect('book_appointment', doctor_id=doctor.id)
+
+#         appointment.time = next_slot
+#         appointment.status = "confirmed"
+#         appointment.save()
+
+#         messages.success(request, f"Appointment booked for {selected_date} at {next_slot}.")
+#         return redirect('appointments')
+
+#     return render(request, 'hms/book_appointment.html', {'doctor': doctor})
+@login_required
+def book_appointment(request, doctor_id):
+    doctor = get_object_or_404(Doctor, id=doctor_id)
+    patients = Patient.objects.all()  # Fetch all patients for dropdown
+
+    if request.method == "POST":
+        patient_id = request.POST.get("patient")  # Get selected patient from dropdown
+        selected_date = request.POST.get("date")
+        selected_time = request.POST.get("time")
+
+        if not patient_id or not selected_date or not selected_time:
+            messages.error(request, "Please fill in all the required fields.")
+            return redirect('book_appointment', doctor_id=doctor.id)
+
+        try:
+            selected_date = datetime.strptime(selected_date, "%Y-%m-%d").date()
+        except ValueError:
+            messages.error(request, "Invalid date format.")
+            return redirect('book_appointment', doctor_id=doctor.id)
+
+        if selected_date < now().date():
+            messages.error(request, "You cannot book an appointment for a past date.")
+            return redirect('book_appointment', doctor_id=doctor.id)
+
+        patient = Patient.objects.filter(id=patient_id).first()
+        if not patient:
+            messages.error(request, "Selected patient does not exist.")
+            return redirect('book_appointment', doctor_id=doctor.id)
+
+        if Appointment.objects.filter(patient=patient, date=selected_date, time=selected_time).exists():
+            messages.error(request, "You already have an appointment booked for this date and time.")
+            return redirect('book_appointment', doctor_id=doctor.id)
+
+        # Create appointment
+        appointment = Appointment(patient=patient, doctor=doctor, date=selected_date, time=selected_time, status="pending")
+        appointment.save()
+
+        messages.success(request, f"Appointment booked for {selected_date} at {selected_time}.")
+        return redirect('appointment_success', doctor_id=doctor_id)
+
+    return render(request, 'hms/book_appointment.html', {'doctor': doctor, 'patients': patients})
+
+def appointment_success(request, doctor_id):
+    return render(request, 'hms/appointment_success.html', {'doctor_id': doctor_id})
 
 
 @login_required
@@ -247,10 +373,10 @@ def update_appointment_status(request):
 
         appointment = get_object_or_404(Appointment, id=appointment_id)
         appointment.status = new_status
-        appointment.save()
+        appointment.save()  # OPD record will be created automatically if status is 'confirmed'
 
         messages.success(request, f"Appointment status updated to {new_status}.")
-        return redirect("appointments")  # Redirect to appointments list
+        return redirect("appointments")  # Redirect to the appointments list
 
     return redirect("appointments")
 

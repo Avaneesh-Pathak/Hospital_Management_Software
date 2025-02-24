@@ -1,14 +1,149 @@
 {% extends 'hms/base.html' %}
+
 {% block content %}
-{% if messages %}
-        {% for message in messages %}
-            <p style="color: red;">{{ message }}</p>
-        {% endfor %}
-    {% endif %}
-  <h2>Book an Appointment</h2>
-  <form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit" class="btn btn-primary">Book Appointment</button>
-  </form>
+<div class="container mt-5">
+    <div class="card shadow-lg border-0 rounded-4 p-4" style="max-width: 600px; margin: auto; background: #ffffff;">
+        <h2 class="text-center" style="color: #007bff; font-weight: bold;">
+            <i class="fas fa-calendar-plus"></i> Book an Appointment
+        </h2>
+
+        <!-- Doctor Information -->
+        <div class="text-center mb-4">
+            <h4 class="fw-bold" style="color: #333;">Dr. {{ doctor.user.full_name }}</h4>
+            <p class="text-muted" style="font-size: 16px;">
+                <i class="fas fa-stethoscope" style="color: #17a2b8;"></i> {{ doctor.specialization }}
+            </p>
+        </div>
+
+        <!-- Display Messages -->
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <form method="POST" class="needs-validation" novalidate>
+            {% csrf_token %}
+
+            <div class="row g-3">
+                <!-- Patient Selection -->
+                <div class="col-12">
+                    <label for="patient" class="form-label fw-bold" style="color: #28a745;">
+                        <i class="fas fa-user-injured"></i> Select Patient:
+                    </label>
+                    <select name="patient" id="patient" class="form-select form-control-lg rounded-3" required 
+                        style="border: 2px solid #28a745; padding: 10px; font-size: 16px;">
+                        <option value="" disabled selected>🔍 Search or Select a Patient</option>
+                        {% for patient in patients %}
+                            <option value="{{ patient.id }}">
+                                🏥 {{ patient.user.full_name }} ({{ patient.patient_code }})
+                            </option>
+                        {% endfor %}
+                    </select>
+                    <div class="invalid-feedback">Please select a patient.</div>
+                </div>
+
+                <!-- Date Selection -->
+                <div class="col-12">
+                    <label for="date" class="form-label fw-bold" style="color: #dc3545;">
+                        <i class="fas fa-calendar-alt"></i> Select Date:
+                    </label>
+                    <input type="date" id="date" name="date" class="form-control form-control-lg rounded-3" required 
+                        min="{{ today }}" 
+                        style="border: 2px solid #dc3545; padding: 10px; font-size: 16px;">
+                    <div class="invalid-feedback">Please select a valid date.</div>
+                </div>
+
+                <!-- Time Selection -->
+                <div class="col-12">
+                    <label for="time" class="form-label fw-bold" style="color: #ffc107;">
+                        <i class="fas fa-clock"></i> Select Time:
+                    </label>
+                    <select name="time" id="time" class="form-select form-control-lg rounded-3" required 
+                        style="border: 2px solid #ffc107; padding: 10px; font-size: 16px;">
+                        <option value="">-- Choose a time slot --</option>
+                        <option value="09:00">09:00 AM</option>
+                        <option value="10:00">10:00 AM</option>
+                        <option value="11:00">11:00 AM</option>
+                        <option value="12:00">12:00 PM</option>
+                        <option value="14:00">02:00 PM</option>
+                        <option value="15:00">03:00 PM</option>
+                        <option value="16:00">04:00 PM</option>
+                    </select>
+                    <div class="invalid-feedback">Please select an available time slot.</div>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="col-12 text-center mt-4">
+                    <button type="submit" class="btn btn-primary btn-lg px-4 shadow rounded-pill"
+                        style="background-color: #007bff; border: none; padding: 12px 30px; font-size: 18px;">
+                        <i class="fas fa-calendar-check"></i> Confirm Booking
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Bootstrap & FontAwesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+<!-- Include Select2 CSS & JS -->
+<link href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
+
+<!-- Initialize Select2 for Searchable Dropdown -->
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        $("#patient").select2({
+            width: '100%', 
+            placeholder: "🔍 Search or Select a Patient",
+            allowClear: true
+        });
+    });
+</script>
+
+<!-- JavaScript for Form Validation & Time Slot Disabling -->
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const dateInput = document.getElementById("date");
+        const timeSelect = document.getElementById("time");
+
+        dateInput.addEventListener("change", function () {
+            const selectedDate = new Date(dateInput.value);
+            const today = new Date();
+            const currentHour = today.getHours();
+
+            // Enable all options first
+            timeSelect.querySelectorAll("option").forEach(option => {
+                option.disabled = false;
+            });
+
+            // Disable past time slots if today is selected
+            if (selectedDate.toDateString() === today.toDateString()) {
+                timeSelect.querySelectorAll("option").forEach(option => {
+                    const optionHour = parseInt(option.value.split(":")[0]);
+                    if (optionHour <= currentHour) {
+                        option.disabled = true;
+                    }
+                });
+            }
+        });
+
+        // Bootstrap 5 Form Validation
+        const forms = document.querySelectorAll('.needs-validation');
+        Array.from(forms).forEach(form => {
+            form.addEventListener('submit', event => {
+                if (!form.checkValidity()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            }, false);
+        });
+    });
+</script>
+
 {% endblock %}

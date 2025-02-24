@@ -1,6 +1,6 @@
 from django.urls import path
 from . import views
-from .views import signup, user_login, profile_view,patient_profile,user_logout,add_emergency_case,admit_emergency_patient, patient_detail,doctor_detail,generate_bill,add_expense,generate_bill_pdf,add_opd,update_opd,admit_patient,add_doctor,add_employee,add_room,employee_list,edit_employee,delete_employee,discharge_patient
+from .views import signup, user_login,book_appointment,update_appointment_status,appointment_success,available_doctors, profile_view,patient_profile,user_logout,add_emergency_case,admit_emergency_patient, patient_detail,doctor_detail,generate_bill,add_expense,generate_bill_pdf,add_opd,update_opd,admit_patient,add_doctor,add_employee,add_room,employee_list,edit_employee,delete_employee,discharge_patient
 
 urlpatterns = [
     path('', views.dashboard, name='dashboard'),
@@ -11,7 +11,11 @@ urlpatterns = [
     path('patients/', views.patients, name='patients'),
     path('doctors/', views.doctors, name='doctors'),
     path('appointments/', views.appointments, name='appointments'),
-    path("appointments/update_status/", views.update_appointment_status, name="update_appointment_status"),
+    path('appointments_update/', views.appointments_update, name='appointments_update'),
+    path('available-doctors/', available_doctors, name='available_doctors'),
+    path('book-appointment/<int:doctor_id>/', book_appointment, name='book_appointment'),
+    path('book-appointment/<int:doctor_id>/success/', appointment_success, name='appointment_success'),
+    path("update-appointment-status/", update_appointment_status, name="update_appointment_status"),
     path('billing/', views.billing, name='billing'),
     path('billing/pay/<int:billing_id>/', views.pay_bill, name='pay_bill'),
     path('billing/generate/<str:patient_code>/', generate_bill, name='generate_bill'),

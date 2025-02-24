@@ -1,68 +1,135 @@
 {% extends 'hms/base.html' %}
 {% load static %}
+
 {% block content %}
-{% if messages %}
-        {% for message in messages %}
-            <p style="color: red;">{{ message }}</p>
-        {% endfor %}
+<div class="container mx-auto p-6">
+    
+    {% if messages %}
+        <div class="bg-red-100 text-red-700 p-3 rounded-lg mb-4">
+            {% for message in messages %}
+                <p>{{ message }}</p>
+            {% endfor %}
+        </div>
     {% endif %}
-<div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; padding: 20px;">
-    <div style="background: #2c3e50; color: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); text-align: center;">
-        <h2 style="font-size: 18px; font-weight: bold;">Total Patients</h2>
-        <p style="font-size: 32px; font-weight: bold;">{{ total_patients }}</p>
+
+    <!-- Dashboard Overview -->
+    <h2 class="text-3xl font-bold text-gray-800 mb-6">Hospital Dashboard</h2>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        <div class="bg-blue-200 text-black-800 p-6 rounded-lg shadow-md text-center">
+            <h3 class="text-lg font-semibold">Total Patients</h3>
+            <p class="text-4xl font-bold">{{ total_patients }}</p>
+        </div>
+        <div class="bg-green-200 text-black-800 p-6 rounded-lg shadow-md text-center">
+            <h3 class="text-lg font-semibold">Total Doctors</h3>
+            <p class="text-4xl font-bold">{{ total_doctors }}</p>
+        </div>
+        <div class="bg-teal-200 text-black-800 p-6 rounded-lg shadow-md text-center">
+            <h3 class="text-lg font-semibold">Total Appointments</h3>
+            <p class="text-4xl font-bold">{{ total_appointments }}</p>
+        </div>
+        <div class="bg-indigo-300 text-black-800 p-6 rounded-lg shadow-md text-center">
+            <h3 class="text-lg font-semibold">Total Revenue</h3>
+            <p class="text-4xl font-bold">₹{{ total_revenue }}</p>
+        </div>
+        <div class="bg-red-200 text-black-800 p-6 rounded-lg shadow-md text-center">
+            <h3 class="text-lg font-semibold">Emergency Cases Today</h3>
+            <p class="text-4xl font-bold">{{ emergency_cases_today }}</p>
+        </div>
     </div>
-    <div style="background: #34495e; color: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); text-align: center;">
-        <h2 style="font-size: 18px; font-weight: bold;">Total Doctors</h2>
-        <p style="font-size: 32px; font-weight: bold;">{{ total_doctors }}</p>
+    
+    <!-- Room Statistics -->
+    <h2 class="text-2xl font-bold text-gray-900 mt-8 mb-4">Room Statistics</h2>
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+        <div class="bg-gray-300 text-black-900 p-6 rounded-lg shadow-md text-center">
+            <h3 class="text-lg font-semibold">Total Rooms</h3>
+            <p class="text-4xl font-bold">{{ total_rooms }}</p>
+        </div>
+        <div class="bg-green-300 text-black-900 p-6 rounded-lg shadow-md text-center">
+            <h3 class="text-lg font-semibold">Available Rooms</h3>
+            <p class="text-4xl font-bold">{{ available_rooms_count }}</p>
+        </div>
+        <div class="bg-red-200 text-black-900 p-6 rounded-lg shadow-md text-center">
+            <h3 class="text-lg font-semibold">Booked Rooms</h3>
+            <p class="text-4xl font-bold">{{ booked_rooms }}</p>
+        </div>
     </div>
-    <div style="background: #1abc9c; color: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); text-align: center;">
-        <h2 style="font-size: 18px; font-weight: bold;">Total Appointments</h2>
-        <p style="font-size: 32px; font-weight: bold;">{{ total_appointments }}</p>
+    
+
+    <!-- Rooms by Type -->
+    <h3 class="text-2xl font-bold text-gray-800 mt-8 mb-4">Rooms by Type</h3>
+    <div class="overflow-x-auto bg-white p-6 rounded-lg shadow-md">
+        <table class="w-full border-collapse">
+            <thead>
+                <tr class="bg-gray-800 text-white">
+                    <th class="p-3">Room Type</th>
+                    <th class="p-3">Total Rooms</th>
+                    <th class="p-3">Available Rooms</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for room_type, data in room_type_data.items %}
+                <tr class="border-b text-center">
+                    <td class="p-3">{{ room_type|title }}</td>
+                    <td class="p-3">{{ data.total }}</td>
+                    <td class="p-3">{{ data.available }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="3" class="p-5 text-center text-gray-600">No rooms available</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
-    <div style="background: #16a085; color: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); text-align: center;">
-        <h2 style="font-size: 18px; font-weight: bold;">Total Revenue</h2>
-        <p style="font-size: 32px; font-weight: bold;">₹{{ total_revenue }}</p>
+
+    <!-- Upcoming Appointments -->
+    <h2 class="text-2xl font-bold text-gray-800 mt-8 mb-4">Upcoming Appointments</h2>
+    <div class="overflow-x-auto bg-white p-6 rounded-lg shadow-md">
+        <table class="w-full border-collapse">
+            <thead>
+                <tr class="bg-gray-800 text-white">
+                    <th class="p-3">Patient</th>
+                    <th class="p-3">Doctor</th>
+                    <th class="p-3">Date and Time</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for appointment in upcoming_appointments %}
+                <tr class="border-b text-center">
+                    <td class="p-3">
+                        <a href="{% url 'patient_profile' appointment.patient.patient_code %}" 
+                           class="text-blue-700 hover:underline">
+                            {{ appointment.patient.user.full_name }}
+                        </a>
+                    </td>
+                    
+                    <td class="p-3 text-green-700">{{ appointment.doctor.user.full_name }}</td>
+                    <td class="p-3 text-yellow-600">{{ appointment.date }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="3" class="p-5 text-center text-gray-600">No upcoming appointments</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
-    <div style="background: #2980b9; color: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); text-align: center;">
-        <h2 style="font-size: 18px; font-weight: bold;">Emergency Cases Today</h2>
-        <p style="font-size: 32px; font-weight: bold;">{{ emergency_cases_today }}</p>
+
+    <!-- Daily Patient Trends -->
+    <h2 class="text-2xl font-bold text-gray-800 mt-8 mb-4">Daily Patient Trends</h2>
+    <div class="bg-white p-6 rounded-lg shadow-md">
+        <canvas id="patientChart"></canvas>
     </div>
+
 </div>
 
-<div style="padding: 20px;">
-    <h2 style="font-size: 24px; font-weight: bold; margin-bottom: 20px;">Upcoming Appointments</h2>
-    <table style="width: 100%; background: white; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border-radius: 10px; overflow: hidden; border-collapse: collapse;">
-        <tr style="background: #2c3e50; color: white; text-align: center;">
-            <th style="padding: 12px;">Patient</th>
-            <th style="padding: 12px;">Doctor</th>
-            <th style="padding: 12px;">Date and Time</th>
-        </tr>
-        {% for appointment in upcoming_appointments %}
-        <tr style="border-bottom: 1px solid #ddd; text-align: center;">
-            <td style="padding: 12px;">{{ appointment.patient.user.full_name }}</td>
-            <td style="padding: 12px;">{{ appointment.doctor.user.full_name }}</td>
-            <td style="padding: 12px;">{{ appointment.date }}</td>
-        </tr>
-        {% empty %}
-        <tr>
-            <td colspan="3" style="padding: 20px; text-align: center;">No upcoming appointments</td>
-        </tr>
-        {% endfor %}
-    </table>
-</div>
-
-<div style="padding: 20px;">
-    <h2 style="font-size: 24px; font-weight: bold; margin-bottom: 20px;">Daily Patient Trends</h2>
-    <div style="background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
-        <canvas id="patientChart" style="width: 100%; max-width: 700px;"></canvas>
-    </div>
-</div>
-
+<!-- Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         var ctx = document.getElementById('patientChart').getContext('2d');
-        var patientChart = new Chart(ctx, {
+        new Chart(ctx, {
             type: 'line',
             data: {
                 labels: {{ daily_patient_labels|safe }},
@@ -81,47 +148,16 @@
             },
             options: {
                 responsive: true,
-                maintainAspectRatio: false,
                 plugins: {
-                    legend: {
-                        display: true,
-                        position: 'top',
-                        labels: {
-                            color: '#333',
-                            font: {
-                                size: 14,
-                                weight: 'bold'
-                            }
-                        }
-                    }
+                    legend: { position: 'top' }
                 },
                 scales: {
-                    x: {
-                        grid: {
-                            display: false
-                        },
-                        ticks: {
-                            color: '#2c3e50',
-                            font: {
-                                size: 12
-                            }
-                        }
-                    },
-                    y: {
-                        beginAtZero: true,
-                        grid: {
-                            color: 'rgba(200, 200, 200, 0.2)'
-                        },
-                        ticks: {
-                            color: '#2c3e50',
-                            font: {
-                                size: 12
-                            }
-                        }
-                    }
+                    x: { grid: { display: false }, ticks: { color: '#2c3e50' } },
+                    y: { beginAtZero: true, grid: { color: 'rgba(200, 200, 200, 0.2)' }, ticks: { color: '#2c3e50' } }
                 }
             }
         });
     });
 </script>
+
 {% endblock %}
