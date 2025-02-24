@@ -370,6 +370,7 @@ def update_appointment_status(request):
     if request.method == "POST":
         appointment_id = request.POST.get("appointment_id")
         new_status = request.POST.get(f"status_{appointment_id}")
+        print(new_status)
 
         appointment = get_object_or_404(Appointment, id=appointment_id)
         appointment.status = new_status
@@ -388,7 +389,6 @@ def billing(request):
     # Add pending_amount calculation for each bill
     for bill in bills:
         bill.pending_amount = bill.total_amount - bill.paid_amount
-
     return render(request, 'hms/billing.html', {'bills': bills})
 
 

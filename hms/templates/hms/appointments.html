@@ -34,7 +34,7 @@
                             <td style="padding: 10px;">
                                 <select name="status_{{ appointment.id }}" style="padding: 5px; border: 1px solid #ccc;">
                                     <option value="Pending" {% if appointment.status == "Pending" %}selected{% endif %}>Pending</option>
-                                    <option value="Confirmed" {% if appointment.status == "Confirmed" %}selected{% endif %}>Confirmed</option>
+                                    <option value="confirmed" {% if appointment.status == "confirmed" %}selected{% endif %}>Confirmed</option>
                                     <option value="Completed" {% if appointment.status == "Completed" %}selected{% endif %}>Completed</option>
                                     <option value="Canceled" {% if appointment.status == "Canceled" %}selected{% endif %}>Canceled</option>
                                 </select>

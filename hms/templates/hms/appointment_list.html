@@ -23,7 +23,7 @@
                 <td class="p-3">{{ appointment.date }}</td>
                 <td class="p-3">{{ appointment.time }}</td>
                 <td class="p-3">
-                    <span class="px-2 py-1 rounded-lg {% if appointment.status == 'Confirmed' %}bg-green-500 text-white{% else %}bg-yellow-500 text-black{% endif %}">
+                    <span class="px-2 py-1 rounded-lg {% if appointment.status == 'confirmed' %}bg-green-500 text-white{% else %}bg-yellow-500 text-black{% endif %}">
                         {{ appointment.status }}
                     </span>
                 </td>
