@@ -3,6 +3,7 @@ import logging
 from decimal import Decimal
 from django.db import models
 from django.utils import timezone
+from django.http import JsonResponse
 from django.http import HttpResponse
 from reportlab.pdfgen import canvas
 from django.contrib import messages
@@ -11,14 +12,16 @@ from django.db.models import Count,Sum
 from datetime import datetime ,timedelta
 from django.contrib.auth.models import User
 from django.db.models.functions import TruncDate
+from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
 from django.shortcuts import render, redirect,get_object_or_404
 from .models import (
-    CustomUser, Patient, Doctor, Appointment, Billing, EmergencyCase, OPD, IPD, Expense, Employee, Room
+    CustomUser, Patient, Doctor, Appointment, Billing, EmergencyCase, OPD, IPD, Expense, Employee, Room, PatientReport,Prescription
 )
 from .forms import (
-    PatientRegistrationForm, ExpenseForm, BillingForm, OPDForm, DoctorForm, EmployeeForm, RoomForm, EmergencyCaseForm, ProfileUpdateForm
+    PatientRegistrationForm, ExpenseForm, BillingForm, OPDForm, DoctorForm, EmployeeForm, RoomForm, EmergencyCaseForm, ProfileUpdateForm,PatientReportForm,
+    PrescriptionForm,
 )
 
 logger = logging.getLogger(__name__)
@@ -163,6 +166,7 @@ def patient_profile(request, patient_code):
     ipd_record = IPD.objects.filter(patient=patient, discharge_date__isnull=True).first()
     expenses = Expense.objects.filter(patient=patient)
     billing = Billing.objects.filter(patient=patient).first()
+    reports = PatientReport.objects.filter(patient=patient)
 
     context = {
         'patient': patient,
@@ -170,8 +174,29 @@ def patient_profile(request, patient_code):
         'ipd_record': ipd_record,
         'expenses': expenses,
         'billing': billing,
+        'reports': reports,
+        'profile_picture': patient.profile_picture.url if patient.profile_picture else None  # Ensuring profile picture is included
     }
     return render(request, 'hms/patient_profile.html', context)
+
+@login_required
+def upload_patient_report(request, patient_code):
+    patient = get_object_or_404(Patient, patient_code=patient_code)
+
+    if request.method == "POST":
+        form = PatientReportForm(request.POST, request.FILES)
+        if form.is_valid():
+            report = form.save(commit=False)
+            report.patient = patient
+            report.save()
+            return redirect('view_ipd_report', patient_code=patient_code)  # Redirect to profile
+    else:
+        form = PatientReportForm()
+
+    context = {'form': form, 'patient': patient}
+    return render(request, 'hms/upload_patient_report.html', context)
+
+
 
 @login_required
 def discharge_patient(request, patient_code):
@@ -229,6 +254,12 @@ def register_patient(request):
     return render(request, 'hms/register_patient.html', {'form': form})
 
 
+def fetch_patients(request):
+    patients = Patient.objects.select_related("user").values(
+        "patient_code", "user__full_name"
+    )
+    return JsonResponse({"patients": list(patients)}, safe=False)
+
 @login_required
 def doctors(request):
     doctors = Doctor.objects.all()
@@ -264,72 +295,34 @@ def appointments(request):
     print("Doctors in view:", doctors)  # Debugging line
     return render(request, 'hms/appointment_list.html', {'appointments': appointments, 'doctors': doctors })
 
+def fetch_appointments(request):
+    appointments = Appointment.objects.select_related("doctor__user", "patient__user").values(
+        "id", "doctor__user__full_name", "patient__user__full_name", "date", "time", "status"
+    )
+    return JsonResponse({"appointments": list(appointments)}, safe=False)
+
 @login_required
 def available_doctors(request):
     doctors = Doctor.objects.exclude(availability="").order_by("user__full_name")  # Assuming you have an 'is_available' field
     return render(request, 'hms/available_doctors.html', {'doctors': doctors})
 
 
-# @login_required
-# def book_appointment(request, doctor_id):
-#     doctor = get_object_or_404(Doctor, id=doctor_id)
-#     # Ensure the logged-in user is a CustomUser instance
-#     if not isinstance(request.user, CustomUser):
-#         messages.error(request, "Invalid user type. Please log in as a patient.")
-#         return redirect('appointments')
-#     try:
-#         patient = get_object_or_404(Patient, user=request.user)
-#     except Patient.DoesNotExist:
-#         messages.error(request, "Only registered patients can book an appointment.")
-#         return redirect('appointments')
-
-#     if request.method == "POST":
-#         selected_date = request.POST.get("date")
-
-#         if not selected_date:
-#             messages.error(request, "Please select a valid date.")
-#             return redirect('book_appointment', doctor_id=doctor.id)
-
-#         try:
-#             selected_date = datetime.strptime(selected_date, "%Y-%m-%d").date()
-#         except ValueError:
-#             messages.error(request, "Invalid date format.")
-#             return redirect('book_appointment', doctor_id=doctor.id)
-
-#         if selected_date < now().date():
-#             messages.error(request, "You cannot book an appointment for a past date.")
-#             return redirect('book_appointment', doctor_id=doctor.id)
-
-#         if Appointment.objects.filter(patient=patient, date=selected_date).exists():
-#             messages.error(request, "You already have an appointment booked for this date.")
-#             return redirect('book_appointment', doctor_id=doctor.id)
-
-#         appointment = Appointment(patient=patient, doctor=doctor, date=selected_date)
-#         next_slot = appointment.get_next_available_time()
-
-#         if not next_slot:
-#             messages.error(request, "No available slots for this doctor on the selected date.")
-#             return redirect('book_appointment', doctor_id=doctor.id)
-
-#         appointment.time = next_slot
-#         appointment.status = "confirmed"
-#         appointment.save()
-
-#         messages.success(request, f"Appointment booked for {selected_date} at {next_slot}.")
-#         return redirect('appointments')
-
-#     return render(request, 'hms/book_appointment.html', {'doctor': doctor})
 @login_required
 def book_appointment(request, doctor_id):
     doctor = get_object_or_404(Doctor, id=doctor_id)
-    patients = Patient.objects.all()  # Fetch all patients for dropdown
+
+    # Get the logged-in user's patient profile
+    try:
+        patient = request.user.patient  # Assuming OneToOne relation with CustomUser
+    except Patient.DoesNotExist:
+        messages.error(request, "You must be a registered patient to book an appointment.")
+        return redirect("dashboard")  # Redirect to a relevant page
 
     if request.method == "POST":
-        patient_id = request.POST.get("patient")  # Get selected patient from dropdown
         selected_date = request.POST.get("date")
         selected_time = request.POST.get("time")
 
-        if not patient_id or not selected_date or not selected_time:
+        if not selected_date or not selected_time:
             messages.error(request, "Please fill in all the required fields.")
             return redirect('book_appointment', doctor_id=doctor.id)
 
@@ -343,23 +336,24 @@ def book_appointment(request, doctor_id):
             messages.error(request, "You cannot book an appointment for a past date.")
             return redirect('book_appointment', doctor_id=doctor.id)
 
-        patient = Patient.objects.filter(id=patient_id).first()
-        if not patient:
-            messages.error(request, "Selected patient does not exist.")
-            return redirect('book_appointment', doctor_id=doctor.id)
-
         if Appointment.objects.filter(patient=patient, date=selected_date, time=selected_time).exists():
             messages.error(request, "You already have an appointment booked for this date and time.")
             return redirect('book_appointment', doctor_id=doctor.id)
 
-        # Create appointment
-        appointment = Appointment(patient=patient, doctor=doctor, date=selected_date, time=selected_time, status="pending")
+        # Create the appointment
+        appointment = Appointment(
+            patient=patient,
+            doctor=doctor,
+            date=selected_date,
+            time=selected_time,
+            status="pending"
+        )
         appointment.save()
 
         messages.success(request, f"Appointment booked for {selected_date} at {selected_time}.")
         return redirect('appointment_success', doctor_id=doctor_id)
 
-    return render(request, 'hms/book_appointment.html', {'doctor': doctor, 'patients': patients})
+    return render(request, 'hms/book_appointment.html', {'doctor': doctor, 'patient': patient})
 
 def appointment_success(request, doctor_id):
     return render(request, 'hms/appointment_success.html', {'doctor_id': doctor_id})
@@ -595,7 +589,58 @@ def admit_emergency_patient(request, emergency_id):
 @login_required
 def ipd(request):
     ipds = IPD.objects.all()
-    return render(request, 'hms/ipd.html', {'ipds': ipds})
+    room = Room.objects.all()
+    return render(request, 'hms/ipd.html', {'ipds': ipds,'room':room})
+
+def get_ipd_data(request):
+    ipds = IPD.objects.all().values(
+        'id',
+        'patient__user__full_name', 
+        'room__room_number',
+        'patient__patient_code',  # ✅ Get the room number
+        'bed_number',         # ✅ Get the bed number
+        'admitted_on', 
+        'reason_for_admission'
+    )
+    return JsonResponse(list(ipds), safe=False)
+
+# ✅ View IPD Report
+def view_ipd_report(request, ipd_id):
+    ipd = get_object_or_404(IPD, id=ipd_id)
+    rooms = Room.objects.all()
+    prescriptions = Prescription.objects.filter(ipd=ipd).order_by('-timing')
+    reports = PatientReport.objects.filter(patient=ipd.patient).order_by('-uploaded_at')  # Fetch reports
+    return render(request, 'hms/view_ipd_report.html', {'ipd': ipd, 'rooms': rooms,'prescriptions':prescriptions,'reports': reports})
+
+    # ✅ Update IPD Room
+def update_ipd_room(request, ipd_id):
+    ipd = get_object_or_404(IPD, id=ipd_id)
+    if request.method == "POST":
+        room_id = request.POST.get("room")
+        bed_number = request.POST.get("bed_number")
+        ipd.room_id = room_id
+        ipd.bed_number = bed_number
+        ipd.save()
+        messages.success(request, "Room and bed updated successfully.")
+    return redirect('view_ipd_report', ipd_id=ipd.id)
+
+
+def add_prescription(request, ipd_id):
+    ipd = get_object_or_404(IPD, id=ipd_id)
+
+    if request.method == "POST":
+        form = PrescriptionForm(request.POST)
+        if form.is_valid():
+            prescription = form.save(commit=False)
+            prescription.ipd = ipd
+            prescription.save()
+            messages.success(request, "Prescription added successfully.")
+            return redirect('view_ipd_report', ipd_id=ipd_id)
+
+    else:
+        form = PrescriptionForm()
+
+    return render(request, 'hms/add_prescription.html', {'form': form, 'ipd': ipd})
 
 
 @login_required
@@ -603,6 +648,44 @@ def opd(request):
     opds = OPD.objects.all()
     return render(request, 'hms/opd.html', {'opds': opds})
 
+def fetch_opd(request):
+    try:
+        # Fetch OPD records with related patient and doctor details
+        opd_records = OPD.objects.select_related("patient__user", "doctor__user").values(
+            "id", 
+            "patient__user__full_name", 
+            "doctor__user__full_name", 
+            "created_at",   # Use 'created_at' instead of 'visit_date'
+            "diagnosis", 
+            "symptoms", 
+            "prescription", 
+            "visit_type", 
+            "payment_status", 
+            "payment_amount", 
+            "follow_up_date"
+        )
+
+        # Format the data for JSON response
+        formatted_records = []
+        for record in opd_records:
+            formatted_records.append({
+                "id": record["id"],
+                "patient__user__full_name": record["patient__user__full_name"],
+                "doctor__user__full_name": record["doctor__user__full_name"],
+                "created_at": record["created_at"].strftime("%Y-%m-%d %H:%M:%S"),  # Format datetime
+                "diagnosis": record["diagnosis"],
+                "symptoms": record["symptoms"] or "N/A",  # Handle null values
+                "prescription": record["prescription"] or "N/A",  # Handle null values
+                "visit_type": record["visit_type"],
+                "payment_status": record["payment_status"],
+                "payment_amount": float(record["payment_amount"]),  # Convert Decimal to float
+                "follow_up_date": record["follow_up_date"].strftime("%Y-%m-%d") if record["follow_up_date"] else "N/A"  # Format date
+            })
+
+        return JsonResponse({"opds": formatted_records}, safe=False)
+
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=500)
 
 @login_required
 def add_opd(request):
@@ -630,9 +713,21 @@ def update_opd(request, opd_id):
     if request.method == "POST":
         doctor_id = request.POST.get("doctor")
         diagnosis = request.POST.get("diagnosis")
+        symptoms = request.POST.get("symptoms")
+        prescription = request.POST.get("prescription")
+        follow_up_date = request.POST.get("follow_up_date")
+        visit_type = request.POST.get("visit_type")
+        payment_status = request.POST.get("payment_status")
+        payment_amount = request.POST.get("payment_amount")
 
         opd.doctor = Doctor.objects.get(id=doctor_id)
         opd.diagnosis = diagnosis
+        opd.symptoms = symptoms
+        opd.prescription = prescription
+        opd.follow_up_date = follow_up_date
+        opd.visit_type = visit_type
+        opd.payment_status = payment_status
+        opd.payment_amount = payment_amount
         opd.save()
 
         messages.success(request, "OPD visit updated successfully!")
@@ -642,35 +737,81 @@ def update_opd(request, opd_id):
     return render(request, "hms/update_opd.html", {"opd": opd, "doctors": doctors})
 
 
+
+def opd_report_template(request, patient_id):
+    # Fetch the OPD record for the specific patient
+    opd = get_object_or_404(OPD, id=patient_id)
+    
+    # Prepare the context with all fields from the OPD model
+    opd_visits = [
+        {
+            'created_at': opd.created_at.strftime("%Y-%m-%d %H:%M:%S"),  # Include time for precision
+            'doctor': opd.doctor.user.full_name,
+            'diagnosis': opd.diagnosis,
+            'symptoms': opd.symptoms,
+            'prescription': opd.prescription,
+            'visit_type': opd.get_visit_type_display(),  # Get the display value for the choice field
+            'follow_up_date': opd.follow_up_date.strftime("%Y-%m-%d") if opd.follow_up_date else "N/A",  # Format date or show "N/A"
+        },
+    ]
+    
+    context = {
+        'current_date': timezone.now().strftime("%Y-%m-%d %H:%M:%S"),  # Include time for precision
+        'patient_name': opd.patient.user.full_name,
+        'patient_gender': opd.patient.gender,
+        'patient_contact': opd.patient.contact_number,
+        'opd_visits': opd_visits,
+    }
+    return render(request, 'hms/opd_report_template.html', context)
+
+
+
 @login_required
 def admit_patient(request, opd_id):
     opd = get_object_or_404(OPD, id=opd_id)
-    available_rooms = Room.objects.filter(is_available=True)
+    available_rooms = Room.objects.filter(available_beds__gt=0)  # Only rooms with available beds
 
     if request.method == "POST":
-        room_id = request.POST.get("room")  # Get selected room
+        room_id = request.POST.get("room")
+        bed_number = request.POST.get("bed")
+
         room = get_object_or_404(Room, id=room_id)
+
+        if not bed_number:
+            messages.error(request, "Please select a bed.")
+            return redirect("admit_patient", opd_id=opd_id)
+
+        bed_number = int(bed_number)
+
+        if bed_number in room.occupied_beds:
+            messages.error(request, "This bed is already occupied.")
+            return redirect("admit_patient", opd_id=opd_id)
+
+        # Assign the selected bed
+        room.occupied_beds.append(bed_number)
+        room.update_availability()
 
         # Create an IPD record for the patient
         ipd = IPD.objects.create(
             patient=opd.patient,
             room=room,
-            reason_for_admission=opd.diagnosis  # Use OPD diagnosis as admission reason
+            reason_for_admission=opd.diagnosis,
+            bed_number=bed_number,
+            bed_price_per_day=room.bed_price_per_day
         )
 
-        # Mark the room as occupied
-        room.is_available = False
-        room.save()
-
-        # Delete OPD entry since patient is admitted
-        opd.delete()
-
-        messages.success(request, "Patient admitted to IPD successfully!")
+        messages.success(request, f"Patient admitted to Room {room.room_number}, Bed {bed_number}.")
         return redirect("ipd")
 
     return render(request, "hms/admit_patient.html", {"opd": opd, "rooms": available_rooms})
 
-
+def get_available_beds(request):
+    room_id = request.GET.get("room_id")
+    if room_id:
+        room = get_object_or_404(Room, id=room_id)
+        available_beds = [bed for bed in range(1, room.total_beds + 1) if bed not in room.occupied_beds]
+        return JsonResponse({"beds": [{"id": bed, "bed_number": f"Bed {bed}"} for bed in available_beds]})
+    return JsonResponse({"beds": []})
 
 
 @login_required
@@ -746,7 +887,14 @@ def delete_employee(request, pk):
 
 
 
-
+@login_required
+def pay_salary(request, pk):
+    employee = get_object_or_404(Employee, pk=pk)
+    if request.method == 'POST':
+        payment_date = request.POST.get('payment_date')  # Get payment date from form
+        employee.pay_salary(payment_date)  # Pass payment_date to the method
+        return redirect('employee_list')
+    return render(request, 'hms/pay_salary.html', {'employee': employee})
 
 
 

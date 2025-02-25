@@ -15,7 +15,7 @@
         <th class="border p-2">Action</th>
     </tr>
     {% for case in emergencies %}
-    <tr>
+    <tr class="text-center" >
         <td class="border p-2">{{ case.patient.user.full_name }}</td>
         <td class="border p-2">{{ case.referred_by|default:"Self" }}</td>
         <td class="border p-2">{{ case.get_emergency_type_display }}</td>

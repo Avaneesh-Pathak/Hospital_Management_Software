@@ -1,9 +1,11 @@
 import uuid
+import os
 import logging
-from django.utils import timezone
 from django.db import models
-from django.core.exceptions import ValidationError
+from django.utils import timezone
 from django.utils.timezone import now
+from datetime import datetime, timedelta
+from django.core.exceptions import ValidationError
 from django.core.validators import MinLengthValidator
 from django.contrib.auth.models import AbstractUser, Group, Permission
 
@@ -26,11 +28,24 @@ class CustomUser(AbstractUser):
     groups = models.ManyToManyField(Group, related_name="customuser_groups", blank=True)
     user_permissions = models.ManyToManyField(Permission, related_name="customuser_permissions", blank=True)
 
+    def save(self, *args, **kwargs):
+        # Fetch the existing user object if it exists
+        if self.pk:
+            existing_user = CustomUser.objects.filter(pk=self.pk).first()
+            if existing_user and existing_user.password != self.password:
+                self.set_password(self.password)  # Hash only if password changed
+        else:
+            if self.password and not self.password.startswith('pbkdf2_'):  # Prevent double hashing
+                self.set_password(self.password)
+
+        super().save(*args, **kwargs)
+
     def __str__(self):
         return self.username
 
 
 # Patient Model
+
 class Patient(models.Model):
     patient_code = models.CharField(max_length=10, unique=True, editable=False, blank=True, null=True)
     created_at = models.DateTimeField(default=now)
@@ -53,6 +68,9 @@ class Patient(models.Model):
     guarantor_relationship = models.CharField(max_length=50, blank=True, null=True)
     guarantor_gender = models.CharField(max_length=10, choices=CustomUser.GENDER_CHOICES, blank=True, null=True)
 
+    # ✅ Profile Picture Field
+    profile_picture = models.ImageField(upload_to='patient_profiles/', blank=True, null=True)
+
     def save(self, *args, **kwargs):
         """Ensure a unique patient_code is assigned"""
         if not self.patient_code:
@@ -66,6 +84,29 @@ class Patient(models.Model):
 
     def __str__(self):
         return f"{self.user.full_name} ({self.patient_code})"
+
+
+
+class PatientReport(models.Model):
+    patient = models.ForeignKey('hms.Patient', on_delete=models.CASCADE, related_name="reports")
+    file_name = models.CharField(max_length=255, help_text="Enter a name for this report")  # Custom file name
+    report_file = models.FileField(upload_to="patient_reports/")
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+    description = models.TextField(blank=True, null=True)
+
+    def __str__(self):
+        return f"{self.file_name} ({self.patient.patient_code})"
+
+    def get_filename(self):
+        return os.path.basename(self.report_file.name)
+
+    def save(self, *args, **kwargs):
+        """Override save method to set a unique file path."""
+        if self.report_file and not self.report_file.name.startswith("patient_reports/"):
+            ext = self.report_file.name.split('.')[-1]
+            filename = f"{self.patient.patient_code}_{now().strftime('%Y%m%d%H%M%S')}.{ext}"
+            self.report_file.name = os.path.join("patient_reports/", filename)
+        super().save(*args, **kwargs)
 
 
 # Doctor Model
@@ -105,7 +146,7 @@ class Appointment(models.Model):
 
         # Prevent duplicate appointments only when creating a new one
         if self.pk is None:  # This ensures validation runs only when creating an appointment
-            if Appointment.objects.filter(patient=self.patient, date=self.date).exists():
+            if Appointment.objects.filter(patient=self.patient, date=self.date, doctor=self.doctor).exists():
                 raise ValidationError("You already have an appointment booked for this date.")
 
 
@@ -166,13 +207,42 @@ class Room(models.Model):
         ('private', 'Private'),
         ('icu', 'ICU'),
     ]
-    
+
     room_number = models.CharField(max_length=10, unique=True)
     room_type = models.CharField(max_length=20, choices=ROOM_TYPES)
     is_available = models.BooleanField(default=True)
+    total_beds = models.IntegerField(default=1,null=True)
+    available_beds = models.IntegerField(default=1,null=True)
+    bed_price_per_day = models.DecimalField(max_digits=10, decimal_places=2,null=True)
+    occupied_beds = models.JSONField(default=list)  # Store occupied bed numbers in a list
 
     def __str__(self):
         return f"Room {self.room_number} - {self.get_room_type_display()}"
+
+    def update_availability(self):
+        """Update room availability based on occupied beds."""
+        self.available_beds = self.total_beds - len(self.occupied_beds)
+        self.is_available = self.available_beds > 0
+        self.save()
+
+    def admit_patient_to_bed(self):
+        """Assign an available bed to a patient and update availability."""
+        for bed_number in range(1, self.total_beds + 1):
+            if bed_number not in self.occupied_beds:
+                self.occupied_beds.append(bed_number)
+                self.update_availability()
+                return bed_number
+        return None  # No available beds
+
+    def discharge_patient_from_bed(self, bed_number):
+        """Release a bed when a patient is discharged."""
+        if bed_number in self.occupied_beds:
+            self.occupied_beds.remove(bed_number)
+            self.update_availability()
+
+    def calculate_total_cost(self, stay_days):
+        """Calculate total cost based on stay duration and bed pricing."""
+        return self.bed_price_per_day * stay_days
     
 
 
@@ -184,7 +254,9 @@ class IPD(models.Model):
     admitted_on = models.DateTimeField(auto_now_add=True)
     discharge_date = models.DateTimeField(null=True, blank=True)
     reason_for_admission = models.TextField(null=True, blank=True)
-
+    # ✅ Added Fields
+    bed_number = models.IntegerField(null=True, blank=True)
+    bed_price_per_day = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     def save(self, *args, **kwargs):
         """ Mark room as unavailable when a patient is admitted """
         if self.room:
@@ -202,16 +274,44 @@ class IPD(models.Model):
     def __str__(self):
         return f"IPD - {self.patient.user.full_name} - {self.room.room_number}"
 
+class Prescription(models.Model):
+    ipd = models.ForeignKey(IPD, on_delete=models.CASCADE, related_name="prescriptions")
+    medication = models.CharField(max_length=255)
+    dosage = models.CharField(max_length=100)
+    timing = models.DateTimeField()
+
+    def __str__(self):
+        return f"Prescription for {self.ipd.patient.user.full_name} - {self.medication} ({self.dosage}) at {self.timing})"
+
+
 # OPD Model
 class OPD(models.Model):
+    # Basic Fields
     patient = models.ForeignKey(Patient, on_delete=models.CASCADE, related_name="opd_visits")
     doctor = models.ForeignKey(Doctor, on_delete=models.CASCADE, related_name="opd_visits")
     visit_date = models.DateTimeField(auto_now_add=True)
     created_at = models.DateTimeField(default=now)
     diagnosis = models.TextField()
 
+    # Additional Fields
+    symptoms = models.TextField(blank=True, null=True)  # Symptoms described by the patient
+    prescription = models.TextField(blank=True, null=True)  # Prescribed medication or treatment
+    follow_up_date = models.DateField(blank=True, null=True)  # Date for the next follow-up visit
+    VISIT_TYPE_CHOICES = [
+        ('new', 'New Visit'),
+        ('follow_up', 'Follow-up Visit'),
+        ('emergency', 'Emergency Visit'),
+    ]
+    visit_type = models.CharField(max_length=20, choices=VISIT_TYPE_CHOICES, default='new')  # Type of visit
+    PAYMENT_STATUS_CHOICES = [
+        ('paid', 'Paid'),
+        ('pending', 'Pending'),
+    ]
+    payment_status = models.CharField(max_length=20, choices=PAYMENT_STATUS_CHOICES, default='pending')  # Payment status
+    payment_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)  # Amount paid for the visit
+
     def __str__(self):
-        return f"OPD Visit - {self.patient.user.full_name}"
+        return f"OPD Visit - {self.patient.user.full_name} ({self.visit_date.strftime('%Y-%m-%d')})"
 
 
 # Billing Model
@@ -259,6 +359,20 @@ class Employee(models.Model):
     role = models.CharField(max_length=100)  # Example: Nurse, Receptionist, Admin
     contact_number = models.CharField(max_length=15)
     hired_date = models.DateField(default=now)
+    salary = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)  # Monthly salary
+    last_payment_date = models.DateField(null=True, blank=True)  # Date when last salary was paid
+    next_due_date = models.DateField(null=True, blank=True)  # Next due date for salary payment
 
     def __str__(self):
         return f"{self.user.full_name} - {self.role}"
+
+    def pay_salary(self, payment_date):
+        """
+        Method to pay salary and update payment and due dates.
+        """
+        if payment_date:
+            # Convert payment_date from string to datetime.date object
+            payment_date = datetime.strptime(payment_date, '%Y-%m-%d').date()
+            self.last_payment_date = payment_date
+            self.next_due_date = payment_date + timedelta(days=30)  # Assuming monthly salary
+            self.save()

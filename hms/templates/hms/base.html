@@ -5,60 +5,144 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hospital Management System</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+        }
+        .sidebar-link {
+            transition: all 0.3s ease;
+        }
+        .sidebar-link:hover {
+            transform: translateX(5px);
+        }
+        .dark-mode {
+            background-color: #1a202c; /* Dark background */
+            color: #e2e8f0; /* Light text */
+        }
+        .dark-mode .sidebar {
+            background-color: #2d3748; /* Dark sidebar */
+        }
+        .dark-mode .sidebar-link {
+            background-color: #4a5568; /* Dark sidebar links */
+            color: #e2e8f0;
+        }
+        .dark-mode .navbar {
+            background-color: #2d3748; /* Dark navbar */
+        }
+        .dark-mode .footer {
+            background-color: #2d3748; /* Dark footer */
+        }
+    </style>
 </head>
 <body class="bg-gray-100 flex h-screen" onclick="closeSidebar(event)">
 
     <!-- Sidebar -->
-    <aside id="sidebar" class="w-64 bg-blue-800 text-white h-screen fixed left-0 top-0 overflow-y-auto p-6 shadow-lg transition-all duration-300 ease-in-out transform -translate-x-full">
-        <div class="flex justify-between items-center mb-6">
-            <h2 class="text-xl font-bold">Hospital Management</h2>
-            <button id="closeSidebar" class="text-white text-2xl">✖</button>
+    <aside id="sidebar" class="w-64 bg-blue-900 text-white h-screen fixed left-0 top-0 overflow-y-auto p-6 shadow-2xl transition-all duration-300 ease-in-out transform -translate-x-full">
+        <div class="flex justify-between items-center mb-8">
+            <h2 class="text-2xl font-bold text-white">🏥 Hospital Management</h2>
+            <button id="closeSidebar" class="text-white text-2xl hover:text-gray-300 transition duration-300">✖</button>
         </div>
-        <ul class="space-y-4">
-            <li><a href="{% url 'dashboard' %}" class="block p-3 text-lg font-semibold text-gray-700 bg-gray-100 rounded-lg hover:bg-blue-600 hover:text-white transition duration-300">🏠 Dashboard</a></li>
-            
-            <li><a href="{% url 'patients' %}" class="block p-3 text-lg font-semibold text-gray-700 bg-gray-100 rounded-lg hover:bg-blue-600 hover:text-white transition duration-300">🩺 Patients</a></li>
-            
-            <li><a href="{% url 'doctors' %}" class="block p-3 text-lg font-semibold text-gray-700 bg-gray-100 rounded-lg hover:bg-blue-600 hover:text-white transition duration-300">👨‍⚕️ Doctors</a></li>
-            
-            <li><a href="{% url 'appointments' %}" class="block p-3 text-lg font-semibold text-gray-700 bg-gray-100 rounded-lg hover:bg-blue-600 hover:text-white transition duration-300">📅 Appointments</a></li>
-            <li><a href="{% url 'appointments_update' %}" class="block p-3 text-lg font-semibold text-gray-700 bg-gray-100 rounded-lg hover:bg-blue-600 hover:text-white transition duration-300">📅 Appointments Update</a></li>
-            
-            <li><a href="{% url 'billing' %}" class="block p-3 text-lg font-semibold text-gray-700 bg-gray-100 rounded-lg hover:bg-blue-600 hover:text-white transition duration-300">💰 Billing</a></li>
-            
-            <li><a href="{% url 'emergency' %}" class="block p-3 text-lg font-semibold text-gray-700 bg-gray-100 rounded-lg hover:bg-red-600 hover:text-white transition duration-300">🚨 Emergency</a></li>
-            
+        <ul class="space-y-3">
+            <!-- Dashboard -->
             <li>
-                <a href="{% url 'add_emergency_case' %}" 
-                   class="flex items-center justify-center gap-2 bg-gradient-to-r from-red-500 to-red-700 text-white px-6 py-3 rounded-lg shadow-lg 
-                          hover:from-red-600 hover:to-red-800 transform hover:scale-105 transition duration-300 ease-in-out">
-                    🚑 <span class="font-bold">Add Emergency Patient</span>
+                <a href="{% url 'dashboard' %}" class="sidebar-link flex items-center p-3 text-lg font-semibold text-white bg-blue-700 rounded-lg hover:bg-blue-600 hover:text-white transition duration-300">
+                    🏠 Dashboard
                 </a>
             </li>
-            
-            <li><a href="{% url 'ipd' %}" class="block p-3 text-lg font-semibold text-gray-700 bg-gray-100 rounded-lg hover:bg-purple-600 hover:text-white transition duration-300">🏥 IPD</a></li>
-            
-            <li><a href="{% url 'opd' %}" class="block p-3 text-lg font-semibold text-gray-700 bg-gray-100 rounded-lg hover:bg-green-600 hover:text-white transition duration-300">🩹 OPD</a></li>
-    
-            <!-- Add Buttons Section -->
-            <li><a href="{% url 'add_room' %}" class="block py-3 px-6 text-lg font-semibold text-white bg-blue-500 rounded-lg shadow-md hover:bg-blue-700 transition duration-300">➕ Add Room</a></li>
-    
-            <li><a href="{% url 'add_employee' %}" class="block py-3 px-6 text-lg font-semibold text-white bg-yellow-500 rounded-lg shadow-md hover:bg-yellow-700 transition duration-300">👨‍💼 ➕ Add Employee</a></li>
-    
-            <li><a href="{% url 'add_doctor' %}" class="block py-3 px-6 text-lg font-semibold text-white bg-green-500 rounded-lg shadow-md hover:bg-green-700 transition duration-300">🩺 ➕ Add Doctor</a></li>
-    
-            <!-- Login/Logout Button -->
-            <li class="mt-6">
+
+            <!-- Patients -->
+            <li>
+                <a href="{% url 'patients' %}" class="sidebar-link flex items-center p-3 text-lg font-semibold text-white bg-blue-700 rounded-lg hover:bg-blue-600 hover:text-white transition duration-300">
+                    🩺 Patients
+                </a>
+            </li>
+
+            <!-- Doctors -->
+            <li>
+                <a href="{% url 'doctors' %}" class="sidebar-link flex items-center p-3 text-lg font-semibold text-white bg-blue-700 rounded-lg hover:bg-blue-600 hover:text-white transition duration-300">
+                    👨‍⚕️ Doctors
+                </a>
+            </li>
+
+            <!-- Appointments -->
+            <li>
+                <a href="{% url 'appointments' %}" class="sidebar-link flex items-center p-3 text-lg font-semibold text-white bg-blue-700 rounded-lg hover:bg-blue-600 hover:text-white transition duration-300">
+                    📅 Appointments
+                </a>
+            </li>
+
+            <!-- Appointments Update -->
+            <li>
+                <a href="{% url 'appointments_update' %}" class="sidebar-link flex items-center p-3 text-lg font-semibold text-white bg-blue-700 rounded-lg hover:bg-blue-600 hover:text-white transition duration-300">
+                    🔄 Appointments Update
+                </a>
+            </li>
+
+            <!-- Billing -->
+            <li>
+                <a href="{% url 'billing' %}" class="sidebar-link flex items-center p-3 text-lg font-semibold text-white bg-blue-700 rounded-lg hover:bg-blue-600 hover:text-white transition duration-300">
+                    💰 Billing
+                </a>
+            </li>
+
+            <!-- Emergency -->
+            <li>
+                <a href="{% url 'emergency' %}" class="sidebar-link flex items-center p-3 text-lg font-semibold text-white bg-red-600 rounded-lg hover:bg-red-700 hover:text-white transition duration-300">
+                    🚨 Emergency
+                </a>
+            </li>
+
+            <!-- Add Emergency Patient -->
+            <li>
+                <a href="{% url 'add_emergency_case' %}" class="sidebar-link flex items-center justify-center gap-2 bg-gradient-to-r from-red-500 to-red-700 text-white px-6 py-3 rounded-lg shadow-lg hover:from-red-600 hover:to-red-800 transform hover:scale-105 transition duration-300 ease-in-out">
+                    🚑 Add Emergency Patient
+                </a>
+            </li>
+
+            <!-- IPD -->
+            <li>
+                <a href="{% url 'ipd' %}" class="sidebar-link flex items-center p-3 text-lg font-semibold text-white bg-purple-600 rounded-lg hover:bg-purple-700 hover:text-white transition duration-300">
+                    🏥 IPD
+                </a>
+            </li>
+
+            <!-- OPD -->
+            <li>
+                <a href="{% url 'opd' %}" class="sidebar-link flex items-center p-3 text-lg font-semibold text-white bg-green-600 rounded-lg hover:bg-green-700 hover:text-white transition duration-300">
+                    🩹 OPD
+                </a>
+            </li>
+
+            <!-- Add Room -->
+            <li>
+                <a href="{% url 'add_room' %}" class="sidebar-link flex items-center p-3 text-lg font-semibold text-white bg-blue-500 rounded-lg hover:bg-blue-600 hover:text-white transition duration-300">
+                    ➕ Add Room
+                </a>
+            </li>
+
+            <!-- Add Employee -->
+            <li>
+                <a href="{% url 'add_employee' %}" class="sidebar-link flex items-center p-3 text-lg font-semibold text-white bg-yellow-500 rounded-lg hover:bg-yellow-600 hover:text-white transition duration-300">
+                    👨‍💼 Add Employee
+                </a>
+            </li>
+
+            <!-- Add Doctor -->
+            <li>
+                <a href="{% url 'add_doctor' %}" class="sidebar-link flex items-center p-3 text-lg font-semibold text-white bg-green-500 rounded-lg hover:bg-green-600 hover:text-white transition duration-300">
+                    🩺 Add Doctor
+                </a>
+            </li>
+
+            <!-- Logout Button with Username -->
+            <li class="mt-8">
                 {% if user.is_authenticated %}
-                    <a href="{% url 'logout' %}" 
-                       class="flex items-center justify-center gap-2 bg-gradient-to-r from-gray-600 to-gray-800 text-white px-6 py-3 rounded-lg shadow-lg 
-                              hover:from-gray-700 hover:to-gray-900 transform hover:scale-105 transition duration-300 ease-in-out">
-                        🔓 Logout
+                    <a href="{% url 'logout' %}" class="sidebar-link flex items-center justify-center gap-2 bg-gradient-to-r from-gray-600 to-gray-800 text-white px-6 py-3 rounded-lg shadow-lg hover:from-gray-700 hover:to-gray-900 transform hover:scale-105 transition duration-300 ease-in-out">
+                        🔓 Logout ({{ user.username }})
                     </a>
                 {% else %}
-                    <a href="{% url 'login' %}" 
-                       class="flex items-center justify-center gap-2 bg-gradient-to-r from-green-500 to-green-700 text-white px-6 py-3 rounded-lg shadow-lg 
-                              hover:from-green-600 hover:to-green-800 transform hover:scale-105 transition duration-300 ease-in-out">
+                    <a href="{% url 'login' %}" class="sidebar-link flex items-center justify-center gap-2 bg-gradient-to-r from-green-500 to-green-700 text-white px-6 py-3 rounded-lg shadow-lg hover:from-green-600 hover:to-green-800 transform hover:scale-105 transition duration-300 ease-in-out">
                         🔑 Login
                     </a>
                 {% endif %}
@@ -68,23 +152,26 @@
 
     <!-- Main Content -->
     <div class="flex-1">
-        <nav class="bg-blue-600 p-4 text-white flex justify-between items-center">
-            <button id="toggleSidebar" class="text-white text-2xl">☰</button>
-            <h1 class="text-2xl font-bold flex-1 text-center">Hospital Management</h1>
+        <!-- Navbar -->
+        <nav class="bg-blue-800 p-4 text-white flex justify-between items-center shadow-lg">
+            <button id="toggleSidebar" class="text-white text-2xl hover:text-gray-300 transition duration-300">☰</button>
+            <h1 class="text-2xl font-bold flex-1 text-center">Hospital Management System</h1>
         </nav>
-        
 
+        <!-- Content -->
         <div class="container mx-auto p-6">
             {% block content %}
             {% endblock %}
         </div>
 
-        <footer class="bg-blue-600 p-4 text-white text-center mt-6">
-            &copy; 2025 Hospital Management System
+        <!-- Footer -->
+        <footer class="bg-blue-800 p-4 text-white text-center mt-6 shadow-lg">
+            &copy; 2025 Hospital Management System. All rights reserved.
         </footer>
     </div>
 
     <script>
+        // Sidebar functionality
         const sidebar = document.getElementById("sidebar");
         const toggleButton = document.getElementById("toggleSidebar");
         const closeButton = document.getElementById("closeSidebar");
@@ -104,7 +191,29 @@
                 sidebar.classList.add("-translate-x-full");
             }
         }
-    </script>
+
+        // Night Mode functionality
+        const nightModeToggle = document.getElementById("nightModeToggle");
+        const body = document.body;
+
+        // Check localStorage for night mode preference
+        if (localStorage.getItem("nightMode") === "enabled") {
+            body.classList.add("dark-mode");
+            nightModeToggle.textContent = "☀️"; // Sun icon for light mode
+        }
+
+        // Toggle night mode
+        nightModeToggle.addEventListener("click", () => {
+            body.classList.toggle("dark-mode");
+            if (body.classList.contains("dark-mode")) {
+                localStorage.setItem("nightMode", "enabled");
+                nightModeToggle.textContent = "☀️";
+            } else {
+                localStorage.setItem("nightMode", "disabled");
+                nightModeToggle.textContent = "🌙";
+            }
+        });
+    </script>   
 
 </body>
 </html>

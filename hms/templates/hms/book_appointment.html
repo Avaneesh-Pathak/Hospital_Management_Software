@@ -29,21 +29,23 @@
             {% csrf_token %}
 
             <div class="row g-3">
-                <!-- Patient Selection -->
+                <!-- Display Logged-in Patient Info -->
                 <div class="col-12">
-                    <label for="patient" class="form-label fw-bold" style="color: #28a745;">
-                        <i class="fas fa-user-injured"></i> Select Patient:
+                    <label class="form-label fw-bold" style="color: #28a745;">
+                        <i class="fas fa-user-injured"></i> Patient Name:
                     </label>
-                    <select name="patient" id="patient" class="form-select form-control-lg rounded-3" required 
-                        style="border: 2px solid #28a745; padding: 10px; font-size: 16px;">
-                        <option value="" disabled selected>🔍 Search or Select a Patient</option>
-                        {% for patient in patients %}
-                            <option value="{{ patient.id }}">
-                                🏥 {{ patient.user.full_name }} ({{ patient.patient_code }})
-                            </option>
-                        {% endfor %}
-                    </select>
-                    <div class="invalid-feedback">Please select a patient.</div>
+                    <p class="form-control-lg rounded-3 bg-light p-2">
+                        <strong>{{ patient.user.full_name }}</strong>
+                    </p>
+                </div>
+
+                <div class="col-12">
+                    <label class="form-label fw-bold" style="color: #28a745;">
+                        <i class="fas fa-id-card"></i> Patient Code:
+                    </label>
+                    <p class="form-control-lg rounded-3 bg-light p-2">
+                        <strong>{{ patient.patient_code }}</strong>
+                    </p>
                 </div>
 
                 <!-- Date Selection -->
@@ -90,20 +92,6 @@
 
 <!-- Bootstrap & FontAwesome -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-<!-- Include Select2 CSS & JS -->
-<link href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
-
-<!-- Initialize Select2 for Searchable Dropdown -->
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        $("#patient").select2({
-            width: '100%', 
-            placeholder: "🔍 Search or Select a Patient",
-            allowClear: true
-        });
-    });
-</script>
 
 <!-- JavaScript for Form Validation & Time Slot Disabling -->
 <script>

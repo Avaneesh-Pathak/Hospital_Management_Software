@@ -1,6 +1,7 @@
+
 from django.urls import path
 from . import views
-from .views import signup, user_login,book_appointment,update_appointment_status,appointment_success,available_doctors, profile_view,patient_profile,user_logout,add_emergency_case,admit_emergency_patient, patient_detail,doctor_detail,generate_bill,add_expense,generate_bill_pdf,add_opd,update_opd,admit_patient,add_doctor,add_employee,add_room,employee_list,edit_employee,delete_employee,discharge_patient
+from .views import signup,upload_patient_report,add_prescription,get_available_beds,fetch_patients,fetch_opd,fetch_appointments, user_login,get_ipd_data,book_appointment,update_appointment_status,appointment_success,available_doctors, profile_view,patient_profile,user_logout,add_emergency_case,admit_emergency_patient, patient_detail,doctor_detail,generate_bill,add_expense,generate_bill_pdf,add_opd,update_opd,admit_patient,add_doctor,add_employee,add_room,employee_list,edit_employee,delete_employee,discharge_patient,view_ipd_report,update_ipd_room
 
 urlpatterns = [
     path('', views.dashboard, name='dashboard'),
@@ -9,8 +10,10 @@ urlpatterns = [
     path('logout/', user_logout, name='logout'),
     path("profile/", profile_view, name="profile"),
     path('patients/', views.patients, name='patients'),
+    path('api/patients/', fetch_patients, name='fetch_patients'),
     path('doctors/', views.doctors, name='doctors'),
     path('appointments/', views.appointments, name='appointments'),
+    path('api/appointments/', fetch_appointments, name='fetch_appointments'),
     path('appointments_update/', views.appointments_update, name='appointments_update'),
     path('available-doctors/', available_doctors, name='available_doctors'),
     path('book-appointment/<int:doctor_id>/', book_appointment, name='book_appointment'),
@@ -25,12 +28,20 @@ urlpatterns = [
     path("emergency/add/", add_emergency_case, name="add_emergency_case"),
     path("emergency/admit/<int:emergency_id>/", admit_emergency_patient, name="admit_emergency_patient"),
     path('ipd/', views.ipd, name='ipd'),
+    path('get-ipd-data/', get_ipd_data, name='get_ipd_data'),
+    path('ipd/<int:ipd_id>/add_prescription/', add_prescription, name="add_prescription"),
     path('opd/', views.opd, name='opd'),
+    path('opd/report/<int:patient_id>/', views.opd_report_template, name='opd_report_template'),
+    # path('download-opd-report/<int:patient_id>/', views.download_opd_report, name='download_opd_report'),
+    path('api/opd/', fetch_opd, name='fetch_opd'),
     path('opd/add/', add_opd, name='add_opd'),
+    path('ipd/<int:ipd_id>/', view_ipd_report, name='view_ipd_report'),
+    path('ipd/<int:ipd_id>/update-room/', update_ipd_room, name='update_ipd_room'),
     path('opd/update/<int:opd_id>/', update_opd, name='update_opd'),
     path('opd/admit/<int:opd_id>/', admit_patient, name='admit_patient'),
-    
+    path("get_available_beds/", get_available_beds, name="get_available_beds"),
     path('patient/<str:patient_code>/', patient_profile, name='patient_profile'),
+    path('patient/<str:patient_code>/upload-report/', upload_patient_report, name='upload_patient_report'),
     path('patient/<str:patient_code>/discharge/', discharge_patient, name='discharge_patient'),
     path('register/', views.register_patient, name='register_patient'),
     path('patients/<str:patient_code>/', patient_detail, name='patient_detail'),
@@ -40,5 +51,8 @@ urlpatterns = [
     path('employees/', employee_list, name='employee_list'),
     path('employee/edit/<int:pk>/', edit_employee, name='edit_employee'),
     path('employee/delete/<int:pk>/', delete_employee, name='delete_employee'),
+    path('employees/pay-salary/<int:pk>/', views.pay_salary, name='pay_salary'),
     path('add-doctor/', add_doctor, name='add_doctor'),
 ]
+
+
