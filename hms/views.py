@@ -2,10 +2,12 @@ import datetime
 import logging
 from decimal import Decimal
 from django.db import models
+from django.db.models import Q
 from django.utils import timezone
 from django.http import JsonResponse
 from django.http import HttpResponse
 from reportlab.pdfgen import canvas
+from django.shortcuts import render
 from django.contrib import messages
 from django.utils.timezone import now
 from django.db.models import Count,Sum
@@ -17,11 +19,13 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
 from django.shortcuts import render, redirect,get_object_or_404
 from .models import (
-    CustomUser, Patient, Doctor, Appointment, Billing, EmergencyCase, OPD, IPD, Expense, Employee, Room, PatientReport,Prescription
+    CustomUser, Patient, Doctor, Appointment, Billing, EmergencyCase, OPD, IPD, Expense, Employee, Room, PatientReport,Prescription,
+    License,Asset,Maintenance
+    
 )
 from .forms import (
     PatientRegistrationForm, ExpenseForm, BillingForm, OPDForm, DoctorForm, EmployeeForm, RoomForm, EmergencyCaseForm, ProfileUpdateForm,PatientReportForm,
-    PrescriptionForm,
+    PrescriptionForm,LicenseForm,AssetForm,MaintenanceForm
 )
 
 logger = logging.getLogger(__name__)
@@ -85,6 +89,58 @@ def profile_view(request):
 
     return render(request, "hms/profile.html", {"form": form})
 
+def search(request):
+    query = request.GET.get('q')  # Get the search query from the URL
+    results = {}
+
+    if query:
+        # Search across multiple models
+        patients = Patient.objects.filter(
+            Q(user__full_name__icontains=query) |
+            Q(patient_code__icontains=query) |
+            Q(contact_number__icontains=query) |
+            Q(email__icontains=query)
+        )
+
+        doctors = Doctor.objects.filter(
+            Q(user__full_name__icontains=query) |
+            Q(specialization__icontains=query) |
+            Q(contact_number__icontains=query)
+        )
+
+        appointments = Appointment.objects.filter(
+            Q(patient__user__full_name__icontains=query) |
+            Q(doctor__user__full_name__icontains=query) |
+            Q(status__icontains=query)
+        )
+
+        ipds = IPD.objects.filter(
+            Q(patient__user__full_name__icontains=query) |
+            Q(room__room_number__icontains=query)
+        )
+
+        opds = OPD.objects.filter(
+            Q(patient__user__full_name__icontains=query) |
+            Q(doctor__user__full_name__icontains=query)
+        )
+
+        emergencies = EmergencyCase.objects.filter(
+            Q(patient__user__full_name__icontains=query) |
+            Q(emergency_type__icontains=query)
+        )
+
+        # Combine results into a dictionary
+        results = {
+            'patients': patients,
+            'doctors': doctors,
+            'appointments': appointments,
+            'ipds': ipds,
+            'opds': opds,
+            'emergencies': emergencies,
+        }
+
+    return render(request, 'hms/search_results.html', {'results': results, 'query': query})
+
 @login_required
 def dashboard(request):
     total_patients = Patient.objects.count()
@@ -92,6 +148,7 @@ def dashboard(request):
     total_appointments = Appointment.objects.count()
     total_revenue = Billing.objects.aggregate(total=Sum('total_amount'))['total'] or 0
     today = datetime.today()
+    warning_period = today + timedelta(days=30)
     emergency_cases_today = EmergencyCase.objects.filter(admitted_on__date=today).count()
     upcoming_appointments = Appointment.objects.filter(date__gte=now()).order_by('date')
 
@@ -126,6 +183,10 @@ def dashboard(request):
         if room['room_type'] in room_type_data:
             room_type_data[room['room_type']]['available'] = room['available']
 
+    expiring_licenses = License.objects.filter(expiry_date__lte=warning_period, expiry_date__gte=today)
+    expiring_assets = Asset.objects.filter(warranty_expiry__lte=warning_period, warranty_expiry__gte=today)
+    due_maintenance = Maintenance.objects.filter(next_due_date__lte=warning_period, next_due_date__gte=today)
+
     context = {
         'total_patients': total_patients,
         'total_doctors': total_doctors,
@@ -139,6 +200,9 @@ def dashboard(request):
         'available_rooms_count': available_rooms_count,  # ✅ Fixed
         'booked_rooms': booked_rooms,  # ✅ Fixed
         'room_type_data': room_type_data,  # Dictionary of room counts & available rooms by type
+        'expiring_licenses': expiring_licenses,
+        'expiring_assets': expiring_assets,
+        'due_maintenance': due_maintenance,
     }
 
     return render(request, 'hms/dashboard.html', context)
@@ -281,6 +345,18 @@ def add_doctor(request):
         form = DoctorForm()
     return render(request, 'hms/add_doctor.html', {'form': form})
 
+@login_required
+def update_doctor(request, doctor_id):
+    doctor = get_object_or_404(Doctor, id=doctor_id)
+    if request.method == 'POST':
+        form = DoctorForm(request.POST, instance=doctor)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Doctor details updated successfully!')
+            return redirect('doctors')
+    else:
+        form = DoctorForm(instance=doctor)
+    return render(request, 'hms/update_doctor.html', {'form': form, 'doctor': doctor})
 
 def appointments_update(request):
     doctors  = Doctor.objects.all()  
@@ -899,14 +975,96 @@ def pay_salary(request, pk):
 
 
 
+def license_list(request):
+    licenses = License.objects.all()
+    return render(request, 'hms/license_list.html', {'licenses': licenses})
+
+def add_license(request):
+    if request.method == 'POST':
+        form = LicenseForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            return redirect('license_list')
+    else:
+        form = LicenseForm()
+    return render(request, 'hms/license_form.html', {'form': form})
+
+def edit_license(request, id):
+    license_instance = get_object_or_404(License, id=id)
+    if request.method == 'POST':
+        form = LicenseForm(request.POST, request.FILES, instance=license_instance)
+        if form.is_valid():
+            form.save()
+            return redirect('license_list')
+    else:
+        form = LicenseForm(instance=license_instance)
+    return render(request, 'hms/license_form.html', {'form': form})
+
+def delete_license(request, id):
+    license = get_object_or_404(License, id=id)
+    license.delete()
+    return redirect('license_list')
 
 
+# Asset Views
+def asset_list(request):
+    assets = Asset.objects.all()
+    return render(request, 'hms/asset_list.html', {'assets': assets})
+
+def add_asset(request):
+    if request.method == 'POST':
+        form = AssetForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('asset_list')
+    else:
+        form = AssetForm()
+    return render(request, 'hms/asset_form.html', {'form': form, 'title': 'Add Asset'})
+
+def edit_asset(request, id):
+    asset = get_object_or_404(Asset, id=id)
+    if request.method == 'POST':
+        form = AssetForm(request.POST, instance=asset)
+        if form.is_valid():
+            form.save()
+            return redirect('asset_list')
+    else:
+        form = AssetForm(instance=asset)
+    return render(request, 'hms/asset_form.html', {'form': form, 'title': 'Edit Asset'})
+
+def delete_asset(request, id):
+    asset = get_object_or_404(Asset, id=id)
+    asset.delete()
+    return redirect('asset_list')
 
 
+# Maintenance Views
+def maintenance_list(request):
+    maintenance_records = Maintenance.objects.all()
+    return render(request, 'hms/maintenance_list.html', {'maintenance_records': maintenance_records})
 
+def add_maintenance(request):
+    if request.method == 'POST':
+        form = MaintenanceForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('maintenance_list')
+    else:
+        form = MaintenanceForm()
+    return render(request, 'hms/maintenance_form.html', {'form': form, 'title': 'Add Maintenance'})
 
+def edit_maintenance(request, id):
+    maintenance = get_object_or_404(Maintenance, id=id)
+    if request.method == 'POST':
+        form = MaintenanceForm(request.POST, instance=maintenance)
+        if form.is_valid():
+            form.save()
+            return redirect('maintenance_list')
+    else:
+        form = MaintenanceForm(instance=maintenance)
+    return render(request, 'hms/maintenance_form.html', {'form': form, 'title': 'Edit Maintenance'})
 
-
-
-
-
+def delete_maintenance(request, id):
+    maintenance = get_object_or_404(Maintenance, id=id)
+    maintenance.delete()
+    return redirect('maintenance_list')

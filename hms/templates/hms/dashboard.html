@@ -13,7 +13,51 @@
             {% endfor %}
         </div>
     {% endif %}
-
+     <!-- Expiring Licenses -->
+     {% if expiring_licenses %}
+     <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4">
+         <h3 class="text-lg font-semibold">Expiring Licenses</h3>
+         <ul class="list-disc pl-5">
+             {% for license in expiring_licenses %}
+             <li>
+                 <strong>{{ license.name }}</strong> ({{ license.license_type }}) - 
+                 <span class="text-red-500">Expiring on {{ license.expiry_date }}</span>
+             </li>
+             {% endfor %}
+         </ul>
+     </div>
+     {% endif %}
+ 
+     <!-- Expiring Assets -->
+     {% if expiring_assets %}
+     <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-4">
+         <h3 class="text-lg font-semibold">Expiring Warranties</h3>
+         <ul class="list-disc pl-5">
+             {% for asset in expiring_assets %}
+             <li>
+                 <strong>{{ asset.name }}</strong> ({{ asset.asset_type }}) - 
+                 <span class="text-yellow-500">Warranty expires on {{ asset.warranty_expiry }}</span>
+             </li>
+             {% endfor %}
+         </ul>
+     </div>
+     {% endif %}
+ 
+     <!-- Due Maintenance -->
+     {% if due_maintenance %}
+     <div class="bg-blue-100 border-l-4 border-blue-500 text-blue-700 p-4 mb-4">
+         <h3 class="text-lg font-semibold">Upcoming Maintenance</h3>
+         <ul class="list-disc pl-5">
+             {% for maintenance in due_maintenance %}
+             <li>
+                 <strong>{{ maintenance.asset.name }}</strong> - 
+                 <span class="text-blue-500">Maintenance due on {{ maintenance.next_due_date }}</span>
+             </li>
+             {% endfor %}
+         </ul>
+     </div>
+     {% endif %}
+        
     <!-- Dashboard Overview -->
     <h2 class="text-3xl font-bold text-gray-800 mb-8">Hospital Dashboard</h2>
 

@@ -113,7 +113,15 @@
                     🩹 OPD
                 </a>
             </li>
-
+            <li>
+                <a href="{% url 'license_list' %}" class="block py-2 px-4 rounded hover:bg-blue-700">📜 License Management</a>
+            </li>
+            <li>
+                <a href="{% url 'asset_list' %}" class="block py-2 px-4 rounded hover:bg-blue-700">🏥 Asset & Machine Store</a>
+            </li>
+            <li>
+                <a href="{% url 'maintenance_list' %}" class="block py-2 px-4 rounded hover:bg-blue-700">🔧 Maintenance</a>
+            </li>
             <!-- Add Room -->
             <li>
                 <a href="{% url 'add_room' %}" class="sidebar-link flex items-center p-3 text-lg font-semibold text-white bg-blue-500 rounded-lg hover:bg-blue-600 hover:text-white transition duration-300">
@@ -123,8 +131,8 @@
 
             <!-- Add Employee -->
             <li>
-                <a href="{% url 'add_employee' %}" class="sidebar-link flex items-center p-3 text-lg font-semibold text-white bg-yellow-500 rounded-lg hover:bg-yellow-600 hover:text-white transition duration-300">
-                    👨‍💼 Add Employee
+                <a href="{% url 'employee_list' %}" class="sidebar-link flex items-center p-3 text-lg font-semibold text-white bg-yellow-500 rounded-lg hover:bg-yellow-600 hover:text-white transition duration-300">
+                    👨‍💼 Employee
                 </a>
             </li>
 
@@ -152,11 +160,37 @@
 
     <!-- Main Content -->
     <div class="flex-1">
-        <!-- Navbar -->
-        <nav class="bg-blue-800 p-4 text-white flex justify-between items-center shadow-lg">
-            <button id="toggleSidebar" class="text-white text-2xl hover:text-gray-300 transition duration-300">☰</button>
-            <h1 class="text-2xl font-bold flex-1 text-center">Hospital Management System</h1>
-        </nav>
+ <!-- Navbar -->
+<nav class="bg-blue-800 p-4 text-white flex justify-between items-center shadow-lg">
+    <!-- Sidebar Toggle Button -->
+    <button id="toggleSidebar" class="text-white text-2xl hover:text-gray-300 transition duration-300">☰</button>
+
+    <!-- Title -->
+    <h1 class="text-xl md:text-2xl font-bold text-center flex-1">Hospital Management System</h1>
+
+    <!-- Search Bar (Mobile Mode: Collapsed) -->
+    <div class="relative">
+        <!-- Search Icon (For Small Screens) -->
+        <button id="searchToggle" class="sm:hidden text-white text-2xl focus:outline-none">
+            🔍
+        </button>
+
+        <!-- Search Bar -->
+        <form id="searchForm" action="{% url 'search' %}" method="get" 
+              class="absolute top-10 right-0 bg-white p-2 rounded-lg shadow-lg hidden sm:flex sm:static sm:top-auto sm:right-auto sm:bg-transparent sm:p-0 sm:shadow-none">
+            <input type="text" 
+                   name="q" 
+                   placeholder="Search patients, doctors, appointments..." 
+                   class="px-4 py-2 w-64 border border-gray-300 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-black"
+                   id="searchInput">
+            <button type="submit" 
+                    class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-r-lg transition duration-300">
+                Search
+            </button>
+        </form>
+    </div>
+</nav>
+
 
         <!-- Content -->
         <div class="container mx-auto p-6">
@@ -214,6 +248,21 @@
             }
         });
     </script>   
-
+<!-- JavaScript for Search Bar Toggle -->
+<script>
+    document.getElementById("searchToggle").addEventListener("click", function () {
+        var searchForm = document.getElementById("searchForm");
+        var searchInput = document.getElementById("searchInput");
+        
+        if (searchForm.classList.contains("hidden")) {
+            searchForm.classList.remove("hidden");
+            searchInput.classList.add("block"); // Ensure it's visible
+            searchInput.focus();
+        } else {
+            searchForm.classList.add("hidden");
+            searchInput.classList.remove("block");
+        }
+    });
+</script>
 </body>
 </html>

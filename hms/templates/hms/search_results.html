@@ -1,0 +1,108 @@
+{% extends 'hms/base.html' %}
+
+{% block content %}
+    <div style="max-width: 1200px; margin: 40px auto; padding: 20px; background: #ffffff; border-radius: 12px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);">
+        <h2 style="font-size: 28px; font-weight: 700; color: #2c3e50; margin-bottom: 20px;">
+            Search Results for "{{ query }}"
+        </h2>
+
+        {% if results %}
+            <!-- Patients -->
+            {% if results.patients %}
+                <h3 style="font-size: 22px; font-weight: 600; color: #007bff; margin-top: 20px;">Patients</h3>
+                <ul style="list-style: none; padding: 0;">
+                    {% for patient in results.patients %}
+                        <li style="padding: 10px; border-bottom: 1px solid #e0e0e0;">
+                            <strong>Name:</strong> <a href="{% url 'patient_profile' patient.patient_code %}" class="text-blue-500 hover:text-blue-700 font-semibold">
+                                {{ patient.user.full_name }}
+                            </a><br>
+                            <strong>Code:</strong> {{ patient.patient_code }} <br>
+                            <strong>Phone:</strong> {{ patient.contact_number }} <br>
+                            <strong>Email:</strong> {{ patient.email }}
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+
+            <!-- Doctors -->
+            {% if results.doctors %}
+                <h3 style="font-size: 22px; font-weight: 600; color: #007bff; margin-top: 20px;">Doctors</h3>
+                <ul style="list-style: none; padding: 0;">
+                    {% for doctor in results.doctors %}
+                        <li style="padding: 10px; border-bottom: 1px solid #e0e0e0;">
+                            <strong>Name:</strong> Dr. {{ doctor.user.full_name }} <br>
+                            <strong>Specialization:</strong> {{ doctor.specialization }} <br>
+                            <strong>Phone:</strong> {{ doctor.contact_number }}
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+
+            <!-- Appointments -->
+            {% if results.appointments %}
+                <h3 style="font-size: 22px; font-weight: 600; color: #007bff; margin-top: 20px;">Appointments</h3>
+                <ul style="list-style: none; padding: 0;">
+                    {% for appointment in results.appointments %}
+                        <li style="padding: 10px; border-bottom: 1px solid #e0e0e0;">
+                            <strong>Patient:</strong> {{ appointment.patient.user.full_name }} <br>
+                            <strong>Doctor:</strong> Dr. {{ appointment.doctor.user.full_name }} <br>
+                            <strong>Date:</strong> {{ appointment.date }} <br>
+                            <strong>Time:</strong> {{ appointment.time }} <br>
+                            <strong>Status:</strong> {{ appointment.status }}
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+
+            <!-- IPD Records -->
+            {% if results.ipds %}
+                <h3 style="font-size: 22px; font-weight: 600; color: #007bff; margin-top: 20px;">IPD Records</h3>
+                <ul style="list-style: none; padding: 0;">
+                    {% for ipd in results.ipds %}
+                        <li style="padding: 10px; border-bottom: 1px solid #e0e0e0;">
+                            <strong>Patient:</strong> <a  href="{% url 'view_ipd_report' ipd.id %}" class="text-blue-500 hover:text-blue-700 font-semibold">
+                                {{ ipd.patient.user.full_name }}
+                            </a><br>
+                            <strong>Room Number:</strong> {{ ipd.room.room_number }} <br>
+                            <strong>Admission Date:</strong> {{ ipd.admission_date }} <br>
+                            <strong>Discharge Date:</strong> {{ ipd.discharge_date|default:"Not Discharged" }}
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+
+            <!-- OPD Records -->
+            {% if results.opds %}
+                <h3 style="font-size: 22px; font-weight: 600; color: #007bff; margin-top: 20px;">OPD Records</h3>
+                <ul style="list-style: none; padding: 0;">
+                    {% for opd in results.opds %}
+                        <li style="padding: 10px; border-bottom: 1px solid #e0e0e0;">
+                            <strong>Patient:</strong> {{ opd.patient.user.full_name }} <br>
+                            <strong>Doctor:</strong> Dr. {{ opd.doctor.user.full_name }} <br>
+                            <strong>Visit Date:</strong> {{ opd.visit_date }} <br>
+                            <strong>Diagnosis:</strong> {{ opd.diagnosis }}
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+
+            <!-- Emergency Cases -->
+            {% if results.emergencies %}
+                <h3 style="font-size: 22px; font-weight: 600; color: #007bff; margin-top: 20px;">Emergency Cases</h3>
+                <ul style="list-style: none; padding: 0;">
+                    {% for emergency in results.emergencies %}
+                        <li style="padding: 10px; border-bottom: 1px solid #e0e0e0;">
+                            <strong>Patient:</strong> {{ emergency.patient.user.full_name }} <br>
+                            <strong>Emergency Type:</strong> {{ emergency.emergency_type }} <br>
+                            <strong>Referred By:</strong> {{ emergency.referrer }} <br>
+                            <strong>Admission Date:</strong> {{ emergency.admission_date }}
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+
+        {% else %}
+            <p style="color: #6c757d; font-style: italic;">No results found.</p>
+        {% endif %}
+    </div>
+{% endblock %}

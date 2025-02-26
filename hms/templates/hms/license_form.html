@@ -1,0 +1,91 @@
+{% extends 'hms/base.html' %}
+{% block content %}
+
+<div class="container mx-auto px-4 py-8">
+    <div class="max-w-3xl mx-auto">
+        <!-- Form Header -->
+        <h2 class="text-3xl font-bold text-gray-800 mb-6 text-center">
+            {% if form.instance.pk %}Edit{% else %}Add{% endif %} License
+        </h2>
+
+        <!-- Form Container -->
+        <form method="POST" enctype="multipart/form-data" class="bg-white shadow-xl rounded-lg px-8 pt-6 pb-8 mb-6">
+            {% csrf_token %}
+
+            <!-- License Name -->
+            <div class="mb-6">
+                <label class="block text-gray-700 text-sm font-semibold mb-2">License Name:</label>
+                {{ form.name }}
+                {% if form.name.errors %}
+                <p class="text-red-500 text-xs italic">{{ form.name.errors }}</p>
+                {% endif %}
+            </div>
+
+            <!-- License Type -->
+            <div class="mb-6">
+                <label class="block text-gray-700 text-sm font-semibold mb-2">License Type:</label>
+                {{ form.license_type }}
+                {% if form.license_type.errors %}
+                <p class="text-red-500 text-xs italic">{{ form.license_type.errors }}</p>
+                {% endif %}
+            </div>
+
+            <!-- Issue Date and Expiry Date (Side by Side) -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <div>
+                    <label class="block text-gray-700 text-sm font-semibold mb-2">Issue Date:</label>
+                    {{ form.issue_date }}
+                    {% if form.issue_date.errors %}
+                    <p class="text-red-500 text-xs italic">{{ form.issue_date.errors }}</p>
+                    {% endif %}
+                </div>
+                <div>
+                    <label class="block text-gray-700 text-sm font-semibold mb-2">Expiry Date:</label>
+                    {{ form.expiry_date }}
+                    {% if form.expiry_date.errors %}
+                    <p class="text-red-500 text-xs italic">{{ form.expiry_date.errors }}</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Upload Document -->
+            <div class="mb-6">
+                <label class="block text-gray-700 text-sm font-semibold mb-2">Upload Document:</label>
+                {{ form.document }}
+                {% if form.document.errors %}
+                <p class="text-red-500 text-xs italic">{{ form.document.errors }}</p>
+                {% endif %}
+            </div>
+
+            <!-- Status -->
+            <div class="mb-6">
+                <label class="block text-gray-700 text-sm font-semibold mb-2">Status:</label>
+                {{ form.status }}
+                {% if form.status.errors %}
+                <p class="text-red-500 text-xs italic">{{ form.status.errors }}</p>
+                {% endif %}
+            </div>
+
+            <!-- Renewed By -->
+            <div class="mb-6">
+                <label class="block text-gray-700 text-sm font-semibold mb-2">Renewed By:</label>
+                {{ form.renewed_by }}
+                {% if form.renewed_by.errors %}
+                <p class="text-red-500 text-xs italic">{{ form.renewed_by.errors }}</p>
+                {% endif %}
+            </div>
+
+            <!-- Form Actions -->
+            <div class="flex items-center justify-between mt-8">
+                <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-6 rounded-lg focus:outline-none focus:shadow-outline transition duration-300">
+                    Save License
+                </button>
+                <a href="{% url 'license_list' %}" class="text-gray-600 hover:text-gray-800 font-semibold transition duration-300">
+                    Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% endblock %}

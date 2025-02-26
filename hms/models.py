@@ -376,3 +376,66 @@ class Employee(models.Model):
             self.last_payment_date = payment_date
             self.next_due_date = payment_date + timedelta(days=30)  # Assuming monthly salary
             self.save()
+
+
+
+class License(models.Model):
+    LICENSE_TYPES = [
+        ('Medical', 'Medical'),
+        ('Pharmacy', 'Pharmacy'),
+        ('Fire Safety', 'Fire Safety'),
+        ('Other', 'Other'),
+    ]
+    STATUS_CHOICES = [
+        ('Active', 'Active'),
+        ('Expired', 'Expired'),
+        ('Pending Renewal', 'Pending Renewal'),
+    ]
+    
+    name = models.CharField(max_length=255)
+    license_type = models.CharField(max_length=50, choices=LICENSE_TYPES)
+    issue_date = models.DateField()
+    expiry_date = models.DateField()
+    document = models.FileField(upload_to='licenses/', blank=True, null=True)
+    status = models.CharField(max_length=50, choices=STATUS_CHOICES, default="Active")
+    renewed_by = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True, blank=True)
+    
+    def is_expiring_soon(self):
+        
+        return (self.expiry_date - now().date()).days <= 30  # Warning if less than 30 days
+
+    def __str__(self):
+        return f"{self.name} ({self.license_type})"
+    
+
+class Asset(models.Model):
+    ASSET_TYPES = [
+        ('Medical Equipment', 'Medical Equipment'),
+        ('Furniture', 'Furniture'),
+        ('Electronics', 'Electronics'),
+        ('Other', 'Other'),
+    ]
+    
+    name = models.CharField(max_length=255)
+    asset_type = models.CharField(max_length=50, choices=ASSET_TYPES)
+    purchase_date = models.DateField()
+    warranty_expiry = models.DateField()
+    quantity = models.PositiveIntegerField()
+    location = models.CharField(max_length=255, help_text="Where is this asset located?")
+    
+    def is_under_warranty(self):
+        return self.warranty_expiry > now().date()
+
+    def __str__(self):
+        return f"{self.name} - {self.asset_type} ({self.quantity} units)"
+
+
+class Maintenance(models.Model):
+    asset = models.ForeignKey(Asset, on_delete=models.CASCADE, related_name="maintenance_logs")
+    maintenance_date = models.DateField()
+    next_due_date = models.DateField()
+    performed_by = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True)
+    notes = models.TextField(blank=True)
+
+    def __str__(self):
+        return f"Maintenance for {self.asset.name} on {self.maintenance_date}"

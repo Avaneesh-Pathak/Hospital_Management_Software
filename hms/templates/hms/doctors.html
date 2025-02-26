@@ -1,39 +1,73 @@
 {% extends 'hms/base.html' %}
 
 {% block content %}
-    <div style="max-width: 900px; margin: 30px auto; padding: 20px; border-radius: 10px; box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1); background: #ffffff;">
-        <h2 style="font-size: 28px; font-weight: bold; text-align: center; color: #333; margin-bottom: 20px;">Doctors List</h2>
+    <div class="container" style="max-width: 1200px; margin: 40px auto; padding: 20px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); background: #ffffff;">
+        <h2 class="header" style="font-size: 32px; font-weight: 700; text-align: center; color: #2c3e50; margin-bottom: 30px; position: relative;">
+            Doctors List
+            <span style="position: absolute; bottom: -10px; left: 50%; transform: translateX(-50%); width: 60px; height: 4px; background: #007bff; border-radius: 2px;"></span>
+        </h2>
 
         {% if messages %}
             {% for message in messages %}
-                <p style="color: red; text-align: center; font-weight: bold;">{{ message }}</p>
+                <div class="alert" style="background: #f8d7da; color: #721c24; padding: 12px; border-radius: 8px; text-align: center; margin-bottom: 20px; font-weight: 600;">
+                    {{ message }}
+                </div>
             {% endfor %}
         {% endif %}
 
-        <table style="width: 100%; border-collapse: collapse; border-radius: 10px; overflow: hidden; box-shadow: 0px 3px 10px rgba(0, 0, 0, 0.1);">
+        <table class="doctors-table" style="width: 100%; border-collapse: collapse; border-radius: 12px; overflow: hidden; box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);">
             <thead>
                 <tr style="background-color: #007bff; color: white;">
-                    <th style="padding: 15px; border: none; text-align: left;">Doctor Name</th>
-                    <th style="padding: 15px; border: none; text-align: left;">Specialization</th>
-                    <th style="padding: 15px; border: none; text-align: left;">Availability</th>
-                    <th style="padding: 15px; border: none; text-align: center;">Actions</th>
+                    <th style="padding: 16px; text-align: left; font-weight: 600;">Doctor Name</th>
+                    <th style="padding: 16px; text-align: left; font-weight: 600;">Specialization</th>
+                    <th style="padding: 16px; text-align: left; font-weight: 600;">Availability</th>
+                    <th style="padding: 16px; text-align: center; font-weight: 600;">Actions</th>
                 </tr>
             </thead>
             <tbody>
                 {% for doctor in doctors %}
                     <tr style="background-color: #f9f9f9; transition: background 0.3s ease;">
-                        <td style="padding: 15px; border-bottom: 1px solid #ddd;">{{ doctor.user.full_name }}</td>
-                        <td style="padding: 15px; border-bottom: 1px solid #ddd;">{{ doctor.specialization }}</td>
-                        <td style="padding: 15px; border-bottom: 1px solid #ddd;">{{ doctor.availability }}</td>
-                        <td style="padding: 15px; border-bottom: 1px solid #ddd; text-align: center;">
+                        <td style="padding: 16px; border-bottom: 1px solid #e0e0e0; color: #333;">{{ doctor.user.full_name }}</td>
+                        <td style="padding: 16px; border-bottom: 1px solid #e0e0e0; color: #555;">{{ doctor.specialization }}</td>
+                        <td style="padding: 16px; border-bottom: 1px solid #e0e0e0; color: #555;">{{ doctor.availability }}</td>
+                        <td style="padding: 16px; border-bottom: 1px solid #e0e0e0; text-align: center;">
                             <a href="{% url 'doctor_detail' doctor.id %}" 
-                               style="text-decoration: none; background-color: #28a745; color: white; padding: 8px 12px; border-radius: 5px; font-weight: bold; transition: 0.3s;">
+                               class="action-btn view-btn" 
+                               style="text-decoration: none; background-color: #28a745; color: white; padding: 8px 16px; border-radius: 6px; font-weight: 600; transition: background 0.3s ease; margin-right: 8px;">
                                 View Details
                             </a>
+                            <a href="{% url 'update_doctor' doctor.id %}" 
+                               class="action-btn edit-btn" 
+                               style="text-decoration: none; background-color: #ffc107; color: white; padding: 8px 16px; border-radius: 6px; font-weight: 600; transition: background 0.3s ease;">
+                                Edit
+                            </a>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="4" style="padding: 20px; text-align: center; color: #6c757d; font-style: italic;">
+                            No doctors available.
                         </td>
                     </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
+
+    <style>
+        /* Hover Effects */
+        .action-btn:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+        .view-btn:hover {
+            background-color: #218838 !important;
+        }
+        .edit-btn:hover {
+            background-color: #e0a800 !important;
+        }
+        tr:hover {
+            background-color: #007bff;;
+        }
+    </style>
 {% endblock %}

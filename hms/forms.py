@@ -1,5 +1,5 @@
 from django import forms
-from .models import CustomUser, Patient,Billing,Expense,OPD,Room, Doctor, Employee,EmergencyCase,PatientReport,Prescription
+from .models import CustomUser, Patient,Billing,Expense,OPD,Room, Doctor, Employee,EmergencyCase,PatientReport,Prescription,License,Asset,Maintenance
 
 class ProfileUpdateForm(forms.ModelForm):
     class Meta:
@@ -208,8 +208,34 @@ class PrescriptionForm(forms.ModelForm):
 
 
 
+class LicenseForm(forms.ModelForm):
+    class Meta:
+        model = License
+        fields = ['name', 'license_type', 'issue_date', 'expiry_date', 'document', 'status', 'renewed_by']
+        widgets = {
+            'issue_date': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
+            'expiry_date': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
+            'status': forms.Select(attrs={'class': 'form-control'}),
+        }
 
 
+class AssetForm(forms.ModelForm):
+    class Meta:
+        model = Asset
+        fields = ['name', 'asset_type', 'purchase_date', 'warranty_expiry', 'quantity', 'location']
+        widgets = {
+            'purchase_date': forms.DateInput(attrs={'type': 'date'}),
+            'warranty_expiry': forms.DateInput(attrs={'type': 'date'}),
+        }
+
+class MaintenanceForm(forms.ModelForm):
+    class Meta:
+        model = Maintenance
+        fields = ['asset', 'maintenance_date', 'next_due_date', 'performed_by', 'notes']
+        widgets = {
+            'maintenance_date': forms.DateInput(attrs={'type': 'date'}),
+            'next_due_date': forms.DateInput(attrs={'type': 'date'}),
+        }
 
 
 

@@ -5,13 +5,16 @@ from .views import signup,upload_patient_report,add_prescription,get_available_b
 
 urlpatterns = [
     path('', views.dashboard, name='dashboard'),
+    path('search/', views.search, name='search'),
     path('signup/', signup, name='signup'),
+    path('licenses/', views.license_list, name='license_list'),
     path('login/', user_login, name='login'),
     path('logout/', user_logout, name='logout'),
     path("profile/", profile_view, name="profile"),
     path('patients/', views.patients, name='patients'),
     path('api/patients/', fetch_patients, name='fetch_patients'),
     path('doctors/', views.doctors, name='doctors'),
+    path('doctor/update/<int:doctor_id>/', views.update_doctor, name='update_doctor'),
     path('appointments/', views.appointments, name='appointments'),
     path('api/appointments/', fetch_appointments, name='fetch_appointments'),
     path('appointments_update/', views.appointments_update, name='appointments_update'),
@@ -53,6 +56,20 @@ urlpatterns = [
     path('employee/delete/<int:pk>/', delete_employee, name='delete_employee'),
     path('employees/pay-salary/<int:pk>/', views.pay_salary, name='pay_salary'),
     path('add-doctor/', add_doctor, name='add_doctor'),
+    path('assets/', views.asset_list, name='asset_list'),
+    path('assets/add/', views.add_asset, name='add_asset'),
+    path('assets/edit/<int:id>/', views.edit_asset, name='edit_asset'),
+    path('assets/delete/<int:id>/', views.delete_asset, name='delete_asset'),
+
+    path('maintenance/', views.maintenance_list, name='maintenance_list'),
+    path('maintenance/add/', views.add_maintenance, name='add_maintenance'),
+    path('maintenance/edit/<int:id>/', views.edit_maintenance, name='edit_maintenance'),
+    path('maintenance/delete/<int:id>/', views.delete_maintenance, name='delete_maintenance'),
+
+    path('licenses/', views.license_list, name='license_list'),
+    path('licenses/add/', views.add_license, name='add_license'),
+    path('licenses/edit/<int:id>/', views.edit_license, name='edit_license'),
+    path('licenses/delete/<int:id>/', views.delete_license, name='delete_license'),
 ]
 
 
