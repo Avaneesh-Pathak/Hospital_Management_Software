@@ -94,8 +94,8 @@
                         <li style="padding: 10px; border-bottom: 1px solid #e0e0e0;">
                             <strong>Patient:</strong> {{ emergency.patient.user.full_name }} <br>
                             <strong>Emergency Type:</strong> {{ emergency.emergency_type }} <br>
-                            <strong>Referred By:</strong> {{ emergency.referrer }} <br>
-                            <strong>Admission Date:</strong> {{ emergency.admission_date }}
+                            <strong>Referred By:</strong> {{ emergency.referred_by }} <br>
+                            <strong>Admission Date:</strong> {{ emergency.admitted_on }}
                         </li>
                     {% endfor %}
                 </ul>

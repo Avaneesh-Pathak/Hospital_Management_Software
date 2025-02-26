@@ -1,33 +1,127 @@
 {% extends 'hms/base.html' %}
-
+{% load crispy_forms_tags %}
 {% block content %}
-<div class="max-w-lg mx-auto bg-white p-6 rounded-lg shadow-md">
-    <h2 class="text-2xl font-bold mb-4 text-red-600">🚑 Add Emergency Patient</h2>
+<div class="container mt-4">
+    <!-- Breadcrumb Navigation -->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'emergency' %}">Emergency Cases</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Add Emergency Case</li>
+        </ol>
+    </nav>
 
-    {% if messages %}
-        {% for message in messages %}
-            <p class="text-green-600">{{ message }}</p>
-        {% endfor %}
-    {% endif %}
-
-    <form method="POST">
-        {% csrf_token %}
-        
-        <div class="space-y-4">
-            {% for field in form %}
-                <div>
-                    <label class="block font-semibold">{{ field.label }}</label>
-                    {{ field }}
-                    {% if field.errors %}
-                        <p class="text-red-500 text-sm">{{ field.errors.0 }}</p>
-                    {% endif %}
-                </div>
-            {% endfor %}
+    <!-- Card Layout -->
+    <div class="card shadow-lg animate__animated animate__fadeIn">
+        <div class="card-header bg-danger text-white">
+            <h4><i class="fas fa-ambulance"></i> Add Emergency Case</h4>
         </div>
-
-        <button type="submit" class="w-full bg-red-500 text-white py-3 rounded-lg hover:bg-red-700 transition duration-300 mt-4">
-            🚨 Register Emergency Case
-        </button>
-    </form>
+        <div class="card-body">
+            <form method="post" class="needs-validation" novalidate>
+                {% csrf_token %}
+                <div class="row">
+                    <!-- Patient Field -->
+                    <div class="col-md-6 mb-3">
+                        
+                        <div class="input-group">
+                            {{ form.patient|as_crispy_field }}
+                        </div>
+                    </div>
+                    <!-- Referred By Field -->
+                    <div class="col-md-6 mb-3">
+                    
+                        <div class="input-group">
+                            {{ form.referred_by|as_crispy_field }}
+                        </div>
+                    </div>
+                    <!-- Referrer Contact Field -->
+                    <div class="col-md-6 mb-3">
+                        {% comment %} <label for="id_referrer_contact" class="form-label">Referrer Contact</label> {% endcomment %}
+                        <div class="input-group">
+                            {{ form.referrer_contact|as_crispy_field }}
+                        </div>
+                    </div>
+                    <!-- Emergency Type Field -->
+                    <div class="col-md-6 mb-3">
+                        {% comment %} <label for="id_emergency_type" class="form-label">Emergency Type</label> {% endcomment %}
+                        <div class="input-group">
+                            {{ form.emergency_type|as_crispy_field }}
+                        </div>
+                    </div>
+                    <!-- Case Description Field -->
+                    <div class="col-md-12 mb-3">
+                        {% comment %} <label for="id_case_description" class="form-label">Case Description</label> {% endcomment %}
+                        <div class="input-group">
+                            {{ form.case_description|as_crispy_field }}
+                        </div>
+                    </div>
+                    <!-- Severity Field -->
+                    <div class="col-md-6 mb-3">
+                        {% comment %} <label for="id_severity" class="form-label">Severity (1-5)</label> {% endcomment %}
+                        <div class="input-group">
+                            {{ form.severity|as_crispy_field }}
+                        </div>
+                    </div>
+                </div>
+                <!-- Form Buttons -->
+                <div class="mt-4">
+                    <button type="submit" class="btn btn-danger"><i class="fas fa-save"></i> Save Case</button>
+                    <a href="{% url 'emergency' %}" class="btn btn-secondary"><i class="fas fa-times"></i> Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
+
+<!-- Bootstrap form validation script -->
+<script>
+    (function () {
+        'use strict'
+        var forms = document.querySelectorAll('.needs-validation')
+        Array.prototype.slice.call(forms).forEach(function (form) {
+            form.addEventListener('submit', function (event) {
+                if (!form.checkValidity()) {
+                    event.preventDefault()
+                    event.stopPropagation()
+                }
+                form.classList.add('was-validated')
+            }, false)
+        })
+    })()
+</script>
+
+<!-- Custom CSS for Animations and Borders -->
+<style>
+    /* Add border to all input fields */
+    .form-control {
+        border: 2px solid #ced4da;
+        border-radius: 5px;
+        transition: border-color 0.3s ease-in-out;
+    }
+
+    /* Add focus effect to input fields */
+    .form-control:focus {
+        border-color: #dc3545; /* Red color to match the theme */
+        box-shadow: 0 0 5px rgba(220, 53, 69, 0.5);
+    }
+
+    /* Add animation to the card */
+    .animate__animated {
+        animation-duration: 1s;
+    }
+
+    /* Add hover effect to buttons */
+    .btn-danger:hover {
+        background-color: #c82333;
+        border-color: #bd2130;
+    }
+
+    .btn-secondary:hover {
+        background-color: #5a6268;
+        border-color: #545b62;
+    }
+</style>
+
+<!-- Include Animate.css for animations -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
 {% endblock %}

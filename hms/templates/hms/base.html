@@ -6,37 +6,82 @@
     <title>Hospital Management System</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <style>
+        /* Custom CSS */
         body {
             font-family: 'Poppins', sans-serif;
         }
+
+        /* Sidebar */
+        #sidebar {
+            z-index: 1000; /* Ensure sidebar is above all content */
+            position: fixed;
+            left: 0;
+            top: 0;
+            height: 100vh;
+            width: 250px;
+            background-color: #1e3a8a; /* Dark blue */
+            color: white;
+            transform: translateX(-100%);
+            transition: transform 0.3s ease-in-out;
+            overflow-y: auto;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 0; /* No margin by default */
+            transition: margin-left 0.3s ease-in-out;
+            position: relative;
+            z-index: 1; /* Ensure main content is below the sidebar */
+        }
+
+        /* When sidebar is open */
+        #sidebar.open {
+            transform: translateX(0);
+        }
+
+        /* Adjust main content when sidebar is open */
+        #sidebar.open + .main-content {
+            margin-left: 250px; /* Push main content to the right */
+        }
+
+        /* Sidebar Links */
         .sidebar-link {
             transition: all 0.3s ease;
         }
+
         .sidebar-link:hover {
             transform: translateX(5px);
         }
+
+        /* Dark Mode */
         .dark-mode {
             background-color: #1a202c; /* Dark background */
             color: #e2e8f0; /* Light text */
         }
+
         .dark-mode .sidebar {
             background-color: #2d3748; /* Dark sidebar */
         }
+
         .dark-mode .sidebar-link {
             background-color: #4a5568; /* Dark sidebar links */
             color: #e2e8f0;
         }
+
         .dark-mode .navbar {
             background-color: #2d3748; /* Dark navbar */
         }
+
         .dark-mode .footer {
             background-color: #2d3748; /* Dark footer */
         }
     </style>
 </head>
 <body class="bg-gray-100 flex h-screen" onclick="closeSidebar(event)">
-
     <!-- Sidebar -->
     <aside id="sidebar" class="w-64 bg-blue-900 text-white h-screen fixed left-0 top-0 overflow-y-auto p-6 shadow-2xl transition-all duration-300 ease-in-out transform -translate-x-full">
         <div class="flex justify-between items-center mb-8">
@@ -113,15 +158,31 @@
                     🩹 OPD
                 </a>
             </li>
+
+            <!-- License Management -->
             <li>
-                <a href="{% url 'license_list' %}" class="block py-2 px-4 rounded hover:bg-blue-700">📜 License Management</a>
+                <a href="{% url 'license_list' %}" 
+                class="sidebar-link flex items-center p-3 text-lg font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition duration-300">
+                    📜 License Management
+                </a>
             </li>
+
+            <!-- Asset & Machine Store -->
             <li>
-                <a href="{% url 'asset_list' %}" class="block py-2 px-4 rounded hover:bg-blue-700">🏥 Asset & Machine Store</a>
+                <a href="{% url 'asset_list' %}" 
+                class="sidebar-link flex items-center p-3 text-lg font-semibold text-white bg-purple-600 rounded-lg hover:bg-purple-700 transition duration-300">
+                    🏥 Asset & Machine Store
+                </a>
             </li>
+
+            <!-- Maintenance -->
             <li>
-                <a href="{% url 'maintenance_list' %}" class="block py-2 px-4 rounded hover:bg-blue-700">🔧 Maintenance</a>
+                <a href="{% url 'maintenance_list' %}" 
+                class="sidebar-link flex items-center p-3 text-lg font-semibold text-white bg-yellow-600 rounded-lg hover:bg-yellow-700 transition duration-300">
+                    🔧 Maintenance
+                </a>
             </li>
+
             <!-- Add Room -->
             <li>
                 <a href="{% url 'add_room' %}" class="sidebar-link flex items-center p-3 text-lg font-semibold text-white bg-blue-500 rounded-lg hover:bg-blue-600 hover:text-white transition duration-300">
@@ -159,38 +220,37 @@
     </aside>
 
     <!-- Main Content -->
-    <div class="flex-1">
- <!-- Navbar -->
-<nav class="bg-blue-800 p-4 text-white flex justify-between items-center shadow-lg">
-    <!-- Sidebar Toggle Button -->
-    <button id="toggleSidebar" class="text-white text-2xl hover:text-gray-300 transition duration-300">☰</button>
+    <div class="main-content flex-1">
+        <!-- Navbar -->
+        <nav class="bg-blue-800 p-4 text-white flex justify-between items-center shadow-lg">
+            <!-- Sidebar Toggle Button -->
+            <button id="toggleSidebar" class="text-white text-2xl hover:text-gray-300 transition duration-300">☰</button>
 
-    <!-- Title -->
-    <h1 class="text-xl md:text-2xl font-bold text-center flex-1">Hospital Management System</h1>
+            <!-- Title -->
+            <h1 class="text-xl md:text-2xl font-bold text-center flex-1">Hospital Management System</h1>
 
-    <!-- Search Bar (Mobile Mode: Collapsed) -->
-    <div class="relative">
-        <!-- Search Icon (For Small Screens) -->
-        <button id="searchToggle" class="sm:hidden text-white text-2xl focus:outline-none">
-            🔍
-        </button>
+            <!-- Search Bar -->
+            <div class="relative">
+                <!-- Search Icon (For Small Screens) -->
+                <button id="searchToggle" class="sm:hidden text-white text-2xl focus:outline-none">
+                    🔍
+                </button>
 
-        <!-- Search Bar -->
-        <form id="searchForm" action="{% url 'search' %}" method="get" 
-              class="absolute top-10 right-0 bg-white p-2 rounded-lg shadow-lg hidden sm:flex sm:static sm:top-auto sm:right-auto sm:bg-transparent sm:p-0 sm:shadow-none">
-            <input type="text" 
-                   name="q" 
-                   placeholder="Search patients, doctors, appointments..." 
-                   class="px-4 py-2 w-64 border border-gray-300 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-black"
-                   id="searchInput">
-            <button type="submit" 
-                    class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-r-lg transition duration-300">
-                Search
-            </button>
-        </form>
-    </div>
-</nav>
-
+                <!-- Search Bar -->
+                <form id="searchForm" action="{% url 'search' %}" method="get" 
+                      class="absolute top-10 right-0 bg-white p-2 rounded-lg shadow-lg hidden sm:flex sm:static sm:top-auto sm:right-auto sm:bg-transparent sm:p-0 sm:shadow-none">
+                    <input type="text" 
+                           name="q" 
+                           placeholder="Search patients, doctors, appointments..." 
+                           class="px-4 py-2 w-64 border border-gray-300 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-black"
+                           id="searchInput">
+                    <button type="submit" 
+                            class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-r-lg transition duration-300">
+                        Search
+                    </button>
+                </form>
+            </div>
+        </nav>
 
         <!-- Content -->
         <div class="container mx-auto p-6">
@@ -212,17 +272,17 @@
 
         toggleButton.addEventListener("click", (event) => {
             event.stopPropagation();
-            sidebar.classList.toggle("-translate-x-full");
+            sidebar.classList.toggle("open");
         });
 
         closeButton.addEventListener("click", (event) => {
             event.stopPropagation();
-            sidebar.classList.add("-translate-x-full");
+            sidebar.classList.remove("open");
         });
 
         function closeSidebar(event) {
             if (!sidebar.contains(event.target) && !toggleButton.contains(event.target)) {
-                sidebar.classList.add("-translate-x-full");
+                sidebar.classList.remove("open");
             }
         }
 
@@ -247,22 +307,23 @@
                 nightModeToggle.textContent = "🌙";
             }
         });
-    </script>   
-<!-- JavaScript for Search Bar Toggle -->
-<script>
-    document.getElementById("searchToggle").addEventListener("click", function () {
-        var searchForm = document.getElementById("searchForm");
-        var searchInput = document.getElementById("searchInput");
-        
-        if (searchForm.classList.contains("hidden")) {
-            searchForm.classList.remove("hidden");
-            searchInput.classList.add("block"); // Ensure it's visible
-            searchInput.focus();
-        } else {
-            searchForm.classList.add("hidden");
-            searchInput.classList.remove("block");
-        }
-    });
-</script>
+    </script>
+
+    <!-- JavaScript for Search Bar Toggle -->
+    <script>
+        document.getElementById("searchToggle").addEventListener("click", function () {
+            var searchForm = document.getElementById("searchForm");
+            var searchInput = document.getElementById("searchInput");
+            
+            if (searchForm.classList.contains("hidden")) {
+                searchForm.classList.remove("hidden");
+                searchInput.classList.add("block"); // Ensure it's visible
+                searchInput.focus();
+            } else {
+                searchForm.classList.add("hidden");
+                searchInput.classList.remove("block");
+            }
+        });
+    </script>
 </body>
 </html>

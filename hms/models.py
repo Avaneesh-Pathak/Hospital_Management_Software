@@ -5,8 +5,10 @@ from django.db import models
 from django.utils import timezone
 from django.utils.timezone import now
 from datetime import datetime, timedelta
+from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.core.validators import MinLengthValidator
+from django.utils.translation import gettext_lazy as _
 from django.contrib.auth.models import AbstractUser, Group, Permission
 
 logger = logging.getLogger('hms')
@@ -179,6 +181,11 @@ class Appointment(models.Model):
 
 # Emergency Ward Model
 class EmergencyCase(models.Model):
+    class Status(models.TextChoices):
+        PENDING = "Pending", _("Pending")
+        ADMITTED = "Admitted", _("Admitted")
+        DISCHARGED = "Discharged", _("Discharged")
+
     EMERGENCY_TYPES = [
         ('accident', 'Accident'),
         ('cardiac', 'Cardiac Arrest'),
@@ -192,7 +199,9 @@ class EmergencyCase(models.Model):
     referrer_contact = models.CharField(max_length=15, null=True, blank=True)
     emergency_type = models.CharField(max_length=20, choices=EMERGENCY_TYPES)
     case_description = models.TextField()
+    severity = models.IntegerField(default=1, help_text="Severity Level (1-5)")
     admitted_on = models.DateTimeField(auto_now_add=True)
+    status = models.CharField(max_length=20, choices=Status.choices, default=Status.PENDING)
 
     def __str__(self):
         return f"Emergency Case - {self.patient.user.full_name}"

@@ -180,8 +180,7 @@ class DoctorForm(forms.ModelForm):
 class EmergencyCaseForm(forms.ModelForm):
     class Meta:
         model = EmergencyCase
-        fields = ['patient', 'referred_by', 'referrer_contact', 'emergency_type', 'case_description']
-
+        fields = ['patient', 'referred_by', 'referrer_contact', 'emergency_type', 'case_description', 'severity']
 
 
 class PrescriptionForm(forms.ModelForm):

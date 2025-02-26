@@ -1,0 +1,10 @@
+{% extends 'hms/base.html' %}
+{% block content %}
+<h1>Admit Patient to IPD</h1>
+<p>Are you sure you want to admit <strong>{{ emergency.patient.user.get_full_name }}</strong> to IPD?</p>
+<form method="post">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-success">Yes, Admit</button>
+    <a href="{% url 'emergency_list' %}" class="btn btn-secondary">Cancel</a>
+</form>
+{% endblock %}

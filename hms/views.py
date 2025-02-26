@@ -20,7 +20,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.shortcuts import render, redirect,get_object_or_404
 from .models import (
     CustomUser, Patient, Doctor, Appointment, Billing, EmergencyCase, OPD, IPD, Expense, Employee, Room, PatientReport,Prescription,
-    License,Asset,Maintenance
+    License,Asset,Maintenance,
     
 )
 from .forms import (
@@ -620,6 +620,29 @@ def emergency(request):
     return render(request, 'hms/emergency.html', {'emergencies': emergencies})
 
 
+def emergency_s(request):
+    query = request.GET.get('q', '').strip()
+    emergencies = EmergencyCase.objects.all()
+
+    if query:
+        emergencies = emergencies.filter(
+            Q(patient__full_name__icontains=query) |
+            Q(emergency_type__icontains=query) |
+            Q(status__icontains=query) |
+            Q(case_description__icontains=query) |
+            Q(referred_by__icontains=query) |
+            Q(referrer_contact__icontains=query)
+        )
+
+    emergencies_list = list(emergencies.values(
+        'id', 'patient__full_name', 'emergency_type', 'status', 'case_description', 'severity'
+    ))
+
+    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        return JsonResponse(emergencies_list, safe=False)
+
+    return render(request, 'hms/emergency.html', {'emergencies': emergencies_list})
+
 
 @login_required
 def add_emergency_case(request):
@@ -631,34 +654,65 @@ def add_emergency_case(request):
             return redirect("emergency")
     else:
         form = EmergencyCaseForm()
-
     return render(request, "hms/add_emergency.html", {"form": form})
 
+@login_required
+def edit_emergency_case(request, emergency_id):
+    emergency = get_object_or_404(EmergencyCase, id=emergency_id)
+    if request.method == "POST":
+        form = EmergencyCaseForm(request.POST, instance=emergency)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Emergency case updated successfully!")
+            return redirect("emergency")
+    else:
+        form = EmergencyCaseForm(instance=emergency)
+    return render(request, "hms/edit_emergency.html", {"form": form})
 
+@login_required
+def delete_emergency_case(request, emergency_id):
+    emergency = get_object_or_404(EmergencyCase, id=emergency_id)
+
+    if request.method == 'POST':
+        # Delete the emergency case
+        emergency.delete()
+        messages.success(request, "Emergency case deleted successfully!")
+        return redirect("emergency")
+
+    # Render the confirmation page for GET requests
+    return render(request, 'hms/delete_emergency.html', {'emergency': emergency})
 
 @login_required
 def admit_emergency_patient(request, emergency_id):
     emergency_case = get_object_or_404(EmergencyCase, id=emergency_id)
 
-    # Assign the first available room (modify logic as needed)
-    available_room = Room.objects.filter(is_available=True).first()
+    # Find a room that has available beds
+    available_room = Room.objects.filter(available_beds__gt=0).first()
+
     if available_room:
-        ipd = IPD.objects.create(
-            patient=emergency_case.patient,
-            room=available_room,
-            reason_for_admission=emergency_case.case_description
-        )
-        available_room.is_available = False
-        available_room.save()
+        # Assign an available bed from the room
+        assigned_bed = available_room.admit_patient_to_bed()
 
-        # Remove from emergency list
-        emergency_case.delete()
+        if assigned_bed is not None:
+            # Create an IPD record for the patient
+            ipd = IPD.objects.create(
+                patient=emergency_case.patient,
+                room=available_room,
+                bed_number=assigned_bed,  # Store the assigned bed number
+                reason_for_admission=emergency_case.case_description
+            )
 
-        messages.success(request, "Patient admitted to IPD successfully!")
-        return redirect("ipd")
+            # Update emergency case status
+            emergency_case.status = "Admitted"
+            emergency_case.save()
 
-    messages.error(request, "No available rooms for admission!")
+            messages.success(request, f"Patient admitted to IPD successfully in Room {available_room.room_number}, Bed {assigned_bed}!")
+            return redirect("ipd")
+
+    messages.error(request, "No available beds for admission!")
     return redirect("emergency")
+
+
 
 
 

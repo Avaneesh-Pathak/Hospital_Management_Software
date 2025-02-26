@@ -1,30 +1,177 @@
-{% extends "hms/base.html" %}
-
+{% extends 'hms/base.html' %}
+{% load custom_filters %}
 {% block content %}
-<h2 class="text-2xl font-bold">Emergency Cases</h2>
+<!-- Messages -->
 {% if messages %}
-{% for message in messages %}
-    <p style="color: red;">{{ message }}</p>
-{% endfor %}
-{% endif %}
-<table class="w-full border-collapse border border-gray-300">
-    <tr class="bg-gray-100">
-        <th class="border p-2">Patient</th>
-        <th class="border p-2">Referred By</th>
-        <th class="border p-2">Emergency Type</th>
-        <th class="border p-2">Action</th>
-    </tr>
-    {% for case in emergencies %}
-    <tr class="text-center" >
-        <td class="border p-2">{{ case.patient.user.full_name }}</td>
-        <td class="border p-2">{{ case.referred_by|default:"Self" }}</td>
-        <td class="border p-2">{{ case.get_emergency_type_display }}</td>
-        <td class="border p-2">
-            <a href="{% url 'admit_emergency_patient' case.id %}" 
-               class="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-700">Admit to IPD</a>
-        </td>
-    </tr>
+<div class="mb-6">
+    {% for message in messages %}
+        <div class="p-4 mb-4 text-sm rounded-lg {% if message.tags == 'error' %}bg-red-50 text-red-800{% else %}bg-green-50 text-green-800{% endif %}">
+            {{ message }}
+        </div>
     {% endfor %}
-</table>
+</div>
+{% endif %}
+
+<div class="container-fluid">
+    <div class="card shadow mb-4">
+        <div class="card-header py-3 d-flex justify-content-between align-items-center">
+            <h1 class="h3 mb-0 text-gray-800">Emergency Cases</h1>
+            <a href="{% url 'add_emergency_case' %}" class="btn btn-primary">
+                <i class="fas fa-plus-circle"></i> Add New Emergency Case
+            </a>
+        </div>
+        <div class="card-body">
+            {% comment %} <!-- Search Bar -->
+            <div class="mb-4">
+                <form id="searchForm" method="get" action="{% url 'emergency_s' %}">
+                    <div class="input-group w-100">
+                        <input type="text" name="q" id="searchInput" class="form-control" placeholder="Search by any detail..." value="{{ request.GET.q }}">
+                        <div class="input-group-append">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-search"></i> Search
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div> {% endcomment %}
+
+            <!-- Emergency Cases Table -->
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover" id="dataTable" width="100%" cellspacing="0">
+                    <thead class="thead-light">
+                        <tr>
+                            <th>Patient</th>
+                            <th>Emergency Type</th>
+                            <th>Status</th>
+                            <th>Severity</th>
+                            <th>Description</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="emergencyTableBody">
+                        {% for emergency in emergencies %}
+                        <tr>
+                            <td>{{ emergency.patient.user.full_name }}</td>
+                            <td>{{ emergency.emergency_type }}</td>
+                            <td>
+                                <span class="badge 
+                                    {% if emergency.status == 'Pending' %}bg-warning
+                                    {% elif emergency.status == 'Admitted' %}bg-success
+                                    {% elif emergency.status == 'Discharged' %}bg-secondary
+                                    {% endif %}">
+                                    {{ emergency.status }}
+                                </span>
+                            </td>
+                            <td>
+                                <div class="progress">
+                                    <div class="progress-bar 
+                                        {% if emergency.severity <= 2 %}bg-success
+                                        {% elif emergency.severity == 3 %}bg-warning
+                                        {% else %}bg-danger
+                                        {% endif %}" 
+                                        role="progressbar" 
+                                        style="width: {{ emergency.severity|multiply:20 }}%" 
+                                        aria-valuenow="{{ emergency.severity }}" 
+                                        aria-valuemin="1" 
+                                        aria-valuemax="5">
+                                        {{ emergency.severity }}
+                                    </div>
+                                </div>
+                            </td>
+                            <td>{{ emergency.case_description|truncatechars:50 }}</td>
+                            <td>
+                                <a href="{% url 'edit_emergency_case' emergency.id %}" class="btn btn-sm btn-warning">
+                                    <i class="fas fa-edit"></i> Edit
+                                </a>
+                                <a href="{% url 'delete_emergency_case' emergency.id %}" class="btn btn-sm btn-danger">
+                                    <i class="fas fa-trash"></i> Delete
+                                </a>
+                                {% if emergency.status == 'Pending' %}
+                                <a href="{% url 'admit_emergency_patient' emergency.id %}" class="btn btn-sm btn-success">
+                                    <i class="fas fa-hospital"></i> Admit
+                                </a>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let searchTimeout;
+
+    document.getElementById('searchInput').addEventListener('input', function () {
+        clearTimeout(searchTimeout);
+
+        searchTimeout = setTimeout(async () => {
+            const query = this.value.trim();
+            const url = "{% url 'emergency_s' %}?q=" + encodeURIComponent(query);
+
+            try {
+                const response = await fetch(url, {
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                });
+
+                if (!response.ok) throw new Error('Network response was not ok');
+
+                const data = await response.json();
+                const tableBody = document.getElementById('emergencyTableBody');
+                tableBody.innerHTML = ''; // Clear existing rows
+
+                if (data.length === 0) {
+                    tableBody.innerHTML = `<tr><td colspan="6" class="text-center text-muted">No results found.</td></tr>`;
+                    return;
+                }
+
+                data.forEach(emergency => {
+                    const severityClass = emergency.severity <= 2 ? 'bg-success' :
+                                          emergency.severity == 3 ? 'bg-warning' : 'bg-danger';
+
+                    const statusBadge = emergency.status === 'Pending' ? 'bg-warning' :
+                                        emergency.status === 'Admitted' ? 'bg-success' : 'bg-secondary';
+
+                    const row = `
+                        <tr>
+                            <td>${emergency.patient__full_name}</td>
+                            <td>${emergency.emergency_type}</td>
+                            <td><span class="badge ${statusBadge}">${emergency.status}</span></td>
+                            <td>${emergency.case_description.substring(0, 50)}</td>
+                            <td>
+                                <div class="progress">
+                                    <div class="progress-bar ${severityClass}" role="progressbar"
+                                        style="width: ${emergency.severity * 20}%" 
+                                        aria-valuenow="${emergency.severity}" 
+                                        aria-valuemin="1" 
+                                        aria-valuemax="5">
+                                        ${emergency.severity}
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <a href="/emergency/edit/${emergency.id}/" class="btn btn-sm btn-warning">
+                                    <i class="fas fa-edit"></i> Edit
+                                </a>
+                                <a href="/emergency/delete/${emergency.id}/" class="btn btn-sm btn-danger">
+                                    <i class="fas fa-trash"></i> Delete
+                                </a>
+                                ${emergency.status === 'Pending' ? `
+                                <a href="/emergency/admit/${emergency.id}/" class="btn btn-sm btn-success">
+                                    <i class="fas fa-hospital"></i> Admit
+                                </a>` : ''}
+                            </td>
+                        </tr>
+                    `;
+                    tableBody.insertAdjacentHTML('beforeend', row);
+                });
+            } catch (error) {
+                console.error('Error fetching search results:', error);
+            }
+        }, 300); // Debounce input by 300ms
+    });
+</script>
 
 {% endblock %}
