@@ -1,6 +1,7 @@
 import uuid
 import os
 import logging
+from decimal import Decimal
 from django.db import models
 from django.utils import timezone
 from django.utils.timezone import now
@@ -16,7 +17,6 @@ logger = logging.getLogger('hms')
 
 # Custom User Model
 class CustomUser(AbstractUser):
-
     GENDER_CHOICES = (
         ('male', 'Male'),
         ('female', 'Female'),
@@ -46,40 +46,90 @@ class CustomUser(AbstractUser):
         return self.username
 
 
-# Patient Model
-
 class Patient(models.Model):
-    patient_code = models.CharField(max_length=10, unique=True, editable=False, blank=True, null=True)
+    BLOOD_GROUP_CHOICES = [
+        ('A+', 'A+'), ('A-', 'A-'), ('B+', 'B+'), ('B-', 'B-'),
+        ('O+', 'O+'), ('O-', 'O-'), ('AB+', 'AB+'), ('AB-', 'AB-')
+    ]
+
+    RELATIONSHIP_CHOICES = [
+        ('father', 'Father'),
+        ('mother', 'Mother'),
+        ('son', 'Son'),
+        ('daughter', 'Daughter'),
+        ('spouse', 'Spouse'),
+        ('friend', 'Friend'),
+        ('other', 'Other'),
+    ]
+
+    # Basic Patient Information
+    patient_code = models.CharField(max_length=15, unique=True, editable=False, blank=True, null=True)
     created_at = models.DateTimeField(default=now)
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name="patient")
     date_of_birth = models.DateField(blank=True, null=True)
+    age = models.PositiveIntegerField(blank=True, null=True)  # Age field
     contact_number = models.CharField(max_length=15, blank=True, null=True)
     address = models.TextField(blank=True, null=True)
     gender = models.CharField(max_length=10, choices=CustomUser.GENDER_CHOICES, blank=True, null=True)
     aadhar_number = models.CharField(max_length=12, unique=True, validators=[MinLengthValidator(12)], blank=True, null=True)
-    blood_group = models.CharField(max_length=3, blank=True, null=True, choices=[
-        ('A+', 'A+'), ('A-', 'A-'), ('B+', 'B+'), ('B-', 'B-'),
-        ('O+', 'O+'), ('O-', 'O-'), ('AB+', 'AB+'), ('AB-', 'AB-')
-    ])
+    blood_group = models.CharField(max_length=3, blank=True, null=True, choices=BLOOD_GROUP_CHOICES)
     email = models.EmailField(unique=True, blank=True, null=True)
 
-    # Guarantor Details
-    guarantor_name = models.CharField(max_length=255, blank=True, null=True)
-    guarantor_address = models.TextField(blank=True, null=True)
-    guarantor_mobile = models.CharField(max_length=15, blank=True, null=True)
-    guarantor_relationship = models.CharField(max_length=50, blank=True, null=True)
-    guarantor_gender = models.CharField(max_length=10, choices=CustomUser.GENDER_CHOICES, blank=True, null=True)
+    # Medical Information
+    allergies = models.TextField(blank=True, null=True)  # Known allergies
+    medical_history = models.TextField(blank=True, null=True)  # Past medical history
+    current_medications = models.TextField(blank=True, null=True)  # Current medications
 
-    # ✅ Profile Picture Field
+    # Emergency Contact Information
+    emergency_contact_name = models.CharField(max_length=255, blank=True, null=True)
+    emergency_contact_number = models.CharField(max_length=15, blank=True, null=True)
+    emergency_contact_relationship = models.CharField(max_length=50, blank=True, null=True, choices=RELATIONSHIP_CHOICES)
+
+    # Accompanying Person Details (Replaces Guarantor)
+    accompanying_person_name = models.CharField(max_length=255, blank=True, null=True)
+    accompanying_person_contact = models.CharField(max_length=15, blank=True, null=True)
+    accompanying_person_relationship = models.CharField(max_length=50, blank=True, null=True, choices=RELATIONSHIP_CHOICES)
+    accompanying_person_address = models.TextField(blank=True, null=True)
+
+    # Profile Picture
     profile_picture = models.ImageField(upload_to='patient_profiles/', blank=True, null=True)
 
+    def generate_patient_code(self):
+        """Generate a unique patient code based on logic."""
+        # Extract date and time components
+        now = datetime.now()
+        year = now.strftime('%Y')  # 4-digit year
+        month = now.strftime('%m')  # 2-digit month
+        day = now.strftime('%d')    # 2-digit day
+        hour = now.strftime('%H')   # 2-digit hour (24-hour format)
+        minute = now.strftime('%M') # 2-digit minute
+
+        # Extract initials from the patient's full name
+        initials = ''.join([name[0].upper() for name in self.user.full_name.split()]) if self.user.full_name else 'PT'
+
+        # Generate a unique identifier (last 4 characters of UUID)
+        unique_id = uuid.uuid4().hex[-4:].upper()
+
+        # Combine components to create the patient code
+        patient_code = f"{year}{month}{day}{hour}{minute}-{initials}-{unique_id}"
+
+        return patient_code
+
     def save(self, *args, **kwargs):
-        """Ensure a unique patient_code is assigned"""
+        """Ensure a unique patient_code is assigned."""
         if not self.patient_code:
-            self.patient_code = uuid.uuid4().hex[:10].upper()
+            self.patient_code = self.generate_patient_code()
             while Patient.objects.filter(patient_code=self.patient_code).exists():
-                self.patient_code = uuid.uuid4().hex[:10].upper()
+                self.patient_code = self.generate_patient_code()
             logger.info(f"Generated patient code: {self.patient_code}")
+
+        # Calculate age if date_of_birth is provided
+        if self.date_of_birth:
+            today = now().date()
+            age = today.year - self.date_of_birth.year
+            if (today.month, today.day) < (self.date_of_birth.month, self.date_of_birth.day):
+                age -= 1
+            self.age = age
 
         super().save(*args, **kwargs)
         logger.info(f"Patient {self.user.full_name} saved successfully.")
@@ -259,29 +309,121 @@ class Room(models.Model):
 # IPD Model
 class IPD(models.Model):
     patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
-    room = models.ForeignKey(Room, on_delete=models.CASCADE, limit_choices_to={'is_available': True},null=True, blank=True)
+    room = models.ForeignKey(Room, on_delete=models.CASCADE, limit_choices_to={'is_available': True}, null=True, blank=True)
     admitted_on = models.DateTimeField(auto_now_add=True)
     discharge_date = models.DateTimeField(null=True, blank=True)
     reason_for_admission = models.TextField(null=True, blank=True)
-    # ✅ Added Fields
     bed_number = models.IntegerField(null=True, blank=True)
     bed_price_per_day = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    total_cost = models.DecimalField(max_digits=10, decimal_places=2, default=0.00, editable=False)  # Total cost of the stay
+    transferred_to_hospital = models.CharField(max_length=255, null=True, blank=True)  # New field for transfer to another hospital
+
     def save(self, *args, **kwargs):
-        """ Mark room as unavailable when a patient is admitted """
+        """Mark room as unavailable when a patient is admitted and assign bed price."""
+        if self.room and not self.bed_price_per_day:
+            self.bed_price_per_day = self.room.bed_price_per_day  # Assign bed price from the room
+
         if self.room:
             self.room.is_available = False
             self.room.save()
+
         super().save(*args, **kwargs)
 
+    def calculate_total_cost(self):
+        """Calculate the total cost of the stay based on the duration and bed price."""
+        if self.discharge_date and self.admitted_on and self.bed_price_per_day:
+            stay_duration = (self.discharge_date - self.admitted_on).days
+            self.total_cost = self.bed_price_per_day * stay_duration
+        return self.total_cost
+
     def discharge(self):
-        """ Discharge patient and mark room as available again """
-        self.discharge_date = timezone.now()
-        self.room.is_available = True
-        self.room.save()
+        """Discharge patient, mark room as available, and record income."""
+        if not self.discharge_date:
+            self.discharge_date = timezone.now()
+
+        # Calculate total cost
+        self.total_cost = self.calculate_total_cost()
+
+        # Mark room and bed as available
+        if self.room:
+            self.room.discharge_patient_from_bed(self.bed_number)  # Mark the bed as available
+            self.room.update_availability()  # Update room availability
+            self.room.save()
+
+        # Save the IPD record
+        self.save()
+
+        # Record income in AccountingRecord
+        if self.total_cost > 0:
+            AccountingRecord.objects.create(
+                transaction_type='income',
+                source='ipd',
+                amount=self.total_cost,
+                description=f"IPD charges for {self.patient.user.full_name} (Room {self.room.room_number}, Bed {self.bed_number})",
+                patient=self.patient,
+                room=self.room,
+            )
+
+    def transfer_to_other_hospital(self, hospital_name):
+        """
+        Transfer the patient to another hospital and mark the current bed as available.
+        """
+        if not hospital_name:
+            raise ValueError("Hospital name is required for transfer.")
+
+        # Mark the current bed as available
+        if self.room:
+            self.room.discharge_patient_from_bed(self.bed_number)
+            self.room.update_availability()
+            self.room.save()
+
+        # Update the IPD record
+        self.transferred_to_hospital = hospital_name
+        self.discharge_date = timezone.now()  # Mark as discharged
+        self.save()
+
+    def change_bed(self, new_room, new_bed_number):
+        """
+        Change the patient's bed to a new bed in a new or same room.
+        Mark the previous bed as available.
+        """
+        if not new_room.is_available:
+            raise ValueError("The new room is not available.")
+
+        if new_bed_number in new_room.occupied_beds:
+            raise ValueError("The selected bed is already occupied.")
+
+        # Mark the previous bed as available
+        if self.room:
+            self.room.discharge_patient_from_bed(self.bed_number)
+            self.room.update_availability()
+            self.room.save()
+
+        # Assign the new bed
+        self.room = new_room
+        self.bed_number = new_bed_number
+        new_room.occupied_beds.append(new_bed_number)
+        new_room.update_availability()
+        new_room.save()
+
+        # Save the IPD record
         self.save()
 
     def __str__(self):
-        return f"IPD - {self.patient.user.full_name} - {self.room.room_number}"
+        return f"IPD - {self.patient.user.full_name} - {self.room.room_number if self.room else 'No Room'}"
+
+
+class PatientTransfer(models.Model):
+    patient = models.ForeignKey(Patient, on_delete=models.CASCADE, related_name="transfers")
+    transfer_date = models.DateTimeField(auto_now_add=True)
+    transfer_reason = models.TextField()
+    transferred_to_hospital = models.CharField(max_length=255)  # New hospital name
+    doctor = models.ForeignKey(Doctor, on_delete=models.SET_NULL, null=True, blank=True)
+    
+    def __str__(self):
+        return f"{self.patient.user.full_name} transferred to {self.transferred_to_hospital}"
+
+
 
 class Prescription(models.Model):
     ipd = models.ForeignKey(IPD, on_delete=models.CASCADE, related_name="prescriptions")
@@ -319,7 +461,26 @@ class OPD(models.Model):
     payment_status = models.CharField(max_length=20, choices=PAYMENT_STATUS_CHOICES, default='pending')  # Payment status
     payment_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)  # Amount paid for the visit
 
+    def save(self, *args, **kwargs):
+        if isinstance(self.payment_amount, str):
+            try:
+                self.payment_amount = Decimal(self.payment_amount)
+            except ValueError:
+                self.payment_amount = Decimal(0)  # Set to 0 if conversion fails
+        
+        super().save(*args, **kwargs)
+
+        if self.payment_status == 'paid' and self.payment_amount > 0:
+            AccountingRecord.objects.create(
+                transaction_type='income',
+                source='opd',
+                amount=self.payment_amount,
+                description=f"OPD payment for {self.patient.user.full_name}",
+                patient=self.patient,
+            )
+
     def __str__(self):
+        
         return f"OPD Visit - {self.patient.user.full_name} ({self.visit_date.strftime('%Y-%m-%d')})"
 
 
@@ -339,6 +500,16 @@ class Expense(models.Model):
     category = models.CharField(max_length=20, choices=CATEGORY_CHOICES,null=True)
     description = models.TextField(null=True)  # Description of the expense
     cost = models.DecimalField(max_digits=10, decimal_places=2)
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        AccountingRecord.objects.create(
+            transaction_type='expense',
+            source='other',
+            amount=self.cost,
+            description=f"{self.get_category_display()} expense for {self.patient.user.full_name}",
+            patient=self.patient,
+        )
 
     def __str__(self):
         return f"{self.patient.patient_code} - {self.category} - ₹{self.cost}"
@@ -376,15 +547,18 @@ class Employee(models.Model):
         return f"{self.user.full_name} - {self.role}"
 
     def pay_salary(self, payment_date):
-        """
-        Method to pay salary and update payment and due dates.
-        """
         if payment_date:
-            # Convert payment_date from string to datetime.date object
             payment_date = datetime.strptime(payment_date, '%Y-%m-%d').date()
             self.last_payment_date = payment_date
-            self.next_due_date = payment_date + timedelta(days=30)  # Assuming monthly salary
+            self.next_due_date = payment_date + timedelta(days=30)
             self.save()
+            AccountingRecord.objects.create(
+                transaction_type='expense',
+                source='salary',
+                amount=self.salary,
+                description=f"Salary payment for {self.user.full_name}",
+                employee=self,
+            )
 
 
 
@@ -448,3 +622,93 @@ class Maintenance(models.Model):
 
     def __str__(self):
         return f"Maintenance for {self.asset.name} on {self.maintenance_date}"
+
+
+#Daybook
+
+class Balance(models.Model):
+    amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    carryover_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)  # Add this field
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, null=True, blank=True) 
+
+    def __str__(self):
+        logger.info(f"Balance created with amount: {self.amount} and carryover amount: {self.carryover_amount}")
+        return f"Balance: {self.amount}"
+    
+    def save(self, *args, **kwargs):
+        # Log when the balance is saved (either created or updated)
+        action = "created" if self.pk is None else "updated"
+        super().save(*args, **kwargs)
+        logger.info(f"Balance {action} with amount: {self.amount} and carryover amount: {self.carryover_amount}")
+
+class Daybook(models.Model):
+    ACTIVITY_CHOICES = [
+        ('pantry', 'Pantry'),
+        ('fuel', 'Fuel'),
+        ('office_expense', 'Office Expense'),
+        ('site_development', 'Site Development'),
+        ('site_visit', 'Site Visit'),
+        ('printing', 'Printing'),
+        ('utility', 'Utility'),
+        ('others', 'Others'),
+    ]
+
+    date = models.DateField(default=timezone.now)
+    activity = models.CharField(max_length=50, choices=ACTIVITY_CHOICES,null=True)
+    custom_activity = models.CharField(max_length=100, blank=True, null=True)  # For "Others"
+    amount = models.DecimalField(max_digits=10, decimal_places=2,null=True,blank=True)
+    remark = models.TextField(blank=True, null=True)
+    # Balance field to keep track of remaining balance
+    current_balance = models.DecimalField(max_digits=15, decimal_places=2, default=0.00)
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, null=True, blank=True)
+    
+    def __str__(self):
+        # Log whenever __str__ is called (representing the Daybook entry)
+        activity_display = self.custom_activity if self.activity == 'others' else self.activity
+        logger.info(f"Daybook entry created: {self.date} - {activity_display} - Amount: {self.amount}")
+        return f"{self.date} - {activity_display} - {self.amount}"
+
+    def save(self, *args, **kwargs):
+        # Calculate the new balance after the transaction
+        previous_balance = self.__class__.objects.filter(id=self.id).first().current_balance if self.pk else 0
+        if self.amount:  # If there's an amount for the transaction, update the balance
+            self.current_balance = previous_balance + self.amount
+        
+        activity_display = self.custom_activity if self.activity == 'others' else self.activity
+        action = "created" if self.pk is None else "updated"
+        
+        super().save(*args, **kwargs)
+        
+        # Log and send SMS after save
+        logger.info(f"Daybook entry {action} with date: {self.date}, activity: {activity_display}, amount: {self.amount}, remaining balance: {self.current_balance}")
+
+
+
+class AccountingRecord(models.Model):
+    TRANSACTION_TYPE_CHOICES = [
+        ('income', 'Income'),
+        ('expense', 'Expense'),
+    ]
+
+    SOURCE_CHOICES = [
+        ('opd', 'OPD'),
+        ('ipd', 'IPD'),
+        ('emergency', 'Emergency'),
+        ('salary', 'Salary'),
+        ('other', 'Other'),
+    ]
+
+    transaction_type = models.CharField(max_length=10, choices=TRANSACTION_TYPE_CHOICES)
+    source = models.CharField(max_length=20, choices=SOURCE_CHOICES)
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    description = models.TextField(blank=True, null=True)
+    date = models.DateTimeField(auto_now_add=True)
+    patient = models.ForeignKey(Patient, on_delete=models.SET_NULL, null=True, blank=True, related_name="financial_records")
+    employee = models.ForeignKey(Employee, on_delete=models.SET_NULL, null=True, blank=True, related_name="salary_payments")
+    room = models.ForeignKey(Room, on_delete=models.SET_NULL, null=True, blank=True, related_name="room_charges")
+
+    def __str__(self):
+        return f"{self.get_transaction_type_display()} - {self.get_source_display()} - ₹{self.amount}"
+
+    class Meta:
+        ordering = ['-date']

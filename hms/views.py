@@ -1,10 +1,16 @@
+import io
+import csv
 import datetime
 import logging
+from xhtml2pdf import pisa
 from decimal import Decimal
 from django.db import models
+from django.views import View
 from django.db.models import Q
 from django.utils import timezone
+from reportlab.pdfgen import canvas
 from django.http import JsonResponse
+from django.http import FileResponse
 from django.http import HttpResponse
 from reportlab.pdfgen import canvas
 from django.shortcuts import render
@@ -12,20 +18,24 @@ from django.contrib import messages
 from django.utils.timezone import now
 from django.db.models import Count,Sum
 from datetime import datetime ,timedelta
+from reportlab.lib.pagesizes import letter
+from django.core.paginator import Paginator
 from django.contrib.auth.models import User
+from django.template.loader import get_template
 from django.db.models.functions import TruncDate
 from django.core.exceptions import ObjectDoesNotExist
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
 from django.shortcuts import render, redirect,get_object_or_404
 from .models import (
     CustomUser, Patient, Doctor, Appointment, Billing, EmergencyCase, OPD, IPD, Expense, Employee, Room, PatientReport,Prescription,
-    License,Asset,Maintenance,
+    License,Asset,Maintenance,AccountingRecord,Daybook,Balance,PatientTransfer
     
 )
 from .forms import (
     PatientRegistrationForm, ExpenseForm, BillingForm, OPDForm, DoctorForm, EmployeeForm, RoomForm, EmergencyCaseForm, ProfileUpdateForm,PatientReportForm,
-    PrescriptionForm,LicenseForm,AssetForm,MaintenanceForm
+    PrescriptionForm,LicenseForm,AssetForm,MaintenanceForm,BalanceUpdateForm,DaybookEntryForm
 )
 
 logger = logging.getLogger(__name__)
@@ -151,7 +161,7 @@ def dashboard(request):
     warning_period = today + timedelta(days=30)
     emergency_cases_today = EmergencyCase.objects.filter(admitted_on__date=today).count()
     upcoming_appointments = Appointment.objects.filter(date__gte=now()).order_by('date')
-
+   
     # Get patient registration trend for the last 7 days
     last_week = today - timedelta(days=6)
     patient_trend = (
@@ -203,6 +213,7 @@ def dashboard(request):
         'expiring_licenses': expiring_licenses,
         'expiring_assets': expiring_assets,
         'due_maintenance': due_maintenance,
+        
     }
 
     return render(request, 'hms/dashboard.html', context)
@@ -243,6 +254,7 @@ def patient_profile(request, patient_code):
     }
     return render(request, 'hms/patient_profile.html', context)
 
+
 @login_required
 def upload_patient_report(request, patient_code):
     patient = get_object_or_404(Patient, patient_code=patient_code)
@@ -262,65 +274,67 @@ def upload_patient_report(request, patient_code):
 
 
 
-@login_required
-def discharge_patient(request, patient_code):
-    patient = get_object_or_404(Patient, patient_code=patient_code)
-    
-    # Check if the patient is in IPD
-    ipd_record = IPD.objects.filter(patient=patient, discharge_date__isnull=True).first()
-    if ipd_record:
-        ipd_record.discharge_date = timezone.now()
-        ipd_record.room.is_available = True  # Mark the room as available
-        ipd_record.room.save()
-        ipd_record.save()
-
-    return redirect("patients")  # Redirect to patient list or dashboard
-
 
 @login_required
 def register_patient(request):
     if request.method == "POST":
         logger.info("Received patient registration form submission.")
-        form = PatientRegistrationForm(request.POST)
+        form = PatientRegistrationForm(request.POST, request.FILES)  # Include request.FILES for file uploads
         if form.is_valid():
             try:
-                # Create user first
                 user = CustomUser.objects.create(
                     full_name=form.cleaned_data['full_name'],
                     email=form.cleaned_data['email'],
                     contact_number=form.cleaned_data['contact_number'],
                     address=form.cleaned_data['address'],
-                    username=form.cleaned_data['email']  # Username is email
+                    gender=form.cleaned_data['gender'],
+                    username=form.cleaned_data['email']
                 )
                 user.save()
                 logger.info(f"New user created: {user.full_name} ({user.email})")
 
-                # Create the patient instance
                 patient = Patient.objects.create(
                     user=user,
                     date_of_birth=form.cleaned_data['date_of_birth'],
                     aadhar_number=form.cleaned_data['aadhar_number'],
                     blood_group=form.cleaned_data['blood_group'],
-                    guarantor_name=form.cleaned_data['guarantor_name'],
-                    guarantor_address=form.cleaned_data['guarantor_address'],
-                    guarantor_mobile=form.cleaned_data['guarantor_mobile'],
-                    guarantor_relationship=form.cleaned_data['guarantor_relationship'],
-                    guarantor_gender=form.cleaned_data['guarantor_gender'],
+                    allergies=form.cleaned_data.get('allergies', ''),
+                    medical_history=form.cleaned_data.get('medical_history', ''),
+                    current_medications=form.cleaned_data.get('current_medications', ''),
+                    emergency_contact_name=form.cleaned_data.get('emergency_contact_name', ''),
+                    emergency_contact_number=form.cleaned_data.get('emergency_contact_number', ''),
+                    emergency_contact_relationship=form.cleaned_data.get('emergency_contact_relationship', ''),
+                    accompanying_person_name=form.cleaned_data.get('accompanying_person_name', ''),
+                    accompanying_person_contact=form.cleaned_data.get('accompanying_person_contact', ''),
+                    accompanying_person_relationship=form.cleaned_data.get('accompanying_person_relationship', ''),
+                    accompanying_person_address=form.cleaned_data.get('accompanying_person_address', ''),
+                    profile_picture=form.cleaned_data.get('profile_picture', None),
+                    contact_number=form.cleaned_data['contact_number'],
+                    gender=form.cleaned_data['gender'],
+                    email=form.cleaned_data['email'],
                 )
                 logger.info(f"New patient registered: {patient.user.full_name} (Code: {patient.patient_code})")
+                messages.success(request, "Patient registered successfully!")
                 return redirect('patients')  # Redirect to patients list
             except Exception as e:
                 logger.error(f"Error occurred during patient registration: {e}")
+                messages.error(request, f"Error occurred: {str(e)}")
         else:
             logger.warning("Patient registration form is invalid.")
+            logger.error(f"Form errors: {form.errors}")  # Log errors for debugging
+            messages.error(request, "There were errors in your submission. Please check the form.")
+            print(form.errors)  # Print errors in the console
+
     else:
         form = PatientRegistrationForm()
+
     return render(request, 'hms/register_patient.html', {'form': form})
 
-
+@login_required
 def fetch_patients(request):
     patients = Patient.objects.select_related("user").values(
-        "patient_code", "user__full_name"
+        "patient_code", "user__full_name", "user__email", "user__contact_number", "user__gender",
+        "date_of_birth", "blood_group", "aadhar_number", "emergency_contact_name", "emergency_contact_number"
     )
     return JsonResponse({"patients": list(patients)}, safe=False)
 
@@ -755,6 +769,95 @@ def update_ipd_room(request, ipd_id):
     return redirect('view_ipd_report', ipd_id=ipd.id)
 
 
+
+@login_required
+def discharge_patient(request, patient_code):
+    patient = get_object_or_404(Patient, patient_code=patient_code)
+    ipd_record = IPD.objects.filter(patient=patient, discharge_date__isnull=True).first()
+
+    if not ipd_record:
+        messages.error(request, "Patient is not currently admitted in IPD.")
+        return redirect("patients")
+
+    # Perform discharge
+    ipd_record.discharge()
+    messages.success(request, f"Patient {patient.user.full_name} has been discharged successfully.")
+
+    # Generate discharge summary PDF and return response
+    return discharge_summary_pdf(request, patient_code, action="Discharged")
+
+
+def transfer_patient(request, patient_code):
+    patient = get_object_or_404(Patient, patient_code=patient_code)
+
+    # Fetch OPD visits
+    opd_visits = OPD.objects.filter(patient=patient).order_by('-visit_date')
+
+    # Fetch IPD records and prescriptions
+    ipd_records = IPD.objects.filter(patient=patient)
+    prescriptions = Prescription.objects.filter(ipd__in=ipd_records).order_by('-timing')
+
+    # Fetch Transfer Details
+    transfer = PatientTransfer.objects.filter(patient=patient).order_by('-transfer_date').first()
+
+    context = {
+        "patient": patient,
+        "opd_visits": opd_visits,
+        "ipd_records": ipd_records,
+        "prescriptions": prescriptions,
+        "transfer": transfer,
+    }
+
+    return render(request, "hms/transfer_summary.html", context)
+
+
+def render_to_pdf(template_src, context_dict):
+    template = get_template(template_src)
+    html = template.render(context_dict)
+    response = HttpResponse(content_type="application/pdf")
+    response["Content-Disposition"] = 'inline; filename="report.pdf"'
+
+    pisa_status = pisa.CreatePDF(html, dest=response)
+    
+    if pisa_status.err:
+        return HttpResponse("Error generating PDF", status=500)
+    
+    return response
+
+def discharge_summary_pdf(request, patient_code, action=None):
+    patient = get_object_or_404(Patient, patient_code=patient_code)
+    opd_visits = OPD.objects.filter(patient=patient).order_by('-visit_date')
+    ipd_records = IPD.objects.filter(patient=patient)
+    prescriptions = Prescription.objects.filter(ipd__in=ipd_records).order_by('-timing')
+
+    context = {
+        "patient": patient,
+        "opd_visits": opd_visits,
+        "ipd_records": ipd_records,
+        "prescriptions": prescriptions,
+        "action": action,  # Include action in context if needed
+    }
+
+    return render_to_pdf("hms/discharge_summary.html", context)
+
+def transfer_summary_pdf(request, patient_code):
+    patient = get_object_or_404(Patient, patient_code=patient_code)
+    opd_visits = OPD.objects.filter(patient=patient).order_by('-visit_date')
+    ipd_records = IPD.objects.filter(patient=patient)
+    prescriptions = Prescription.objects.filter(ipd__in=ipd_records).order_by('-timing')
+    transfer = PatientTransfer.objects.filter(patient=patient).order_by('-transfer_date').first()
+
+    context = {
+        "patient": patient,
+        "opd_visits": opd_visits,
+        "ipd_records": ipd_records,
+        "prescriptions": prescriptions,
+        "transfer": transfer,
+    }
+
+    return render_to_pdf("hms/transfer_summary.html", context)
+
+
 def add_prescription(request, ipd_id):
     ipd = get_object_or_404(IPD, id=ipd_id)
 
@@ -1122,3 +1225,258 @@ def delete_maintenance(request, id):
     maintenance = get_object_or_404(Maintenance, id=id)
     maintenance.delete()
     return redirect('maintenance_list')
+
+
+
+
+def accounting_summary(request):
+    today = timezone.now().date()
+    start_date = request.GET.get('start_date')
+    end_date = request.GET.get('end_date')
+
+    # Convert to date objects if provided
+    if start_date and end_date:
+        start_date = timezone.datetime.strptime(start_date, "%Y-%m-%d").date()
+        end_date = timezone.datetime.strptime(end_date, "%Y-%m-%d").date()
+    else:
+        start_date = today
+        end_date = today
+
+    # Today's Income and Expense from AccountingRecord
+    today_income = AccountingRecord.objects.filter(
+        transaction_type='income', date__date=today
+    ).aggregate(total_income=Sum('amount'))['total_income'] or 0
+
+    today_expense = AccountingRecord.objects.filter(
+        transaction_type='expense', date__date=today
+    ).aggregate(total_expense=Sum('amount'))['total_expense'] or 0
+
+    # Today's Income and Expense from Daybook
+    daybook_entries_today = Daybook.objects.filter(date=today)
+    daybook_income_today = daybook_entries_today.filter(activity__in=['pantry', 'fuel', 'office_expense', 'site_development', 'site_visit', 'printing', 'utility']).aggregate(total_income=Sum('amount'))['total_income'] or 0
+    daybook_expense_today = daybook_entries_today.filter(activity__in=['pantry', 'fuel', 'office_expense', 'site_development', 'site_visit', 'printing', 'utility']).aggregate(total_expense=Sum('amount'))['total_expense'] or 0
+
+    # Total Today's Income and Expense
+    total_today_income = today_income + daybook_income_today
+    total_today_expense = today_expense + daybook_expense_today
+    total_today_savings = total_today_income - total_today_expense
+
+    # Income & Expense in a Date Range
+    range_income = AccountingRecord.objects.filter(
+        transaction_type='income', date__date__range=(start_date, end_date)
+    ).aggregate(total_income=Sum('amount'))['total_income'] or 0
+
+    range_expense = AccountingRecord.objects.filter(
+        transaction_type='expense', date__date__range=(start_date, end_date)
+    ).aggregate(total_expense=Sum('amount'))['total_expense'] or 0
+
+    # Excluding IPD and OPD
+    excluded_sources = ['ipd', 'opd']
+    other_income = AccountingRecord.objects.filter(
+        transaction_type='income'
+    ).exclude(source__in=excluded_sources).aggregate(total_income=Sum('amount'))['total_income'] or 0
+
+    other_expense = AccountingRecord.objects.filter(
+        transaction_type='expense'
+    ).exclude(source__in=excluded_sources).aggregate(total_expense=Sum('amount'))['total_expense'] or 0
+
+    # Separate IPD & OPD Reports
+    ipd_income = AccountingRecord.objects.filter(
+        transaction_type='income', source='ipd', date__date__range=(start_date, end_date)
+    ).aggregate(total_income=Sum('amount'))['total_income'] or 0
+
+    opd_income = AccountingRecord.objects.filter(
+        transaction_type='income', source='opd', date__date__range=(start_date, end_date)
+    ).aggregate(total_income=Sum('amount'))['total_income'] or 0
+
+    # Billing Information
+    total_billed = Billing.objects.filter(generated_on__date__range=(start_date, end_date)).aggregate(total_billed=Sum('total_amount'))['total_billed'] or 0
+    total_paid = Billing.objects.filter(generated_on__date__range=(start_date, end_date)).aggregate(total_paid=Sum('paid_amount'))['total_paid'] or 0
+    total_pending = total_billed - total_paid
+
+    # Daybook Data
+    daybook_entries = Daybook.objects.filter(date__range=(start_date, end_date))
+    daybook_income = daybook_entries.filter(activity__in=['pantry', 'fuel', 'office_expense', 'site_development', 'site_visit', 'printing', 'utility']).aggregate(total_income=Sum('amount'))['total_income'] or 0
+    daybook_expense = daybook_entries.filter(activity__in=['pantry', 'fuel', 'office_expense', 'site_development', 'site_visit', 'printing', 'utility']).aggregate(total_expense=Sum('amount'))['total_expense'] or 0
+
+    context = {
+        'today_income': total_today_income,
+        'today_expense': total_today_expense,
+        'today_savings': total_today_savings,
+        'range_income': range_income,
+        'range_expense': range_expense,
+        'range_profit': range_income - range_expense,
+        'other_income': other_income,
+        'other_expense': other_expense,
+        'other_profit': other_income - other_expense,
+        'ipd_income': ipd_income,
+        'opd_income': opd_income,
+        'total_billed': total_billed,
+        'total_paid': total_paid,
+        'total_pending': total_pending,
+        'daybook_income': daybook_income,
+        'daybook_expense': daybook_expense,
+        'daybook_profit': daybook_income - daybook_expense,
+        'start_date': start_date,
+        'end_date': end_date,
+        'daybook_entries': daybook_entries,
+    }
+
+    return render(request, 'hms/accounting_summary.html', context)
+
+
+
+
+
+
+
+class DaybookCreateView(LoginRequiredMixin, View):
+    login_url = '/login/'
+    template_name = 'hms/daybook_form.html'
+
+    def get(self, request, *args, **kwargs):
+        form = DaybookEntryForm()
+        return render(request, self.template_name, {'form': form, 'today': timezone.now().date()})
+
+    def post(self, request, *args, **kwargs):
+        form = DaybookEntryForm(request.POST)
+        if form.is_valid():
+            expense = form.save(commit=False)
+            expense.user = request.user  # Assign the current user
+            balance, created = Balance.objects.get_or_create(user=request.user, defaults={'amount': 0})
+
+            if balance.amount >= expense.amount:
+                balance.amount -= expense.amount
+                action_message = "added"
+            else:
+                messages.error(request, "Daily limit reached. Expense exceeds available balance.")
+                return render(request, self.template_name, {'form': form, 'today': timezone.now().date()})
+
+            expense.save()
+            balance.save()
+
+            remaining_balance = balance.amount
+            message = f"Daybook Entry {action_message}:\nDate: {expense.date}\nActivity: {expense.activity}\nAmount: {expense.amount}\nRemaining Balance: {remaining_balance}"
+            if expense.remark:
+                message += f"\nRemark: {expense.remark}"
+
+            messages.success(request, f"Expense of {expense.amount} has been successfully added.")
+            return redirect('daybook_list')
+        return render(request, self.template_name, {'form': form, 'today': timezone.now().date()})
+
+
+class DaybookListView(LoginRequiredMixin, View):
+    template_name = 'hms/daybook_list.html'
+
+    def get(self, request, *args, **kwargs):
+        today = timezone.now().date()
+        start_date = request.GET.get('start_date')
+        end_date = request.GET.get('end_date')
+        search_query = request.GET.get('search')
+        show_all = request.GET.get('show_all') == 'true'
+
+        # Filter entries based on user role
+        if request.user.is_superuser or request.user.is_staff:
+            # Admin or superuser can see all entries
+            daybook_entries = Daybook.objects.all()
+        else:
+            # Regular users can only see their own entries
+            daybook_entries = Daybook.objects.filter(user=request.user)  # Filter by user
+
+        if start_date:
+            daybook_entries = daybook_entries.filter(date__gte=start_date)
+        if end_date:
+            daybook_entries = daybook_entries.filter(date__lte=end_date)
+        if search_query:
+            daybook_entries = daybook_entries.filter(
+                Q(activity__icontains=search_query) |
+                Q(custom_activity__icontains=search_query) |
+                Q(remark__icontains=search_query)
+            )
+
+        if not show_all:
+            daybook_entries = daybook_entries.filter(date=today)
+
+        # Pagination
+        paginator = Paginator(daybook_entries, 10)
+        page_number = request.GET.get('page')
+        page_obj = paginator.get_page(page_number)
+
+        # Aggregations
+        todays_expenses = daybook_entries.filter(date=today)
+        total_todays_expenses = sum(expense.amount for expense in todays_expenses)
+        total_expenses = daybook_entries.aggregate(total_amount=Sum('amount'))['total_amount'] or 0
+
+        # Balance and carryover
+        current_balance_record = Balance.objects.filter(user=request.user).first()
+        current_balance = current_balance_record.amount if current_balance_record else 0
+        carryover_amount = current_balance_record.carryover_amount if current_balance_record else 0
+
+        context = {
+            'page_obj': page_obj,
+            'total_balance': current_balance,
+            'carryover_amount': carryover_amount,
+            'todays_expense': total_todays_expenses,
+            'total_expenses': total_expenses,
+            'start_date': start_date,
+            'end_date': end_date,
+            'show_all': show_all,
+        }
+        return render(request, self.template_name, context)
+
+    def post(self, request, *args, **kwargs):
+        if 'reset_expenses' in request.POST:
+            Daybook.objects.filter(user=request.user).delete()
+            Balance.objects.filter(user=request.user).delete()
+            return redirect('daybook_list')
+
+
+def export_daybook_to_csv(request):
+    start_date = request.GET.get('start_date')
+    end_date = request.GET.get('end_date')
+
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="daybook.csv"'
+
+    writer = csv.writer(response)
+    writer.writerow(['Date', 'Activity', 'Custom Activity', 'Amount', 'Remark'])
+
+    daybook_entries = Daybook.objects.filter(user=request.user)  # Filter by user
+    if start_date:
+        daybook_entries = daybook_entries.filter(date__gte=start_date)
+    if end_date:
+        daybook_entries = daybook_entries.filter(date__lte=end_date)
+
+    for entry in daybook_entries:
+        writer.writerow([entry.date, entry.activity, entry.custom_activity or '', entry.amount, entry.remark or ''])
+
+    return response
+
+
+
+class BalanceUpdateView(LoginRequiredMixin, View):
+    template_name = 'hms/update_balance.html'
+
+    def get(self, request, *args, **kwargs):
+        form = BalanceUpdateForm()
+        return render(request, self.template_name, {'form': form})
+
+    def post(self, request, *args, **kwargs):
+        form = BalanceUpdateForm(request.POST)
+        if form.is_valid():
+            amount = form.cleaned_data['amount']
+            action = form.cleaned_data['action']
+            balance, created = Balance.objects.get_or_create(user=request.user, defaults={'amount': 0})
+
+            if action == 'add':
+                balance.amount += amount
+                action_message = "added"
+            elif action == 'deduct':
+                balance.amount = max(0, balance.amount - amount)
+                action_message = "deducted"
+
+            balance.save()
+            message = f"Balance has been {action_message} by {amount}. Current balance: {balance.amount}"
+            messages.success(request, message)
+            return redirect('daybook_list')
+        return render(request, self.template_name, {'form': form})

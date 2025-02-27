@@ -1,0 +1,19 @@
+{% extends 'hms/base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Transfer Patient - {{ patient.user.full_name }}</h2>
+    
+    <form method="POST">
+        {% csrf_token %}
+        
+        <div class="mb-3">
+            <label for="hospital_name" class="form-label">Enter Hospital Name for Transfer:</label>
+            <input type="text" name="hospital_name" id="hospital_name" class="form-control" required>
+        </div>
+
+        <button type="submit" class="btn btn-warning">Transfer Patient</button>
+        <a href="{% url 'patients' %}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+{% endblock %}

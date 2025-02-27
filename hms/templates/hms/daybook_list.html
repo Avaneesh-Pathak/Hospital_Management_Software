@@ -1,0 +1,134 @@
+{% extends 'hms/base.html' %}
+
+{% block content %}
+<div style="max-width: 1200px; margin: 0 auto; background-color: #ffffff; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); border-radius: 12px; padding: 32px; margin-top: 40px;">
+    <!-- Header Section -->
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+        <h2 style="font-size: 28px; font-weight: 700; color: #1e293b;">Daily Expenses</h2>
+        <div>
+            <!-- Export CSV Button -->
+            <a href="{% url 'export_daybook_to_csv' %}?start_date={{ request.GET.start_date }}&end_date={{ request.GET.end_date }}" 
+               style="display: inline-block; padding: 10px 20px; background-color: #2563eb; color: white; font-weight: 600; border-radius: 8px; text-decoration: none; transition: background-color 0.3s;">
+                Export CSV
+            </a>
+        </div>
+    </div>
+
+    <!-- Date Filter Form -->
+    <form method="GET" action="{% url 'daybook_list' %}" style="margin-bottom: 24px;">
+        <div style="display: flex; align-items: center; gap: 16px;">
+            <div style="flex: 1;">
+                <label for="start_date" style="font-size: 14px; font-weight: 600; color: #4b5563;">Start Date:</label>
+                <input type="date" id="start_date" name="start_date" style="width: 100%; padding: 10px; border: 1px solid #e5e7eb; border-radius: 8px; margin-top: 8px;" value="{{ request.GET.start_date }}">
+            </div>
+            <div style="flex: 1;">
+                <label for="end_date" style="font-size: 14px; font-weight: 600; color: #4b5563;">End Date:</label>
+                <input type="date" id="end_date" name="end_date" style="width: 100%; padding: 10px; border: 1px solid #e5e7eb; border-radius: 8px; margin-top: 8px;" value="{{ request.GET.end_date }}">
+            </div>
+            <button type="submit" style="padding: 10px 20px; background-color: #3b82f6; color: white; font-weight: 600; border: none; border-radius: 8px; cursor: pointer; transition: background-color 0.3s;">
+                Apply Filter
+            </button>
+        </div>
+    </form>
+
+    <!-- Toggle Buttons for Show All/Today's Expenses -->
+    <div style="display: flex; gap: 12px; margin-bottom: 24px;">
+        <a href="{% url 'daybook_list' %}?show_all=true&start_date={{ request.GET.start_date }}&end_date={{ request.GET.end_date }}" 
+           style="flex: 1; text-align: center; padding: 10px 20px; background-color: {% if show_all %} #1e40af {% else %} #2563eb {% endif %}; color: white; font-weight: 600; border-radius: 8px; text-decoration: none; transition: background-color 0.3s;">
+            Show All Expenses
+        </a>
+        <a href="{% url 'daybook_list' %}?show_all=false&start_date={{ request.GET.start_date }}&end_date={{ request.GET.end_date }}" 
+           style="flex: 1; text-align: center; padding: 10px 20px; background-color: {% if not show_all %} #1e40af {% else %} #2563eb {% endif %}; color: white; font-weight: 600; border-radius: 8px; text-decoration: none; transition: background-color 0.3s;">
+            Show Today's Expenses
+        </a>
+    </div>
+
+    <!-- Balance and Expenses Summary -->
+    <div style="background-color: #f9fafb; padding: 20px; border-radius: 8px; margin-bottom: 24px;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <p style="font-size: 18px; color: #4b5563; margin: 0;">
+                Current Balance: 
+                <span style="font-weight: 700; {% if total_balance >= 0 %} color: #16a34a; {% else %} color: #dc2626; {% endif %}">
+                    {{ total_balance }}
+                </span>
+            </p>
+            <p style="font-size: 18px; color: #4b5563; margin: 0;">
+                Total Expenses: 
+                <span style="font-weight: 700; color: #dc2626;">{{ total_expenses }}</span>
+            </p>
+        </div>
+        {% if current_balance < 0 %}
+            <p style="color: #dc2626; font-weight: 600; margin-top: 12px; margin-bottom: 0;">
+                Add balance to adjust the negative amount.
+            </p>
+        {% endif %}
+    </div>
+
+    <!-- Action Buttons -->
+    <div style="display: flex; gap: 12px; margin-bottom: 24px;">
+        <a href="{% url 'daybook_create' %}" 
+           style="flex: 1; text-align: center; padding: 12px 20px; background-color: #3b82f6; color: white; font-weight: 600; border-radius: 8px; text-decoration: none; transition: background-color 0.3s;">
+            Add New Expense
+        </a>
+        <a href="{% url 'update_balance' %}" 
+           style="flex: 1; text-align: center; padding: 12px 20px; background-color: #10b981; color: white; font-weight: 600; border-radius: 8px; text-decoration: none; transition: background-color 0.3s;">
+            Add/Deduct Balance
+        </a>
+    </div>
+
+    <!-- Messages -->
+    {% if messages %}
+        <div style="margin-bottom: 24px;">
+            {% for message in messages %}
+                <div style="padding: 12px; background-color: #f3f4f6; border-radius: 8px; color: #4b5563; font-size: 14px;">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <!-- Expenses Table -->
+    <div style="overflow-x: auto;">
+        <table style="width: 100%; border-collapse: collapse; background-color: white; border-radius: 8px; overflow: hidden;">
+            <thead>
+                <tr style="background-color: #1e293b; color: white;">
+                    <th style="padding: 16px; font-size: 14px; font-weight: 600; text-align: left;">Date</th>
+                    <th style="padding: 16px; font-size: 14px; font-weight: 600; text-align: left;">Activity</th>
+                    <th style="padding: 16px; font-size: 14px; font-weight: 600; text-align: left;">Amount</th>
+                    <th style="padding: 16px; font-size: 14px; font-weight: 600; text-align: left;">Remark</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for expense in page_obj %}
+                <tr style="background-color: #ffffff; transition: background-color 0.3s;">
+                    <td style="padding: 16px; font-size: 14px; border-bottom: 1px solid #e5e7eb;">{{ expense.date }}</td>
+                    <td style="padding: 16px; font-size: 14px; border-bottom: 1px solid #e5e7eb;">
+                        {{ expense.activity }} {% if expense.custom_activity %} ({{ expense.custom_activity }}) {% endif %}
+                    </td>
+                    <td style="padding: 16px; font-size: 14px; border-bottom: 1px solid #e5e7eb;">{{ expense.amount }}</td>
+                    <td style="padding: 16px; font-size: 14px; border-bottom: 1px solid #e5e7eb;">{{ expense.remark }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4" style="padding: 16px; text-align: center; color: #6b7280;">No expenses recorded.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pagination -->
+    {% if page_obj.has_other_pages %}
+    <div style="display: flex; justify-content: center; margin-top: 24px;">
+        <div style="display: flex; gap: 8px;">
+            {% if page_obj.has_previous %}
+                <a href="?page={{ page_obj.previous_page_number }}" style="padding: 8px 16px; background-color: #3b82f6; color: white; border-radius: 8px; text-decoration: none;">Previous</a>
+            {% endif %}
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}" style="padding: 8px 16px; background-color: #3b82f6; color: white; border-radius: 8px; text-decoration: none;">Next</a>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

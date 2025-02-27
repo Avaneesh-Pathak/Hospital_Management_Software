@@ -1,5 +1,7 @@
 from django import forms
-from .models import CustomUser, Patient,Billing,Expense,OPD,Room, Doctor, Employee,EmergencyCase,PatientReport,Prescription,License,Asset,Maintenance
+from django.utils import timezone
+from django.core.exceptions import ValidationError
+from .models import CustomUser, Patient,Billing,Expense,OPD,Room, Doctor, Employee,EmergencyCase,PatientReport,Prescription,License,Asset,Maintenance,Daybook
 
 class ProfileUpdateForm(forms.ModelForm):
     class Meta:
@@ -8,21 +10,28 @@ class ProfileUpdateForm(forms.ModelForm):
 
         
 class PatientRegistrationForm(forms.ModelForm):
+    full_name = forms.CharField(max_length=255, required=True)
+    email = forms.EmailField(required=True)
+    contact_number = forms.CharField(max_length=15, required=True)
+    address = forms.CharField(widget=forms.Textarea, required=True)
+    gender = forms.ChoiceField(choices=CustomUser.GENDER_CHOICES, required=True)
     class Meta:
-        model = CustomUser
-        fields = ['full_name', 'email', 'contact_number', 'address','gender']
+        model = Patient
+        fields = [
+            'date_of_birth', 'aadhar_number',
+            'blood_group', 'allergies', 'medical_history', 'current_medications', 'emergency_contact_name',
+            'emergency_contact_number', 'emergency_contact_relationship', 'accompanying_person_name',
+            'accompanying_person_contact', 'accompanying_person_relationship', 'accompanying_person_address',
+            'profile_picture'
+        ]
+        widgets = {
+            'date_of_birth': forms.DateInput(attrs={'type': 'date'}),
+            'allergies': forms.Textarea(attrs={'rows': 3}),
+            'medical_history': forms.Textarea(attrs={'rows': 3}),
+            'current_medications': forms.Textarea(attrs={'rows': 3}),
+            'accompanying_person_address': forms.Textarea(attrs={'rows': 3}),
+        }
 
-    date_of_birth = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}))
-    aadhar_number = forms.CharField(max_length=12)
-    blood_group = forms.ChoiceField(choices=[('A+', 'A+'), ('A-', 'A-'), ('B+', 'B+'), ('B-', 'B-'), 
-                                             ('O+', 'O+'), ('O-', 'O-'), ('AB+', 'AB+'), ('AB-', 'AB-')])
-
-    guarantor_name = forms.CharField(max_length=255)
-    guarantor_address = forms.CharField(widget=forms.Textarea)
-    guarantor_mobile = forms.CharField(max_length=15)
-    guarantor_relationship = forms.CharField(max_length=50)
-    guarantor_gender = forms.ChoiceField(choices=[('Male', 'Male'), ('Female', 'Female'), ('Other', 'Other')])
-    profile_picture = forms.ImageField(required=False)
 
 class PatientReportForm(forms.ModelForm):
     class Meta:
@@ -53,39 +62,30 @@ class OPDForm(forms.ModelForm):
             'follow_up_date', 'visit_type', 'payment_status', 'payment_amount'
         ]
         widgets = {
-            'patient': forms.Select(attrs={
-                'class': 'w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500',
-            }),
-            'doctor': forms.Select(attrs={
-                'class': 'w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500',
-            }),
-            'diagnosis': forms.Textarea(attrs={
-                'class': 'w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500',
-                'rows': 3,
-            }),
-            'symptoms': forms.Textarea(attrs={
-                'class': 'w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500',
-                'rows': 3,
-            }),
-            'prescription': forms.Textarea(attrs={
-                'class': 'w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500',
-                'rows': 3,
-            }),
-            'follow_up_date': forms.DateInput(attrs={
-                'type': 'date',
-                'class': 'w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500',
-            }),
-            'visit_type': forms.Select(attrs={
-                'class': 'w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500',
-            }),
-            'payment_status': forms.Select(attrs={
-                'class': 'w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500',
-            }),
-            'payment_amount': forms.NumberInput(attrs={
-                'class': 'w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500',
-            }),
+            'patient': forms.Select(attrs={'class': 'w-full p-2 border border-gray-300 rounded-md'}),
+            'doctor': forms.Select(attrs={'class': 'w-full p-2 border border-gray-300 rounded-md'}),
+            'diagnosis': forms.Textarea(attrs={'class': 'w-full p-2 border border-gray-300 rounded-md', 'rows': 3}),
+            'symptoms': forms.Textarea(attrs={'class': 'w-full p-2 border border-gray-300 rounded-md', 'rows': 3}),
+            'prescription': forms.Textarea(attrs={'class': 'w-full p-2 border border-gray-300 rounded-md', 'rows': 3}),
+            'follow_up_date': forms.DateInput(attrs={'type': 'date', 'class': 'w-full p-2 border border-gray-300 rounded-md'}),
+            'visit_type': forms.Select(attrs={'class': 'w-full p-2 border border-gray-300 rounded-md'}),
+            'payment_status': forms.Select(attrs={'class': 'w-full p-2 border border-gray-300 rounded-md'}),
+            'payment_amount': forms.NumberInput(attrs={'class': 'w-full p-2 border border-gray-300 rounded-md'}),
         }
 
+    def clean_follow_up_date(self):
+        follow_up_date = self.cleaned_data.get('follow_up_date')
+
+        if follow_up_date in ["", None]:
+            return None  # Ensure None instead of an empty string
+        
+        if isinstance(follow_up_date, str):
+            try:
+                follow_up_date = timezone.datetime.strptime(follow_up_date, "%Y-%m-%d").date()
+            except ValueError:
+                raise ValidationError("Invalid date format. Use YYYY-MM-DD.")
+        
+        return follow_up_date
 
 
 class RoomForm(forms.ModelForm):
@@ -235,6 +235,43 @@ class MaintenanceForm(forms.ModelForm):
             'maintenance_date': forms.DateInput(attrs={'type': 'date'}),
             'next_due_date': forms.DateInput(attrs={'type': 'date'}),
         }
+
+
+
+
+
+class DaybookEntryForm(forms.ModelForm):
+    class Meta:
+        model = Daybook
+        fields = ['date', 'activity', 'custom_activity', 'amount', 'remark']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['date'].initial = timezone.now().date()  # Set current date as the initial value
+
+    def clean_date(self):
+        date = self.cleaned_data.get('date')
+        today = timezone.now().date()
+        if date != today:
+            raise forms.ValidationError("Please enter today's date.")
+        return date
+    def clean_amount(self):
+        amount = self.cleaned_data.get('amount')
+        if amount <= 0:
+            raise forms.ValidationError("Amount must be greater than zero.")
+        return amount
+class BalanceUpdateForm(forms.Form):
+    ACTION_CHOICES = [
+        ('add', 'Add'),
+        ('deduct', 'Deduct'),
+    ]
+
+    action = forms.ChoiceField(choices=ACTION_CHOICES, required=True)
+    amount = forms.DecimalField(max_digits=10, decimal_places=2, required=True)
+
+    
+
+
 
 
 

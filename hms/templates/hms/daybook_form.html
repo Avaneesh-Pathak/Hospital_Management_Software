@@ -1,0 +1,107 @@
+{% extends 'hms/base.html' %}
+
+{% block content %}
+<div class="max-w-md mx-auto bg-white shadow-lg rounded-lg p-8 mt-10">
+    <!-- Header -->
+    <h2 class="text-3xl font-bold text-gray-800 mb-6 text-center">Add New Expense</h2>
+    {% if messages %}
+        <div style="margin-bottom: 24px;">
+            {% for message in messages %}
+                <div style="padding: 12px; background-color:rgb(185, 164, 150); border-radius: 8px; color:rgb(5, 6, 7); font-size: 14px;">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+    <!-- Form -->
+    <form method="POST" class="space-y-6">
+        {% csrf_token %}
+
+        <!-- Date Field -->
+        <div>
+            <label for="{{ form.date.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">Date</label>
+            <input type="date" name="date" id="{{ form.date.id_for_label }}" value="{{ today|date:'Y-m-d' }}" required
+                   class="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200">
+            {% if form.date.errors %}
+                <p class="text-sm text-red-600 mt-2">{{ form.date.errors.0 }}</p>
+            {% endif %}
+        </div>
+
+        <!-- Activity Field -->
+        <div>
+            <label for="{{ form.activity.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">Activity</label>
+            <select name="activity" id="{{ form.activity.id_for_label }}" required
+                    class="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200">
+                {% for choice in form.activity.field.choices %}
+                    <option value="{{ choice.0 }}">{{ choice.1 }}</option>
+                {% endfor %}
+            </select>
+            {% if form.activity.errors %}
+                <p class="text-sm text-red-600 mt-2">{{ form.activity.errors.0 }}</p>
+            {% endif %}
+        </div>
+
+        <!-- Custom Activity Field (Hidden by Default) -->
+        <div id="custom_activity_input" class="hidden">
+            <label for="custom_activity" class="block text-sm font-medium text-gray-700 mb-2">Please specify:</label>
+            <input type="text" name="custom_activity" id="custom_activity"
+                   class="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200"
+                   placeholder="Specify custom activity">
+            {% if form.custom_activity.errors %}
+                <p class="text-sm text-red-600 mt-2">{{ form.custom_activity.errors.0 }}</p>
+            {% endif %}
+        </div>
+
+        <!-- Amount Field -->
+        <div>
+            <label for="{{ form.amount.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">Amount</label>
+            <input type="number" name="amount" id="{{ form.amount.id_for_label }}" required
+                   class="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200"
+                   placeholder="Enter amount">
+            {% if form.amount.errors %}
+                <p class="text-sm text-red-600 mt-2">{{ form.amount.errors.0 }}</p>
+            {% endif %}
+        </div>
+
+        <!-- Remark Field -->
+        <div>
+            <label for="{{ form.remark.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">Remark</label>
+            <textarea name="remark" id="{{ form.remark.id_for_label }}" rows="3"
+                      class="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200"
+                      placeholder="Add a remark (optional)"></textarea>
+            {% if form.remark.errors %}
+                <p class="text-sm text-red-600 mt-2">{{ form.remark.errors.0 }}</p>
+            {% endif %}
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition duration-300 transform hover:scale-105">
+            Save Expense
+        </button>
+    </form>
+
+    <!-- Back Button -->
+    <div class="mt-6 text-center">
+        <a href="{% url 'daybook_list' %}" class="text-blue-600 hover:text-blue-800 font-semibold transition duration-200">
+            &larr; Back to Expenses
+        </a>
+    </div>
+</div>
+
+<!-- JavaScript to Toggle Custom Activity Input -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const activitySelect = document.getElementById('{{ form.activity.id_for_label }}');
+        const customActivityDiv = document.getElementById('custom_activity_input');
+
+        activitySelect.addEventListener('change', function() {
+            if (activitySelect.value === 'others') {
+                customActivityDiv.classList.remove('hidden');  // Show custom input
+            } else {
+                customActivityDiv.classList.add('hidden');     // Hide custom input
+                document.getElementById('custom_activity').value = '';  // Clear the input
+            }
+        });
+    });
+</script>
+{% endblock %}

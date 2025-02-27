@@ -1,0 +1,185 @@
+{% extends 'hms/base.html' %}
+{% block content %}
+<div class="container">
+    <h2 class="text-center my-4">📊 Accounting Summary</h2>
+
+    <!-- Date Filter Form -->
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <h3 class="card-title">📅 Date Filter</h3>
+        </div>
+        <div class="card-body">
+            <form method="get">
+                <div class="form-row align-items-center">
+                    <div class="col-md-4">
+                        <label for="start_date">Start Date:</label>
+                        <input type="date" class="form-control" id="start_date" name="start_date" value="{{ start_date }}">
+                    </div>
+                    <div class="col-md-4">
+                        <label for="end_date">End Date:</label>
+                        <input type="date" class="form-control" id="end_date" name="end_date" value="{{ end_date }}">
+                    </div>
+                    <div class="col-md-4">
+                        <button type="submit" class="btn btn-primary mt-4">Filter</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Today's Summary -->
+    <div class="card mb-4">
+        <div class="card-header bg-success text-white">
+            <h3 class="card-title">📅 Today's Summary ({{ today }})</h3>
+        </div>
+        <div class="card-body">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="bg-green-50 p-4 rounded-lg">
+                    <p class="text-sm text-gray-600">Income</p>
+                    <p class="text-2xl font-bold text-green-700">₹{{ today_income }}</p>
+                </div>
+                <div class="bg-red-50 p-4 rounded-lg">
+                    <p class="text-sm text-gray-600">Expense</p>
+                    <p class="text-2xl font-bold text-red-700">₹{{ today_expense }}</p>
+                </div>
+                <div class="bg-blue-50 p-4 rounded-lg">
+                    <p class="text-sm text-gray-600">Savings</p>
+                    <p class="text-2xl font-bold text-blue-700">₹{{ today_savings }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Range Summary -->
+    <div class="card mb-4">
+        <div class="card-header bg-warning text-dark">
+            <h3 class="card-title">📅 Range Summary ({{ start_date }} to {{ end_date }})</h3>
+        </div>
+        <div class="card-body">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="bg-green-50 p-4 rounded-lg">
+                    <p class="text-sm text-gray-600">Income</p>
+                    <p class="text-2xl font-bold text-green-700">₹{{ range_income }}</p>
+                </div>
+                <div class="bg-red-50 p-4 rounded-lg">
+                    <p class="text-sm text-gray-600">Expense</p>
+                    <p class="text-2xl font-bold text-red-700">₹{{ range_expense }}</p>
+                </div>
+                <div class="bg-blue-50 p-4 rounded-lg">
+                    <p class="text-sm text-gray-600">Profit</p>
+                    <p class="text-2xl font-bold text-blue-700">₹{{ range_profit }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Daybook Summary -->
+    <div class="card mb-4">
+        <div class="card-header bg-info text-white">
+            <h3 class="card-title">📅 Daybook Summary ({{ start_date }} to {{ end_date }})</h3>
+        </div>
+        <div class="card-body">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="bg-green-50 p-4 rounded-lg">
+                    <p class="text-sm text-gray-600">Income</p>
+                    <p class="text-2xl font-bold text-green-700">₹{{ daybook_income }}</p>
+                </div>
+                <div class="bg-red-50 p-4 rounded-lg">
+                    <p class="text-sm text-gray-600">Expense</p>
+                    <p class="text-2xl font-bold text-red-700">₹{{ daybook_expense }}</p>
+                </div>
+                <div class="bg-blue-50 p-4 rounded-lg">
+                    <p class="text-sm text-gray-600">Profit</p>
+                    <p class="text-2xl font-bold text-blue-700">₹{{ daybook_profit }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Excluding IPD & OPD -->
+<div class="card mb-4">
+    <div class="card-header bg-warning text-dark">
+        <h3 class="card-title">📂 Excluding IPD & OPD</h3>
+    </div>
+    <div class="card-body">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="bg-green-50 p-4 rounded-lg">
+                <p class="text-sm text-gray-600">💰 Other Income</p>
+                <p class="text-2xl font-bold text-green-700">₹{{ other_income }}</p>
+            </div>
+            <div class="bg-red-50 p-4 rounded-lg">
+                <p class="text-sm text-gray-600">💸 Other Expense</p>
+                <p class="text-2xl font-bold text-red-700">₹{{ other_expense }}</p>
+            </div>
+            <div class="bg-blue-50 p-4 rounded-lg">
+                <p class="text-sm text-gray-600">📈 Other Profit</p>
+                <p class="text-2xl font-bold text-blue-700">₹{{ other_profit }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Hospital Departmental Income -->
+<div class="card mb-4">
+    <div class="card-header bg-info text-white">
+        <h3 class="card-title">🏥 Hospital Departmental Income</h3>
+    </div>
+    <div class="card-body">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="bg-green-50 p-4 rounded-lg">
+                <p class="text-sm text-gray-600">🛏 IPD Income</p>
+                <p class="text-2xl font-bold text-green-700">₹{{ ipd_income }}</p>
+            </div>
+            <div class="bg-blue-50 p-4 rounded-lg">
+                <p class="text-sm text-gray-600">🩺 OPD Income</p>
+                <p class="text-2xl font-bold text-blue-700">₹{{ opd_income }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Billing Information -->
+<div class="card mb-4">
+    <div class="card-header bg-info text-white">
+        <h3 class="card-title">💳 Billing Information</h3>
+    </div>
+    <div class="card-body">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="bg-green-50 p-4 rounded-lg">
+                <p class="text-sm text-gray-600">📜 Total Billed Amount</p>
+                <p class="text-2xl font-bold text-green-700">₹{{ total_billed }}</p>
+            </div>
+            <div class="bg-blue-50 p-4 rounded-lg">
+                <p class="text-sm text-gray-600">💵 Total Paid</p>
+                <p class="text-2xl font-bold text-blue-700">₹{{ total_paid }}</p>
+            </div>
+            <div class="bg-red-50 p-4 rounded-lg">
+                <p class="text-sm text-gray-600">🚨 Pending Payments</p>
+                <p class="text-2xl font-bold text-red-700">₹{{ total_pending }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+<style>
+    /* Custom CSS for Accounting Summary */
+    .card-header {
+        font-size: 1.25rem;
+        font-weight: bold;
+    }
+
+    .list-group-item {
+        font-size: 1.1rem;
+    }
+
+    .btn-primary {
+        background-color: #007bff;
+        border-color: #007bff;
+    }
+
+    .btn-primary:hover {
+        background-color: #0056b3;
+        border-color: #004085;
+    }
+</style>
+{% endblock %}
