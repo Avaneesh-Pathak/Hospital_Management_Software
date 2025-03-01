@@ -504,8 +504,8 @@ class Expense(models.Model):
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
         AccountingRecord.objects.create(
-            transaction_type='expense',
-            source='other',
+            transaction_type='income',
+            source='IPD',
             amount=self.cost,
             description=f"{self.get_category_display()} expense for {self.patient.user.full_name}",
             patient=self.patient,

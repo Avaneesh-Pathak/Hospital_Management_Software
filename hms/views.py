@@ -161,7 +161,7 @@ def dashboard(request):
     warning_period = today + timedelta(days=30)
     emergency_cases_today = EmergencyCase.objects.filter(admitted_on__date=today).count()
     upcoming_appointments = Appointment.objects.filter(date__gte=now()).order_by('date')
-   
+    
     # Get patient registration trend for the last 7 days
     last_week = today - timedelta(days=6)
     patient_trend = (
@@ -741,7 +741,8 @@ def get_ipd_data(request):
         'id',
         'patient__user__full_name', 
         'room__room_number',
-        'patient__patient_code',  # ✅ Get the room number
+        'patient__patient_code',
+        'total_cost',  # ✅ Get the room number
         'bed_number',         # ✅ Get the bed number
         'admitted_on', 
         'reason_for_admission'
@@ -1228,7 +1229,6 @@ def delete_maintenance(request, id):
 
 
 
-
 def accounting_summary(request):
     today = timezone.now().date()
     start_date = request.GET.get('start_date')
@@ -1253,11 +1253,10 @@ def accounting_summary(request):
 
     # Today's Income and Expense from Daybook
     daybook_entries_today = Daybook.objects.filter(date=today)
-    daybook_income_today = daybook_entries_today.filter(activity__in=['pantry', 'fuel', 'office_expense', 'site_development', 'site_visit', 'printing', 'utility']).aggregate(total_income=Sum('amount'))['total_income'] or 0
     daybook_expense_today = daybook_entries_today.filter(activity__in=['pantry', 'fuel', 'office_expense', 'site_development', 'site_visit', 'printing', 'utility']).aggregate(total_expense=Sum('amount'))['total_expense'] or 0
 
     # Total Today's Income and Expense
-    total_today_income = today_income + daybook_income_today
+    total_today_income = today_income
     total_today_expense = today_expense + daybook_expense_today
     total_today_savings = total_today_income - total_today_expense
 
@@ -1296,7 +1295,7 @@ def accounting_summary(request):
 
     # Daybook Data
     daybook_entries = Daybook.objects.filter(date__range=(start_date, end_date))
-    daybook_income = daybook_entries.filter(activity__in=['pantry', 'fuel', 'office_expense', 'site_development', 'site_visit', 'printing', 'utility']).aggregate(total_income=Sum('amount'))['total_income'] or 0
+    
     daybook_expense = daybook_entries.filter(activity__in=['pantry', 'fuel', 'office_expense', 'site_development', 'site_visit', 'printing', 'utility']).aggregate(total_expense=Sum('amount'))['total_expense'] or 0
 
     context = {
@@ -1314,9 +1313,7 @@ def accounting_summary(request):
         'total_billed': total_billed,
         'total_paid': total_paid,
         'total_pending': total_pending,
-        'daybook_income': daybook_income,
         'daybook_expense': daybook_expense,
-        'daybook_profit': daybook_income - daybook_expense,
         'start_date': start_date,
         'end_date': end_date,
         'daybook_entries': daybook_entries,
