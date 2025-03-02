@@ -44,6 +44,7 @@
                             <a href="{% url 'add_prescription' ipd.id %}" class="text-blue-500 hover:text-blue-700 hover:underline">Add Prescription</a>
                             <a href="{% url 'upload_patient_report' ipd.patient.patient_code %}" class="text-green-500 hover:text-green-700 hover:underline">Upload Report</a>
                             <a href="{% url 'view_ipd_report' ipd.id %}" class="text-purple-500 hover:text-purple-700 hover:underline font-semibold">View Report</a>
+                            <a href="{% url 'view_nicu_vitals' ipd.id %}" class="btn btn-info">View NICU Vitals</a>
                         </div>
                     </td>
                 </tr>
@@ -87,6 +88,7 @@
                                     <a href="/ipd/${ipd.id}/add_prescription/" class="text-blue-500 hover:text-blue-700 hover:underline">Add Prescription</a>
                                     <a href="/patient/${ipd.patient__patient_code}/upload-report/" class="text-green-500 hover:text-green-700 hover:underline">Upload Report</a>
                                     <a href="/ipd/${ipd.id}/" class="text-purple-500 hover:text-purple-700 hover:underline font-semibold">View Report</a>
+                                    <a href="/nicu/view/${ipd.id}/" class="text-red-500 hover:text-red-700 hover:underline font-semibold">View Vitals</a>
                                 </div>
                             </td>
                         </tr>`;

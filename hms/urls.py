@@ -115,4 +115,9 @@ urlpatterns = [
     path('daybook/create/', DaybookCreateView.as_view(), name='daybook_create'),
     path('update-balance/', BalanceUpdateView.as_view(), name='update_balance'),
     path('daybook/export/', views.export_daybook_to_csv, name='export_daybook_to_csv'),
+
+    #Vitals
+    path('nicu/add/<int:ipd_id>/', views.add_nicu_vitals, name='add_nicu_vitals'),
+    path('nicu/view/<int:ipd_id>/', views.view_nicu_vitals, name='view_nicu_vitals')
+
 ]

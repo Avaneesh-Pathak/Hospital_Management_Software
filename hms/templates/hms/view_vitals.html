@@ -1,0 +1,40 @@
+{% extends 'hms/base.html' %}
+{% block content %}
+<div class="container">
+    <h2>NICU Vitals for {{ ipd.patient.user.full_name }}</h2>
+    <a href="{% url 'add_nicu_vitals' ipd.id %}" class="btn btn-success">Add Vitals</a>
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Vitals</th>
+                {% for vitals in vitals_list %}
+                    <th>{{ vitals.time }}</th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            <tr><td><b>Temperature (°F)</b></td>{% for vitals in vitals_list %}<td>{{ vitals.temperature }}</td>{% endfor %}</tr>
+            <tr><td><b>Respiratory Rate</b></td>{% for vitals in vitals_list %}<td>{{ vitals.respiratory_rate }}</td>{% endfor %}</tr>
+            <tr><td><b>Pulse Rate</b></td>{% for vitals in vitals_list %}<td>{{ vitals.pulse_rate }}</td>{% endfor %}</tr>
+            <tr><td><b>CFT (sec)</b></td>{% for vitals in vitals_list %}<td>{{ vitals.cft }}</td>{% endfor %}</tr>
+            <tr><td><b>Skin Color</b></td>{% for vitals in vitals_list %}<td>{{ vitals.get_skin_color_display }}</td>{% endfor %}</tr>
+            <tr><td><b>Seizure</b></td>{% for vitals in vitals_list %}<td>{{ vitals.seizure|yesno:"Yes,No" }}</td>{% endfor %}</tr>
+            <tr><td><b>SpO₂ (%)</b></td>{% for vitals in vitals_list %}<td>{{ vitals.spo2 }}</td>{% endfor %}</tr>
+            <tr><td><b>Oxygen Support</b></td>{% for vitals in vitals_list %}<td>{{ vitals.oxygen }}</td>{% endfor %}</tr>
+            <tr><td><b>Retraction</b></td>{% for vitals in vitals_list %}<td>{{ vitals.retraction|yesno:"Yes,No" }}</td>{% endfor %}</tr>
+            
+            <tr><td colspan="{{ vitals_list|length|add:1 }}" class="bg-primary text-white text-center"><b>Fluid Balance</b></td></tr>
+            <tr><td><b>IV Fluids (ml)</b></td>{% for vitals in vitals_list %}<td>{{ vitals.iv_fluids }}</td>{% endfor %}</tr>
+            <tr><td><b>By Nasogastric (ml)</b></td>{% for vitals in vitals_list %}<td>{{ vitals.by_nasogastric }}</td>{% endfor %}</tr>
+            <tr><td><b>Oral (ml)</b></td>{% for vitals in vitals_list %}<td>{{ vitals.oral }}</td>{% endfor %}</tr>
+            <tr><td><b>Breastfeeding</b></td>{% for vitals in vitals_list %}<td>{{ vitals.breastfeeding|yesno:"Yes,No" }}</td>{% endfor %}</tr>
+            
+            <tr><td colspan="{{ vitals_list|length|add:1 }}" class="bg-success text-white text-center"><b>Output</b></td></tr>
+            <tr><td><b>Urine</b></td>{% for vitals in vitals_list %}<td>{{ vitals.get_urine_display }}</td>{% endfor %}</tr>
+            <tr><td><b>Stool</b></td>{% for vitals in vitals_list %}<td>{{ vitals.stool|yesno:"Yes,No" }}</td>{% endfor %}</tr>
+            <tr><td><b>IFT (ml)</b></td>{% for vitals in vitals_list %}<td>{{ vitals.ift }}</td>{% endfor %}</tr>
+            <tr><td><b>Vomiting</b></td>{% for vitals in vitals_list %}<td>{{ vitals.vomiting|yesno:"Yes,No" }}</td>{% endfor %}</tr>
+        </tbody>
+    </table>
+</div>
+{% endblock %}

@@ -1,0 +1,56 @@
+{% extends 'hms/base.html' %}
+{% load custom_filters %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>NICU Vitals for {{ ipd.patient.full_name }}</h2>
+    
+    <form method="post">
+        {% csrf_token %}
+        
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Vitals</th>
+                    {% for time, label in time_slots %}
+                        <th>{{ label }}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for field_name in numeric_fields %}
+                    <tr>
+                        <td class="fw-bold">{{ field_name|title }}</td>
+                        {% for time, label in time_slots %}
+                            <td>
+                                {% with field_name|add:","|add:time as key %}
+                                    <input type="number" class="form-control" name="{{ field_name }}_{{ time }}" 
+                                        value="{{ existing_vitals_dict|get_vital:key }}" step="0.1">
+                                    {% comment %} <small class="text-muted">Previous: {{ existing_vitals_dict|get_vital:key }}</small> {% endcomment %}
+                                {% endwith %}
+                            </td>
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+
+                {% for field_name in boolean_fields %}
+                    <tr>
+                        <td class="fw-bold">{{ field_name|title }}</td>
+                        {% for time, label in time_slots %}
+                            <td>
+                                {% with field_name|add:","|add:time as key %}
+                                    <input type="checkbox" class="form-check-input" name="{{ field_name }}_{{ time }}" 
+                                           {% if existing_vitals_dict|get_vital:key %}checked{% endif %}>
+                                    {% comment %} <small class="text-muted">Previous: {% if existing_vitals_dict|get_vital:key %}Yes{% else %}No{% endif %}</small> {% endcomment %}
+                                {% endwith %}
+                            </td>
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <button type="submit" class="btn btn-primary">Save Vitals</button>
+    </form>
+</div>
+{% endblock %}

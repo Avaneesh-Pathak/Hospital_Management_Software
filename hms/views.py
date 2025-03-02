@@ -19,8 +19,10 @@ from django.utils.timezone import now
 from django.db.models import Count,Sum
 from datetime import datetime ,timedelta
 from reportlab.lib.pagesizes import letter
+from django.utils.timezone import localdate
 from django.core.paginator import Paginator
 from django.contrib.auth.models import User
+from django.utils.dateparse import parse_time
 from django.template.loader import get_template
 from django.db.models.functions import TruncDate
 from django.core.exceptions import ObjectDoesNotExist
@@ -30,12 +32,12 @@ from django.contrib.auth import authenticate, login, logout
 from django.shortcuts import render, redirect,get_object_or_404
 from .models import (
     CustomUser, Patient, Doctor, Appointment, Billing, EmergencyCase, OPD, IPD, Expense, Employee, Room, PatientReport,Prescription,
-    License,Asset,Maintenance,AccountingRecord,Daybook,Balance,PatientTransfer
+    License,Asset,Maintenance,AccountingRecord,Daybook,Balance,PatientTransfer,NICUVitals
     
 )
 from .forms import (
     PatientRegistrationForm, ExpenseForm, BillingForm, OPDForm, DoctorForm, EmployeeForm, RoomForm, EmergencyCaseForm, ProfileUpdateForm,PatientReportForm,
-    PrescriptionForm,LicenseForm,AssetForm,MaintenanceForm,BalanceUpdateForm,DaybookEntryForm
+    PrescriptionForm,LicenseForm,AssetForm,MaintenanceForm,BalanceUpdateForm,DaybookEntryForm,NICUVitalsForm
 )
 
 logger = logging.getLogger(__name__)
@@ -327,6 +329,9 @@ def register_patient(request):
 
     else:
         form = PatientRegistrationForm()
+        doctor_users = Doctor.objects.values_list('user_id', flat=True)
+        employee_users = Employee.objects.values_list('user_id', flat=True)
+        form.fields['user'].queryset = CustomUser.objects.exclude(id__in=doctor_users).exclude(id__in=employee_users)
 
     return render(request, 'hms/register_patient.html', {'form': form})
 
@@ -1477,3 +1482,97 @@ class BalanceUpdateView(LoginRequiredMixin, View):
             messages.success(request, message)
             return redirect('daybook_list')
         return render(request, self.template_name, {'form': form})
+    
+
+
+
+
+
+@login_required
+def add_nicu_vitals(request, ipd_id):
+    ipd = get_object_or_404(IPD, id=ipd_id)
+    today = localdate()
+
+    # Fetch existing vitals for today
+    existing_vitals = NICUVitals.objects.filter(ipd=ipd, date=today)
+    existing_vitals_dict = {f"{vital.time.strftime('%H:%M')}": vital for vital in existing_vitals}
+
+    TIME_SLOTS = [
+        ("08:00", "08 AM"),
+        ("10:00", "10 AM"),
+        ("12:00", "12 PM"),
+        ("14:00", "2 PM"),
+        ("16:00", "4 PM"),
+        ("18:00", "6 PM"),
+        ("20:00", "8 PM"),
+        ("22:00", "10 PM"),
+        ("23:59", "12 AM"),
+        ("02:00", "2 AM"),
+        ("04:00", "4 AM"),
+        ("06:00", "6 AM"),
+    ]
+
+    numeric_fields = ['temperature', 'respiratory_rate', 'pulse_rate', 'cft', 'spo2', 'oxygen', 'iv_fluids', 'by_nasogastric', 'oral', 'ift']
+    boolean_fields = ['seizure', 'retraction', 'breastfeeding', 'stool', 'vomiting']
+
+    if request.method == "POST":
+        for time, label in TIME_SLOTS:
+            # Get or create a NICUVitals entry for this time slot
+            vitals, created = NICUVitals.objects.get_or_create(ipd=ipd, date=today, time=time)
+
+            # Update fields safely from request.POST
+            for field in numeric_fields:
+                field_name = f"{field}_{time}"
+                value = request.POST.get(field_name, "").strip()  # Get value, handle missing values
+                if value:  # If value is not empty
+                    setattr(vitals, field, float(value))
+                else:
+                    setattr(vitals, field, None)  # Default to NULL
+
+            for field in boolean_fields:
+                field_name = f"{field}_{time}"
+                setattr(vitals, field, request.POST.get(field_name) == "on")  # Checkbox handling
+
+            vitals.save()
+
+        messages.success(request, "NICU Vitals recorded successfully.")
+        return redirect('view_nicu_vitals', ipd_id=ipd.id)
+    # print("Existing Vitals Dict:", existing_vitals_dict)
+    return render(request, 'hms/add_vitals.html', {
+        'ipd': ipd,
+        'existing_vitals': existing_vitals,
+        'existing_vitals_dict': existing_vitals_dict,  # Pass existing data
+        'time_slots': TIME_SLOTS,
+        'numeric_fields': numeric_fields,
+        'boolean_fields': boolean_fields,
+    })
+
+
+@login_required
+def view_nicu_vitals(request, ipd_id):
+    ipd = get_object_or_404(IPD, id=ipd_id)
+    vitals_list = NICUVitals.objects.filter(ipd=ipd).order_by('-date')
+
+    return render(request, 'hms/view_vitals.html', {'vitals_list': vitals_list, 'ipd': ipd})
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

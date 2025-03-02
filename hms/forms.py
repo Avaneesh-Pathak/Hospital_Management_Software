@@ -1,7 +1,7 @@
 from django import forms
 from django.utils import timezone
 from django.core.exceptions import ValidationError
-from .models import CustomUser, Patient,Billing,Expense,OPD,Room, Doctor, Employee,EmergencyCase,PatientReport,Prescription,License,Asset,Maintenance,Daybook
+from .models import CustomUser,NICUVitals, Patient,Billing,Expense,OPD,Room, Doctor, Employee,EmergencyCase,PatientReport,Prescription,License,Asset,Maintenance,Daybook
 
 class ProfileUpdateForm(forms.ModelForm):
     class Meta:
@@ -18,6 +18,7 @@ class PatientRegistrationForm(forms.ModelForm):
     class Meta:
         model = Patient
         fields = [
+            'user', 
             'date_of_birth', 'aadhar_number',
             'blood_group', 'allergies', 'medical_history', 'current_medications', 'emergency_contact_name',
             'emergency_contact_number', 'emergency_contact_relationship', 'accompanying_person_name',
@@ -31,6 +32,16 @@ class PatientRegistrationForm(forms.ModelForm):
             'current_medications': forms.Textarea(attrs={'rows': 3}),
             'accompanying_person_address': forms.Textarea(attrs={'rows': 3}),
         }
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # ✅ Ensure doctor_users and employee_users are properly defined before using them
+        doctor_users = CustomUser.objects.filter(groups__name="Doctor").values_list('id', flat=True)
+        employee_users = CustomUser.objects.filter(groups__name="Employee").values_list('id', flat=True)
+
+        # ✅ Now assign the queryset correctly
+        self.fields['user'].queryset = CustomUser.objects.exclude(id__in=doctor_users).exclude(id__in=employee_users)
+
 
 
 class PatientReportForm(forms.ModelForm):
@@ -273,6 +284,34 @@ class BalanceUpdateForm(forms.Form):
 
 
 
+
+class NICUVitalsForm(forms.ModelForm):
+    class Meta:
+        model = NICUVitals
+        fields = [
+            'time','temperature', 'respiratory_rate', 'pulse_rate', 'cft', 'skin_color',
+            'seizure', 'spo2', 'oxygen', 'retraction', 'iv_fluids', 'by_nasogastric',
+            'oral', 'breastfeeding', 'urine', 'stool', 'ift', 'vomiting'
+        ]
+        widgets = {
+            'temperature': forms.NumberInput(attrs={'step': '0.1', 'placeholder': 'Enter Temperature in °F'}),
+            'respiratory_rate': forms.NumberInput(attrs={'min': 10, 'max': 100, 'placeholder': 'Breaths per minute'}),
+            'pulse_rate': forms.NumberInput(attrs={'min': 50, 'max': 200, 'placeholder': 'Beats per minute'}),
+            'cft': forms.NumberInput(attrs={'step': '0.1', 'placeholder': 'Capillary Refill Time (seconds)'}),
+            'spo2': forms.NumberInput(attrs={'min': 0, 'max': 100, 'placeholder': 'SpO₂ %'}),
+            'oxygen': forms.NumberInput(attrs={'min': 0, 'max': 100, 'placeholder': 'Oxygen Level (1-100%)'}),
+            'iv_fluids': forms.NumberInput(attrs={'step': '1', 'placeholder': 'IV Fluid (ml)'}),
+            'by_nasogastric': forms.NumberInput(attrs={'step': '1', 'placeholder': 'Nasogastric Intake (ml)'}),
+            'oral': forms.NumberInput(attrs={'step': '1', 'placeholder': 'Oral Intake (ml)'}),
+            'ift': forms.NumberInput(attrs={'step': '1', 'placeholder': 'IFT Intake (ml)'}),
+            'urine': forms.Select(choices=[('nil', 'Nil'), ('ml', 'ML')]),
+            'skin_color': forms.Select(choices=[('pink', 'Pink'), ('pallor', 'Pallor')]),
+            'seizure': forms.Select(choices=[(True, 'Present'), (False, 'Absent')]),
+            'retraction': forms.Select(choices=[(True, 'Yes'), (False, 'No')]),
+            'breastfeeding': forms.Select(choices=[(True, 'Yes'), (False, 'No')]),
+            'stool': forms.Select(choices=[(True, 'Yes'), (False, 'No')]),
+            'vomiting': forms.Select(choices=[(True, 'Yes'), (False, 'No')]),
+        }
 
 
 

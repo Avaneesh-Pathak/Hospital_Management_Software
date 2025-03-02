@@ -413,6 +413,39 @@ class IPD(models.Model):
         return f"IPD - {self.patient.user.full_name} - {self.room.room_number if self.room else 'No Room'}"
 
 
+
+
+class NICUVitals(models.Model):
+    ipd = models.ForeignKey('IPD', on_delete=models.CASCADE, related_name='nicu_vitals')
+    date = models.DateField(auto_now_add=True)
+    time = models.TimeField(default=timezone.now)  # New field to record time slots (2-hour interval)
+    
+    # Vitals
+    temperature = models.DecimalField(max_digits=4, decimal_places=1,null=True, blank=True)
+    respiratory_rate = models.IntegerField(null=True, blank=True)
+    pulse_rate = models.IntegerField(null=True, blank=True)
+    cft = models.DecimalField(max_digits=3, decimal_places=1,null=True, blank=True)
+    skin_color = models.CharField(max_length=10, choices=[('pink', 'Pink'), ('pallor', 'Pallor')])
+    seizure = models.BooleanField(null=True, blank=True)
+    spo2 = models.IntegerField(null=True, blank=True)
+    oxygen = models.IntegerField(help_text="Options: 1. Nasal Prong, 2. Hood, 3. Without O2",null=True, blank=True)
+    retraction = models.BooleanField(null=True, blank=True)
+
+    # Fluid Balance
+    iv_fluids = models.IntegerField(null=True, blank=True)
+    by_nasogastric = models.IntegerField(null=True, blank=True)
+    oral = models.IntegerField(null=True, blank=True)
+    breastfeeding = models.BooleanField(null=True, blank=True)
+    urine = models.CharField(max_length=10, choices=[('nil', 'Nil'), ('ml', 'ML')])
+    stool = models.BooleanField(null=True, blank=True)
+    ift = models.IntegerField(null=True, blank=True)
+    vomiting = models.BooleanField(null=True, blank=True)
+
+    def __str__(self):
+        return f"Vitals for {self.ipd.patient.user.full_name} on {self.date}"
+    
+
+
 class PatientTransfer(models.Model):
     patient = models.ForeignKey(Patient, on_delete=models.CASCADE, related_name="transfers")
     transfer_date = models.DateTimeField(auto_now_add=True)
