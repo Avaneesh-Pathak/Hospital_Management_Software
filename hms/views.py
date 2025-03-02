@@ -1511,9 +1511,22 @@ def add_nicu_vitals(request, ipd_id):
         ("04:00", "4 AM"),
         ("06:00", "6 AM"),
     ]
-
+    URINE_CHOICES=[('',''), ('nil', 'Nil'), ('ml', 'ML')]
     numeric_fields = ['temperature', 'respiratory_rate', 'pulse_rate', 'cft', 'spo2', 'oxygen', 'iv_fluids', 'by_nasogastric', 'oral', 'ift']
     boolean_fields = ['seizure', 'retraction', 'breastfeeding', 'stool', 'vomiting']
+    dropdown_fields = ['skin_color','urine']  # Adding skin_color dropdown field
+
+    SKIN_COLOR_CHOICES = [
+    ('', ''),
+    ('pink', 'Pink (Normal)'),
+    ('pallor', 'Pallor (Pale)'),
+    ('jaundiced', 'Jaundiced (Yellowish)'),
+    ('cyanotic', 'Cyanotic (Bluish)'),
+    ('mottled', 'Mottled (Blotchy)'),
+    ('erythematous', 'Erythematous (Red/Flushed)'),
+    ('grayish', 'Grayish'),
+    ('dusky', 'Dusky (Bluish-Gray)'),
+]
 
     if request.method == "POST":
         for time, label in TIME_SLOTS:
@@ -1533,6 +1546,11 @@ def add_nicu_vitals(request, ipd_id):
                 field_name = f"{field}_{time}"
                 setattr(vitals, field, request.POST.get(field_name) == "on")  # Checkbox handling
 
+            # Update dropdown fields
+            for field in dropdown_fields:
+                field_name = f"{field}_{time}"
+                setattr(vitals, field, request.POST.get(field_name,""))
+
             vitals.save()
 
         messages.success(request, "NICU Vitals recorded successfully.")
@@ -1545,6 +1563,9 @@ def add_nicu_vitals(request, ipd_id):
         'time_slots': TIME_SLOTS,
         'numeric_fields': numeric_fields,
         'boolean_fields': boolean_fields,
+        'dropdown_fields': dropdown_fields,  # Passing dropdown fields
+        'skin_color_choices': SKIN_COLOR_CHOICES,  # Passing choices for template
+        'urine_choices': URINE_CHOICES,  # Fixed variable name
     })
 
 

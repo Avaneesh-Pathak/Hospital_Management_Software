@@ -3,54 +3,154 @@
 
 {% block content %}
 <div class="container mt-4">
-    <h2>NICU Vitals for {{ ipd.patient.full_name }}</h2>
-    
-    <form method="post">
-        {% csrf_token %}
-        
-        <table class="table table-bordered">
-            <thead>
-                <tr>
-                    <th>Vitals</th>
-                    {% for time, label in time_slots %}
-                        <th>{{ label }}</th>
-                    {% endfor %}
-                </tr>
-            </thead>
-            <tbody>
-                {% for field_name in numeric_fields %}
-                    <tr>
-                        <td class="fw-bold">{{ field_name|title }}</td>
-                        {% for time, label in time_slots %}
-                            <td>
-                                {% with field_name|add:","|add:time as key %}
-                                    <input type="number" class="form-control" name="{{ field_name }}_{{ time }}" 
-                                        value="{{ existing_vitals_dict|get_vital:key }}" step="0.1">
-                                    {% comment %} <small class="text-muted">Previous: {{ existing_vitals_dict|get_vital:key }}</small> {% endcomment %}
-                                {% endwith %}
-                            </td>
-                        {% endfor %}
-                    </tr>
-                {% endfor %}
+    <div class="card shadow">
+        <div class="card-header bg-primary text-white">
+            <!-- Messages -->
+    {% if messages %}
+    <div class="mb-6">
+        {% for message in messages %}
+            <div class="p-4 mb-4 text-sm rounded-lg {% if message.tags == 'error' %}bg-red-50 text-red-800{% else %}bg-green-50 text-green-800{% endif %}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
+            <h2 class="card-title mb-0">
+                <i class="fas fa-heartbeat me-2"></i>NICU Vitals for {{ ipd.patient.user.full_name }}
+            </h2>
+        </div>
+        <div class="card-body">
+            <form method="post">
+                {% csrf_token %}
+                
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th class="fw-bold">Vitals</th>
+                                {% for time, label in time_slots %}
+                                    <th class="text-center">{{ label }}</th>
+                                {% endfor %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Section: Vitals -->
+                            <tr class="table-info">
+                                <td colspan="{{ time_slots|length|add:1 }}" class="fw-bold text-center bg-light">
+                                    <i class="fas fa-thermometer-half me-2"></i>Vitals
+                                </td>
+                            </tr>
+                            {% for field_name in numeric_fields %}
+                                <tr>
+                                    <td class="fw-bold">{{ field_name|title }}</td>
+                                    {% for time, label in time_slots %}
+                                        <td>
+                                            {% with field_name|add:","|add:time as key %}
+                                                <input type="number" class="form-control" name="{{ field_name }}_{{ time }}" 
+                                                       value="{{ existing_vitals_dict|get_vital:key|default:'' }}" step="0.1"
+                                                       placeholder="Enter {{ field_name|title }}" 
+                                                       aria-label="{{ field_name|title }}"
+                                                       data-bs-toggle="tooltip" data-bs-placement="top" 
+                                                       title="Enter {{ field_name|title }} in appropriate units">
+                                            {% endwith %}
+                                        </td>
+                                    {% endfor %}
+                                </tr>
+                            {% endfor %}
 
-                {% for field_name in boolean_fields %}
-                    <tr>
-                        <td class="fw-bold">{{ field_name|title }}</td>
-                        {% for time, label in time_slots %}
-                            <td>
-                                {% with field_name|add:","|add:time as key %}
-                                    <input type="checkbox" class="form-check-input" name="{{ field_name }}_{{ time }}" 
-                                           {% if existing_vitals_dict|get_vital:key %}checked{% endif %}>
-                                    {% comment %} <small class="text-muted">Previous: {% if existing_vitals_dict|get_vital:key %}Yes{% else %}No{% endif %}</small> {% endcomment %}
-                                {% endwith %}
-                            </td>
-                        {% endfor %}
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+                            <!-- Section: Skin Color -->
+                            <tr class="table-info">
+                                <td colspan="{{ time_slots|length|add:1 }}" class="fw-bold text-center bg-light">
+                                    <i class="fas fa-palette me-2"></i>Skin Color
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="fw-bold">Skin Color</td>
+                                {% for time, label in time_slots %}
+                                    <td>
+                                        {% with "skin_color"|add:","|add:time as key %}
+                                            <select class="form-select" name="skin_color_{{ time }}" aria-label="Skin Color">
+                                                {% for value, display in skin_color_choices %}
+                                                    <option value="{{ value }}" {% if existing_vitals_dict|get_vital:key == value %}selected{% endif %}>
+                                                        {{ display }}
+                                                    </option>
+                                                {% endfor %}
+                                            </select>
+                                        {% endwith %}
+                                    </td>
+                                {% endfor %}
+                            </tr>
 
-        <button type="submit" class="btn btn-primary">Save Vitals</button>
-    </form>
+                            <!-- Section: Fluid Balance -->
+                            <tr class="table-info">
+                                <td colspan="{{ time_slots|length|add:1 }}" class="fw-bold text-center bg-light">
+                                    <i class="fas fa-tint me-2"></i>Fluid Balance
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="fw-bold">Urine Output</td>
+                                {% for time, label in time_slots %}
+                                    <td>
+                                        {% with "urine"|add:","|add:time as key %}
+                                            <select class="form-select" name="urine_{{ time }}" aria-label="Urine Output">
+                                                {% for value, display in urine_choices %}
+                                                    <option value="{{ value }}" {% if existing_vitals_dict|get_vital:key == value %}selected{% endif %}>
+                                                        {{ display }}
+                                                    </option>
+                                                {% endfor %}
+                                            </select>
+                                        {% endwith %}
+                                    </td>
+                                {% endfor %}
+                            </tr>
+
+                            <!-- Section: Other Observations -->
+                            <tr class="table-info">
+                                <td colspan="{{ time_slots|length|add:1 }}" class="fw-bold text-center bg-light">
+                                    <i class="fas fa-clipboard-check me-2"></i>Other Observations
+                                </td>
+                            </tr>
+                            {% for field_name in boolean_fields %}
+                                <tr>
+                                    <td class="fw-bold">{{ field_name|title }}</td>
+                                    {% for time, label in time_slots %}
+                                        <td class="text-center">
+                                            {% with field_name|add:","|add:time as key %}
+                                                <div class="form-check form-switch">
+                                                    <input type="checkbox" class="form-check-input" name="{{ field_name }}_{{ time }}" 
+                                                           {% if existing_vitals_dict|get_vital:key %}checked{% endif %}>
+                                                </div>
+                                            {% endwith %}
+                                        </td>
+                                    {% endfor %}
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Form Actions -->
+                <div class="mt-4 d-flex justify-content-between">
+                    <button type="reset" class="btn btn-outline-secondary">
+                        <i class="fas fa-undo me-2"></i>Reset
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-2"></i>Save Vitals
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
+
+<!-- Tooltip Initialization -->
+<script>
+    // Enable Bootstrap tooltips
+    document.addEventListener('DOMContentLoaded', function () {
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+    });
+</script>
 {% endblock %}

@@ -1,40 +1,155 @@
 {% extends 'hms/base.html' %}
 {% block content %}
-<div class="container">
-    <h2>NICU Vitals for {{ ipd.patient.user.full_name }}</h2>
-    <a href="{% url 'add_nicu_vitals' ipd.id %}" class="btn btn-success">Add Vitals</a>
-    <table class="table table-bordered">
-        <thead>
-            <tr>
-                <th>Vitals</th>
-                {% for vitals in vitals_list %}
-                    <th>{{ vitals.time }}</th>
-                {% endfor %}
-            </tr>
-        </thead>
-        <tbody>
-            <tr><td><b>Temperature (°F)</b></td>{% for vitals in vitals_list %}<td>{{ vitals.temperature }}</td>{% endfor %}</tr>
-            <tr><td><b>Respiratory Rate</b></td>{% for vitals in vitals_list %}<td>{{ vitals.respiratory_rate }}</td>{% endfor %}</tr>
-            <tr><td><b>Pulse Rate</b></td>{% for vitals in vitals_list %}<td>{{ vitals.pulse_rate }}</td>{% endfor %}</tr>
-            <tr><td><b>CFT (sec)</b></td>{% for vitals in vitals_list %}<td>{{ vitals.cft }}</td>{% endfor %}</tr>
-            <tr><td><b>Skin Color</b></td>{% for vitals in vitals_list %}<td>{{ vitals.get_skin_color_display }}</td>{% endfor %}</tr>
-            <tr><td><b>Seizure</b></td>{% for vitals in vitals_list %}<td>{{ vitals.seizure|yesno:"Yes,No" }}</td>{% endfor %}</tr>
-            <tr><td><b>SpO₂ (%)</b></td>{% for vitals in vitals_list %}<td>{{ vitals.spo2 }}</td>{% endfor %}</tr>
-            <tr><td><b>Oxygen Support</b></td>{% for vitals in vitals_list %}<td>{{ vitals.oxygen }}</td>{% endfor %}</tr>
-            <tr><td><b>Retraction</b></td>{% for vitals in vitals_list %}<td>{{ vitals.retraction|yesno:"Yes,No" }}</td>{% endfor %}</tr>
-            
-            <tr><td colspan="{{ vitals_list|length|add:1 }}" class="bg-primary text-white text-center"><b>Fluid Balance</b></td></tr>
-            <tr><td><b>IV Fluids (ml)</b></td>{% for vitals in vitals_list %}<td>{{ vitals.iv_fluids }}</td>{% endfor %}</tr>
-            <tr><td><b>By Nasogastric (ml)</b></td>{% for vitals in vitals_list %}<td>{{ vitals.by_nasogastric }}</td>{% endfor %}</tr>
-            <tr><td><b>Oral (ml)</b></td>{% for vitals in vitals_list %}<td>{{ vitals.oral }}</td>{% endfor %}</tr>
-            <tr><td><b>Breastfeeding</b></td>{% for vitals in vitals_list %}<td>{{ vitals.breastfeeding|yesno:"Yes,No" }}</td>{% endfor %}</tr>
-            
-            <tr><td colspan="{{ vitals_list|length|add:1 }}" class="bg-success text-white text-center"><b>Output</b></td></tr>
-            <tr><td><b>Urine</b></td>{% for vitals in vitals_list %}<td>{{ vitals.get_urine_display }}</td>{% endfor %}</tr>
-            <tr><td><b>Stool</b></td>{% for vitals in vitals_list %}<td>{{ vitals.stool|yesno:"Yes,No" }}</td>{% endfor %}</tr>
-            <tr><td><b>IFT (ml)</b></td>{% for vitals in vitals_list %}<td>{{ vitals.ift }}</td>{% endfor %}</tr>
-            <tr><td><b>Vomiting</b></td>{% for vitals in vitals_list %}<td>{{ vitals.vomiting|yesno:"Yes,No" }}</td>{% endfor %}</tr>
-        </tbody>
-    </table>
+<div class="container mt-4">
+    <div class="card shadow">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                <h2 class="card-title mb-0">
+                    <i class="fas fa-heartbeat me-2"></i>NICU Vitals for {{ ipd.patient.user.full_name }}
+                </h2>
+                <a href="{% url 'add_nicu_vitals' ipd.id %}" class="btn btn-success btn-lg">
+                    <i class="fas fa-plus me-2"></i>Add Vitals
+                </a>
+            </div>
+        </div> 
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th class="fw-bold">Vitals</th>
+                            {% for vitals in vitals_list %}
+                                <th class="text-center">{{ vitals.time }}</th>
+                            {% endfor %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Section: Vitals -->
+                        <tr class="table-info">
+                            <td colspan="{{ vitals_list|length|add:1 }}" class="fw-bold text-center bg-light">
+                                <i class="fas fa-thermometer-half me-2"></i>Vitals
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="fw-bold">Temperature (°F)</td>
+                            {% for vitals in vitals_list %}
+                                <td>{{ vitals.temperature|default:"-" }}</td>
+                            {% endfor %}
+                        </tr>
+                        <tr>
+                            <td class="fw-bold">Respiratory Rate (b/min)</td>
+                            {% for vitals in vitals_list %}
+                                <td>{{ vitals.respiratory_rate|default:"-" }}</td>
+                            {% endfor %}
+                        </tr>
+                        <tr>
+                            <td class="fw-bold">Pulse Rate (b/min)</td>
+                            {% for vitals in vitals_list %}
+                                <td>{{ vitals.pulse_rate|default:"-" }}</td>
+                            {% endfor %}
+                        </tr>
+                        <tr>
+                            <td class="fw-bold">CFT (sec)</td>
+                            {% for vitals in vitals_list %}
+                                <td>{{ vitals.cft|default:"-" }}</td>
+                            {% endfor %}
+                        </tr>
+                        <tr>
+                            <td class="fw-bold">Skin Color</td>
+                            {% for vitals in vitals_list %}
+                                <td>{{ vitals.get_skin_color_display|default:"-" }}</td>
+                            {% endfor %}
+                        </tr>
+                        <tr>
+                            <td class="fw-bold">Seizure</td>
+                            {% for vitals in vitals_list %}
+                                <td>{{ vitals.seizure|yesno:"Yes,No"|default:"-" }}</td>
+                            {% endfor %}
+                        </tr>
+                        <tr>
+                            <td class="fw-bold">SpO₂ (%)</td>
+                            {% for vitals in vitals_list %}
+                                <td>{{ vitals.spo2|default:"-" }}</td>
+                            {% endfor %}
+                        </tr>
+                        <tr>
+                            <td class="fw-bold">Oxygen Support</td>
+                            {% for vitals in vitals_list %}
+                                <td>{{ vitals.oxygen|default:"-" }}</td>
+                            {% endfor %}
+                        </tr>
+                        <tr>
+                            <td class="fw-bold">Retraction</td>
+                            {% for vitals in vitals_list %}
+                                <td>{{ vitals.retraction|yesno:"Yes,No"|default:"-" }}</td>
+                            {% endfor %}
+                        </tr>
+
+                        <!-- Section: Fluid Balance -->
+                        <tr class="table-info">
+                            <td colspan="{{ vitals_list|length|add:1 }}" class="fw-bold text-center bg-light">
+                                <i class="fas fa-tint me-2"></i>Fluid Balance
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="fw-bold">IV Fluids (ml)</td>
+                            {% for vitals in vitals_list %}
+                                <td>{{ vitals.iv_fluids|default:"-" }}</td>
+                            {% endfor %}
+                        </tr>
+                        <tr>
+                            <td class="fw-bold">By Nasogastric (ml)</td>
+                            {% for vitals in vitals_list %}
+                                <td>{{ vitals.by_nasogastric|default:"-" }}</td>
+                            {% endfor %}
+                        </tr>
+                        <tr>
+                            <td class="fw-bold">Oral (ml)</td>
+                            {% for vitals in vitals_list %}
+                                <td>{{ vitals.oral|default:"-" }}</td>
+                            {% endfor %}
+                        </tr>
+                        <tr>
+                            <td class="fw-bold">Breastfeeding</td>
+                            {% for vitals in vitals_list %}
+                                <td>{{ vitals.breastfeeding|yesno:"Yes,No"|default:"-" }}</td>
+                            {% endfor %}
+                        </tr>
+
+                        <!-- Section: Output -->
+                        <tr class="table-info">
+                            <td colspan="{{ vitals_list|length|add:1 }}" class="fw-bold text-center bg-light">
+                                <i class="fas fa-clipboard-check me-2"></i>Output
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="fw-bold">Urine</td>
+                            {% for vitals in vitals_list %}
+                                <td>{{ vitals.get_urine_display|default:"-" }}</td>
+                            {% endfor %}
+                        </tr>
+                        <tr>
+                            <td class="fw-bold">Stool</td>
+                            {% for vitals in vitals_list %}
+                                <td>{{ vitals.stool|yesno:"Yes,No"|default:"-" }}</td>
+                            {% endfor %}
+                        </tr>
+                        <tr>
+                            <td class="fw-bold">IFT (ml)</td>
+                            {% for vitals in vitals_list %}
+                                <td>{{ vitals.ift|default:"-" }}</td>
+                            {% endfor %}
+                        </tr>
+                        <tr>
+                            <td class="fw-bold">Vomiting</td>
+                            {% for vitals in vitals_list %}
+                                <td>{{ vitals.vomiting|yesno:"Yes,No"|default:"-" }}</td>
+                            {% endfor %}
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock %}

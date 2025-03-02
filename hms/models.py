@@ -416,6 +416,16 @@ class IPD(models.Model):
 
 
 class NICUVitals(models.Model):
+    SKIN_COLOR_CHOICES = [
+        ('pink', 'Pink (Normal)'),
+        ('pallor', 'Pallor (Pale)'),
+        ('jaundiced', 'Jaundiced (Yellowish)'),
+        ('cyanotic', 'Cyanotic (Bluish)'),
+        ('mottled', 'Mottled (Blotchy)'),
+        ('erythematous', 'Erythematous (Red/Flushed)'),
+        ('grayish', 'Grayish'),
+        ('dusky', 'Dusky (Bluish-Gray)'),
+    ]
     ipd = models.ForeignKey('IPD', on_delete=models.CASCADE, related_name='nicu_vitals')
     date = models.DateField(auto_now_add=True)
     time = models.TimeField(default=timezone.now)  # New field to record time slots (2-hour interval)
@@ -425,10 +435,10 @@ class NICUVitals(models.Model):
     respiratory_rate = models.IntegerField(null=True, blank=True)
     pulse_rate = models.IntegerField(null=True, blank=True)
     cft = models.DecimalField(max_digits=3, decimal_places=1,null=True, blank=True)
-    skin_color = models.CharField(max_length=10, choices=[('pink', 'Pink'), ('pallor', 'Pallor')])
+    skin_color = models.CharField(max_length=20, choices=SKIN_COLOR_CHOICES,default='pink')
     seizure = models.BooleanField(null=True, blank=True)
     spo2 = models.IntegerField(null=True, blank=True)
-    oxygen = models.IntegerField(help_text="Options: 1. Nasal Prong, 2. Hood, 3. Without O2",null=True, blank=True)
+    oxygen = models.CharField(max_length=100,help_text="Options: 1. Nasal Prong, 2. Hood, 3. Without O2",null=True, blank=True)
     retraction = models.BooleanField(null=True, blank=True)
 
     # Fluid Balance
