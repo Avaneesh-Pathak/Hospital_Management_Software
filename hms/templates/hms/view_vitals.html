@@ -1,21 +1,24 @@
 {% extends 'hms/base.html' %}
 {% block content %}
 <div class="container mt-4">
-    <div class="card shadow">
-        <div class="card shadow">
-            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-                <h2 class="card-title mb-0">
-                    <i class="fas fa-heartbeat me-2"></i>NICU Vitals for {{ ipd.patient.user.full_name }}
-                </h2>
-                <a href="{% url 'add_nicu_vitals' ipd.id %}" class="btn btn-success btn-lg">
+    <div class="card shadow-lg">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+            <h2 class="card-title mb-0">
+                <i class="fas fa-heartbeat me-2"></i>NICU Vitals for {{ ipd.patient.user.full_name }}
+            </h2>
+            <div>
+                <a href="{% url 'add_nicu_vitals' ipd.id %}" class="btn btn-success btn-lg me-2">
                     <i class="fas fa-plus me-2"></i>Add Vitals
                 </a>
+                <button id="downloadChart" class="btn btn-light btn-lg">
+                    <i class="fas fa-download me-2"></i> Download Chart
+                </button>
             </div>
-        </div> 
+        </div>
         <div class="card-body">
             <div class="table-responsive">
-                <table class="table table-bordered table-hover">
-                    <thead class="table-light">
+                <table class="table table-bordered table-hover table-striped">
+                    <thead class="table-dark">
                         <tr>
                             <th class="fw-bold">Vitals</th>
                             {% for vitals in vitals_list %}
@@ -33,7 +36,9 @@
                         <tr>
                             <td class="fw-bold">Temperature (°F)</td>
                             {% for vitals in vitals_list %}
-                                <td>{{ vitals.temperature|default:"-" }}</td>
+                                <td class="{% if vitals.temperature > 100 %}table-warning{% endif %}">
+                                    {{ vitals.temperature|default:"-" }}
+                                </td>
                             {% endfor %}
                         </tr>
                         <tr>
@@ -63,13 +68,17 @@
                         <tr>
                             <td class="fw-bold">Seizure</td>
                             {% for vitals in vitals_list %}
-                                <td>{{ vitals.seizure|yesno:"Yes,No"|default:"-" }}</td>
+                                <td class="{% if vitals.seizure %}table-danger{% endif %}">
+                                    {{ vitals.seizure|yesno:"Yes,No"|default:"-" }}
+                                </td>
                             {% endfor %}
                         </tr>
                         <tr>
                             <td class="fw-bold">SpO₂ (%)</td>
                             {% for vitals in vitals_list %}
-                                <td>{{ vitals.spo2|default:"-" }}</td>
+                                <td class="{% if vitals.spo2 < 90 %}table-warning{% endif %}">
+                                    {{ vitals.spo2|default:"-" }}
+                                </td>
                             {% endfor %}
                         </tr>
                         <tr>
@@ -81,7 +90,9 @@
                         <tr>
                             <td class="fw-bold">Retraction</td>
                             {% for vitals in vitals_list %}
-                                <td>{{ vitals.retraction|yesno:"Yes,No"|default:"-" }}</td>
+                                <td class="{% if vitals.retraction %}table-danger{% endif %}">
+                                    {{ vitals.retraction|yesno:"Yes,No"|default:"-" }}
+                                </td>
                             {% endfor %}
                         </tr>
 
@@ -134,7 +145,6 @@
                                 </td>
                             {% endfor %}
                         </tr>
-                        
                         <tr>
                             <td class="fw-bold">Stool</td>
                             {% for vitals in vitals_list %}
@@ -150,7 +160,9 @@
                         <tr>
                             <td class="fw-bold">Vomiting</td>
                             {% for vitals in vitals_list %}
-                                <td>{{ vitals.vomiting|yesno:"Yes,No"|default:"-" }}</td>
+                                <td class="{% if vitals.vomiting %}table-danger{% endif %}">
+                                    {{ vitals.vomiting|yesno:"Yes,No"|default:"-" }}
+                                </td>
                             {% endfor %}
                         </tr>
                     </tbody>
@@ -159,4 +171,42 @@
         </div>
     </div>
 </div>
+
+<!-- Include html2canvas for downloading the chart as an image -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script>
+    document.getElementById("downloadChart").addEventListener("click", function () {
+        let chartElement = document.querySelector(".table-responsive");  // Selects the table container
+        
+        html2canvas(chartElement).then(canvas => {
+            let image = canvas.toDataURL("image/png");  // Convert canvas to image
+            let link = document.createElement("a");
+            link.href = image;
+            link.download = "nicu_vitals_chart.png";  // Set the file name
+            link.click();
+        });
+    });
+</script>
+
+<style>
+    .table th, .table td {
+        vertical-align: middle; /* Center align content */
+    }
+    .table thead th {
+        background-color: #343a40; /* Dark header background */
+        color: white; /* White text for header */
+    }
+    .table-striped tbody tr:nth-of-type(odd) {
+        background-color: rgba(0, 0, 0, 0.05); /* Light striped rows */
+    }
+    .table-hover tbody tr:hover {
+        background-color: rgba(0, 0, 0, 0.075); /* Hover effect */
+    }
+    .card {
+        border-radius: 15px; /* Rounded corners for the card */
+    }
+    .btn-lg {
+        font-size: 1.1rem; /* Larger buttons */
+    }
+</style>
 {% endblock %}
