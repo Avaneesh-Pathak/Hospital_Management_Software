@@ -42305,3 +42305,8 @@ Traceback (most recent call last):
     raise TemplateSyntaxError("Invalid filter: '%s'" % filter_name)
 django.template.exceptions.TemplateSyntaxError: Invalid filter: 'get_vitals'
 ERROR 2025-03-03 12:42:59,875 basehttp "GET /nicu/view/30/ HTTP/1.1" 500 269371
+WARNING 2025-03-03 13:24:43,872 basehttp "GET /favicon.ico HTTP/1.1" 404 23240
+WARNING 2025-03-03 13:24:50,443 log Forbidden (Origin checking failed - https://fcde-223-184-163-226.ngrok-free.app does not match any trusted origins.): /login/
+WARNING 2025-03-03 13:24:50,445 basehttp "POST /login/?next=/ HTTP/1.1" 403 2576
+WARNING 2025-03-03 13:26:22,348 basehttp "GET /favicon.ico HTTP/1.1" 404 23240
+WARNING 2025-03-03 18:38:39,111 basehttp "GET /favicon.ico HTTP/1.1" 404 23219

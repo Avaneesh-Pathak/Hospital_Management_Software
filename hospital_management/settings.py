@@ -36,7 +36,7 @@ ALLOWED_HOSTS = ["*"]
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 CRISPY_TEMPLATE_PACK = "bootstrap5"
 CSRF_TRUSTED_ORIGINS = [
-    "https://002a-2401-4900-a483-ce1a-88be-d339-22f-df6a.ngrok-free.app"
+    "https://fcde-223-184-163-226.ngrok-free.app"
 ]
 
 

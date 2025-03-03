@@ -18,7 +18,6 @@
         <tr>
             <td colspan="100%">
                 <div class="d-flex justify-content-start align-items-center gap-3 p-2">
-                    <span class="fw-bold">Legend:</span>
                     <span class="table-success p-2 rounded text-center">
                         ✅ <strong>Normal</strong> <br>
                         <small class="text-muted">(Stable Condition)</small>
@@ -103,9 +102,22 @@
                         <tr>
                             <td class="fw-bold text-center">Skin Color</td>
                             {% for vitals in vitals_list %}
-                                <td class="text-center">{{ vitals.get_skin_color_display|default:"-" }}</td>
+                                <td class="text-center 
+                                    {% if vitals.skin_color == 'pink' %} bg-light text-success
+                                    {% elif vitals.skin_color == 'pallor' %} bg-light text-secondary
+                                    {% elif vitals.skin_color == 'jaundiced' %} bg-warning bg-opacity-25 text-dark
+                                    {% elif vitals.skin_color == 'cyanotic' %} bg-info bg-opacity-25 text-dark
+                                    {% elif vitals.skin_color == 'mottled' %} bg-secondary bg-opacity-25 text-dark
+                                    {% elif vitals.skin_color == 'erythematous' %} bg-danger bg-opacity-25 text-dark
+                                    {% elif vitals.skin_color == 'grayish' %} bg-dark bg-opacity-10 text-dark
+                                    {% elif vitals.skin_color == 'dusky' %} bg-primary bg-opacity-25 text-dark
+                                    {% endif %}">
+                                    {{ vitals.get_skin_color_display|default:"-" }}
+                                </td>
                             {% endfor %}
                         </tr>
+                        
+                        
                         <tr>
                             <td class="fw-bold text-center">Seizure</td>
                             {% for vitals in vitals_list %}
