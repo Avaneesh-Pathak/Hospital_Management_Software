@@ -35,6 +35,9 @@ ALLOWED_HOSTS = ["*"]
 
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 CRISPY_TEMPLATE_PACK = "bootstrap5"
+CSRF_TRUSTED_ORIGINS = [
+    "https://002a-2401-4900-a483-ce1a-88be-d339-22f-df6a.ngrok-free.app"
+]
 
 
 # Application definition
@@ -142,6 +145,11 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 AUTH_USER_MODEL = 'hms.CustomUser'
+
+LOGIN_URL = '/login/'  # Your login page
+LOGIN_REDIRECT_URL = '/dashboard/'  # Redirect after login
+ # Redirect after login (change as needed)
+LOGOUT_REDIRECT_URL = '/login/'  # Redirect after logout
 
 
 LOGGING = {

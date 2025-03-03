@@ -6,15 +6,15 @@
     <div class="card shadow">
         <div class="card-header bg-primary text-white">
             <!-- Messages -->
-    {% if messages %}
-    <div class="mb-6">
-        {% for message in messages %}
-            <div class="p-4 mb-4 text-sm rounded-lg {% if message.tags == 'error' %}bg-red-50 text-red-800{% else %}bg-green-50 text-green-800{% endif %}">
-                {{ message }}
-            </div>
-        {% endfor %}
-    </div>
-{% endif %}
+            {% if messages %}
+                <div class="mb-6">
+                    {% for message in messages %}
+                        <div class="p-4 mb-4 text-sm rounded-lg {% if message.tags == 'error' %}bg-red-50 text-red-800{% else %}bg-green-50 text-green-800{% endif %}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
             <h2 class="card-title mb-0">
                 <i class="fas fa-heartbeat me-2"></i>NICU Vitals for {{ ipd.patient.user.full_name }}
             </h2>
@@ -91,15 +91,16 @@
                                 <td class="fw-bold">Urine Output</td>
                                 {% for time, label in time_slots %}
                                     <td>
-                                        {% with "urine"|add:","|add:time as key %}
-                                            <select class="form-select" name="urine_{{ time }}" aria-label="Urine Output">
-                                                {% for value, display in urine_choices %}
-                                                    <option value="{{ value }}" {% if existing_vitals_dict|get_vital:key == value %}selected{% endif %}>
-                                                        {{ display }}
-                                                    </option>
-                                                {% endfor %}
-                                            </select>
-                                        {% endwith %}
+                                        <select name="urine_{{ time }}" class="urine-select form-select" data-time="{{ time }}">
+                                            {% for value, text in urine_choices %}
+                                                <option value="{{ value }}" {% if existing_vitals_dict|get_vital:time and existing_vitals_dict|get_vital:time.urine == value %}selected{% endif %}>
+                                                    {{ text }}
+                                                </option>
+                                            {% endfor %}
+                                        </select>
+                                        <input type="number" name="urine_ml_{{ time|cut:':' }}" id="urine_ml_{{ time|cut:':' }}" placeholder="Enter ML"
+                                               class="form-control mt-2" style="display: none;" step="0.1" min="0"
+                                               value="{% if existing_vitals_dict|get_vital:time and existing_vitals_dict|get_vital:time.urine_value %}{{ existing_vitals_dict|get_vital:time.urine_value }}{% endif %}">
                                     </td>
                                 {% endfor %}
                             </tr>
@@ -153,4 +154,29 @@
         });
     });
 </script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        document.querySelectorAll(".urine-select").forEach(function (select) {
+            select.addEventListener("change", function () {
+                let time = this.dataset.time.replace(":", ""); // Remove ':'
+                let inputBox = document.querySelector(`#urine_ml_${time}`);
+
+                if (this.value.trim().toLowerCase() === "ml") {
+                    inputBox.style.display = "block";  // Show input if "ML" is selected
+                    inputBox.required = true;
+                } else {
+                    inputBox.style.display = "none";  // Hide otherwise
+                    inputBox.value = "";  // Clear value when hidden
+                    inputBox.required = false;
+                }
+            });
+
+            // Trigger change event on page load to set correct visibility
+            select.dispatchEvent(new Event("change"));
+        });
+    });
+</script>
+
+
 {% endblock %}

@@ -447,6 +447,7 @@ class NICUVitals(models.Model):
     oral = models.IntegerField(null=True, blank=True)
     breastfeeding = models.BooleanField(null=True, blank=True)
     urine = models.CharField(max_length=10, choices=[('nil', 'Nil'), ('ml', 'ML')])
+    urine_value = models.FloatField(blank=True, null=True)  # Store ML value
     stool = models.BooleanField(null=True, blank=True)
     ift = models.IntegerField(null=True, blank=True)
     vomiting = models.BooleanField(null=True, blank=True)

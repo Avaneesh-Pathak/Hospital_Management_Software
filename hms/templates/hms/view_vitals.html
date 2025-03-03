@@ -125,9 +125,16 @@
                         <tr>
                             <td class="fw-bold">Urine</td>
                             {% for vitals in vitals_list %}
-                                <td>{{ vitals.get_urine_display|default:"-" }}</td>
+                                <td>
+                                    {% if vitals.urine == "ml" %}
+                                        {{ vitals.urine_value|default:"-" }} ml
+                                    {% else %}
+                                        {{ vitals.get_urine_display|default:"-" }}
+                                    {% endif %}
+                                </td>
                             {% endfor %}
                         </tr>
+                        
                         <tr>
                             <td class="fw-bold">Stool</td>
                             {% for vitals in vitals_list %}

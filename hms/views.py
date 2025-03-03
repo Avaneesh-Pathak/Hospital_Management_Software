@@ -1529,10 +1529,25 @@ def add_nicu_vitals(request, ipd_id):
 ]
 
     if request.method == "POST":
+        # print("Received POST Data:", request.POST)
         for time, label in TIME_SLOTS:
             # Get or create a NICUVitals entry for this time slot
             vitals, created = NICUVitals.objects.get_or_create(ipd=ipd, date=today, time=time)
+            # Handle Urine Output
+            urine_value = request.POST.get(f"urine_{time}", "").strip()
+            vitals.urine = urine_value  # Store selected value
+            ml_value = None
+            if urine_value == "ml":
+                ml_value = request.POST.get(f"urine_ml_{time.replace(':', '')}", "").strip()
+                if ml_value:
+                    vitals.urine_value = float(ml_value)
+                else:
+                    print(f"Missing Urine ML value for time {time}")  # Debugging output
+                    vitals.urine_value = None
+            else:
+                vitals.urine_value = None  # Reset if not "ML"
 
+            # print(f"Time: {time}, Urine: {urine_value}, Urine ML: {ml_value}")  # Debugging line
             # Update fields safely from request.POST
             for field in numeric_fields:
                 field_name = f"{field}_{time}"
