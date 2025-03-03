@@ -15,12 +15,36 @@
                 </button>
             </div>
         </div>
+        <tr>
+            <td colspan="100%">
+                <div class="d-flex justify-content-start align-items-center gap-3 p-2">
+                    <span class="fw-bold">Legend:</span>
+                    <span class="table-success p-2 rounded text-center">
+                        ✅ <strong>Normal</strong> <br>
+                        <small class="text-muted">(Stable Condition)</small>
+                    </span>
+                    <span class="table-warning p-2 rounded text-center">
+                        ⚠️ <strong>Mild Concern</strong> <br>
+                        <small class="text-muted">(Needs Monitoring)</small>
+                    </span>
+                    <span class="table-primary p-2 rounded text-center">
+                        🔵 <strong>Below Normal</strong> <br>
+                        <small class="text-muted">(Potential Risk)</small>
+                    </span>
+                    <span class="table-danger p-2 rounded text-center">
+                        🔴 <strong>Critical</strong> <br>
+                        <small class="text-muted">(Immediate Attention Needed)</small>
+                    </span>
+                </div>
+            </td>
+        </tr>
+        
         <div class="card-body">
             <div class="table-responsive">
                 <table class="table table-bordered table-hover table-striped">
                     <thead class="table-dark">
                         <tr>
-                            <th class="fw-bold">Vitals</th>
+                            <th class="fw-bold text-center">Vitals</th>
                             {% for vitals in vitals_list %}
                                 <th class="text-center">{{ vitals.time }}</th>
                             {% endfor %}
@@ -34,68 +58,88 @@
                             </td>
                         </tr>
                         <tr>
-                            <td class="fw-bold">Temperature (°F)</td>
+                            <td class="fw-bold text-center">Temperature (°F)</td>
                             {% for vitals in vitals_list %}
-                                <td class="{% if vitals.temperature > 100 %}table-warning{% endif %}">
+                                <td class="text-center {% if vitals.temperature < 97.5 %}table-primary
+                                           {% elif vitals.temperature >= 97.5 and vitals.temperature <= 99.5 %}table-success
+                                           {% elif vitals.temperature > 99.5 and vitals.temperature <= 100.4 %}table-warning
+                                           {% elif vitals.temperature > 100.4 %}table-danger{% endif %}">
                                     {{ vitals.temperature|default:"-" }}
                                 </td>
                             {% endfor %}
                         </tr>
                         <tr>
-                            <td class="fw-bold">Respiratory Rate (b/min)</td>
+                            <td class="fw-bold text-center">Respiratory Rate (b/min)</td>
                             {% for vitals in vitals_list %}
-                                <td>{{ vitals.respiratory_rate|default:"-" }}</td>
+                                <td class="text-center {% if vitals.respiratory_rate < 30 %}table-primary
+                                           {% elif vitals.respiratory_rate >= 30 and vitals.respiratory_rate <= 60 %}table-success
+                                           {% elif vitals.respiratory_rate > 60 and vitals.respiratory_rate <= 70 %}table-warning
+                                           {% elif vitals.respiratory_rate > 70 %}table-danger{% endif %}">
+                                    {{ vitals.respiratory_rate|default:"-" }}
+                                </td>
+                            {% endfor %}
+                        </tr> 
+                        <tr>
+                            <td class="fw-bold text-center">Pulse Rate (b/min)</td>
+                            {% for vitals in vitals_list %}
+                                <td class="text-center {% if vitals.pulse_rate < 100 %}table-primary
+                                           {% elif vitals.pulse_rate >= 100 and vitals.pulse_rate <= 160 %}table-success
+                                           {% elif vitals.pulse_rate > 160 and vitals.pulse_rate <= 180 %}table-warning
+                                           {% elif vitals.pulse_rate > 180 %}table-danger{% endif %}">
+                                    {{ vitals.pulse_rate|default:"-" }}
+                                </td>
                             {% endfor %}
                         </tr>
                         <tr>
-                            <td class="fw-bold">Pulse Rate (b/min)</td>
+                            <td class="fw-bold text-center">CFT (sec)</td>
                             {% for vitals in vitals_list %}
-                                <td>{{ vitals.pulse_rate|default:"-" }}</td>
+                                <td class="text-center {% if vitals.cft <= 2 %}table-success
+                                           {% elif vitals.cft == 3 or vitals.cft == 4 %}table-warning
+                                           {% elif vitals.cft > 4 %}table-danger{% endif %}">
+                                    {{ vitals.cft|default:"-" }}
+                                </td>
+                            {% endfor %}
+                        </tr>                       
+                        <tr>
+                            <td class="fw-bold text-center">Skin Color</td>
+                            {% for vitals in vitals_list %}
+                                <td class="text-center">{{ vitals.get_skin_color_display|default:"-" }}</td>
                             {% endfor %}
                         </tr>
                         <tr>
-                            <td class="fw-bold">CFT (sec)</td>
+                            <td class="fw-bold text-center">Seizure</td>
                             {% for vitals in vitals_list %}
-                                <td>{{ vitals.cft|default:"-" }}</td>
-                            {% endfor %}
-                        </tr>
-                        <tr>
-                            <td class="fw-bold">Skin Color</td>
-                            {% for vitals in vitals_list %}
-                                <td>{{ vitals.get_skin_color_display|default:"-" }}</td>
-                            {% endfor %}
-                        </tr>
-                        <tr>
-                            <td class="fw-bold">Seizure</td>
-                            {% for vitals in vitals_list %}
-                                <td class="{% if vitals.seizure %}table-danger{% endif %}">
+                                <td class="text-center {% if vitals.seizure %}table-danger{% endif %}">
                                     {{ vitals.seizure|yesno:"Yes,No"|default:"-" }}
                                 </td>
                             {% endfor %}
                         </tr>
                         <tr>
-                            <td class="fw-bold">SpO₂ (%)</td>
+                            <td class="fw-bold text-center">SpO₂ (%)</td>
                             {% for vitals in vitals_list %}
-                                <td class="{% if vitals.spo2 < 90 %}table-warning{% endif %}">
+                                <td class="text-center {% if vitals.spo2 >= 95 %}table-success
+                                           {% elif vitals.spo2 >= 90 and vitals.spo2 < 95 %}table-warning
+                                           {% elif vitals.spo2 < 90 %}table-danger{% endif %}">
                                     {{ vitals.spo2|default:"-" }}
                                 </td>
                             {% endfor %}
                         </tr>
                         <tr>
-                            <td class="fw-bold">Oxygen Support</td>
+                            <td class="fw-bold text-center">Oxygen Support</td>
                             {% for vitals in vitals_list %}
-                                <td>{{ vitals.oxygen|default:"-" }}</td>
+                                <td class="text-center {% if vitals.oxygen and vitals.oxygen != '-' %}table-info{% endif %}">
+                                    {{ vitals.oxygen|default:"-" }}
+                                </td>
                             {% endfor %}
                         </tr>
                         <tr>
-                            <td class="fw-bold">Retraction</td>
+                            <td class="fw-bold text-center">Retraction</td>
                             {% for vitals in vitals_list %}
-                                <td class="{% if vitals.retraction %}table-danger{% endif %}">
+                                <td class="text-center {% if vitals.retraction %}table-danger{% endif %}">
                                     {{ vitals.retraction|yesno:"Yes,No"|default:"-" }}
                                 </td>
                             {% endfor %}
                         </tr>
-
                         <!-- Section: Fluid Balance -->
                         <tr class="table-info">
                             <td colspan="{{ vitals_list|length|add:1 }}" class="fw-bold text-center bg-light">
@@ -103,30 +147,40 @@
                             </td>
                         </tr>
                         <tr>
-                            <td class="fw-bold">IV Fluids (ml)</td>
+                            <td class="fw-bold text-center">IV Fluids (ml)</td>
                             {% for vitals in vitals_list %}
-                                <td>{{ vitals.iv_fluids|default:"-" }}</td>
+                                <td class="text-center {% if vitals.iv_fluids >= 60 and vitals.iv_fluids <= 150 %}table-success
+                                           {% elif vitals.iv_fluids < 60 %}table-danger
+                                           {% elif vitals.iv_fluids > 150 %}table-warning{% endif %}">
+                                    {{ vitals.iv_fluids|default:"-" }}
+                                </td>
+                            {% endfor %}
+                        </tr>
+                        
+                        <tr>
+                            <td class="fw-bold text-center">By Nasogastric (ml)</td>
+                            {% for vitals in vitals_list %}
+                                <td class="text-center {% if vitals.by_nasogastric >= 10 and vitals.by_nasogastric <= 20 %}table-success
+                                           {% elif vitals.by_nasogastric < 10 %}table-danger{% endif %}">
+                                    {{ vitals.by_nasogastric|default:"-" }}
+                                </td>
                             {% endfor %}
                         </tr>
                         <tr>
-                            <td class="fw-bold">By Nasogastric (ml)</td>
+                            <td class="fw-bold text-center">Oral (ml)</td>
                             {% for vitals in vitals_list %}
-                                <td>{{ vitals.by_nasogastric|default:"-" }}</td>
+                                <td class="text-center {% if vitals.oral >= 10 and vitals.oral <= 20 %}table-success
+                                           {% elif vitals.oral < 10 %}table-warning{% endif %}">
+                                    {{ vitals.oral|default:"-" }}
+                                </td>
                             {% endfor %}
                         </tr>
                         <tr>
-                            <td class="fw-bold">Oral (ml)</td>
+                            <td class="fw-bold text-center">Breastfeeding</td>
                             {% for vitals in vitals_list %}
-                                <td>{{ vitals.oral|default:"-" }}</td>
+                                <td class="text-center">{{ vitals.breastfeeding|yesno:"Yes,No"|default:"-" }}</td>
                             {% endfor %}
                         </tr>
-                        <tr>
-                            <td class="fw-bold">Breastfeeding</td>
-                            {% for vitals in vitals_list %}
-                                <td>{{ vitals.breastfeeding|yesno:"Yes,No"|default:"-" }}</td>
-                            {% endfor %}
-                        </tr>
-
                         <!-- Section: Output -->
                         <tr class="table-info">
                             <td colspan="{{ vitals_list|length|add:1 }}" class="fw-bold text-center bg-light">
@@ -134,9 +188,19 @@
                             </td>
                         </tr>
                         <tr>
-                            <td class="fw-bold">Urine</td>
+                            <td class="fw-bold text-center">Urine</td>
                             {% for vitals in vitals_list %}
-                                <td>
+                                <td class="text-center
+                                    {% if vitals.urine == 'ml' %}
+                                        {% if vitals.urine_value >= 1 %}table-success
+                                        {% elif vitals.urine_value >= 0.5 %}table-warning
+                                        {% else %}table-danger{% endif %}
+                                    {% else %}
+                                        {% if vitals.urine == 'Anuria' %}table-danger
+                                        {% elif vitals.urine == 'Oliguria' %}table-warning
+                                        {% endif %}
+                                    {% endif %}
+                                ">
                                     {% if vitals.urine == "ml" %}
                                         {{ vitals.urine_value|default:"-" }} ml
                                     {% else %}
@@ -146,21 +210,28 @@
                             {% endfor %}
                         </tr>
                         <tr>
-                            <td class="fw-bold">Stool</td>
+                            <td class="fw-bold text-center">Stool</td>
                             {% for vitals in vitals_list %}
-                                <td>{{ vitals.stool|yesno:"Yes,No"|default:"-" }}</td>
+                                <td class="text-center">{{ vitals.stool|yesno:"Yes,No"|default:"-" }}</td>
                             {% endfor %}
                         </tr>
                         <tr>
-                            <td class="fw-bold">IFT (ml)</td>
+                            <td class="fw-bold text-center">IFT (ml)</td>
                             {% for vitals in vitals_list %}
-                                <td>{{ vitals.ift|default:"-" }}</td>
+                                <td class="text-center
+                                    {% if vitals.ift >= 6 %}table-danger
+                                    {% elif vitals.ift >= 4 %}table-warning
+                                    {% elif vitals.ift >= 2 %}table-success
+                                    {% endif %}
+                                ">
+                                    {{ vitals.ift|default:"-" }}
+                                </td>
                             {% endfor %}
                         </tr>
                         <tr>
-                            <td class="fw-bold">Vomiting</td>
+                            <td class="fw-bold text-center">Vomiting</td>
                             {% for vitals in vitals_list %}
-                                <td class="{% if vitals.vomiting %}table-danger{% endif %}">
+                                <td class="text-center {% if vitals.vomiting %}table-danger{% endif %}">
                                     {{ vitals.vomiting|yesno:"Yes,No"|default:"-" }}
                                 </td>
                             {% endfor %}
@@ -191,6 +262,7 @@
 <style>
     .table th, .table td {
         vertical-align: middle; /* Center align content */
+        text-align: center; /* Center text */
     }
     .table thead th {
         background-color: #343a40; /* Dark header background */
@@ -207,6 +279,15 @@
     }
     .btn-lg {
         font-size: 1.1rem; /* Larger buttons */
+    }
+    .table-responsive {
+        overflow-x: auto; /* Ensure table is responsive */
+    }
+    .table-bordered {
+        border-collapse: collapse; /* Ensure borders are collapsed */
+    }
+    .table-bordered th, .table-bordered td {
+        border: 1px solid #dee2e6; /* Ensure borders are consistent */
     }
 </style>
 {% endblock %}
