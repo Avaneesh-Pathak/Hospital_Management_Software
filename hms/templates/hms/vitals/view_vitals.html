@@ -1,74 +1,57 @@
 {% extends 'hms/base.html' %}
 {% block content %}
-<div class="table-responsive mt-4">
-    <div class="align-items-right">
+<div class="container mt-4">
+    <!-- Action Buttons -->
+    <div class="d-flex justify-content-end mb-4">
         <a href="{% url 'add_nicu_vitals' ipd.id %}" class="btn btn-success btn-lg me-2">
             <i class="fas fa-plus me-2"></i>Add Vitals
         </a>
-        <button id="downloadChart" class="bg-primary text-white btn btn-light btn-lg">
+        <button id="downloadChart" class="btn btn-primary btn-lg text-white">
             <i class="fas fa-download me-2"></i> Download Chart
         </button>
     </div>
-    <div class="card shadow-lg">
+
+    <!-- Patient Information Card -->
+    <div class=" table-responsive card shadow-lg">
         <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
             <h2 class="card-title mb-0">
-                <i class="fas fa-heartbeat me-2"></i>NICU Vitals for {{ ipd.patient.user.full_name }}
+                <i class="fas fa-heartbeat me-2"></i> NICU Vitals of  {{ ipd.patient.user.full_name }}
             </h2>
-            <p><strong>Age:</strong> {{ age }}</p>
-            <p><strong>Weight:</strong> {{ weight }} kg</p>
+                <p class="mb-0"><strong>Age:</strong> {{ age }}</p>
+                <p class="mb-0"><strong>Weight:</strong> {{ weight }} kg</p>
         </div>
-        <tr>
-            <td colspan="100%">
-                <div class="d-flex justify-content-start align-items-center gap-3 p-2">
-                    <span class="table-success p-2 rounded text-center">
-                        ✅ <strong>Normal</strong> <br>
-                        <small class="text-muted">(Stable Condition)</small>
-                    </span>
-                    <span class="table-warning p-2 rounded text-center">
-                        ⚠️ <strong>Mild Concern</strong> <br>
-                        <small class="text-muted">(Needs Monitoring)</small>
-                    </span>
-                    <span class="table-primary p-2 rounded text-center">
-                        🔵 <strong>Below Normal</strong> <br>
-                        <small class="text-muted">(Potential Risk)</small>
-                    </span>
-                    <span class="table-danger p-2 rounded text-center">
-                        🔴 <strong>Critical</strong> <br>
-                        <small class="text-muted">(Immediate Attention Needed)</small>
-                    </span>
-                </div>
-            </td>
-        </tr>
+        
+
+        <!-- Status Indicators -->
+        <div class="card-body p-0">
+            <table class="table table-borderless mb-0">
+                <tr>
+                    <td colspan="100%" class="w-100 p-3">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="table-success rounded text-center">
+                                ✅ <strong>Normal</strong> <br>
+                                <small class="text-muted">(Stable Condition)</small>
+                            </span>
+                            <span class="table-warning rounded text-center">
+                                ⚠️ <strong>Mild Concern</strong> <br>
+                                <small class="text-muted">(Needs Monitoring)</small>
+                            </span>
+                            <span class="table-primary rounded text-center">
+                                🔵 <strong>Below Normal</strong> <br>
+                                <small class="text-muted">(Potential Risk)</small>
+                            </span>
+                            <span class="table-danger rounded text-center">
+                                🔴 <strong>Critical</strong> <br>
+                                <small class="text-muted">(Immediate Attention Needed)</small>
+                            </span>
+                        </div>
+                    </td>                
+                </tr>
+            </table>
+        </div>
         
         <div class="card-body">
-            <div class="table-responsive">
-                <!-- Display grouped totals in a table -->
-                <!-- Centered Heading -->
-                <div class="text-center my-4">
-                    <h2 class="fw-bold" style="border-bottom: 3px solid #000; display: inline-block; padding-bottom: 5px;">
-                        Fluid Input and Output by Time 
-                    </h2>
-                </div>                
-                <table class="table table-bordered table-hover table-striped">
-                    <thead class="table-dark">
-                        <tr>
-                            <th class="fw-bold text-center">Time Slot</th>
-                            <th class="fw-bold text-center">Total Fluid Input (ml)</th>
-                            <th class="fw-bold text-center">Total Fluid Output (ml)</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for group, data in fluid_totals.items %}
-                        <tr>
-                            <td class="text-center">{{ group }}</td>
-                            <td class="text-center">{{ data.input }}</td>
-                            <td class="text-center">{{ data.output }}</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-                
-
+            <div class="table-responsive">             
                 <table class="table table-bordered table-hover table-striped">
                     <thead class="table-dark">
                         <tr id="day-header">
@@ -186,7 +169,7 @@
                         </tr>
                         <!-- Section: Fluid Balance -->
                         <tr class="table-info">
-                            <td colspan="{{ vitals_list|length|add:1 }}" class="fw-bold text-center bg-light">
+                            <td colspan="{{ vitals_list|length|add:1 }}" class="fw-bold bg-light border border-dark">
                                 <i class="fas fa-tint me-2"></i>Fluid Balance
                             </td>
                         </tr>
@@ -227,7 +210,7 @@
                         </tr>
                         <!-- Section: Output -->
                         <tr class="table-info">
-                            <td colspan="{{ vitals_list|length|add:1 }}" class="fw-bold text-center bg-light">
+                            <td colspan="{{ vitals_list|length|add:1 }}" class="fw-bold bg-light border border-dark">
                                 <i class="fas fa-clipboard-check me-2"></i>Output
                             </td>
                         </tr>
@@ -281,6 +264,29 @@
                                 </td>
                             {% endfor %}
                         </tr>
+                    </tbody>
+                </table>
+                <div class="text-center my-4">
+                    <h2 class="fw-bold" style="border-bottom: 3px solid #000; display: inline-block; padding-bottom: 5px;">
+                        Fluid Input and Output by Time 
+                    </h2>
+                </div>                
+                <table class="table table-bordered table-hover table-striped">
+                    <thead class="table-dark">
+                        <tr>
+                            <th class="fw-bold text-center">Time Slot</th>
+                            <th class="fw-bold text-center">Total Fluid Input (ml)</th>
+                            <th class="fw-bold text-center">Total Fluid Output (ml)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for group, data in fluid_totals.items %}
+                        <tr>
+                            <td class="text-center">{{ group }}</td>
+                            <td class="text-center">{{ data.input }}</td>
+                            <td class="text-center">{{ data.output }}</td>
+                        </tr>
+                        {% endfor %}
                     </tbody>
                 </table>
             </div>

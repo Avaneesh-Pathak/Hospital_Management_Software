@@ -59468,3 +59468,111 @@ INFO 2025-03-07 14:48:41,712 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62651
 INFO 2025-03-07 14:48:41,911 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62651
 INFO 2025-03-07 14:48:45,910 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62513
 INFO 2025-03-07 14:48:46,506 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62513
+INFO 2025-03-07 14:49:21,821 autoreload Watching for file changes with StatReloader
+INFO 2025-03-07 14:51:14,702 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 63017
+INFO 2025-03-07 14:51:15,641 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 63017
+INFO 2025-03-07 14:51:16,028 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 63017
+INFO 2025-03-07 14:51:16,257 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 63017
+INFO 2025-03-07 14:51:17,483 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 63017
+INFO 2025-03-07 14:52:01,603 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62911
+INFO 2025-03-07 14:52:02,370 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62911
+INFO 2025-03-07 14:52:43,789 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62931
+INFO 2025-03-07 14:52:44,304 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62931
+INFO 2025-03-07 14:52:44,541 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62931
+INFO 2025-03-07 14:52:55,720 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62895
+INFO 2025-03-07 14:52:56,140 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62895
+INFO 2025-03-07 14:52:56,406 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62895
+INFO 2025-03-07 14:53:08,390 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62876
+INFO 2025-03-07 14:53:09,135 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62876
+INFO 2025-03-07 14:53:14,195 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62863
+INFO 2025-03-07 14:53:14,668 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62863
+INFO 2025-03-07 14:53:25,965 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62863
+INFO 2025-03-07 14:53:26,369 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62863
+INFO 2025-03-07 14:53:26,615 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62864
+INFO 2025-03-07 14:53:26,722 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62864
+INFO 2025-03-07 14:53:26,898 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62864
+INFO 2025-03-07 14:53:27,053 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62864
+INFO 2025-03-07 14:53:27,189 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62864
+INFO 2025-03-07 14:53:31,176 basehttp - Broken pipe from ('127.0.0.1', 56024)
+INFO 2025-03-07 14:53:31,192 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62864
+INFO 2025-03-07 14:53:31,369 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62864
+INFO 2025-03-07 14:53:31,509 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62864
+INFO 2025-03-07 14:53:31,703 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62865
+INFO 2025-03-07 14:53:31,789 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62865
+INFO 2025-03-07 14:53:31,945 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62865
+INFO 2025-03-07 14:53:32,082 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62865
+INFO 2025-03-07 14:53:32,210 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62865
+INFO 2025-03-07 14:53:32,465 basehttp - Broken pipe from ('127.0.0.1', 56025)
+INFO 2025-03-07 14:53:32,485 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62865
+INFO 2025-03-07 14:53:32,582 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62865
+INFO 2025-03-07 14:53:32,809 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62865
+INFO 2025-03-07 14:53:32,921 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62865
+INFO 2025-03-07 14:53:44,696 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62865
+INFO 2025-03-07 14:53:45,139 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62865
+INFO 2025-03-07 14:53:45,351 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62865
+INFO 2025-03-07 14:53:45,515 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62865
+INFO 2025-03-07 14:53:45,795 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62865
+INFO 2025-03-07 14:53:56,495 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62852
+INFO 2025-03-07 14:53:56,950 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62852
+INFO 2025-03-07 14:53:57,426 basehttp - Broken pipe from ('127.0.0.1', 56607)
+INFO 2025-03-07 14:53:57,464 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62852
+INFO 2025-03-07 14:54:45,491 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62923
+INFO 2025-03-07 14:54:46,130 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62923
+INFO 2025-03-07 14:55:03,123 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62883
+INFO 2025-03-07 14:55:03,511 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62883
+INFO 2025-03-07 14:55:03,739 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62883
+INFO 2025-03-07 14:55:03,957 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62883
+INFO 2025-03-07 14:55:04,112 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62883
+INFO 2025-03-07 14:55:09,829 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62873
+INFO 2025-03-07 14:55:10,158 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62873
+INFO 2025-03-07 14:55:10,420 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62873
+INFO 2025-03-07 14:55:10,626 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62873
+INFO 2025-03-07 14:55:10,868 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62873
+INFO 2025-03-07 14:55:40,356 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62872
+INFO 2025-03-07 14:55:40,851 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62872
+INFO 2025-03-07 14:55:41,002 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62872
+INFO 2025-03-07 14:56:02,391 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62880
+INFO 2025-03-07 14:56:02,911 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62880
+INFO 2025-03-07 14:56:13,699 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62887
+INFO 2025-03-07 14:56:14,117 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62887
+INFO 2025-03-07 14:56:14,309 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62887
+INFO 2025-03-07 14:56:14,541 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62887
+INFO 2025-03-07 14:56:14,913 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62887
+INFO 2025-03-07 14:56:15,324 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62887
+INFO 2025-03-07 14:56:21,474 basehttp - Broken pipe from ('127.0.0.1', 57481)
+INFO 2025-03-07 14:56:21,535 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62887
+INFO 2025-03-07 14:56:21,704 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62887
+INFO 2025-03-07 14:57:10,340 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62898
+INFO 2025-03-07 14:57:10,861 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62898
+INFO 2025-03-07 14:57:42,501 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62894
+INFO 2025-03-07 14:57:42,921 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62894
+INFO 2025-03-07 14:57:48,536 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62898
+INFO 2025-03-07 14:57:49,157 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62898
+INFO 2025-03-07 14:58:49,196 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-03-07 14:58:50,146 autoreload Watching for file changes with StatReloader
+INFO 2025-03-07 14:58:51,996 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62898
+INFO 2025-03-07 14:58:54,111 basehttp "GET /nicu/add/3/ HTTP/1.1" 200 205834
+INFO 2025-03-07 14:59:00,267 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-03-07 14:59:01,206 autoreload Watching for file changes with StatReloader
+INFO 2025-03-07 14:59:03,186 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62898
+INFO 2025-03-07 14:59:12,197 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-03-07 14:59:12,948 autoreload Watching for file changes with StatReloader
+INFO 2025-03-07 14:59:15,628 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-03-07 14:59:16,388 autoreload Watching for file changes with StatReloader
+INFO 2025-03-07 14:59:19,040 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-03-07 14:59:19,839 autoreload Watching for file changes with StatReloader
+INFO 2025-03-07 14:59:21,617 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62898
+INFO 2025-03-07 14:59:21,813 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62898
+INFO 2025-03-07 14:59:23,295 basehttp "GET /nicu/add/3/ HTTP/1.1" 200 205789
+INFO 2025-03-07 14:59:23,855 basehttp "GET /nicu/add/3/ HTTP/1.1" 200 205789
+INFO 2025-03-07 14:59:24,446 basehttp "GET /nicu/add/3/ HTTP/1.1" 200 205789
+INFO 2025-03-07 14:59:24,745 basehttp "GET /nicu/add/3/ HTTP/1.1" 200 205789
+INFO 2025-03-07 14:59:25,194 basehttp "GET /nicu/add/3/ HTTP/1.1" 200 205789
+INFO 2025-03-07 14:59:32,900 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-03-07 14:59:33,719 autoreload Watching for file changes with StatReloader
+INFO 2025-03-07 14:59:37,369 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-03-07 14:59:38,100 autoreload Watching for file changes with StatReloader
+INFO 2025-03-07 14:59:39,636 basehttp - Broken pipe from ('127.0.0.1', 60992)
+INFO 2025-03-07 14:59:39,675 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62898
+INFO 2025-03-07 14:59:39,846 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62898
+INFO 2025-03-07 14:59:40,042 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62898
