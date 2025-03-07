@@ -380,4 +380,59 @@
         dayHeaderRow.appendChild(th);
     });
 </script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    function fetchVitalsData() {
+        $.ajax({
+            url: window.location.href,  // Fetch from the same URL
+            type: "GET",
+            dataType: "json",
+            headers: {
+                "X-Requested-With": "XMLHttpRequest"  // Mark request as AJAX
+            },
+            success: function (data) {
+                $("#age").text(data.age);
+                $("#weight").text(data.weight + " kg");
+
+                let vitalsTable = $("#vitals-table tbody");
+                vitalsTable.empty();  // Clear old records
+
+                data.vitals.forEach(function (vital) {
+                    let row = `
+                        <tr>
+                            <td>${vital.temperature || "-"}</td>
+                            <td>${vital.respiratory_rate || "-"}</td>
+                            <td>${vital.pulse_rate || "-"}</td>
+                            <td>${vital.cft || "-"}</td>
+                            <td>${vital.skin_color || "-"}</td>
+                            <td>${vital.seizure}</td>
+                            <td>${vital.spo2 || "-"}</td>
+                            <td>${vital.oxygen}</td>
+                            <td>${vital.retraction}</td>
+                            <td>${vital.iv_fluids || "-"}</td>
+                            <td>${vital.by_nasogastric || "-"}</td>
+                            <td>${vital.oral || "-"}</td>
+                            <td>${vital.breastfeeding}</td>
+                            <td>${vital.urine}</td>
+                            <td>${vital.urine_value || "-"}</td>
+                            <td>${vital.stool}</td>
+                            <td>${vital.ift || "-"}</td>
+                            <td>${vital.vomiting}</td>
+                        </tr>
+                    `;
+                    vitalsTable.append(row);
+                });
+            },
+            error: function (xhr, status, error) {
+                console.error("Error fetching data:", error);
+            }
+        });
+    }
+
+    $(document).ready(function () {
+        fetchVitalsData(); // Initial load
+        setInterval(fetchVitalsData, 5000); // Refresh every 5 seconds
+    });
+</script>
+
 {% endblock %}

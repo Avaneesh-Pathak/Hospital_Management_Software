@@ -59576,3 +59576,758 @@ INFO 2025-03-07 14:59:39,636 basehttp - Broken pipe from ('127.0.0.1', 60992)
 INFO 2025-03-07 14:59:39,675 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62898
 INFO 2025-03-07 14:59:39,846 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62898
 INFO 2025-03-07 14:59:40,042 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62898
+INFO 2025-03-07 15:00:09,372 autoreload Watching for file changes with StatReloader
+INFO 2025-03-07 15:00:11,030 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62898
+INFO 2025-03-07 15:00:11,135 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62898
+INFO 2025-03-07 15:00:11,289 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62898
+INFO 2025-03-07 15:00:11,447 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62898
+INFO 2025-03-07 15:00:16,991 basehttp "GET / HTTP/1.1" 200 20369
+INFO 2025-03-07 15:00:45,806 basehttp "GET /ipd/ HTTP/1.1" 200 21491
+INFO 2025-03-07 15:00:46,030 basehttp "GET /get-ipd-data/ HTTP/1.1" 200 755
+INFO 2025-03-07 15:00:47,637 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62898
+INFO 2025-03-07 15:02:35,047 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-03-07 15:02:35,912 autoreload Watching for file changes with StatReloader
+INFO 2025-03-07 15:05:39,106 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-03-07 15:05:39,997 autoreload Watching for file changes with StatReloader
+INFO 2025-03-07 15:05:56,682 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 65208
+ERROR 2025-03-07 15:05:57,190 log Internal Server Error: /nicu/view/3/
+Traceback (most recent call last):
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\contrib\auth\decorators.py", line 60, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\hms\views.py", line 1607, in view_nicu_vitals
+    "time": localtime(vital.time).strftime("%I:%M %p"),
+            ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\utils\timezone.py", line 183, in localtime
+    raise ValueError("localtime() cannot be applied to a naive datetime")
+ValueError: localtime() cannot be applied to a naive datetime
+ERROR 2025-03-07 15:05:57,196 basehttp "GET /nicu/view/3/ HTTP/1.1" 500 83505
+INFO 2025-03-07 15:05:58,160 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 65208
+ERROR 2025-03-07 15:05:58,410 log Internal Server Error: /nicu/view/3/
+Traceback (most recent call last):
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\contrib\auth\decorators.py", line 60, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\hms\views.py", line 1607, in view_nicu_vitals
+    "time": localtime(vital.time).strftime("%I:%M %p"),
+            ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\utils\timezone.py", line 183, in localtime
+    raise ValueError("localtime() cannot be applied to a naive datetime")
+ValueError: localtime() cannot be applied to a naive datetime
+ERROR 2025-03-07 15:05:58,411 basehttp "GET /nicu/view/3/ HTTP/1.1" 500 83505
+ERROR 2025-03-07 15:06:03,897 log Internal Server Error: /nicu/view/3/
+Traceback (most recent call last):
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\contrib\auth\decorators.py", line 60, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\hms\views.py", line 1607, in view_nicu_vitals
+    "time": localtime(vital.time).strftime("%I:%M %p"),
+            ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\utils\timezone.py", line 183, in localtime
+    raise ValueError("localtime() cannot be applied to a naive datetime")
+ValueError: localtime() cannot be applied to a naive datetime
+ERROR 2025-03-07 15:06:03,897 basehttp "GET /nicu/view/3/ HTTP/1.1" 500 83505
+ERROR 2025-03-07 15:06:08,921 log Internal Server Error: /nicu/view/3/
+Traceback (most recent call last):
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\contrib\auth\decorators.py", line 60, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\hms\views.py", line 1607, in view_nicu_vitals
+    "time": localtime(vital.time).strftime("%I:%M %p"),
+            ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\utils\timezone.py", line 183, in localtime
+    raise ValueError("localtime() cannot be applied to a naive datetime")
+ValueError: localtime() cannot be applied to a naive datetime
+ERROR 2025-03-07 15:06:08,922 basehttp "GET /nicu/view/3/ HTTP/1.1" 500 83505
+ERROR 2025-03-07 15:06:13,436 log Internal Server Error: /nicu/view/3/
+Traceback (most recent call last):
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\contrib\auth\decorators.py", line 60, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\hms\views.py", line 1607, in view_nicu_vitals
+    "time": localtime(vital.time).strftime("%I:%M %p"),
+            ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\utils\timezone.py", line 183, in localtime
+    raise ValueError("localtime() cannot be applied to a naive datetime")
+ValueError: localtime() cannot be applied to a naive datetime
+ERROR 2025-03-07 15:06:13,437 basehttp "GET /nicu/view/3/ HTTP/1.1" 500 83505
+ERROR 2025-03-07 15:06:18,492 log Internal Server Error: /nicu/view/3/
+Traceback (most recent call last):
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\contrib\auth\decorators.py", line 60, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\hms\views.py", line 1607, in view_nicu_vitals
+    "time": localtime(vital.time).strftime("%I:%M %p"),
+            ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\utils\timezone.py", line 183, in localtime
+    raise ValueError("localtime() cannot be applied to a naive datetime")
+ValueError: localtime() cannot be applied to a naive datetime
+ERROR 2025-03-07 15:06:18,494 basehttp "GET /nicu/view/3/ HTTP/1.1" 500 83505
+ERROR 2025-03-07 15:06:23,983 log Internal Server Error: /nicu/view/3/
+Traceback (most recent call last):
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\contrib\auth\decorators.py", line 60, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\hms\views.py", line 1607, in view_nicu_vitals
+    "time": localtime(vital.time).strftime("%I:%M %p"),
+            ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\utils\timezone.py", line 183, in localtime
+    raise ValueError("localtime() cannot be applied to a naive datetime")
+ValueError: localtime() cannot be applied to a naive datetime
+ERROR 2025-03-07 15:06:23,985 basehttp "GET /nicu/view/3/ HTTP/1.1" 500 83505
+ERROR 2025-03-07 15:06:28,458 log Internal Server Error: /nicu/view/3/
+Traceback (most recent call last):
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\contrib\auth\decorators.py", line 60, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\hms\views.py", line 1607, in view_nicu_vitals
+    "time": localtime(vital.time).strftime("%I:%M %p"),
+            ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\utils\timezone.py", line 183, in localtime
+    raise ValueError("localtime() cannot be applied to a naive datetime")
+ValueError: localtime() cannot be applied to a naive datetime
+ERROR 2025-03-07 15:06:28,459 basehttp "GET /nicu/view/3/ HTTP/1.1" 500 83505
+ERROR 2025-03-07 15:06:34,037 log Internal Server Error: /nicu/view/3/
+Traceback (most recent call last):
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\contrib\auth\decorators.py", line 60, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\hms\views.py", line 1607, in view_nicu_vitals
+    "time": localtime(vital.time).strftime("%I:%M %p"),
+            ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\utils\timezone.py", line 183, in localtime
+    raise ValueError("localtime() cannot be applied to a naive datetime")
+ValueError: localtime() cannot be applied to a naive datetime
+ERROR 2025-03-07 15:06:34,039 basehttp "GET /nicu/view/3/ HTTP/1.1" 500 83505
+ERROR 2025-03-07 15:06:38,958 log Internal Server Error: /nicu/view/3/
+Traceback (most recent call last):
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\contrib\auth\decorators.py", line 60, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\hms\views.py", line 1607, in view_nicu_vitals
+    "time": localtime(vital.time).strftime("%I:%M %p"),
+            ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\utils\timezone.py", line 183, in localtime
+    raise ValueError("localtime() cannot be applied to a naive datetime")
+ValueError: localtime() cannot be applied to a naive datetime
+ERROR 2025-03-07 15:06:38,962 basehttp "GET /nicu/view/3/ HTTP/1.1" 500 83505
+ERROR 2025-03-07 15:06:43,972 log Internal Server Error: /nicu/view/3/
+Traceback (most recent call last):
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\contrib\auth\decorators.py", line 60, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\hms\views.py", line 1607, in view_nicu_vitals
+    "time": localtime(vital.time).strftime("%I:%M %p"),
+            ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\utils\timezone.py", line 183, in localtime
+    raise ValueError("localtime() cannot be applied to a naive datetime")
+ValueError: localtime() cannot be applied to a naive datetime
+ERROR 2025-03-07 15:06:43,974 basehttp "GET /nicu/view/3/ HTTP/1.1" 500 83505
+ERROR 2025-03-07 15:06:48,974 log Internal Server Error: /nicu/view/3/
+Traceback (most recent call last):
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\contrib\auth\decorators.py", line 60, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\hms\views.py", line 1607, in view_nicu_vitals
+    "time": localtime(vital.time).strftime("%I:%M %p"),
+            ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\utils\timezone.py", line 183, in localtime
+    raise ValueError("localtime() cannot be applied to a naive datetime")
+ValueError: localtime() cannot be applied to a naive datetime
+ERROR 2025-03-07 15:06:48,976 basehttp "GET /nicu/view/3/ HTTP/1.1" 500 83505
+ERROR 2025-03-07 15:06:53,954 log Internal Server Error: /nicu/view/3/
+Traceback (most recent call last):
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\contrib\auth\decorators.py", line 60, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\hms\views.py", line 1607, in view_nicu_vitals
+    "time": localtime(vital.time).strftime("%I:%M %p"),
+            ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\utils\timezone.py", line 183, in localtime
+    raise ValueError("localtime() cannot be applied to a naive datetime")
+ValueError: localtime() cannot be applied to a naive datetime
+ERROR 2025-03-07 15:06:53,955 basehttp "GET /nicu/view/3/ HTTP/1.1" 500 83505
+ERROR 2025-03-07 15:06:58,931 log Internal Server Error: /nicu/view/3/
+Traceback (most recent call last):
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\contrib\auth\decorators.py", line 60, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\hms\views.py", line 1607, in view_nicu_vitals
+    "time": localtime(vital.time).strftime("%I:%M %p"),
+            ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\utils\timezone.py", line 183, in localtime
+    raise ValueError("localtime() cannot be applied to a naive datetime")
+ValueError: localtime() cannot be applied to a naive datetime
+ERROR 2025-03-07 15:06:58,932 basehttp "GET /nicu/view/3/ HTTP/1.1" 500 83505
+ERROR 2025-03-07 15:07:03,948 log Internal Server Error: /nicu/view/3/
+Traceback (most recent call last):
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\contrib\auth\decorators.py", line 60, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\hms\views.py", line 1607, in view_nicu_vitals
+    "time": localtime(vital.time).strftime("%I:%M %p"),
+            ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\utils\timezone.py", line 183, in localtime
+    raise ValueError("localtime() cannot be applied to a naive datetime")
+ValueError: localtime() cannot be applied to a naive datetime
+ERROR 2025-03-07 15:07:03,949 basehttp "GET /nicu/view/3/ HTTP/1.1" 500 83505
+ERROR 2025-03-07 15:07:08,951 log Internal Server Error: /nicu/view/3/
+Traceback (most recent call last):
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\contrib\auth\decorators.py", line 60, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\hms\views.py", line 1607, in view_nicu_vitals
+    "time": localtime(vital.time).strftime("%I:%M %p"),
+            ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\utils\timezone.py", line 183, in localtime
+    raise ValueError("localtime() cannot be applied to a naive datetime")
+ValueError: localtime() cannot be applied to a naive datetime
+ERROR 2025-03-07 15:07:08,953 basehttp "GET /nicu/view/3/ HTTP/1.1" 500 83505
+ERROR 2025-03-07 15:07:13,950 log Internal Server Error: /nicu/view/3/
+Traceback (most recent call last):
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\contrib\auth\decorators.py", line 60, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\hms\views.py", line 1607, in view_nicu_vitals
+    "time": localtime(vital.time).strftime("%I:%M %p"),
+            ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\utils\timezone.py", line 183, in localtime
+    raise ValueError("localtime() cannot be applied to a naive datetime")
+ValueError: localtime() cannot be applied to a naive datetime
+ERROR 2025-03-07 15:07:13,951 basehttp "GET /nicu/view/3/ HTTP/1.1" 500 83505
+INFO 2025-03-07 15:07:18,474 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 65208
+ERROR 2025-03-07 15:07:18,758 log Internal Server Error: /nicu/view/3/
+Traceback (most recent call last):
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\contrib\auth\decorators.py", line 60, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\hms\views.py", line 1607, in view_nicu_vitals
+    "time": localtime(vital.time).strftime("%I:%M %p"),
+            ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\utils\timezone.py", line 183, in localtime
+    raise ValueError("localtime() cannot be applied to a naive datetime")
+ValueError: localtime() cannot be applied to a naive datetime
+INFO 2025-03-07 15:07:18,760 basehttp - Broken pipe from ('127.0.0.1', 49815)
+ERROR 2025-03-07 15:07:18,904 log Internal Server Error: /nicu/view/3/
+Traceback (most recent call last):
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\contrib\auth\decorators.py", line 60, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\hms\views.py", line 1607, in view_nicu_vitals
+    "time": localtime(vital.time).strftime("%I:%M %p"),
+            ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\utils\timezone.py", line 183, in localtime
+    raise ValueError("localtime() cannot be applied to a naive datetime")
+ValueError: localtime() cannot be applied to a naive datetime
+ERROR 2025-03-07 15:07:18,906 basehttp "GET /nicu/view/3/ HTTP/1.1" 500 83505
+INFO 2025-03-07 15:07:19,343 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 65208
+ERROR 2025-03-07 15:07:19,803 log Internal Server Error: /nicu/view/3/
+Traceback (most recent call last):
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\contrib\auth\decorators.py", line 60, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\hms\views.py", line 1607, in view_nicu_vitals
+    "time": localtime(vital.time).strftime("%I:%M %p"),
+            ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\utils\timezone.py", line 183, in localtime
+    raise ValueError("localtime() cannot be applied to a naive datetime")
+ValueError: localtime() cannot be applied to a naive datetime
+ERROR 2025-03-07 15:07:19,804 basehttp "GET /nicu/view/3/ HTTP/1.1" 500 83505
+INFO 2025-03-07 15:07:20,074 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 65208
+INFO 2025-03-07 15:07:20,257 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 65208
+ERROR 2025-03-07 15:07:20,535 log Internal Server Error: /nicu/view/3/
+Traceback (most recent call last):
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\contrib\auth\decorators.py", line 60, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\hms\views.py", line 1607, in view_nicu_vitals
+    "time": localtime(vital.time).strftime("%I:%M %p"),
+            ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\utils\timezone.py", line 183, in localtime
+    raise ValueError("localtime() cannot be applied to a naive datetime")
+ValueError: localtime() cannot be applied to a naive datetime
+INFO 2025-03-07 15:07:20,539 basehttp - Broken pipe from ('127.0.0.1', 50233)
+ERROR 2025-03-07 15:07:20,572 log Internal Server Error: /nicu/view/3/
+Traceback (most recent call last):
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\contrib\auth\decorators.py", line 60, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\hms\views.py", line 1607, in view_nicu_vitals
+    "time": localtime(vital.time).strftime("%I:%M %p"),
+            ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\utils\timezone.py", line 183, in localtime
+    raise ValueError("localtime() cannot be applied to a naive datetime")
+ValueError: localtime() cannot be applied to a naive datetime
+ERROR 2025-03-07 15:07:20,573 basehttp "GET /nicu/view/3/ HTTP/1.1" 500 83505
+ERROR 2025-03-07 15:07:26,066 log Internal Server Error: /nicu/view/3/
+Traceback (most recent call last):
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\contrib\auth\decorators.py", line 60, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\hms\views.py", line 1607, in view_nicu_vitals
+    "time": localtime(vital.time).strftime("%I:%M %p"),
+            ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\utils\timezone.py", line 183, in localtime
+    raise ValueError("localtime() cannot be applied to a naive datetime")
+ValueError: localtime() cannot be applied to a naive datetime
+ERROR 2025-03-07 15:07:26,067 basehttp "GET /nicu/view/3/ HTTP/1.1" 500 83505
+ERROR 2025-03-07 15:07:30,922 log Internal Server Error: /nicu/view/3/
+Traceback (most recent call last):
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\contrib\auth\decorators.py", line 60, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\hms\views.py", line 1607, in view_nicu_vitals
+    "time": localtime(vital.time).strftime("%I:%M %p"),
+            ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\utils\timezone.py", line 183, in localtime
+    raise ValueError("localtime() cannot be applied to a naive datetime")
+ValueError: localtime() cannot be applied to a naive datetime
+ERROR 2025-03-07 15:07:30,923 basehttp "GET /nicu/view/3/ HTTP/1.1" 500 83505
+ERROR 2025-03-07 15:07:35,479 log Internal Server Error: /nicu/view/3/
+Traceback (most recent call last):
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\contrib\auth\decorators.py", line 60, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\hms\views.py", line 1607, in view_nicu_vitals
+    "time": localtime(vital.time).strftime("%I:%M %p"),
+            ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\utils\timezone.py", line 183, in localtime
+    raise ValueError("localtime() cannot be applied to a naive datetime")
+ValueError: localtime() cannot be applied to a naive datetime
+ERROR 2025-03-07 15:07:35,479 basehttp "GET /nicu/view/3/ HTTP/1.1" 500 83505
+ERROR 2025-03-07 15:07:40,524 log Internal Server Error: /nicu/view/3/
+Traceback (most recent call last):
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\contrib\auth\decorators.py", line 60, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\hms\views.py", line 1607, in view_nicu_vitals
+    "time": localtime(vital.time).strftime("%I:%M %p"),
+            ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\utils\timezone.py", line 183, in localtime
+    raise ValueError("localtime() cannot be applied to a naive datetime")
+ValueError: localtime() cannot be applied to a naive datetime
+ERROR 2025-03-07 15:07:40,525 basehttp "GET /nicu/view/3/ HTTP/1.1" 500 83505
+ERROR 2025-03-07 15:07:45,544 log Internal Server Error: /nicu/view/3/
+Traceback (most recent call last):
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\contrib\auth\decorators.py", line 60, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\hms\views.py", line 1607, in view_nicu_vitals
+    "time": localtime(vital.time).strftime("%I:%M %p"),
+            ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\utils\timezone.py", line 183, in localtime
+    raise ValueError("localtime() cannot be applied to a naive datetime")
+ValueError: localtime() cannot be applied to a naive datetime
+ERROR 2025-03-07 15:07:45,545 basehttp "GET /nicu/view/3/ HTTP/1.1" 500 83505
+ERROR 2025-03-07 15:07:50,934 log Internal Server Error: /nicu/view/3/
+Traceback (most recent call last):
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\contrib\auth\decorators.py", line 60, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\hms\views.py", line 1607, in view_nicu_vitals
+    "time": localtime(vital.time).strftime("%I:%M %p"),
+            ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\utils\timezone.py", line 183, in localtime
+    raise ValueError("localtime() cannot be applied to a naive datetime")
+ValueError: localtime() cannot be applied to a naive datetime
+ERROR 2025-03-07 15:07:50,936 basehttp "GET /nicu/view/3/ HTTP/1.1" 500 83505
+ERROR 2025-03-07 15:07:56,042 log Internal Server Error: /nicu/view/3/
+Traceback (most recent call last):
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\contrib\auth\decorators.py", line 60, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\hms\views.py", line 1607, in view_nicu_vitals
+    "time": localtime(vital.time).strftime("%I:%M %p"),
+            ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\utils\timezone.py", line 183, in localtime
+    raise ValueError("localtime() cannot be applied to a naive datetime")
+ValueError: localtime() cannot be applied to a naive datetime
+ERROR 2025-03-07 15:07:56,043 basehttp "GET /nicu/view/3/ HTTP/1.1" 500 83505
+ERROR 2025-03-07 15:08:00,915 log Internal Server Error: /nicu/view/3/
+Traceback (most recent call last):
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\contrib\auth\decorators.py", line 60, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\hms\views.py", line 1607, in view_nicu_vitals
+    "time": localtime(vital.time).strftime("%I:%M %p"),
+            ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\utils\timezone.py", line 183, in localtime
+    raise ValueError("localtime() cannot be applied to a naive datetime")
+ValueError: localtime() cannot be applied to a naive datetime
+ERROR 2025-03-07 15:08:00,916 basehttp "GET /nicu/view/3/ HTTP/1.1" 500 83505
+ERROR 2025-03-07 15:08:05,909 log Internal Server Error: /nicu/view/3/
+Traceback (most recent call last):
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\contrib\auth\decorators.py", line 60, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\hms\views.py", line 1607, in view_nicu_vitals
+    "time": localtime(vital.time).strftime("%I:%M %p"),
+            ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\utils\timezone.py", line 183, in localtime
+    raise ValueError("localtime() cannot be applied to a naive datetime")
+ValueError: localtime() cannot be applied to a naive datetime
+ERROR 2025-03-07 15:08:05,910 basehttp "GET /nicu/view/3/ HTTP/1.1" 500 83505
+INFO 2025-03-07 15:08:07,955 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-03-07 15:08:08,798 autoreload Watching for file changes with StatReloader
+INFO 2025-03-07 15:08:10,875 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 4252
+INFO 2025-03-07 15:08:15,849 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 4252
+INFO 2025-03-07 15:08:17,006 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 65157
+INFO 2025-03-07 15:08:17,349 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 4252
+INFO 2025-03-07 15:08:22,846 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 4252
+INFO 2025-03-07 15:08:27,978 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 4252
+INFO 2025-03-07 15:08:32,859 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 4252
+INFO 2025-03-07 15:08:37,385 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 4252
+INFO 2025-03-07 15:08:42,399 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 4252
+INFO 2025-03-07 15:08:47,391 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 4252
+INFO 2025-03-07 15:08:52,398 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 4252
+INFO 2025-03-07 15:08:57,399 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 4252
+INFO 2025-03-07 15:09:02,413 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 4252
+INFO 2025-03-07 15:09:07,389 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 4252
+INFO 2025-03-07 15:09:12,398 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 4252
+INFO 2025-03-07 15:09:17,493 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 4252
+INFO 2025-03-07 15:09:22,398 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 4252
+INFO 2025-03-07 15:09:27,377 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 4252
+INFO 2025-03-07 15:09:31,102 basehttp "GET /admin/hms/patient/ HTTP/1.1" 200 16863
+INFO 2025-03-07 15:09:31,183 basehttp "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-03-07 15:09:32,843 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 4252
+INFO 2025-03-07 15:09:36,299 basehttp "GET /nicu/view/2/ HTTP/1.1" 200 28038
+INFO 2025-03-07 15:09:36,549 basehttp "GET /nicu/view/2/ HTTP/1.1" 200 279
+INFO 2025-03-07 15:09:39,842 basehttp "GET /get-ipd-data/ HTTP/1.1" 200 755
+INFO 2025-03-07 15:09:41,285 basehttp "GET /nicu/view/1/ HTTP/1.1" 200 28037
+INFO 2025-03-07 15:09:41,532 basehttp "GET /nicu/view/1/ HTTP/1.1" 200 283
+INFO 2025-03-07 15:09:44,311 basehttp "GET /get-ipd-data/ HTTP/1.1" 200 755
+INFO 2025-03-07 15:09:49,303 basehttp "GET /get-ipd-data/ HTTP/1.1" 200 755
+INFO 2025-03-07 15:09:54,288 basehttp "GET /get-ipd-data/ HTTP/1.1" 200 755
+INFO 2025-03-07 15:09:59,281 basehttp "GET /get-ipd-data/ HTTP/1.1" 200 755
+INFO 2025-03-07 15:10:04,285 basehttp "GET /get-ipd-data/ HTTP/1.1" 200 755
+INFO 2025-03-07 15:10:09,290 basehttp "GET /get-ipd-data/ HTTP/1.1" 200 755
+INFO 2025-03-07 15:10:14,852 basehttp "GET /get-ipd-data/ HTTP/1.1" 200 755
+INFO 2025-03-07 15:10:19,851 basehttp "GET /get-ipd-data/ HTTP/1.1" 200 755
+INFO 2025-03-07 15:10:23,472 basehttp "GET /ipd/ HTTP/1.1" 200 21493
+INFO 2025-03-07 15:10:23,671 basehttp "GET /get-ipd-data/ HTTP/1.1" 200 755
+INFO 2025-03-07 15:10:23,780 basehttp - Broken pipe from ('127.0.0.1', 51040)
+INFO 2025-03-07 15:10:23,842 basehttp "GET /ipd/ HTTP/1.1" 200 21493
+INFO 2025-03-07 15:10:24,019 basehttp "GET /get-ipd-data/ HTTP/1.1" 200 755
+INFO 2025-03-07 15:10:29,837 basehttp "GET /get-ipd-data/ HTTP/1.1" 200 755
+INFO 2025-03-07 15:10:34,856 basehttp "GET /get-ipd-data/ HTTP/1.1" 200 755
+INFO 2025-03-07 15:14:22,135 autoreload Watching for file changes with StatReloader
+INFO 2025-03-07 15:14:27,503 basehttp "GET /get-ipd-data/ HTTP/1.1" 200 755
+INFO 2025-03-07 15:14:28,636 basehttp "GET /ipd/ HTTP/1.1" 200 21517
+INFO 2025-03-07 15:14:28,897 basehttp "GET /get-ipd-data/ HTTP/1.1" 200 755
+INFO 2025-03-07 15:14:29,619 basehttp "GET /ipd/ HTTP/1.1" 200 21517
+INFO 2025-03-07 15:14:29,902 basehttp "GET /get-ipd-data/ HTTP/1.1" 200 755
+INFO 2025-03-07 15:14:31,034 basehttp "GET /ipd/ HTTP/1.1" 200 21517
+INFO 2025-03-07 15:14:31,171 basehttp "GET /get-ipd-data/ HTTP/1.1" 200 755
+INFO 2025-03-07 15:14:31,602 basehttp "GET /ipd/ HTTP/1.1" 200 21517
+INFO 2025-03-07 15:14:31,729 basehttp "GET /get-ipd-data/ HTTP/1.1" 200 755
+INFO 2025-03-07 15:14:32,018 basehttp "GET /ipd/ HTTP/1.1" 200 21517
+INFO 2025-03-07 15:14:32,294 basehttp "GET /get-ipd-data/ HTTP/1.1" 200 755
+INFO 2025-03-07 15:14:32,321 basehttp "GET /ipd/ HTTP/1.1" 200 21517
+INFO 2025-03-07 15:14:32,565 basehttp "GET /get-ipd-data/ HTTP/1.1" 200 755
+INFO 2025-03-07 15:14:37,990 basehttp "GET /get-ipd-data/ HTTP/1.1" 200 755
+INFO 2025-03-07 15:14:42,840 basehttp "GET /get-ipd-data/ HTTP/1.1" 200 755
+INFO 2025-03-07 15:14:47,951 basehttp "GET /get-ipd-data/ HTTP/1.1" 200 755
+INFO 2025-03-07 15:14:52,842 basehttp "GET /get-ipd-data/ HTTP/1.1" 200 755
+INFO 2025-03-07 15:14:57,870 basehttp "GET /get-ipd-data/ HTTP/1.1" 200 755
+INFO 2025-03-07 15:15:02,866 basehttp "GET /get-ipd-data/ HTTP/1.1" 200 755
+INFO 2025-03-07 15:15:07,964 basehttp "GET /get-ipd-data/ HTTP/1.1" 200 755
+INFO 2025-03-07 15:15:12,948 basehttp "GET /get-ipd-data/ HTTP/1.1" 200 755
+INFO 2025-03-07 15:15:17,954 basehttp "GET /get-ipd-data/ HTTP/1.1" 200 755
+INFO 2025-03-07 15:15:22,851 basehttp "GET /get-ipd-data/ HTTP/1.1" 200 755
+INFO 2025-03-07 15:15:27,831 basehttp "GET /get-ipd-data/ HTTP/1.1" 200 755
+INFO 2025-03-07 15:15:32,830 basehttp "GET /get-ipd-data/ HTTP/1.1" 200 755
+INFO 2025-03-07 15:15:36,514 basehttp "GET /ipd/ HTTP/1.1" 200 21444
+INFO 2025-03-07 15:15:36,707 basehttp "GET /get-ipd-data/ HTTP/1.1" 200 755
+INFO 2025-03-07 15:15:41,842 basehttp "GET /get-ipd-data/ HTTP/1.1" 200 755
+INFO 2025-03-07 15:15:46,297 basehttp "GET /ipd/ HTTP/1.1" 200 21444
+INFO 2025-03-07 15:15:46,512 basehttp "GET /get-ipd-data/ HTTP/1.1" 200 755
+INFO 2025-03-07 15:15:49,857 basehttp "GET /ipd/ HTTP/1.1" 200 21444
+INFO 2025-03-07 15:15:50,033 basehttp "GET /get-ipd-data/ HTTP/1.1" 200 755
+INFO 2025-03-07 15:15:50,500 basehttp - Broken pipe from ('127.0.0.1', 55317)
+INFO 2025-03-07 15:15:50,544 basehttp "GET /ipd/ HTTP/1.1" 200 21444
+INFO 2025-03-07 15:15:50,684 basehttp "GET /get-ipd-data/ HTTP/1.1" 200 755
+INFO 2025-03-07 15:15:50,858 basehttp "GET /ipd/ HTTP/1.1" 200 21443
+INFO 2025-03-07 15:15:51,009 basehttp "GET /get-ipd-data/ HTTP/1.1" 200 755
+INFO 2025-03-07 15:15:51,028 basehttp "GET /ipd/ HTTP/1.1" 200 21443
+INFO 2025-03-07 15:15:51,360 basehttp "GET /get-ipd-data/ HTTP/1.1" 200 755
+INFO 2025-03-07 15:15:56,838 basehttp "GET /get-ipd-data/ HTTP/1.1" 200 755
+INFO 2025-03-07 15:16:01,936 basehttp "GET /get-ipd-data/ HTTP/1.1" 200 755
+INFO 2025-03-07 15:16:04,831 basehttp "GET /ipd/ HTTP/1.1" 200 21443
+INFO 2025-03-07 15:16:04,974 basehttp "GET /get-ipd-data/ HTTP/1.1" 200 755
+INFO 2025-03-07 15:16:05,268 basehttp "GET /ipd/ HTTP/1.1" 200 21437
+INFO 2025-03-07 15:16:05,404 basehttp "GET /get-ipd-data/ HTTP/1.1" 200 755
+INFO 2025-03-07 15:16:05,474 basehttp "GET /ipd/ HTTP/1.1" 200 21437
+INFO 2025-03-07 15:16:05,601 basehttp "GET /get-ipd-data/ HTTP/1.1" 200 755
+INFO 2025-03-07 15:16:10,848 basehttp "GET /get-ipd-data/ HTTP/1.1" 200 755
+INFO 2025-03-07 15:16:15,855 basehttp "GET /get-ipd-data/ HTTP/1.1" 200 755
+INFO 2025-03-07 15:16:20,864 basehttp "GET /get-ipd-data/ HTTP/1.1" 200 755
+INFO 2025-03-07 15:16:25,858 basehttp "GET /get-ipd-data/ HTTP/1.1" 200 755
+INFO 2025-03-07 15:16:27,121 basehttp "GET /ipd/ HTTP/1.1" 200 21437
+INFO 2025-03-07 15:16:27,329 basehttp "GET /get-ipd-data/ HTTP/1.1" 200 755
+INFO 2025-03-07 15:16:27,807 basehttp "GET /ipd/ HTTP/1.1" 200 21416
+INFO 2025-03-07 15:16:28,000 basehttp "GET /get-ipd-data/ HTTP/1.1" 200 755
+INFO 2025-03-07 15:16:28,484 basehttp "GET /ipd/ HTTP/1.1" 200 21416
+INFO 2025-03-07 15:16:28,642 basehttp "GET /get-ipd-data/ HTTP/1.1" 200 755
+INFO 2025-03-07 15:16:29,092 basehttp "GET /ipd/ HTTP/1.1" 200 21416
+INFO 2025-03-07 15:16:29,259 basehttp "GET /get-ipd-data/ HTTP/1.1" 200 755
+INFO 2025-03-07 15:16:34,843 basehttp "GET /get-ipd-data/ HTTP/1.1" 200 755
+INFO 2025-03-07 15:16:39,853 basehttp "GET /get-ipd-data/ HTTP/1.1" 200 755
+INFO 2025-03-07 15:16:44,851 basehttp "GET /get-ipd-data/ HTTP/1.1" 200 755
+INFO 2025-03-07 15:16:47,976 basehttp "GET /ipd/ HTTP/1.1" 200 21416
+INFO 2025-03-07 15:16:48,110 basehttp "GET /get-ipd-data/ HTTP/1.1" 200 755
+INFO 2025-03-07 15:16:48,568 basehttp "GET /ipd/ HTTP/1.1" 200 21409
+INFO 2025-03-07 15:16:48,691 basehttp "GET /get-ipd-data/ HTTP/1.1" 200 755
+INFO 2025-03-07 15:16:49,232 basehttp "GET /ipd/ HTTP/1.1" 200 21409
+INFO 2025-03-07 15:16:49,540 basehttp "GET /get-ipd-data/ HTTP/1.1" 200 755
+INFO 2025-03-07 15:16:54,829 basehttp "GET /get-ipd-data/ HTTP/1.1" 200 755
+INFO 2025-03-07 15:16:59,844 basehttp "GET /get-ipd-data/ HTTP/1.1" 200 755
+INFO 2025-03-07 15:17:04,837 basehttp "GET /get-ipd-data/ HTTP/1.1" 200 755
+INFO 2025-03-07 15:17:09,863 basehttp "GET /get-ipd-data/ HTTP/1.1" 200 755
+INFO 2025-03-07 15:17:14,857 basehttp "GET /get-ipd-data/ HTTP/1.1" 200 755
+INFO 2025-03-07 15:17:18,467 basehttp "GET /ipd/ HTTP/1.1" 200 21556
+INFO 2025-03-07 15:17:18,627 basehttp "GET /get-ipd-data/ HTTP/1.1" 200 755
+INFO 2025-03-07 15:17:19,000 basehttp "GET /ipd/ HTTP/1.1" 200 21556
+INFO 2025-03-07 15:17:19,137 basehttp "GET /get-ipd-data/ HTTP/1.1" 200 755
+INFO 2025-03-07 15:17:19,203 basehttp "GET /ipd/ HTTP/1.1" 200 21556
+INFO 2025-03-07 15:17:19,471 basehttp "GET /get-ipd-data/ HTTP/1.1" 200 755
+INFO 2025-03-07 15:17:19,505 basehttp "GET /ipd/ HTTP/1.1" 200 21556
+INFO 2025-03-07 15:17:19,673 basehttp "GET /ipd/ HTTP/1.1" 200 21556
+INFO 2025-03-07 15:17:19,737 basehttp - Broken pipe from ('127.0.0.1', 55885)
+INFO 2025-03-07 15:17:19,795 basehttp "GET /get-ipd-data/ HTTP/1.1" 200 755
+INFO 2025-03-07 15:17:19,968 basehttp - Broken pipe from ('127.0.0.1', 56960)
+INFO 2025-03-07 15:17:20,016 basehttp "GET /ipd/ HTTP/1.1" 200 21556
+INFO 2025-03-07 15:17:20,137 basehttp "GET /get-ipd-data/ HTTP/1.1" 200 755
+INFO 2025-03-07 15:17:21,370 basehttp "GET /ipd/ HTTP/1.1" 200 21556
+INFO 2025-03-07 15:17:21,527 basehttp "GET /ipd/ HTTP/1.1" 200 21556
+INFO 2025-03-07 15:17:21,808 basehttp "GET /get-ipd-data/ HTTP/1.1" 200 755
+INFO 2025-03-07 15:17:21,825 basehttp "GET /ipd/ HTTP/1.1" 200 21556
+INFO 2025-03-07 15:17:21,965 basehttp "GET /get-ipd-data/ HTTP/1.1" 200 755
+INFO 2025-03-07 15:17:22,140 basehttp - Broken pipe from ('127.0.0.1', 55708)
+INFO 2025-03-07 15:17:22,195 basehttp "GET /ipd/ HTTP/1.1" 200 21556
+INFO 2025-03-07 15:17:22,468 basehttp "GET /get-ipd-data/ HTTP/1.1" 200 755
+INFO 2025-03-07 15:17:27,863 basehttp "GET /get-ipd-data/ HTTP/1.1" 200 755
+INFO 2025-03-07 15:17:32,825 basehttp "GET /get-ipd-data/ HTTP/1.1" 200 755
+INFO 2025-03-07 15:17:37,838 basehttp "GET /get-ipd-data/ HTTP/1.1" 200 755
+INFO 2025-03-07 15:17:42,838 basehttp "GET /get-ipd-data/ HTTP/1.1" 200 755
+INFO 2025-03-07 15:17:45,257 basehttp "GET /ipd/ HTTP/1.1" 200 21561
+INFO 2025-03-07 15:17:45,397 basehttp "GET /get-ipd-data/ HTTP/1.1" 200 755
+INFO 2025-03-07 15:17:45,548 basehttp "GET /ipd/ HTTP/1.1" 200 21561
+INFO 2025-03-07 15:17:45,681 basehttp "GET /get-ipd-data/ HTTP/1.1" 200 755
+INFO 2025-03-07 15:17:45,761 basehttp "GET /ipd/ HTTP/1.1" 200 21561
+INFO 2025-03-07 15:17:45,896 basehttp "GET /get-ipd-data/ HTTP/1.1" 200 755
+INFO 2025-03-07 15:17:46,023 basehttp "GET /ipd/ HTTP/1.1" 200 21561
+INFO 2025-03-07 15:17:46,293 basehttp "GET /get-ipd-data/ HTTP/1.1" 200 755
+INFO 2025-03-07 15:17:51,874 basehttp "GET /get-ipd-data/ HTTP/1.1" 200 755
+INFO 2025-03-07 15:17:56,857 basehttp "GET /get-ipd-data/ HTTP/1.1" 200 755
+INFO 2025-03-07 15:18:01,186 basehttp "GET /get-ipd-data/ HTTP/1.1" 200 755
+INFO 2025-03-07 15:18:01,990 basehttp "GET /ipd/ HTTP/1.1" 200 21561
+INFO 2025-03-07 15:18:02,186 basehttp "GET /get-ipd-data/ HTTP/1.1" 200 755
+INFO 2025-03-07 15:18:07,216 basehttp "GET /get-ipd-data/ HTTP/1.1" 200 755
+INFO 2025-03-07 15:18:12,854 basehttp "GET /get-ipd-data/ HTTP/1.1" 200 755
+INFO 2025-03-07 15:18:17,836 basehttp "GET /get-ipd-data/ HTTP/1.1" 200 755
+INFO 2025-03-07 15:18:22,850 basehttp "GET /get-ipd-data/ HTTP/1.1" 200 755
+INFO 2025-03-07 15:18:27,852 basehttp "GET /get-ipd-data/ HTTP/1.1" 200 755
+INFO 2025-03-07 15:18:32,832 basehttp "GET /get-ipd-data/ HTTP/1.1" 200 755
+INFO 2025-03-07 15:18:37,836 basehttp "GET /get-ipd-data/ HTTP/1.1" 200 755
+INFO 2025-03-07 15:18:42,170 basehttp "GET /get-ipd-data/ HTTP/1.1" 200 755
+INFO 2025-03-07 15:18:43,970 basehttp "GET /ipd/3/add_prescription/ HTTP/1.1" 200 15799
+INFO 2025-03-07 15:18:46,312 basehttp "GET /patient/202503051127-P3-69D8/upload-report/ HTTP/1.1" 200 15182
+INFO 2025-03-07 15:18:47,961 basehttp "GET /ipd/3/ HTTP/1.1" 200 21944
+INFO 2025-03-07 15:18:50,020 basehttp "GET /get-ipd-data/ HTTP/1.1" 200 755
+INFO 2025-03-07 15:18:51,197 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 65157
+INFO 2025-03-07 15:18:51,472 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 4252
+INFO 2025-03-07 15:18:56,490 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 4252
+INFO 2025-03-07 15:19:01,518 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 4252
+INFO 2025-03-07 15:19:01,809 basehttp "GET /nicu/add/3/ HTTP/1.1" 200 205835
+INFO 2025-03-07 15:19:06,812 basehttp "POST /nicu/add/3/ HTTP/1.1" 302 0
+INFO 2025-03-07 15:19:06,870 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 65157
+INFO 2025-03-07 15:19:07,113 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 4252
+INFO 2025-03-07 15:19:12,166 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 4252
+INFO 2025-03-07 15:19:17,162 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 4252
+INFO 2025-03-07 15:19:22,857 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 4252

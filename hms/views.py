@@ -1588,23 +1588,52 @@ def add_nicu_vitals(request, ipd_id):
     })
 
 
+from django.http import JsonResponse
+from django.utils.timezone import localtime
+
 @login_required
 def view_nicu_vitals(request, ipd_id):
     ipd = get_object_or_404(IPD, id=ipd_id)
     vitals_list = NICUVitals.objects.filter(ipd=ipd).order_by('-date')
     fluid_totals = calculate_total_fluids(vitals_list)
-    # Fetching patient details
-    patient = ipd.patient  
-    age = patient.age  
+
+    patient = ipd.patient
+    age = patient.age
     weight = patient.weight
-    print("Vitals being sent to template:")
-    for v in vitals_list:
-        print(f" view Time: {v.time}, Urine: {v.urine}, Urine Value: {v.urine_value}")
 
+    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':  # Check if AJAX request
+        vitals_data = [
+            {
+                "temperature": vital.temperature,
+                "respiratory_rate": vital.respiratory_rate,
+                "pulse_rate": vital.pulse_rate,
+                "cft": vital.cft,
+                "skin_color": vital.get_skin_color_display(),  # Get human-readable choice
+                "seizure": "Yes" if vital.seizure else "No",
+                "spo2": vital.spo2,
+                "oxygen": vital.oxygen or "N/A",
+                "retraction": "Yes" if vital.retraction else "No",
+                "iv_fluids": vital.iv_fluids,
+                "by_nasogastric": vital.by_nasogastric,
+                "oral": vital.oral,
+                "breastfeeding": "Yes" if vital.breastfeeding else "No",
+                "urine": vital.urine,
+                "urine_value": vital.urine_value,
+                "stool": "Yes" if vital.stool else "No",
+                "ift": vital.ift,
+                "vomiting": "Yes" if vital.vomiting else "No",
+            }
+            for vital in vitals_list
+        ]
+        return JsonResponse({"vitals": vitals_data, "fluid_totals": fluid_totals, "age": age, "weight": weight})
 
-    return render(request, 'hms/vitals/view_vitals.html', {'vitals_list': vitals_list, 'ipd': ipd,'fluid_totals': fluid_totals,'age': age,'weight': weight,})
-
-
+    return render(request, 'hms/vitals/view_vitals.html', {
+        'vitals_list': vitals_list,
+        'ipd': ipd,
+        'fluid_totals': fluid_totals,
+        'age': age,
+        'weight': weight,
+    })
 
 
 

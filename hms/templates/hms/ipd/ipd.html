@@ -19,32 +19,33 @@
     <!-- IPD Patients Table -->
     <div class="overflow-x-auto bg-white rounded-lg shadow-lg">
         <table class="min-w-full">
-            <thead class="bg-gray-50">
+            <thead class="bg-blue-600 text-white">
                 <tr>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Patient Name</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Room Number</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Bed Number</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Stay cost</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Admitted On</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Reason for Admission</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                    <th class="px-6 py-3 text-center text-l font-medium uppercase tracking-wider">Patient Name</th>
+                    <th class="px-6 py-3 text-center text-l font-medium uppercase tracking-wider">Room Number</th>
+                    <th class="px-6 py-3 text-center text-l font-medium uppercase tracking-wider">Bed Number</th>
+                    <th class="px-6 py-3 text-center text-l font-medium uppercase tracking-wider">Total Stay Cost</th>
+                    <th class="px-6 py-3 text-center text-l font-medium uppercase tracking-wider">Admitted On</th>
+                    <th class="px-6 py-3 text-center text-l font-medium uppercase tracking-wider">Reason for Admission</th>
+                    <th class="px-6 py-3 text-center text-l font-medium uppercase tracking-wider">Actions</th>
                 </tr>
             </thead>
-            <tbody id="ipd-table-body" class="divide-y divide-gray-200">
+            
+            <tbody id="ipd-table-body" class="divide-y divide-gray-200 text-center">
                 {% for ipd in ipds %}
                 <tr class="hover:bg-gray-50 transition duration-200">
-                    <td class="px-6 py-4 text-sm text-gray-700">{{ ipd.patient.user.full_name }}</td>
-                    <td class="px-6 py-4 text-sm text-gray-700">{{ ipd.room.room_number }}</td>
-                    <td class="px-6 py-4 text-sm text-gray-700">{{ ipd.bed_number }}</td>
-                    <td class="px-6 py-4 text-sm text-gray-700">{{ ipd.total_cost }}</td>
-                    <td class="px-6 py-4 text-sm text-gray-700">{{ ipd.admitted_on|date:"d M Y, H:i" }}</td>
-                    <td class="px-6 py-4 text-sm text-gray-700">{{ ipd.reason_for_admission }}</td>
-                    <td class="px-6 py-4 text-sm">
+                    <td class="px-6 py-4 text-l text-gray-700">{{ ipd.patient.user.full_name }}</td>
+                    <td class="px-6 py-4 text-l text-gray-700">{{ ipd.room.room_number }}</td>
+                    <td class="px-6 py-4 text-l text-gray-700">{{ ipd.bed_number }}</td>
+                    <td class="px-6 py-4 text-l text-gray-700">{{ ipd.total_cost }}</td>
+                    <td class="px-6 py-4 text-l text-gray-700">{{ ipd.admitted_on|date:"d M Y, H:i" }}</td>
+                    <td class="px-6 py-4 text-l text-gray-700">{{ ipd.reason_for_admission }}</td>
+                    <td class="px-6 py-4 text-l">
                         <div class="flex space-x-4">
                             <a href="{% url 'add_prescription' ipd.id %}" class="text-blue-500 hover:text-blue-700 hover:underline">Add Prescription</a>
                             <a href="{% url 'upload_patient_report' ipd.patient.patient_code %}" class="text-green-500 hover:text-green-700 hover:underline">Upload Report</a>
                             <a href="{% url 'view_ipd_report' ipd.id %}" class="text-purple-500 hover:text-purple-700 hover:underline font-semibold">View Report</a>
-                            <a href="{% url 'view_nicu_vitals' ipd.id %}" class="btn btn-info">View NICU Vitals</a>
+                            <a href="{% url 'view_nicu_vitals' ipd.id %}" class="text-red-500 hover:text-red-700 hover:underline font-semibold">View NICU Vitals</a>
                         </div>
                     </td>
                 </tr>
@@ -77,18 +78,18 @@
                     let admittedOn = new Date(ipd.admitted_on).toLocaleString();
                     let row = `
                         <tr class="hover:bg-gray-50 transition duration-200">
-                            <td class="px-6 py-4 text-sm text-gray-700">${ipd.patient__user__full_name}</td>
-                            <td class="px-6 py-4 text-sm text-gray-700">${ipd.room__room_number }</td>
-                            <td class="px-6 py-4 text-sm text-gray-700">${ipd.bed_number || 'N/A'}</td>
-                            <td class="px-6 py-4 text-sm text-gray-700">${ipd.total_cost || 'N/A'}</td>
-                            <td class="px-6 py-4 text-sm text-gray-700">${admittedOn}</td>
-                            <td class="px-6 py-4 text-sm text-gray-700">${ipd.reason_for_admission}</td>
-                            <td class="px-6 py-4 text-sm">
+                            <td class="px-6 py-4 text-l text-gray-700">${ipd.patient__user__full_name}</td>
+                            <td class="px-6 py-4 text-l text-gray-700">${ipd.room__room_number }</td>
+                            <td class="px-6 py-4 text-l text-gray-700">${ipd.bed_number || 'N/A'}</td>
+                            <td class="px-6 py-4 text-l text-gray-700">${ipd.total_cost || 'N/A'}</td>
+                            <td class="px-6 py-4 text-l text-gray-700">${admittedOn}</td>
+                            <td class="px-6 py-4 text-l text-gray-700">${ipd.reason_for_admission}</td>
+                            <td class="px-6 py-4 text-l">
                                 <div class="flex space-x-4">
                                     <a href="/ipd/${ipd.id}/add_prescription/" class="text-blue-500 hover:text-blue-700 hover:underline">Add Prescription</a>
                                     <a href="/patient/${ipd.patient__patient_code}/upload-report/" class="text-green-500 hover:text-green-700 hover:underline">Upload Report</a>
                                     <a href="/ipd/${ipd.id}/" class="text-purple-500 hover:text-purple-700 hover:underline font-semibold">View Report</a>
-                                    <a href="/nicu/view/${ipd.id}/" class="text-red-500 hover:text-red-700 hover:underline font-semibold">View Vitals</a>
+                                    <a href="/nicu/view/${ipd.id}/" class="text-red-500 hover:text-red-700 hover:underline font-semibold">View NICU Vitals</a>
                                 </div>
                             </td>
                         </tr>`;
