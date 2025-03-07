@@ -35,9 +35,9 @@ ALLOWED_HOSTS = ["*"]
 
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 CRISPY_TEMPLATE_PACK = "bootstrap5"
-CSRF_TRUSTED_ORIGINS = [
-    "https://fcde-223-184-163-226.ngrok-free.app"
-]
+# CSRF_TRUSTED_ORIGINS = [
+#     "https://60ef-2401-4900-a4f7-a541-b558-b7e6-78fa-914f.ngrok-free.app"
+# ]
 
 
 # Application definition
@@ -88,13 +88,23 @@ WSGI_APPLICATION = "hospital_management.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
+# DATABASES = {
+#     "default": {
+#         "ENGINE": "django.db.backends.sqlite3",
+#         "NAME": BASE_DIR / "db.sqlite3",
+#     }
+# }
+
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'hospital',   # Your database name
+        'USER': 'postgres',   # Your PostgreSQL username
+        'PASSWORD': 'anuj@saumya',  # Your PostgreSQL password
+        'HOST': 'localhost',  # PostgreSQL runs locally
+        'PORT': '5432',       # Default PostgreSQL port
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
@@ -118,13 +128,14 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
 
+# settings.py
+
 LANGUAGE_CODE = "en-us"
-
-TIME_ZONE = "UTC"
-
+TIME_ZONE = "Asia/Kolkata"  # ✅ Set to IST
 USE_I18N = True
+USE_L10N = True
+USE_TZ = True  # ✅ Keep this True to use timezone-aware datetimes
 
-USE_TZ = True
 
 
 # Static files (CSS, JavaScript, Images)
@@ -152,6 +163,13 @@ LOGIN_REDIRECT_URL = '/dashboard/'  # Redirect after login
 LOGOUT_REDIRECT_URL = '/login/'  # Redirect after logout
 
 
+import os
+from pathlib import Path
+
+# Ensure the logs directory exists
+LOG_DIR = os.path.join(BASE_DIR, 'logs')
+Path(LOG_DIR).mkdir(parents=True, exist_ok=True)
+
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -167,7 +185,7 @@ LOGGING = {
     },
     'handlers': {
         'file': {
-            'level': 'WARNING',
+            'level': 'INFO',  # Log INFO and above
             'class': 'logging.FileHandler',
             'filename': os.path.join(BASE_DIR, 'logs/django.log'),
             'formatter': 'verbose',
@@ -182,7 +200,7 @@ LOGGING = {
         'django': {
             'handlers': ['file', 'console'],
             'level': 'INFO',
-            'propagate': False,
+            'propagate': True,  # Propagate to parent loggers
         },
         'django.request': {
             'handlers': ['file'],

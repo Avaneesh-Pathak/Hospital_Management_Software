@@ -34,4 +34,21 @@ def get_vital(existing_vitals_dict, key):
         print(f"Error in get_vital filter: {e}")  # Debugging in console
     return ""
 
+@register.filter
+def get_dict_value(dictionary, key):
+    """Safely get a value from a dictionary."""
+    return dictionary.get(key, "")
 
+@register.filter
+def replace_underscore(value):
+    """Replaces underscores with spaces and capitalizes words."""
+    return value.replace("_", " ").title()
+
+@register.filter
+def subtract(value, arg):
+    try:
+        value = float(value)  # Convert value to float
+        arg = float(arg)      # Convert arg to float
+        return value - arg
+    except (ValueError, TypeError):
+        return 0  # Return 0 if conversion fails

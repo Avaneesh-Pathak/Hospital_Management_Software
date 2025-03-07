@@ -18,13 +18,13 @@ class PatientRegistrationForm(forms.ModelForm):
     class Meta:
         model = Patient
         fields = [
-            'user', 
-            'date_of_birth', 'aadhar_number',
+            'date_of_birth', 'aadhar_number','weight',
             'blood_group', 'allergies', 'medical_history', 'current_medications', 'emergency_contact_name',
             'emergency_contact_number', 'emergency_contact_relationship', 'accompanying_person_name',
             'accompanying_person_contact', 'accompanying_person_relationship', 'accompanying_person_address',
             'profile_picture'
         ]
+        exclude = ['user']
         widgets = {
             'date_of_birth': forms.DateInput(attrs={'type': 'date'}),
             'allergies': forms.Textarea(attrs={'rows': 3}),
@@ -34,13 +34,14 @@ class PatientRegistrationForm(forms.ModelForm):
         }
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        if 'user' in self.fields:  # Only filter if the user field exists
+            # Get all Doctor & Employee users
+            doctor_users = CustomUser.objects.filter(groups__name='Doctor').values_list('id', flat=True)
+            employee_users = CustomUser.objects.filter(groups__name='Employee').values_list('id', flat=True)
 
-        # ✅ Ensure doctor_users and employee_users are properly defined before using them
-        doctor_users = CustomUser.objects.filter(groups__name="Doctor").values_list('id', flat=True)
-        employee_users = CustomUser.objects.filter(groups__name="Employee").values_list('id', flat=True)
+            # Exclude Doctor & Employee from user selection
+            self.fields['user'].queryset = CustomUser.objects.exclude(id__in=doctor_users).exclude(id__in=employee_users)
 
-        # ✅ Now assign the queryset correctly
-        self.fields['user'].queryset = CustomUser.objects.exclude(id__in=doctor_users).exclude(id__in=employee_users)
 
 
 
@@ -182,7 +183,7 @@ class DoctorForm(forms.ModelForm):
             'contact_number': forms.TextInput(attrs={
                 'class': 'w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500',
             }),
-            'availability': forms.Select(attrs={
+            'availability': forms.TextInput(attrs={
                 'class': 'w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500',
             }),
         }

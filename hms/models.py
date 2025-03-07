@@ -63,7 +63,7 @@ class Patient(models.Model):
     ]
 
     # Basic Patient Information
-    patient_code = models.CharField(max_length=15, unique=True, editable=False, blank=True, null=True)
+    patient_code = models.CharField(max_length=35, unique=True, editable=False, blank=True, null=True)
     created_at = models.DateTimeField(default=now)
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name="patient")
     date_of_birth = models.DateField(blank=True, null=True)
@@ -73,6 +73,7 @@ class Patient(models.Model):
     gender = models.CharField(max_length=10, choices=CustomUser.GENDER_CHOICES, blank=True, null=True)
     aadhar_number = models.CharField(max_length=12, unique=True, validators=[MinLengthValidator(12)], blank=True, null=True)
     blood_group = models.CharField(max_length=3, blank=True, null=True, choices=BLOOD_GROUP_CHOICES)
+    weight = models.PositiveBigIntegerField(blank=True,null=True)
     email = models.EmailField(unique=True, blank=True, null=True)
 
     # Medical Information
@@ -123,13 +124,19 @@ class Patient(models.Model):
                 self.patient_code = self.generate_patient_code()
             logger.info(f"Generated patient code: {self.patient_code}")
 
-        # Calculate age if date_of_birth is provided
+        # Calculate age dynamically
         if self.date_of_birth:
             today = now().date()
-            age = today.year - self.date_of_birth.year
-            if (today.month, today.day) < (self.date_of_birth.month, self.date_of_birth.day):
-                age -= 1
-            self.age = age
+            delta = today - self.date_of_birth  # Difference in days
+
+            if delta.days < 30:
+                self.age = f"{delta.days} day(s) old" if delta.days > 0 else "Newborn"
+            elif delta.days < 365:
+                months = delta.days // 30
+                self.age = f"{months} month(s) old"
+            else:
+                years = delta.days // 365
+                self.age = f"{years} year(s) old"
 
         super().save(*args, **kwargs)
         logger.info(f"Patient {self.user.full_name} saved successfully.")

@@ -275,28 +275,30 @@ def upload_patient_report(request, patient_code):
     return render(request, 'hms/upload_patient_report.html', context)
 
 
-
-
 @login_required
 def register_patient(request):
     if request.method == "POST":
         logger.info("Received patient registration form submission.")
-        form = PatientRegistrationForm(request.POST, request.FILES)  # Include request.FILES for file uploads
+        form = PatientRegistrationForm(request.POST, request.FILES)
+
         if form.is_valid():
             try:
+                # Create a new user with the provided details
                 user = CustomUser.objects.create(
                     full_name=form.cleaned_data['full_name'],
                     email=form.cleaned_data['email'],
                     contact_number=form.cleaned_data['contact_number'],
                     address=form.cleaned_data['address'],
                     gender=form.cleaned_data['gender'],
-                    username=form.cleaned_data['email']
+                    username=form.cleaned_data['email'],  # Using email as username
                 )
+                user.set_password("pass123")  # You can generate a random password instead
                 user.save()
                 logger.info(f"New user created: {user.full_name} ({user.email})")
 
+                # Create a new patient and link the newly created user
                 patient = Patient.objects.create(
-                    user=user,
+                    user=user,  # Linking newly created user
                     date_of_birth=form.cleaned_data['date_of_birth'],
                     aadhar_number=form.cleaned_data['aadhar_number'],
                     blood_group=form.cleaned_data['blood_group'],
@@ -316,24 +318,23 @@ def register_patient(request):
                     email=form.cleaned_data['email'],
                 )
                 logger.info(f"New patient registered: {patient.user.full_name} (Code: {patient.patient_code})")
+
                 messages.success(request, "Patient registered successfully!")
-                return redirect('patients')  # Redirect to patients list
+                return redirect('patients')
+
             except Exception as e:
                 logger.error(f"Error occurred during patient registration: {e}")
                 messages.error(request, f"Error occurred: {str(e)}")
         else:
             logger.warning("Patient registration form is invalid.")
-            logger.error(f"Form errors: {form.errors}")  # Log errors for debugging
+            logger.error(f"Form errors: {form.errors}")
             messages.error(request, "There were errors in your submission. Please check the form.")
-            print(form.errors)  # Print errors in the console
 
     else:
         form = PatientRegistrationForm()
-        doctor_users = Doctor.objects.values_list('user_id', flat=True)
-        employee_users = Employee.objects.values_list('user_id', flat=True)
-        form.fields['user'].queryset = CustomUser.objects.exclude(id__in=doctor_users).exclude(id__in=employee_users)
 
     return render(request, 'hms/register_patient.html', {'form': form})
+
 
 @login_required
 def fetch_patients(request):
@@ -739,7 +740,7 @@ def admit_emergency_patient(request, emergency_id):
 def ipd(request):
     ipds = IPD.objects.all()
     room = Room.objects.all()
-    return render(request, 'hms/ipd.html', {'ipds': ipds,'room':room})
+    return render(request, 'hms/ipd/ipd.html', {'ipds': ipds,'room':room})
 
 def get_ipd_data(request):
     ipds = IPD.objects.all().values(
@@ -760,7 +761,7 @@ def view_ipd_report(request, ipd_id):
     rooms = Room.objects.all()
     prescriptions = Prescription.objects.filter(ipd=ipd).order_by('-timing')
     reports = PatientReport.objects.filter(patient=ipd.patient).order_by('-uploaded_at')  # Fetch reports
-    return render(request, 'hms/view_ipd_report.html', {'ipd': ipd, 'rooms': rooms,'prescriptions':prescriptions,'reports': reports})
+    return render(request, 'hms/ipd/view_ipd_report.html', {'ipd': ipd, 'rooms': rooms,'prescriptions':prescriptions,'reports': reports})
 
     # ✅ Update IPD Room
 def update_ipd_room(request, ipd_id):
@@ -1334,7 +1335,7 @@ def accounting_summary(request):
 
 class DaybookCreateView(LoginRequiredMixin, View):
     login_url = '/login/'
-    template_name = 'hms/daybook_form.html'
+    template_name = 'hms/daybook/daybook_form.html'
 
     def get(self, request, *args, **kwargs):
         form = DaybookEntryForm()
@@ -1368,7 +1369,7 @@ class DaybookCreateView(LoginRequiredMixin, View):
 
 
 class DaybookListView(LoginRequiredMixin, View):
-    template_name = 'hms/daybook_list.html'
+    template_name = 'hms/daybook/daybook_list.html'
 
     def get(self, request, *args, **kwargs):
         today = timezone.now().date()
@@ -1430,7 +1431,7 @@ class DaybookListView(LoginRequiredMixin, View):
         if 'reset_expenses' in request.POST:
             Daybook.objects.filter(user=request.user).delete()
             Balance.objects.filter(user=request.user).delete()
-            return redirect('daybook_list')
+            return redirect('daybook/daybook_list')
 
 
 def export_daybook_to_csv(request):
@@ -1457,7 +1458,7 @@ def export_daybook_to_csv(request):
 
 
 class BalanceUpdateView(LoginRequiredMixin, View):
-    template_name = 'hms/update_balance.html'
+    template_name = 'hms/daybook/update_balance.html'
 
     def get(self, request, *args, **kwargs):
         form = BalanceUpdateForm()
@@ -1484,10 +1485,7 @@ class BalanceUpdateView(LoginRequiredMixin, View):
         return render(request, self.template_name, {'form': form})
     
 
-
-
-
-
+@login_required
 @login_required
 def add_nicu_vitals(request, ipd_id):
     ipd = get_object_or_404(IPD, id=ipd_id)
@@ -1511,43 +1509,50 @@ def add_nicu_vitals(request, ipd_id):
         ("04:00", "4 AM"),
         ("06:00", "6 AM"),
     ]
-    URINE_CHOICES=[('',''), ('nil', 'Nil'), ('ml', 'ML')]
+    URINE_CHOICES = [('', ''), ('nil', 'Nil'), ('ml', 'ML')]
     numeric_fields = ['temperature', 'respiratory_rate', 'pulse_rate', 'cft', 'spo2', 'oxygen', 'iv_fluids', 'by_nasogastric', 'oral', 'ift']
     boolean_fields = ['seizure', 'retraction', 'breastfeeding', 'stool', 'vomiting']
-    dropdown_fields = ['skin_color','urine']  # Adding skin_color dropdown field
+    dropdown_fields = ['skin_color', 'urine']  # Adding skin_color dropdown field
 
     SKIN_COLOR_CHOICES = [
-    ('', ''),
-    ('pink', 'Pink (Normal)'),
-    ('pallor', 'Pallor (Pale)'),
-    ('jaundiced', 'Jaundiced (Yellowish)'),
-    ('cyanotic', 'Cyanotic (Bluish)'),
-    ('mottled', 'Mottled (Blotchy)'),
-    ('erythematous', 'Erythematous (Red/Flushed)'),
-    ('grayish', 'Grayish'),
-    ('dusky', 'Dusky (Bluish-Gray)'),
-]
+        ('', ''),
+        ('pink', 'Pink (Normal)'),
+        ('pallor', 'Pallor (Pale)'),
+        ('jaundiced', 'Jaundiced (Yellowish)'),
+        ('cyanotic', 'Cyanotic (Bluish)'),
+        ('mottled', 'Mottled (Blotchy)'),
+        ('erythematous', 'Erythematous (Red/Flushed)'),
+        ('grayish', 'Grayish'),
+        ('dusky', 'Dusky (Bluish-Gray)'),
+    ]
 
     if request.method == "POST":
-        # print("Received POST Data:", request.POST)
         for time, label in TIME_SLOTS:
+            time_obj = datetime.strptime(time, "%H:%M").time()  # Convert string to time object
             # Get or create a NICUVitals entry for this time slot
-            vitals, created = NICUVitals.objects.get_or_create(ipd=ipd, date=today, time=time)
+            vitals, created = NICUVitals.objects.get_or_create(ipd=ipd, date=today, time=time_obj)
+
             # Handle Urine Output
             urine_value = request.POST.get(f"urine_{time}", "").strip()
-            vitals.urine = urine_value  # Store selected value
-            ml_value = None
-            if urine_value == "ml":
-                ml_value = request.POST.get(f"urine_ml_{time.replace(':', '')}", "").strip()
-                if ml_value:
+            ml_value = request.POST.get(f"urine_ml_{time.replace(':', '')}", "").strip()
+
+            if urine_value:
+                vitals.urine = urine_value
+                if urine_value == "ml" and ml_value:
                     vitals.urine_value = float(ml_value)
                 else:
-                    print(f"Missing Urine ML value for time {time}")  # Debugging output
                     vitals.urine_value = None
             else:
-                vitals.urine_value = None  # Reset if not "ML"
+                # Preserve existing urine value if no new value is provided
+                if not created:
+                    existing_vital = existing_vitals_dict.get(time)
+                    if existing_vital:
+                        vitals.urine = existing_vital.urine
+                        vitals.urine_value = existing_vital.urine_value
 
-            # print(f"Time: {time}, Urine: {urine_value}, Urine ML: {ml_value}")  # Debugging line
+            # Debugging: Print urine values for each time slot
+            print(f"Time: {time}, Urine: {vitals.urine}, Urine Value: {vitals.urine_value}")
+
             # Update fields safely from request.POST
             for field in numeric_fields:
                 field_name = f"{field}_{time}"
@@ -1564,14 +1569,14 @@ def add_nicu_vitals(request, ipd_id):
             # Update dropdown fields
             for field in dropdown_fields:
                 field_name = f"{field}_{time}"
-                setattr(vitals, field, request.POST.get(field_name,""))
+                setattr(vitals, field, request.POST.get(field_name, ""))
 
             vitals.save()
 
         messages.success(request, "NICU Vitals recorded successfully.")
         return redirect('view_nicu_vitals', ipd_id=ipd.id)
-    # print("Existing Vitals Dict:", existing_vitals_dict)
-    return render(request, 'hms/add_vitals.html', {
+
+    return render(request, 'hms/vitals/add_vitals.html', {
         'ipd': ipd,
         'existing_vitals': existing_vitals,
         'existing_vitals_dict': existing_vitals_dict,  # Pass existing data
@@ -1588,27 +1593,9 @@ def add_nicu_vitals(request, ipd_id):
 def view_nicu_vitals(request, ipd_id):
     ipd = get_object_or_404(IPD, id=ipd_id)
     vitals_list = NICUVitals.objects.filter(ipd=ipd).order_by('-date')
-
-    return render(request, 'hms/view_vitals.html', {'vitals_list': vitals_list, 'ipd': ipd})
-
-
-
+    print("Vitals being sent to template:")
+    for v in vitals_list:
+        print(f" view Time: {v.time}, Urine: {v.urine}, Urine Value: {v.urine_value}")
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    return render(request, 'hms/vitals/view_vitals.html', {'vitals_list': vitals_list, 'ipd': ipd})
