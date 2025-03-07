@@ -1486,7 +1486,6 @@ class BalanceUpdateView(LoginRequiredMixin, View):
     
 
 @login_required
-@login_required
 def add_nicu_vitals(request, ipd_id):
     ipd = get_object_or_404(IPD, id=ipd_id)
     today = localdate()
@@ -1593,9 +1592,45 @@ def add_nicu_vitals(request, ipd_id):
 def view_nicu_vitals(request, ipd_id):
     ipd = get_object_or_404(IPD, id=ipd_id)
     vitals_list = NICUVitals.objects.filter(ipd=ipd).order_by('-date')
+    fluid_totals = calculate_total_fluids(vitals_list)
+    # Fetching patient details
+    patient = ipd.patient  
+    age = patient.age  
+    weight = patient.weight
     print("Vitals being sent to template:")
     for v in vitals_list:
         print(f" view Time: {v.time}, Urine: {v.urine}, Urine Value: {v.urine_value}")
 
 
-    return render(request, 'hms/vitals/view_vitals.html', {'vitals_list': vitals_list, 'ipd': ipd})
+    return render(request, 'hms/vitals/view_vitals.html', {'vitals_list': vitals_list, 'ipd': ipd,'fluid_totals': fluid_totals,'age': age,'weight': weight,})
+
+
+
+
+
+def calculate_total_fluids(vitals_list):
+    """
+    Calculate total input and output of fluids in specific time groups.
+    """
+    time_groups = {
+        "Morning (08 AM - 12 PM)": ["08:00", "10:00", "12:00"],
+        "Afternoon (02 PM - 06 PM)": ["14:00", "16:00", "18:00"],
+        "Night (08 PM - 12 AM)": ["20:00", "22:00", "23:59"],
+        "Early Morning (02 AM - 06 AM)": ["02:00", "04:00", "06:00"],
+    }
+
+    totals = {group: {"input": 0, "output": 0} for group in time_groups}
+
+    for vital in vitals_list:
+        time_str = vital.time.strftime("%H:%M")
+        for group, times in time_groups.items():
+            if time_str in times:
+                totals[group]["input"] += (vital.iv_fluids or 0) + (vital.by_nasogastric or 0) + (vital.oral or 0) + (vital.ift or 0)
+                totals[group]["output"] += vital.urine_value or 0
+
+    return totals
+
+
+
+
+

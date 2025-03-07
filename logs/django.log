@@ -58729,3 +58729,742 @@ INFO 2025-03-07 13:31:11,931 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 59932
 INFO 2025-03-07 13:31:12,157 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 59932
 INFO 2025-03-07 13:31:12,435 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 59932
 INFO 2025-03-07 13:31:22,185 basehttp "GET /nicu/add/3/ HTTP/1.1" 200 206094
+INFO 2025-03-07 13:32:48,085 autoreload Watching for file changes with StatReloader
+INFO 2025-03-07 13:32:51,355 basehttp "GET /nicu/add/3/ HTTP/1.1" 200 205794
+INFO 2025-03-07 13:32:54,138 basehttp "GET /nicu/add/3/ HTTP/1.1" 200 205794
+INFO 2025-03-07 13:32:54,772 basehttp "GET /nicu/add/3/ HTTP/1.1" 200 205794
+INFO 2025-03-07 13:32:55,005 basehttp "GET /nicu/add/3/ HTTP/1.1" 200 205794
+INFO 2025-03-07 13:32:55,308 basehttp "GET /nicu/add/3/ HTTP/1.1" 200 205794
+INFO 2025-03-07 13:32:56,242 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 59932
+INFO 2025-03-07 13:32:57,502 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 59932
+INFO 2025-03-07 13:33:42,873 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 59951
+INFO 2025-03-07 13:33:43,590 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 59951
+INFO 2025-03-07 13:33:44,115 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 59951
+INFO 2025-03-07 13:33:44,656 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 59951
+INFO 2025-03-07 13:33:44,820 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 59951
+INFO 2025-03-07 13:33:44,983 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 59951
+INFO 2025-03-07 13:33:45,922 basehttp - Broken pipe from ('127.0.0.1', 64371)
+INFO 2025-03-07 13:33:45,971 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 59951
+INFO 2025-03-07 13:33:46,238 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 59951
+INFO 2025-03-07 13:33:46,374 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 59951
+INFO 2025-03-07 13:33:57,424 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 59966
+INFO 2025-03-07 13:33:57,973 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 59966
+INFO 2025-03-07 13:33:58,644 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 59966
+INFO 2025-03-07 13:33:58,793 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 59966
+INFO 2025-03-07 13:33:59,133 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 59966
+INFO 2025-03-07 13:34:05,559 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 59966
+INFO 2025-03-07 13:34:06,103 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 59966
+INFO 2025-03-07 13:34:06,689 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 59966
+INFO 2025-03-07 13:34:13,063 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 59932
+INFO 2025-03-07 13:34:34,810 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 59951
+INFO 2025-03-07 13:34:35,536 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 59951
+INFO 2025-03-07 13:34:45,923 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 59951
+INFO 2025-03-07 13:34:46,459 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 59951
+INFO 2025-03-07 13:34:46,908 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 59951
+INFO 2025-03-07 13:34:47,015 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 59951
+INFO 2025-03-07 13:35:14,028 basehttp "GET /admin/hms/nicuvitals/ HTTP/1.1" 200 19841
+INFO 2025-03-07 13:35:14,238 basehttp "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-03-07 13:35:14,417 basehttp "GET /admin/hms/nicuvitals/ HTTP/1.1" 200 19841
+INFO 2025-03-07 13:35:14,512 basehttp "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-03-07 13:35:19,320 basehttp "GET /admin/hms/nicuvitals/721/change/ HTTP/1.1" 200 30107
+INFO 2025-03-07 13:35:19,388 basehttp "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-03-07 13:35:24,168 basehttp "GET /admin/hms/nicuvitals/ HTTP/1.1" 200 19841
+INFO 2025-03-07 13:35:32,700 basehttp "GET /ipd/ HTTP/1.1" 200 21491
+INFO 2025-03-07 13:35:32,937 basehttp "GET /get-ipd-data/ HTTP/1.1" 200 755
+INFO 2025-03-07 13:35:34,758 basehttp "GET /nicu/view/2/ HTTP/1.1" 200 23289
+INFO 2025-03-07 13:35:40,786 basehttp "GET /nicu/add/2/ HTTP/1.1" 200 205779
+INFO 2025-03-07 13:35:44,146 basehttp "GET /get-ipd-data/ HTTP/1.1" 200 755
+INFO 2025-03-07 13:35:45,652 basehttp "GET /nicu/view/1/ HTTP/1.1" 200 23284
+INFO 2025-03-07 13:36:00,178 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-03-07 13:36:01,045 autoreload Watching for file changes with StatReloader
+INFO 2025-03-07 13:37:44,011 basehttp "GET /nicu/view/1/ HTTP/1.1" 200 23284
+INFO 2025-03-07 13:38:29,129 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-03-07 13:38:29,886 autoreload Watching for file changes with StatReloader
+INFO 2025-03-07 13:38:32,656 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-03-07 13:38:33,399 autoreload Watching for file changes with StatReloader
+INFO 2025-03-07 13:38:49,463 basehttp "GET /nicu/view/1/ HTTP/1.1" 200 23302
+INFO 2025-03-07 13:38:50,058 basehttp "GET /nicu/view/1/ HTTP/1.1" 200 23302
+INFO 2025-03-07 13:38:50,311 basehttp "GET /nicu/view/1/ HTTP/1.1" 200 23302
+INFO 2025-03-07 13:38:50,660 basehttp "GET /nicu/view/1/ HTTP/1.1" 200 23302
+INFO 2025-03-07 13:38:53,690 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 60169
+INFO 2025-03-07 13:39:21,885 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-03-07 13:39:22,624 autoreload Watching for file changes with StatReloader
+INFO 2025-03-07 13:39:24,073 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 59969
+INFO 2025-03-07 13:39:24,132 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 59969
+INFO 2025-03-07 13:39:24,404 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 59969
+INFO 2025-03-07 13:39:24,752 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 59969
+INFO 2025-03-07 13:39:24,907 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 59969
+INFO 2025-03-07 13:39:49,931 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-03-07 13:39:50,846 autoreload Watching for file changes with StatReloader
+INFO 2025-03-07 13:40:19,302 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-03-07 13:40:20,067 autoreload Watching for file changes with StatReloader
+INFO 2025-03-07 13:40:21,953 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 60124
+INFO 2025-03-07 13:40:27,769 basehttp "GET /nicu/add/3/ HTTP/1.1" 200 205794
+INFO 2025-03-07 13:41:38,301 basehttp "POST /nicu/add/3/ HTTP/1.1" 302 0
+INFO 2025-03-07 13:41:38,514 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 64730
+INFO 2025-03-07 13:41:57,060 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-03-07 13:41:57,849 autoreload Watching for file changes with StatReloader
+INFO 2025-03-07 13:44:03,340 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-03-07 13:44:04,096 autoreload Watching for file changes with StatReloader
+ERROR 2025-03-07 13:44:09,760 log Internal Server Error: /nicu/view/3/
+Traceback (most recent call last):
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\contrib\auth\decorators.py", line 60, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\hms\views.py", line 1615, in view_nicu_vitals
+    time_str = localtime(vital.time).strftime("%H:%M")  # Format time as a string
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\utils\timezone.py", line 183, in localtime
+    raise ValueError("localtime() cannot be applied to a naive datetime")
+ValueError: localtime() cannot be applied to a naive datetime
+ERROR 2025-03-07 13:44:09,766 basehttp "GET /nicu/view/3/ HTTP/1.1" 500 84173
+INFO 2025-03-07 13:49:11,126 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-03-07 13:49:11,896 autoreload Watching for file changes with StatReloader
+ERROR 2025-03-07 13:49:17,536 log Internal Server Error: /nicu/view/3/
+Traceback (most recent call last):
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\contrib\auth\decorators.py", line 60, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\hms\views.py", line 1609, in view_nicu_vitals
+    grouped_totals = defaultdict(lambda: defaultdict(lambda: {'input': 0, 'output': 0}))
+                     ^^^^^^^^^^^
+NameError: name 'defaultdict' is not defined
+ERROR 2025-03-07 13:49:17,553 basehttp "GET /nicu/view/3/ HTTP/1.1" 500 79636
+ERROR 2025-03-07 13:49:18,204 log Internal Server Error: /nicu/view/3/
+Traceback (most recent call last):
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\contrib\auth\decorators.py", line 60, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\hms\views.py", line 1609, in view_nicu_vitals
+    grouped_totals = defaultdict(lambda: defaultdict(lambda: {'input': 0, 'output': 0}))
+                     ^^^^^^^^^^^
+NameError: name 'defaultdict' is not defined
+ERROR 2025-03-07 13:49:18,210 basehttp "GET /nicu/view/3/ HTTP/1.1" 500 79636
+ERROR 2025-03-07 13:49:18,417 log Internal Server Error: /nicu/view/3/
+Traceback (most recent call last):
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\contrib\auth\decorators.py", line 60, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\hms\views.py", line 1609, in view_nicu_vitals
+    grouped_totals = defaultdict(lambda: defaultdict(lambda: {'input': 0, 'output': 0}))
+                     ^^^^^^^^^^^
+NameError: name 'defaultdict' is not defined
+ERROR 2025-03-07 13:49:18,424 basehttp "GET /nicu/view/3/ HTTP/1.1" 500 79636
+ERROR 2025-03-07 13:49:18,603 log Internal Server Error: /nicu/view/3/
+Traceback (most recent call last):
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\contrib\auth\decorators.py", line 60, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\hms\views.py", line 1609, in view_nicu_vitals
+    grouped_totals = defaultdict(lambda: defaultdict(lambda: {'input': 0, 'output': 0}))
+                     ^^^^^^^^^^^
+NameError: name 'defaultdict' is not defined
+ERROR 2025-03-07 13:49:18,610 basehttp "GET /nicu/view/3/ HTTP/1.1" 500 79636
+INFO 2025-03-07 13:49:36,742 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-03-07 13:49:37,690 autoreload Watching for file changes with StatReloader
+ERROR 2025-03-07 13:49:39,471 log Internal Server Error: /nicu/view/3/
+Traceback (most recent call last):
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\contrib\auth\decorators.py", line 60, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\hms\views.py", line 1620, in view_nicu_vitals
+    time_str = localtime(vital_time).strftime("%H:%M")  # Convert to local time and format
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\utils\timezone.py", line 183, in localtime
+    raise ValueError("localtime() cannot be applied to a naive datetime")
+ValueError: localtime() cannot be applied to a naive datetime
+ERROR 2025-03-07 13:49:39,475 basehttp "GET /nicu/view/3/ HTTP/1.1" 500 84402
+INFO 2025-03-07 13:51:31,343 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-03-07 13:51:32,191 autoreload Watching for file changes with StatReloader
+INFO 2025-03-07 13:51:53,822 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 65509
+INFO 2025-03-07 13:51:53,905 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 65509
+INFO 2025-03-07 13:51:54,330 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 65509
+INFO 2025-03-07 13:53:46,007 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-03-07 13:53:46,725 autoreload Watching for file changes with StatReloader
+INFO 2025-03-07 13:53:57,535 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-03-07 13:53:58,280 autoreload Watching for file changes with StatReloader
+INFO 2025-03-07 13:54:06,537 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-03-07 13:54:07,171 autoreload Watching for file changes with StatReloader
+INFO 2025-03-07 13:54:13,978 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-03-07 13:54:14,731 autoreload Watching for file changes with StatReloader
+INFO 2025-03-07 13:54:20,893 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 65521
+INFO 2025-03-07 13:54:21,657 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 65521
+INFO 2025-03-07 13:54:21,851 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 65521
+INFO 2025-03-07 13:54:26,992 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-03-07 13:54:27,889 autoreload Watching for file changes with StatReloader
+INFO 2025-03-07 13:54:29,630 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 65521
+INFO 2025-03-07 13:54:29,657 basehttp - Broken pipe from ('127.0.0.1', 63311)
+INFO 2025-03-07 13:54:29,909 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 65521
+INFO 2025-03-07 13:54:30,129 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 65521
+INFO 2025-03-07 13:54:30,324 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 65521
+INFO 2025-03-07 13:54:36,684 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-03-07 13:54:37,449 autoreload Watching for file changes with StatReloader
+INFO 2025-03-07 13:54:39,426 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 65519
+INFO 2025-03-07 13:54:39,956 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 65519
+INFO 2025-03-07 13:54:47,306 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-03-07 13:54:48,083 autoreload Watching for file changes with StatReloader
+INFO 2025-03-07 13:54:49,480 basehttp - Broken pipe from ('127.0.0.1', 63571)
+INFO 2025-03-07 13:54:49,480 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 65517
+INFO 2025-03-07 13:54:50,064 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 65517
+INFO 2025-03-07 13:55:10,793 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 66348
+INFO 2025-03-07 13:55:11,023 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 66348
+INFO 2025-03-07 13:55:11,401 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 66348
+INFO 2025-03-07 13:55:11,570 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 66348
+INFO 2025-03-07 13:55:21,866 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-03-07 13:55:22,769 autoreload Watching for file changes with StatReloader
+INFO 2025-03-07 13:55:25,402 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-03-07 13:55:26,160 autoreload Watching for file changes with StatReloader
+INFO 2025-03-07 13:55:30,752 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-03-07 13:55:31,546 autoreload Watching for file changes with StatReloader
+INFO 2025-03-07 13:55:34,233 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-03-07 13:55:35,007 autoreload Watching for file changes with StatReloader
+INFO 2025-03-07 13:55:38,598 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-03-07 13:55:39,342 autoreload Watching for file changes with StatReloader
+INFO 2025-03-07 13:55:41,010 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 66365
+INFO 2025-03-07 13:55:41,654 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 66365
+INFO 2025-03-07 13:55:41,934 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 66365
+INFO 2025-03-07 13:55:42,103 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 66365
+INFO 2025-03-07 13:55:47,177 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-03-07 13:55:48,049 autoreload Watching for file changes with StatReloader
+INFO 2025-03-07 13:55:49,664 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 66372
+INFO 2025-03-07 13:55:49,899 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 66372
+INFO 2025-03-07 13:55:53,974 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-03-07 13:55:54,787 autoreload Watching for file changes with StatReloader
+INFO 2025-03-07 13:55:57,435 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-03-07 13:55:58,225 autoreload Watching for file changes with StatReloader
+INFO 2025-03-07 13:56:01,775 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-03-07 13:56:02,575 autoreload Watching for file changes with StatReloader
+INFO 2025-03-07 13:56:05,157 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-03-07 13:56:05,937 autoreload Watching for file changes with StatReloader
+INFO 2025-03-07 13:56:08,491 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 66382
+INFO 2025-03-07 13:56:08,586 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-03-07 13:56:09,332 autoreload Watching for file changes with StatReloader
+INFO 2025-03-07 13:56:10,926 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 66386
+INFO 2025-03-07 13:56:50,932 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 66500
+INFO 2025-03-07 13:56:51,184 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 66500
+INFO 2025-03-07 13:56:51,455 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 66500
+INFO 2025-03-07 13:56:51,621 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 66500
+INFO 2025-03-07 13:59:07,327 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 66585
+INFO 2025-03-07 13:59:08,204 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 66585
+INFO 2025-03-07 13:59:30,882 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-03-07 13:59:31,625 autoreload Watching for file changes with StatReloader
+INFO 2025-03-07 13:59:35,233 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 65462
+INFO 2025-03-07 14:00:38,166 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-03-07 14:00:38,935 autoreload Watching for file changes with StatReloader
+INFO 2025-03-07 14:01:34,501 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 66585
+INFO 2025-03-07 14:05:17,762 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-03-07 14:05:18,517 autoreload Watching for file changes with StatReloader
+ERROR 2025-03-07 14:05:24,032 log Internal Server Error: /nicu/view/3/
+Traceback (most recent call last):
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\contrib\auth\decorators.py", line 60, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\hms\views.py", line 1614, in view_nicu_vitals
+    vital_time = localtime(vital.time).time()  # Convert to time object
+                 ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\utils\timezone.py", line 183, in localtime
+    raise ValueError("localtime() cannot be applied to a naive datetime")
+ValueError: localtime() cannot be applied to a naive datetime
+ERROR 2025-03-07 14:05:24,036 basehttp "GET /nicu/view/3/ HTTP/1.1" 500 84268
+INFO 2025-03-07 14:06:38,652 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-03-07 14:06:39,649 autoreload Watching for file changes with StatReloader
+ERROR 2025-03-07 14:06:43,403 log Internal Server Error: /nicu/view/3/
+Traceback (most recent call last):
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\contrib\auth\decorators.py", line 60, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\hms\views.py", line 1620, in view_nicu_vitals
+    vital_time = vital_time.time()  # Convert to time object
+                 ^^^^^^^^^^^^^^^
+AttributeError: 'datetime.time' object has no attribute 'time'
+ERROR 2025-03-07 14:06:43,406 basehttp "GET /nicu/view/3/ HTTP/1.1" 500 80525
+ERROR 2025-03-07 14:06:45,101 log Internal Server Error: /nicu/view/3/
+Traceback (most recent call last):
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\contrib\auth\decorators.py", line 60, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\hms\views.py", line 1620, in view_nicu_vitals
+    vital_time = vital_time.time()  # Convert to time object
+                 ^^^^^^^^^^^^^^^
+AttributeError: 'datetime.time' object has no attribute 'time'
+ERROR 2025-03-07 14:06:45,102 basehttp "GET /nicu/view/3/ HTTP/1.1" 500 80525
+INFO 2025-03-07 14:07:17,542 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-03-07 14:07:18,340 autoreload Watching for file changes with StatReloader
+INFO 2025-03-07 14:07:19,896 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 66597
+INFO 2025-03-07 14:07:24,909 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 66597
+INFO 2025-03-07 14:07:25,628 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 66597
+INFO 2025-03-07 14:07:25,748 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 66597
+INFO 2025-03-07 14:11:32,179 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-03-07 14:11:32,968 autoreload Watching for file changes with StatReloader
+INFO 2025-03-07 14:11:39,005 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-03-07 14:11:39,739 autoreload Watching for file changes with StatReloader
+INFO 2025-03-07 14:11:46,345 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-03-07 14:11:47,181 autoreload Watching for file changes with StatReloader
+INFO 2025-03-07 14:11:56,949 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-03-07 14:11:57,645 autoreload Watching for file changes with StatReloader
+INFO 2025-03-07 14:11:59,094 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 65462
+INFO 2025-03-07 14:12:37,157 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-03-07 14:12:37,963 autoreload Watching for file changes with StatReloader
+INFO 2025-03-07 14:15:42,289 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-03-07 14:15:43,041 autoreload Watching for file changes with StatReloader
+INFO 2025-03-07 14:15:49,385 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 66597
+INFO 2025-03-07 14:15:50,433 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 66597
+INFO 2025-03-07 14:15:51,097 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 66597
+INFO 2025-03-07 14:15:53,797 basehttp "GET /nicu/add/3/ HTTP/1.1" 200 206258
+INFO 2025-03-07 14:15:57,682 basehttp "GET /nicu/add/3/ HTTP/1.1" 200 205958
+INFO 2025-03-07 14:15:58,547 basehttp "GET /nicu/add/3/ HTTP/1.1" 200 205958
+INFO 2025-03-07 14:15:59,604 basehttp "GET /nicu/add/3/ HTTP/1.1" 200 205958
+INFO 2025-03-07 14:16:04,295 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 66597
+INFO 2025-03-07 14:16:21,965 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-03-07 14:16:22,969 autoreload Watching for file changes with StatReloader
+ERROR 2025-03-07 14:16:24,520 log Internal Server Error: /nicu/view/3/
+Traceback (most recent call last):
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\contrib\auth\decorators.py", line 60, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\hms\views.py", line 1616, in view_nicu_vitals
+    vital_time = localtime(vital.time).time() if vital.time else None
+                 ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\utils\timezone.py", line 183, in localtime
+    raise ValueError("localtime() cannot be applied to a naive datetime")
+ValueError: localtime() cannot be applied to a naive datetime
+ERROR 2025-03-07 14:16:24,524 basehttp "GET /nicu/view/3/ HTTP/1.1" 500 83990
+INFO 2025-03-07 14:17:12,279 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-03-07 14:17:13,051 autoreload Watching for file changes with StatReloader
+INFO 2025-03-07 14:17:16,809 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-03-07 14:17:17,584 autoreload Watching for file changes with StatReloader
+INFO 2025-03-07 14:17:19,272 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 66597
+INFO 2025-03-07 14:20:25,990 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-03-07 14:20:27,017 autoreload Watching for file changes with StatReloader
+ERROR 2025-03-07 14:20:35,145 log Internal Server Error: /nicu/view/3/
+Traceback (most recent call last):
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\contrib\auth\decorators.py", line 60, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\hms\views.py", line 1620, in view_nicu_vitals
+    vital_time = localtime(vital.time).time() if vital.time else None  # Ensure local time
+                 ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\utils\timezone.py", line 183, in localtime
+    raise ValueError("localtime() cannot be applied to a naive datetime")
+ValueError: localtime() cannot be applied to a naive datetime
+ERROR 2025-03-07 14:20:35,149 basehttp "GET /nicu/view/3/ HTTP/1.1" 500 84831
+INFO 2025-03-07 14:20:44,243 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-03-07 14:20:45,061 autoreload Watching for file changes with StatReloader
+INFO 2025-03-07 14:20:49,268 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-03-07 14:20:50,092 autoreload Watching for file changes with StatReloader
+INFO 2025-03-07 14:20:52,530 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 68658
+INFO 2025-03-07 14:25:24,260 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 68658
+INFO 2025-03-07 14:25:25,170 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 68156
+INFO 2025-03-07 14:25:25,810 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 68156
+INFO 2025-03-07 14:25:35,098 basehttp "GET /nicu/add/3/ HTTP/1.1" 200 205958
+INFO 2025-03-07 14:25:45,045 basehttp "POST /nicu/add/3/ HTTP/1.1" 302 0
+INFO 2025-03-07 14:25:45,261 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 71162
+INFO 2025-03-07 14:26:58,570 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 71162
+INFO 2025-03-07 14:26:59,220 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 71162
+INFO 2025-03-07 14:26:59,648 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 71162
+INFO 2025-03-07 14:27:18,588 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 71212
+INFO 2025-03-07 14:27:19,259 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 71212
+INFO 2025-03-07 14:27:19,400 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 71212
+INFO 2025-03-07 14:27:19,729 basehttp - Broken pipe from ('127.0.0.1', 54156)
+INFO 2025-03-07 14:27:19,772 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 71212
+INFO 2025-03-07 14:27:19,941 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 71212
+INFO 2025-03-07 14:27:21,059 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 71212
+INFO 2025-03-07 14:27:21,378 basehttp - Broken pipe from ('127.0.0.1', 54157)
+INFO 2025-03-07 14:27:21,441 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 71212
+INFO 2025-03-07 14:27:31,843 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 71763
+INFO 2025-03-07 14:27:32,162 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 71763
+INFO 2025-03-07 14:27:32,493 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 71763
+INFO 2025-03-07 14:27:33,421 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 71763
+INFO 2025-03-07 14:27:33,724 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 71763
+INFO 2025-03-07 14:27:33,930 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 71763
+INFO 2025-03-07 14:27:34,084 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 71763
+INFO 2025-03-07 14:27:44,166 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-03-07 14:27:45,002 autoreload Watching for file changes with StatReloader
+INFO 2025-03-07 14:27:46,514 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 69707
+INFO 2025-03-07 14:29:23,750 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-03-07 14:29:24,535 autoreload Watching for file changes with StatReloader
+INFO 2025-03-07 14:29:28,089 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 69707
+INFO 2025-03-07 14:29:28,671 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 69707
+INFO 2025-03-07 14:29:28,943 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 69707
+INFO 2025-03-07 14:29:29,269 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 69707
+INFO 2025-03-07 14:29:29,532 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 69707
+INFO 2025-03-07 14:29:29,793 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 69707
+INFO 2025-03-07 14:29:30,032 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 69707
+INFO 2025-03-07 14:29:30,292 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 69707
+INFO 2025-03-07 14:29:30,683 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 69707
+INFO 2025-03-07 14:29:30,884 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 69707
+INFO 2025-03-07 14:29:31,067 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 69707
+INFO 2025-03-07 14:29:31,233 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 69707
+INFO 2025-03-07 14:29:34,807 basehttp "GET /nicu/add/3/ HTTP/1.1" 200 206275
+INFO 2025-03-07 14:29:40,409 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 69707
+INFO 2025-03-07 14:29:42,732 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 69707
+INFO 2025-03-07 14:29:42,872 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 69707
+INFO 2025-03-07 14:30:06,758 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-03-07 14:30:07,537 autoreload Watching for file changes with StatReloader
+INFO 2025-03-07 14:30:09,321 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 69707
+INFO 2025-03-07 14:30:13,322 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-03-07 14:30:14,139 autoreload Watching for file changes with StatReloader
+INFO 2025-03-07 14:30:17,835 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 69707
+INFO 2025-03-07 14:30:18,022 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-03-07 14:30:18,799 autoreload Watching for file changes with StatReloader
+ERROR 2025-03-07 14:30:20,511 log Internal Server Error: /nicu/view/3/
+Traceback (most recent call last):
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\contrib\auth\decorators.py", line 60, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\hms\views.py", line 1620, in view_nicu_vitals
+    vital_time = vital_time.time()  # Convert to time object
+                 ^^^^^^^^^^^^^^^
+AttributeError: 'datetime.time' object has no attribute 'time'
+ERROR 2025-03-07 14:30:20,514 basehttp "GET /nicu/view/3/ HTTP/1.1" 500 80315
+INFO 2025-03-07 14:30:24,844 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-03-07 14:30:25,590 autoreload Watching for file changes with StatReloader
+ERROR 2025-03-07 14:30:27,225 log Internal Server Error: /nicu/view/3/
+Traceback (most recent call last):
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\contrib\auth\decorators.py", line 60, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\hms\views.py", line 1614, in view_nicu_vitals
+    vital_time = localtime(vital.time).time()  # Convert to time object
+                 ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\utils\timezone.py", line 183, in localtime
+    raise ValueError("localtime() cannot be applied to a naive datetime")
+ValueError: localtime() cannot be applied to a naive datetime
+ERROR 2025-03-07 14:30:27,228 basehttp "GET /nicu/view/3/ HTTP/1.1" 500 84058
+INFO 2025-03-07 14:30:31,473 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-03-07 14:30:32,213 autoreload Watching for file changes with StatReloader
+INFO 2025-03-07 14:30:33,862 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 69695
+INFO 2025-03-07 14:30:56,370 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-03-07 14:30:57,228 autoreload Watching for file changes with StatReloader
+INFO 2025-03-07 14:31:02,877 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-03-07 14:31:03,652 autoreload Watching for file changes with StatReloader
+INFO 2025-03-07 14:31:06,224 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-03-07 14:31:07,024 autoreload Watching for file changes with StatReloader
+INFO 2025-03-07 14:31:08,633 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 68574
+INFO 2025-03-07 14:31:14,710 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 68574
+INFO 2025-03-07 14:31:14,742 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-03-07 14:31:15,570 autoreload Watching for file changes with StatReloader
+INFO 2025-03-07 14:31:17,084 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 68574
+INFO 2025-03-07 14:31:33,905 basehttp "POST /admin/hms/nicuvitals/ HTTP/1.1" 200 16939
+INFO 2025-03-07 14:31:34,866 basehttp "POST /admin/hms/nicuvitals/ HTTP/1.1" 302 0
+INFO 2025-03-07 14:31:35,025 basehttp "GET /admin/hms/nicuvitals/ HTTP/1.1" 200 16438
+INFO 2025-03-07 14:31:35,086 basehttp "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-03-07 14:31:41,006 basehttp "POST /admin/hms/nicuvitals/ HTTP/1.1" 200 15034
+INFO 2025-03-07 14:31:42,261 basehttp "POST /admin/hms/nicuvitals/ HTTP/1.1" 302 0
+INFO 2025-03-07 14:31:42,455 basehttp "GET /admin/hms/nicuvitals/ HTTP/1.1" 200 15090
+INFO 2025-03-07 14:31:42,519 basehttp "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-03-07 14:31:43,426 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 24199
+INFO 2025-03-07 14:31:45,062 basehttp "GET /nicu/add/3/ HTTP/1.1" 200 205779
+INFO 2025-03-07 14:31:54,725 basehttp "POST /nicu/add/3/ HTTP/1.1" 302 0
+INFO 2025-03-07 14:31:54,968 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 60734
+INFO 2025-03-07 14:32:09,643 basehttp "GET /nicu/add/3/ HTTP/1.1" 200 206127
+INFO 2025-03-07 14:32:13,975 basehttp "POST /nicu/add/3/ HTTP/1.1" 302 0
+INFO 2025-03-07 14:32:14,069 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 60736
+INFO 2025-03-07 14:32:16,508 basehttp "GET /nicu/add/3/ HTTP/1.1" 200 206127
+INFO 2025-03-07 14:32:22,599 basehttp "POST /nicu/add/3/ HTTP/1.1" 302 0
+INFO 2025-03-07 14:32:22,833 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 60830
+INFO 2025-03-07 14:32:57,852 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-03-07 14:32:58,776 autoreload Watching for file changes with StatReloader
+INFO 2025-03-07 14:33:00,627 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 61959
+INFO 2025-03-07 14:33:01,753 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 61959
+INFO 2025-03-07 14:33:04,219 basehttp "GET /nicu/add/3/ HTTP/1.1" 200 206127
+INFO 2025-03-07 14:33:16,791 basehttp "POST /nicu/add/3/ HTTP/1.1" 302 0
+INFO 2025-03-07 14:33:17,012 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 61959
+INFO 2025-03-07 14:34:24,732 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-03-07 14:34:25,503 autoreload Watching for file changes with StatReloader
+INFO 2025-03-07 14:34:28,256 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-03-07 14:34:29,073 autoreload Watching for file changes with StatReloader
+INFO 2025-03-07 14:35:02,523 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 60730
+INFO 2025-03-07 14:35:03,370 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 60730
+INFO 2025-03-07 14:35:06,134 basehttp "GET /nicu/add/3/ HTTP/1.1" 200 206127
+INFO 2025-03-07 14:35:12,782 basehttp "POST /nicu/add/3/ HTTP/1.1" 302 0
+INFO 2025-03-07 14:35:12,877 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 60826
+INFO 2025-03-07 14:37:54,949 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-03-07 14:37:55,728 autoreload Watching for file changes with StatReloader
+INFO 2025-03-07 14:38:07,769 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-03-07 14:38:08,579 autoreload Watching for file changes with StatReloader
+INFO 2025-03-07 14:38:16,452 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-03-07 14:38:17,202 autoreload Watching for file changes with StatReloader
+INFO 2025-03-07 14:38:55,647 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 61921
+INFO 2025-03-07 14:39:12,191 basehttp "GET /nicu/add/3/ HTTP/1.1" 200 206127
+INFO 2025-03-07 14:39:20,460 basehttp "POST /nicu/add/3/ HTTP/1.1" 302 0
+INFO 2025-03-07 14:39:20,577 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62062
+INFO 2025-03-07 14:39:26,715 basehttp "GET /nicu/add/3/ HTTP/1.1" 200 206127
+INFO 2025-03-07 14:39:37,411 basehttp "POST /nicu/add/3/ HTTP/1.1" 302 0
+INFO 2025-03-07 14:39:37,520 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62296
+INFO 2025-03-07 14:40:13,044 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62370
+INFO 2025-03-07 14:40:22,902 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-03-07 14:40:23,835 autoreload Watching for file changes with StatReloader
+INFO 2025-03-07 14:40:26,694 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-03-07 14:40:27,504 autoreload Watching for file changes with StatReloader
+INFO 2025-03-07 14:40:29,506 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62379
+INFO 2025-03-07 14:41:12,708 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-03-07 14:41:13,752 autoreload Watching for file changes with StatReloader
+INFO 2025-03-07 14:41:15,488 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62416
+INFO 2025-03-07 14:41:16,974 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62416
+INFO 2025-03-07 14:41:23,970 basehttp "GET /nicu/add/3/ HTTP/1.1" 200 206135
+INFO 2025-03-07 14:41:28,608 basehttp "POST /nicu/add/3/ HTTP/1.1" 302 0
+INFO 2025-03-07 14:41:28,680 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62418
+INFO 2025-03-07 14:43:00,181 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-03-07 14:43:00,972 autoreload Watching for file changes with StatReloader
+INFO 2025-03-07 14:43:12,846 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-03-07 14:43:13,633 autoreload Watching for file changes with StatReloader
+INFO 2025-03-07 14:43:20,345 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-03-07 14:43:21,044 autoreload Watching for file changes with StatReloader
+INFO 2025-03-07 14:43:28,875 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62532
+INFO 2025-03-07 14:43:29,811 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62532
+INFO 2025-03-07 14:43:30,119 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62532
+INFO 2025-03-07 14:43:34,122 basehttp "GET /admin/hms/nicuvitals/ HTTP/1.1" 200 19981
+INFO 2025-03-07 14:43:34,184 basehttp "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-03-07 14:43:36,338 basehttp "GET /admin/hms/patient/ HTTP/1.1" 200 16863
+INFO 2025-03-07 14:43:36,398 basehttp "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-03-07 14:43:37,892 basehttp "GET /admin/hms/patient/3/change/ HTTP/1.1" 200 32585
+INFO 2025-03-07 14:43:37,957 basehttp "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-03-07 14:43:38,146 basehttp "GET /static/admin/img/icon-calendar.svg HTTP/1.1" 200 1086
+ERROR 2025-03-07 14:43:46,053 log Internal Server Error: /admin/hms/patient/3/change/
+Traceback (most recent call last):
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\db\models\fields\__init__.py", line 2123, in get_prep_value
+    return int(value)
+           ^^^^^^^^^^
+ValueError: invalid literal for int() with base 10: '3 day(s) old'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\contrib\admin\options.py", line 718, in wrapper
+    return self.admin_site.admin_view(view)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\utils\decorators.py", line 188, in _view_wrapper
+    result = _process_exception(request, e)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\utils\decorators.py", line 186, in _view_wrapper
+    response = view_func(request, *args, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\views\decorators\cache.py", line 80, in _view_wrapper
+    response = view_func(request, *args, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\contrib\admin\sites.py", line 241, in inner
+    return view(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\contrib\admin\options.py", line 1964, in change_view
+    return self.changeform_view(request, object_id, form_url, extra_context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\utils\decorators.py", line 48, in _wrapper
+    return bound_method(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\utils\decorators.py", line 188, in _view_wrapper
+    result = _process_exception(request, e)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\utils\decorators.py", line 186, in _view_wrapper
+    response = view_func(request, *args, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\contrib\admin\options.py", line 1820, in changeform_view
+    return self._changeform_view(request, object_id, form_url, extra_context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\contrib\admin\options.py", line 1871, in _changeform_view
+    self.save_model(request, new_object, form, not add)
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\contrib\admin\options.py", line 1294, in save_model
+    obj.save()
+  File "D:\Hospital_Management\hospital_management\hms\models.py", line 141, in save
+    super().save(*args, **kwargs)
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\db\models\base.py", line 891, in save
+    self.save_base(
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\db\models\base.py", line 997, in save_base
+    updated = self._save_table(
+              ^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\db\models\base.py", line 1129, in _save_table
+    updated = self._do_update(
+              ^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\db\models\base.py", line 1194, in _do_update
+    return filtered._update(values) > 0
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\db\models\query.py", line 1278, in _update
+    return query.get_compiler(self.db).execute_sql(CURSOR)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\db\models\sql\compiler.py", line 2003, in execute_sql
+    cursor = super().execute_sql(result_type)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\db\models\sql\compiler.py", line 1561, in execute_sql
+    sql, params = self.as_sql()
+                  ^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\db\models\sql\compiler.py", line 1966, in as_sql
+    val = field.get_db_prep_save(val, connection=self.connection)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\db\models\fields\__init__.py", line 1008, in get_db_prep_save
+    return self.get_db_prep_value(value, connection=connection, prepared=False)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\db\models\fields\__init__.py", line 2130, in get_db_prep_value
+    value = super().get_db_prep_value(value, connection, prepared)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\db\models\fields\__init__.py", line 1001, in get_db_prep_value
+    value = self.get_prep_value(value)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\avane\anaconda3\Lib\site-packages\django\db\models\fields\__init__.py", line 2125, in get_prep_value
+    raise e.__class__(
+ValueError: Field 'age' expected a number but got '3 day(s) old'.
+ERROR 2025-03-07 14:43:46,074 basehttp "POST /admin/hms/patient/3/change/ HTTP/1.1" 500 211139
+INFO 2025-03-07 14:44:04,203 autoreload D:\Hospital_Management\hospital_management\hms\models.py changed, reloading.
+INFO 2025-03-07 14:44:04,977 autoreload Watching for file changes with StatReloader
+INFO 2025-03-07 14:44:06,177 autoreload D:\Hospital_Management\hospital_management\hms\models.py changed, reloading.
+INFO 2025-03-07 14:44:24,703 autoreload Watching for file changes with StatReloader
+INFO 2025-03-07 14:44:28,341 basehttp "POST /admin/hms/patient/3/change/ HTTP/1.1" 302 0
+INFO 2025-03-07 14:44:28,461 basehttp "GET /admin/hms/patient/ HTTP/1.1" 200 17088
+INFO 2025-03-07 14:44:28,521 basehttp "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-03-07 14:44:30,488 basehttp "GET /admin/hms/patient/3/change/ HTTP/1.1" 200 32613
+INFO 2025-03-07 14:44:30,557 basehttp "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-03-07 14:44:34,025 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62541
+INFO 2025-03-07 14:44:35,078 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62541
+INFO 2025-03-07 14:44:35,378 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62541
+INFO 2025-03-07 14:44:43,667 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62541
+INFO 2025-03-07 14:44:44,224 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62541
+INFO 2025-03-07 14:44:44,476 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62535
+INFO 2025-03-07 14:44:44,734 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62535
+INFO 2025-03-07 14:44:44,886 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62535
+INFO 2025-03-07 14:44:45,176 basehttp - Broken pipe from ('127.0.0.1', 50391)
+INFO 2025-03-07 14:44:45,203 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62535
+INFO 2025-03-07 14:44:53,943 basehttp "GET /static/admin/img/calendar-icons.svg HTTP/1.1" 200 2455
+INFO 2025-03-07 14:44:58,385 basehttp "POST /admin/hms/patient/3/change/ HTTP/1.1" 302 0
+INFO 2025-03-07 14:44:58,544 basehttp "GET /admin/hms/patient/ HTTP/1.1" 200 17088
+INFO 2025-03-07 14:44:58,630 basehttp "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-03-07 14:45:00,321 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62535
+INFO 2025-03-07 14:45:00,976 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62535
+INFO 2025-03-07 14:45:01,115 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62535
+INFO 2025-03-07 14:45:35,794 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62535
+INFO 2025-03-07 14:45:36,480 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62542
+INFO 2025-03-07 14:46:04,736 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62465
+INFO 2025-03-07 14:46:05,531 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62465
+INFO 2025-03-07 14:46:26,823 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62523
+INFO 2025-03-07 14:46:27,326 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62523
+INFO 2025-03-07 14:46:27,629 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62523
+INFO 2025-03-07 14:46:27,771 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62523
+INFO 2025-03-07 14:46:39,832 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62523
+INFO 2025-03-07 14:46:40,110 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62523
+INFO 2025-03-07 14:46:40,562 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62534
+INFO 2025-03-07 14:46:40,833 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62534
+INFO 2025-03-07 14:46:52,045 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62545
+INFO 2025-03-07 14:46:52,199 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62545
+INFO 2025-03-07 14:46:52,509 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62545
+INFO 2025-03-07 14:46:52,647 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62545
+INFO 2025-03-07 14:46:52,975 basehttp - Broken pipe from ('127.0.0.1', 51355)
+INFO 2025-03-07 14:46:53,161 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62545
+INFO 2025-03-07 14:47:10,534 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62512
+INFO 2025-03-07 14:47:11,000 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62512
+INFO 2025-03-07 14:47:23,949 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62524
+INFO 2025-03-07 14:47:24,421 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62524
+INFO 2025-03-07 14:47:25,203 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62524
+INFO 2025-03-07 14:47:25,646 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62524
+INFO 2025-03-07 14:47:25,868 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62524
+INFO 2025-03-07 14:47:25,998 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62524
+INFO 2025-03-07 14:47:26,127 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62524
+INFO 2025-03-07 14:47:38,084 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62514
+INFO 2025-03-07 14:47:38,688 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62514
+INFO 2025-03-07 14:47:38,818 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62524
+INFO 2025-03-07 14:47:38,986 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62524
+INFO 2025-03-07 14:47:39,159 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62524
+INFO 2025-03-07 14:47:43,765 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62524
+INFO 2025-03-07 14:47:44,254 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62523
+INFO 2025-03-07 14:47:44,395 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62523
+INFO 2025-03-07 14:47:44,606 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62523
+INFO 2025-03-07 14:47:44,761 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62523
+INFO 2025-03-07 14:47:44,918 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62523
+INFO 2025-03-07 14:47:45,063 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62523
+INFO 2025-03-07 14:47:45,199 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62523
+INFO 2025-03-07 14:47:45,327 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62523
+INFO 2025-03-07 14:47:50,206 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62523
+INFO 2025-03-07 14:47:50,588 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62523
+INFO 2025-03-07 14:47:51,065 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62523
+INFO 2025-03-07 14:47:51,288 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62513
+INFO 2025-03-07 14:47:51,447 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62513
+INFO 2025-03-07 14:47:51,609 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62513
+INFO 2025-03-07 14:47:51,931 basehttp - Broken pipe from ('127.0.0.1', 51356)
+INFO 2025-03-07 14:47:51,989 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62513
+INFO 2025-03-07 14:48:40,913 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62651
+INFO 2025-03-07 14:48:41,483 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62651
+INFO 2025-03-07 14:48:41,712 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62651
+INFO 2025-03-07 14:48:41,911 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62651
+INFO 2025-03-07 14:48:45,910 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62513
+INFO 2025-03-07 14:48:46,506 basehttp "GET /nicu/view/3/ HTTP/1.1" 200 62513

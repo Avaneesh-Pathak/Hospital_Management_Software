@@ -67,7 +67,7 @@ class Patient(models.Model):
     created_at = models.DateTimeField(default=now)
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name="patient")
     date_of_birth = models.DateField(blank=True, null=True)
-    age = models.PositiveIntegerField(blank=True, null=True)  # Age field
+    age = models.TextField(blank=True, null=True)  # Age field
     contact_number = models.CharField(max_length=15, blank=True, null=True)
     address = models.TextField(blank=True, null=True)
     gender = models.CharField(max_length=10, choices=CustomUser.GENDER_CHOICES, blank=True, null=True)
