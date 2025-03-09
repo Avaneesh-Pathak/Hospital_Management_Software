@@ -1,15 +1,40 @@
-{% extends 'hms/base.html' %}
-{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vitals Dashboard</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .background-grayish {
+            background-color: #f8f9fa;
+        }
+        .cursor-pointer {
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
 <div class="container mt-4">
     <!-- Action Buttons -->
-    <div class="d-flex justify-content-end mb-4">
-        <a href="{% url 'add_nicu_vitals' ipd.id %}" class="btn btn-success btn-lg me-2">
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <a href="{% url 'ipd' %}" class="btn btn-primary">
+        <i class="fas fa-arrow-left"></i> Go Back to IPD List
+    </a>
+
+    <div class="d-flex gap-2">
+        <a href="{% url 'add_nicu_vitals' ipd.id %}" class="btn btn-success btn-lg">
             <i class="fas fa-plus me-2"></i>Add Vitals
         </a>
         <button id="downloadChart" class="btn btn-primary btn-lg text-white">
             <i class="fas fa-download me-2"></i> Download Chart
         </button>
     </div>
+</div>
+
 
     <!-- Patient Information Card -->
     <div class=" table-responsive card shadow-lg">
@@ -51,249 +76,355 @@
         </div>
         
         <div class="card-body">
-            <div class="table-responsive">             
-                <table class="table table-bordered table-hover table-striped">
-                    <thead class="table-dark">
-                        <tr id="day-header">
-                            <th class="fw-bold text-center">Day</th>
-                        </tr>
-                        <tr>
-                            <th class="fw-bold text-center">Vitals</th>
-                            {% for vitals in vitals_list %}
-                                <th class="text-center">{{ vitals.time }}</th>
-                            {% endfor %}
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <!-- Section: Vitals -->
-                        <tr class="table-info">
-                            <td colspan="{{ vitals_list|length|add:1 }}" class="fw-bold text-center bg-light border border-dark">
-                                <i class="fas fa-thermometer-half me-2"></i>Vitals
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="fw-bold text-center">Temperature (°F)</td>
-                            {% for vitals in vitals_list %}
-                                <td class="text-center {% if vitals.temperature < 97.5 %}table-primary
-                                           {% elif vitals.temperature >= 97.5 and vitals.temperature <= 99.5 %}table-success
-                                           {% elif vitals.temperature > 99.5 and vitals.temperature <= 100.4 %}table-warning
-                                           {% elif vitals.temperature > 100.4 %}table-danger{% endif %}">
-                                    {{ vitals.temperature|default:"-" }}
-                                </td>
-                            {% endfor %}
-                        </tr>
-                        <tr>
-                            <td class="fw-bold text-center">Respiratory Rate (b/min)</td>
-                            {% for vitals in vitals_list %}
-                                <td class="text-center {% if vitals.respiratory_rate < 30 %}table-primary
-                                           {% elif vitals.respiratory_rate >= 30 and vitals.respiratory_rate <= 60 %}table-success
-                                           {% elif vitals.respiratory_rate > 60 and vitals.respiratory_rate <= 70 %}table-warning
-                                           {% elif vitals.respiratory_rate > 70 %}table-danger{% endif %}">
-                                    {{ vitals.respiratory_rate|default:"-" }}
-                                </td>
-                            {% endfor %}
-                        </tr> 
-                        <tr>
-                            <td class="fw-bold text-center">Pulse Rate (b/min)</td>
-                            {% for vitals in vitals_list %}
-                                <td class="text-center {% if vitals.pulse_rate < 100 %}table-primary
-                                           {% elif vitals.pulse_rate >= 100 and vitals.pulse_rate <= 160 %}table-success
-                                           {% elif vitals.pulse_rate > 160 and vitals.pulse_rate <= 180 %}table-warning
-                                           {% elif vitals.pulse_rate > 180 %}table-danger{% endif %}">
-                                    {{ vitals.pulse_rate|default:"-" }}
-                                </td>
-                            {% endfor %}
-                        </tr>
-                        <tr>
-                            <td class="fw-bold text-center">CFT (sec)</td>
-                            {% for vitals in vitals_list %}
-                                <td class="text-center {% if vitals.cft <= 2 %}table-success
-                                           {% elif vitals.cft == 3 or vitals.cft == 4 %}table-warning
-                                           {% elif vitals.cft > 4 %}table-danger{% endif %}">
-                                    {{ vitals.cft|default:"-" }}
-                                </td>
-                            {% endfor %}
-                        </tr>                       
-                        <tr>
-                            <td class="fw-bold text-center">Skin Color</td>
-                            {% for vitals in vitals_list %}
-                                <td class="text-center 
-                                    {% if vitals.skin_color == 'pink' %} bg-light text-success
-                                    {% elif vitals.skin_color == 'pallor' %} bg-light text-secondary
-                                    {% elif vitals.skin_color == 'jaundiced' %} bg-warning bg-opacity-25 text-dark
-                                    {% elif vitals.skin_color == 'cyanotic' %} bg-info bg-opacity-25 text-dark
-                                    {% elif vitals.skin_color == 'mottled' %} bg-secondary bg-opacity-25 text-dark
-                                    {% elif vitals.skin_color == 'erythematous' %} bg-danger bg-opacity-25 text-dark
-                                    {% elif vitals.skin_color == 'grayish' %} bg-dark bg-opacity-10 text-dark
-                                    {% elif vitals.skin_color == 'dusky' %} bg-primary bg-opacity-25 text-dark
-                                    {% endif %}">
-                                    {{ vitals.get_skin_color_display|default:"-" }}
-                                </td>
-                            {% endfor %}
-                        </tr>
-                        
-                        
-                        <tr>
-                            <td class="fw-bold text-center">Seizure</td>
-                            {% for vitals in vitals_list %}
-                                <td class="text-center {% if vitals.seizure %}table-danger{% endif %}">
-                                    {{ vitals.seizure|yesno:"Yes,No"|default:"-" }}
-                                </td>
-                            {% endfor %}
-                        </tr>
-                        <tr>
-                            <td class="fw-bold text-center">SpO₂ (%)</td>
-                            {% for vitals in vitals_list %}
-                                <td class="text-center {% if vitals.spo2 >= 95 %}table-success
-                                           {% elif vitals.spo2 >= 90 and vitals.spo2 < 95 %}table-warning
-                                           {% elif vitals.spo2 < 90 %}table-danger{% endif %}">
-                                    {{ vitals.spo2|default:"-" }}
-                                </td>
-                            {% endfor %}
-                        </tr>
-                        <tr>
-                            <td class="fw-bold text-center">Oxygen Support</td>
-                            {% for vitals in vitals_list %}
-                                <td class="text-center {% if vitals.oxygen and vitals.oxygen != '-' %}table-info{% endif %}">
-                                    {{ vitals.oxygen|default:"-" }}
-                                </td>
-                            {% endfor %}
-                        </tr>
-                        <tr>
-                            <td class="fw-bold text-center">Retraction</td>
-                            {% for vitals in vitals_list %}
-                                <td class="text-center {% if vitals.retraction %}table-danger{% endif %}">
-                                    {{ vitals.retraction|yesno:"Yes,No"|default:"-" }}
-                                </td>
-                            {% endfor %}
-                        </tr>
-                        <!-- Section: Fluid Balance -->
-                        <tr class="table-info">
-                            <td colspan="{{ vitals_list|length|add:1 }}" class="fw-bold bg-light border border-dark">
-                                <i class="fas fa-tint me-2"></i>Fluid Balance
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="fw-bold text-center">IV Fluids (ml)</td>
-                            {% for vitals in vitals_list %}
-                                <td class="text-center {% if vitals.iv_fluids >= 60 and vitals.iv_fluids <= 150 %}table-success
-                                           {% elif vitals.iv_fluids < 60 %}table-danger
-                                           {% elif vitals.iv_fluids > 150 %}table-warning{% endif %}">
-                                    {{ vitals.iv_fluids|default:"-" }}
-                                </td>
-                            {% endfor %}
-                        </tr>
-                        
-                        <tr>
-                            <td class="fw-bold text-center">By Nasogastric (ml)</td>
-                            {% for vitals in vitals_list %}
-                                <td class="text-center {% if vitals.by_nasogastric >= 10 and vitals.by_nasogastric <= 20 %}table-success
-                                           {% elif vitals.by_nasogastric < 10 %}table-danger{% endif %}">
-                                    {{ vitals.by_nasogastric|default:"-" }}
-                                </td>
-                            {% endfor %}
-                        </tr>
-                        <tr>
-                            <td class="fw-bold text-center">Oral (ml)</td>
-                            {% for vitals in vitals_list %}
-                                <td class="text-center {% if vitals.oral >= 10 and vitals.oral <= 20 %}table-success
-                                           {% elif vitals.oral < 10 %}table-warning{% endif %}">
-                                    {{ vitals.oral|default:"-" }}
-                                </td>
-                            {% endfor %}
-                        </tr>
-                        <tr>
-                            <td class="fw-bold text-center">Breastfeeding</td>
-                            {% for vitals in vitals_list %}
-                                <td class="text-center">{{ vitals.breastfeeding|yesno:"Yes,No"|default:"-" }}</td>
-                            {% endfor %}
-                        </tr>
-                        <!-- Section: Output -->
-                        <tr class="table-info">
-                            <td colspan="{{ vitals_list|length|add:1 }}" class="fw-bold bg-light border border-dark">
-                                <i class="fas fa-clipboard-check me-2"></i>Output
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="fw-bold text-center">Urine</td>
-                            {% for vitals in vitals_list %}
-                                <td class="text-center
-                                    {% if vitals.urine_value is not None %}
-                                        {% if vitals.urine_value >= 50 %}table-success
-                                        {% elif vitals.urine_value >= 40 %}table-warning
-                                        {% else %}table-danger{% endif %}
-                                    {% elif vitals.urine == 'Anuria' %}table-danger
-                                    {% elif vitals.urine == 'Oliguria' %}table-warning
-                                    {% endif %}
-                                ">
-                                    {% if vitals.urine_value is not None %}
-                                        {{ vitals.urine_value }} ml
-                                    {% elif vitals.urine and vitals.urine.strip != "" %}
-                                        {{ vitals.urine }}
-                                    {% else %}
-                                        -
-                                    {% endif %}
-                                </td>
-                            {% endfor %}
-                        </tr>
-                        </tr>
-                        <tr>
-                            <td class="fw-bold text-center">Stool</td>
-                            {% for vitals in vitals_list %}
-                                <td class="text-center">{{ vitals.stool|yesno:"Yes,No"|default:"-" }}</td>
-                            {% endfor %}
-                        </tr>
-                        <tr>
-                            <td class="fw-bold text-center">IFT (ml)</td>
-                            {% for vitals in vitals_list %}
-                                <td class="text-center
-                                    {% if vitals.ift >= 6 %}table-danger
-                                    {% elif vitals.ift >= 4 %}table-warning
-                                    {% elif vitals.ift >= 2 %}table-success
-                                    {% endif %}
-                                ">
-                                    {{ vitals.ift|default:"-" }}
-                                </td>
-                            {% endfor %}
-                        </tr>
-                        <tr>
-                            <td class="fw-bold text-center">Vomiting</td>
-                            {% for vitals in vitals_list %}
-                                <td class="text-center {% if vitals.vomiting %}table-danger{% endif %}">
-                                    {{ vitals.vomiting|yesno:"Yes,No"|default:"-" }}
-                                </td>
-                            {% endfor %}
-                        </tr>
-                    </tbody>
-                </table>
+            <div class="table-responsive">
+                {% for date, vitals in grouped_vitals.items %}
+                    <div class="date-table-container mb-5"> <!-- Container for each date's table -->
+                        <h3  class="fw-bold text-center background-grayish mb-3">Date: {{ date }}</h3>
+                        <table class="table table-bordered table-hover table-striped">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th class="fw-bold text-center">Vitals</th>
+                                    {% for vital in vitals %}
+                                        <th class="text-center">{{ vital.time }}</th>
+                                    {% endfor %}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Section: Vitals -->
+                                <tr class="table-info">
+                                    <td colspan="{{ vitals|length|add:1 }}" class="fw-bold text-center bg-light border border-dark">
+                                        <i class="fas fa-thermometer-half me-2"></i>Vitals
+                                    </td>
+                                </tr>
+                                <tr id="temperatureRow">
+                                    <td class="fw-bold text-center cursor-pointer" 
+                                        data-bs-toggle="modal" data-bs-target="#temperatureChartModal"
+                                        onclick="generateTemperatureChart([{% for vital in vitals %}{{ vital.temperature|default:'0' }},{% endfor %}], [{% for vital in vitals %}'{{ vital.time }}',{% endfor %}])">
+                                        Temperature (°F)
+                                    </td>
+                                    {% for vital in vitals %}
+                                        <td class="text-center {% if vital.temperature < 97.5 %}table-primary
+                                                   {% elif vital.temperature >= 97.5 and vital.temperature <= 99.5 %}table-success
+                                                   {% elif vital.temperature > 99.5 and vital.temperature <= 100.4 %}table-warning
+                                                   {% elif vital.temperature > 100.4 %}table-danger{% endif %}">
+                                            {{ vital.temperature|default:"-" }}
+                                        </td>
+                                    {% endfor %}
+                                </tr>
+
+                                <!-- Respiratory Rate Row with Click Event -->
+                                <tr id="respiratoryRateRow">
+                                    <td class="fw-bold text-center cursor-pointer" 
+                                        data-bs-toggle="modal" data-bs-target="#respiratoryRateChartModal"
+                                        onclick="generateRespiratoryRateChart([{% for vital in vitals %}{{ vital.respiratory_rate|default:'0' }},{% endfor %}], [{% for vital in vitals %}'{{ vital.time }}',{% endfor %}])">
+                                        Respiratory Rate (b/min)
+                                    </td>
+                                    {% for vital in vitals %}
+                                        <td class="text-center {% if vital.respiratory_rate < 30 %}table-primary
+                                                   {% elif vital.respiratory_rate >= 30 and vital.respiratory_rate <= 60 %}table-success
+                                                   {% elif vital.respiratory_rate > 60 and vital.respiratory_rate <= 70 %}table-warning
+                                                   {% elif vital.respiratory_rate > 70 %}table-danger{% endif %}">
+                                            {{ vital.respiratory_rate|default:"-" }}
+                                        </td>
+                                    {% endfor %}
+                                </tr>
+
+                                <!-- Pulse Rate Row with Click Event -->
+                                <tr id="pulseRateRow">
+                                    <td class="fw-bold text-center cursor-pointer" 
+                                        data-bs-toggle="modal" data-bs-target="#pulseRateChartModal"
+                                        onclick="generatePulseRateChart([{% for vital in vitals %}{{ vital.pulse_rate|default:'0' }},{% endfor %}], [{% for vital in vitals %}'{{ vital.time }}',{% endfor %}])">
+                                        Pulse Rate (b/min)
+                                    </td>
+                                    {% for vital in vitals %}
+                                        <td class="text-center {% if vital.pulse_rate < 100 %}table-primary
+                                                   {% elif vital.pulse_rate >= 100 and vital.pulse_rate <= 160 %}table-success
+                                                   {% elif vital.pulse_rate > 160 and vital.pulse_rate <= 180 %}table-warning
+                                                   {% elif vital.pulse_rate > 180 %}table-danger{% endif %}">
+                                            {{ vital.pulse_rate|default:"-" }}
+                                        </td>
+                                    {% endfor %}
+                                </tr>
+                                <!-- Modals for Charts -->
+                                <!-- Temperature Chart Modal -->
+                                <div class="modal fade" id="temperatureChartModal" tabindex="-1" aria-labelledby="temperatureChartModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog modal-lg">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="temperatureChartModalLabel">Temperature Trend</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <canvas id="temperatureChart"></canvas>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Respiratory Rate Chart Modal -->
+                                <div class="modal fade" id="respiratoryRateChartModal" tabindex="-1" aria-labelledby="respiratoryRateChartModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog modal-lg">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="respiratoryRateChartModalLabel">Respiratory Rate Trend</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <canvas id="respiratoryRateChart"></canvas>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Pulse Rate Chart Modal -->
+                                <div class="modal fade" id="pulseRateChartModal" tabindex="-1" aria-labelledby="pulseRateChartModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog modal-lg">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="pulseRateChartModalLabel">Pulse Rate Trend</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <canvas id="pulseRateChart"></canvas>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <tr>
+                                    <td class="fw-bold text-center">CFT (sec)</td>
+                                    {% for vital in vitals %}
+                                        <td class="text-center {% if vital.cft <= 2 %}table-success
+                                                   {% elif vital.cft == 3 or vital.cft == 4 %}table-warning
+                                                   {% elif vital.cft > 4 %}table-danger{% endif %}">
+                                            {{ vital.cft|default:"-" }}
+                                        </td>
+                                    {% endfor %}
+                                </tr>                       
+                                <tr>
+                                    <td class="fw-bold text-center">Skin Color</td>
+                                    {% for vital in vitals %}
+                                        <td class="text-center 
+                                            {% if vital.skin_color == 'pink' %} bg-light text-success
+                                            {% elif vital.skin_color == 'pallor' %} bg-light text-secondary
+                                            {% elif vital.skin_color == 'jaundiced' %} bg-warning bg-opacity-25 text-dark
+                                            {% elif vital.skin_color == 'cyanotic' %} bg-info bg-opacity-25 text-dark
+                                            {% elif vital.skin_color == 'mottled' %} bg-secondary bg-opacity-25 text-dark
+                                            {% elif vital.skin_color == 'erythematous' %} bg-danger bg-opacity-25 text-dark
+                                            {% elif vital.skin_color == 'grayish' %} bg-dark bg-opacity-10 text-dark
+                                            {% elif vital.skin_color == 'dusky' %} bg-primary bg-opacity-25 text-dark
+                                            {% endif %}">
+                                            {{ vital.get_skin_color_display|default:"-" }}
+                                        </td>
+                                    {% endfor %}
+                                </tr>
+                                <tr>
+                                    <td class="fw-bold text-center">Seizure</td>
+                                    {% for vital in vitals %}
+                                        <td class="text-center {% if vital.seizure %}table-danger{% endif %}">
+                                            {{ vital.seizure|yesno:"Yes,No"|default:"-" }}
+                                        </td>
+                                    {% endfor %}
+                                </tr>
+                                <tr>
+                                    <td class="fw-bold text-center">SpO₂ (%)</td>
+                                    {% for vital in vitals %}
+                                        <td class="text-center {% if vital.spo2 >= 95 %}table-success
+                                                   {% elif vital.spo2 >= 90 and vital.spo2 < 95 %}table-warning
+                                                   {% elif vital.spo2 < 90 %}table-danger{% endif %}">
+                                            {{ vital.spo2|default:"-" }}
+                                        </td>
+                                    {% endfor %}
+                                </tr>
+                                <tr>
+                                    <td class="fw-bold text-center">Oxygen Support</td>
+                                    {% for vital in vitals %}
+                                        <td class="text-center {% if vital.oxygen and vital.oxygen != '-' %}table-info{% endif %}">
+                                            {{ vital.oxygen|default:"-" }}
+                                        </td>
+                                    {% endfor %}
+                                </tr>
+                                <tr>
+                                    <td class="fw-bold text-center">Retraction</td>
+                                    {% for vital in vitals %}
+                                        <td class="text-center {% if vital.retraction %}table-danger{% endif %}">
+                                            {{ vital.retraction|yesno:"Yes,No"|default:"-" }}
+                                        </td>
+                                    {% endfor %}
+                                </tr>
+                                <!-- Section: Fluid Balance -->
+                                <tr class="table-info">
+                                    <td colspan="{{ vitals|length|add:1 }}" class="fw-bold bg-light border border-dark">
+                                        <i class="fas fa-tint me-2"></i>Fluid Balance
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-bold text-center">IV Fluids (ml)</td>
+                                    {% for vital in vitals %}
+                                        <td class="text-center {% if vital.iv_fluids >= 60 and vital.iv_fluids <= 150 %}table-success
+                                                   {% elif vital.iv_fluids < 60 %}table-danger
+                                                   {% elif vital.iv_fluids > 150 %}table-warning{% endif %}">
+                                            {{ vital.iv_fluids|default:"-" }}
+                                        </td>
+                                    {% endfor %}
+                                </tr>
+                                <tr>
+                                    <td class="fw-bold text-center">By Nasogastric (ml)</td>
+                                    {% for vital in vitals %}
+                                        <td class="text-center {% if vital.by_nasogastric >= 10 and vital.by_nasogastric <= 20 %}table-success
+                                                   {% elif vital.by_nasogastric < 10 %}table-danger{% endif %}">
+                                            {{ vital.by_nasogastric|default:"-" }}
+                                        </td>
+                                    {% endfor %}
+                                </tr>
+                                <tr>
+                                    <td class="fw-bold text-center">Oral (ml)</td>
+                                    {% for vital in vitals %}
+                                        <td class="text-center {% if vital.oral >= 10 and vital.oral <= 20 %}table-success
+                                                   {% elif vital.oral < 10 %}table-warning{% endif %}">
+                                            {{ vital.oral|default:"-" }}
+                                        </td>
+                                    {% endfor %}
+                                </tr>
+                                <tr>
+                                    <td class="fw-bold text-center">Breastfeeding</td>
+                                    {% for vital in vitals %}
+                                        <td class="text-center">{{ vital.breastfeeding|yesno:"Yes,No"|default:"-" }}</td>
+                                    {% endfor %}
+                                </tr>
+                                <!-- Section: Output -->
+                                <tr class="table-info">
+                                    <td colspan="{{ vitals|length|add:1 }}" class="fw-bold bg-light border border-dark">
+                                        <i class="fas fa-clipboard-check me-2"></i>Output
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-bold text-center">Urine</td>
+                                    {% for vital in vitals %}
+                                        <td class="text-center
+                                            {% if vital.urine_value is not None %}
+                                                {% if vital.urine_value >= 50 %}table-success
+                                                {% elif vital.urine_value >= 40 %}table-warning
+                                                {% else %}table-danger{% endif %}
+                                            {% elif vital.urine == 'Anuria' %}table-danger
+                                            {% elif vital.urine == 'Oliguria' %}table-warning
+                                            {% endif %}
+                                        ">
+                                            {% if vital.urine_value is not None %}
+                                                {{ vital.urine_value }} ml
+                                            {% elif vital.urine and vital.urine.strip != "" %}
+                                                {{ vital.urine }}
+                                            {% else %}
+                                                -
+                                            {% endif %}
+                                        </td>
+                                    {% endfor %}
+                                </tr>
+                                <tr>
+                                    <td class="fw-bold text-center">Stool</td>
+                                    {% for vital in vitals %}
+                                        <td class="text-center">{{ vital.stool|yesno:"Yes,No"|default:"-" }}</td>
+                                    {% endfor %}
+                                </tr>
+                                <tr>
+                                    <td class="fw-bold text-center">IFT (ml)</td>
+                                    {% for vital in vitals %}
+                                        <td class="text-center
+                                            {% if vital.ift >= 6 %}table-danger
+                                            {% elif vital.ift >= 4 %}table-warning
+                                            {% elif vital.ift >= 2 %}table-success
+                                            {% endif %}
+                                        ">
+                                            {{ vital.ift|default:"-" }}
+                                        </td>
+                                    {% endfor %}
+                                </tr>
+                                <tr>
+                                    <td class="fw-bold text-center">Vomiting</td>
+                                    {% for vital in vitals %}
+                                        <td class="text-center {% if vital.vomiting %}table-danger{% endif %}">
+                                            {{ vital.vomiting|yesno:"Yes,No"|default:"-" }}
+                                        </td>
+                                    {% endfor %}
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                {% endfor %}
                 <div class="text-center my-4">
                     <h2 class="fw-bold" style="border-bottom: 3px solid #000; display: inline-block; padding-bottom: 5px;">
-                        Fluid Input and Output by Time 
+                        Fluid Input and Output by Time and Date
                     </h2>
-                </div>                
-                <table class="table table-bordered table-hover table-striped">
-                    <thead class="table-dark">
-                        <tr>
-                            <th class="fw-bold text-center">Time Slot</th>
-                            <th class="fw-bold text-center">Total Fluid Input (ml)</th>
-                            <th class="fw-bold text-center">Total Fluid Output (ml)</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for group, data in fluid_totals.items %}
-                        <tr>
-                            <td class="text-center">{{ group }}</td>
-                            <td class="text-center">{{ data.input }}</td>
-                            <td class="text-center">{{ data.output }}</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+                </div>
+        
+                <div class="d-flex flex-wrap justify-content-start">
+                    {% for date, totals in fluid_totals.items %}
+                        <div class="me-4 mb-4 date-table-container" style="flex: 1 1 300px;"> <!-- Adjust flex properties as needed -->
+                            <h3 class="fw-bold mt-4 text-center background-grayish">Date: {{ date }}</h3>
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-hover table-striped">
+                                    <thead class="table-dark">
+                                        <tr>
+                                            <th class="fw-bold text-center">Time Slot</th>
+                                            <th class="fw-bold text-center">Total Fluid Input (ml)</th>
+                                            <th class="fw-bold text-center">Total Fluid Output (ml)</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for group, data in totals.items %}
+                                        <tr>
+                                            <td class="text-center">{{ group }}</td>
+                                            <td class="text-center">{{ data.input }}</td>
+                                            <td class="text-center">{{ data.output }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
             </div>
         </div>
     </div>
 </div>
+<style>
+    .date-table-container {
+        border: 2px solid #ddd;
+        border-radius: 8px;
+        padding: 15px;
+        margin-bottom: 20px;
+        background-color: #f9f9f9;
+    }
 
+    .date-table-container h3 {
+        background-color: #e9ecef;
+        padding: 10px;
+        border-radius: 5px;
+        margin-bottom: 15px;
+    }
+
+    .date-table-container .table {
+        margin-bottom: 0;
+    }
+
+    .date-table-container .table thead th {
+        background-color: #343a40;
+        color: white;
+    }
+
+    .date-table-container .table tbody tr:hover {
+        background-color: #f1f1f1;
+    }
+</style>
 <!-- Include html2canvas for downloading the chart as an image -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script>
@@ -341,45 +472,13 @@
         border: 1px solid #dee2e6; /* Ensure borders are consistent */
     }
 </style>
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        let timeSlots = document.querySelectorAll("thead tr:nth-child(2) th.text-center");
-        let dayHeaderRow = document.getElementById("day-header");
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<!-- Add Bootstrap CSS in <head> -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
-        let currentDay = 1;
-        let prevTime = null;
-        let startIndex = 0;
+<!-- Add Bootstrap JS (must be before closing </body>) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-        timeSlots.forEach((slot, index) => {
-            let timeText = slot.innerText.trim();
-            let time = new Date("1970-01-01T" + timeText + ":00"); // Convert to Date object
-
-            if (prevTime === null) {
-                prevTime = time;
-            }
-
-            // Check if new day starts (8 AM to next day 6 AM)
-            if ((prevTime.getHours() < 8 && time.getHours() >= 8) || (prevTime.getHours() >= 6 && time.getHours() < 8)) {
-                let th = document.createElement("th");
-                th.className = "text-center bg-primary text-white";
-                th.innerText = "Day " + currentDay;
-                th.colSpan = index - startIndex; // Merge columns
-                dayHeaderRow.appendChild(th);
-                startIndex = index; // Update new day start index
-                currentDay++;
-            }
-
-            prevTime = time;
-        });
-
-        // Add last day column span
-        let th = document.createElement("th");
-        th.className = "text-center bg-primary text-white";
-        th.innerText = "Day " + currentDay;
-        th.colSpan = timeSlots.length - startIndex;
-        dayHeaderRow.appendChild(th);
-    });
-</script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
     function fetchVitalsData() {
@@ -434,5 +533,99 @@
         setInterval(fetchVitalsData, 5000); // Refresh every 5 seconds
     });
 </script>
+ <!-- JavaScript for Chart Generation -->
+ <script>
+    let temperatureChartInstance = null;
+    let respiratoryRateChartInstance = null;
+    let pulseRateChartInstance = null;
 
-{% endblock %}
+    function generateTemperatureChart(data, labels) {
+        const ctx = document.getElementById('temperatureChart').getContext('2d');
+        if (temperatureChartInstance) {
+            temperatureChartInstance.destroy(); // Destroy existing chart instance
+        }
+        temperatureChartInstance = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Temperature (°F)',
+                    data: data,
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: false
+                    }
+                }
+            }
+        });
+    }
+
+    function generateRespiratoryRateChart(data, labels) {
+        const ctx = document.getElementById('respiratoryRateChart').getContext('2d');
+        if (respiratoryRateChartInstance) {
+            respiratoryRateChartInstance.destroy(); // Destroy existing chart instance
+        }
+        respiratoryRateChartInstance = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Respiratory Rate (b/min)',
+                    data: data,
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    }
+
+    function generatePulseRateChart(data, labels) {
+        const ctx = document.getElementById('pulseRateChart').getContext('2d');
+        if (pulseRateChartInstance) {
+            pulseRateChartInstance.destroy(); // Destroy existing chart instance
+        }
+        pulseRateChartInstance = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Pulse Rate (b/min)',
+                    data: data,
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    }
+</script>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<!-- Bootstrap CSS -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</body>
+</html>

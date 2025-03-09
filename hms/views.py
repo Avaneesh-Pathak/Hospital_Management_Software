@@ -1496,6 +1496,7 @@ def add_nicu_vitals(request, ipd_id):
 
     TIME_SLOTS = [
         ("08:00", "08 AM"),
+        # ("09:00", "09 AM"),
         ("10:00", "10 AM"),
         ("12:00", "12 PM"),
         ("14:00", "2 PM"),
@@ -1590,13 +1591,14 @@ def add_nicu_vitals(request, ipd_id):
 
 from django.http import JsonResponse
 from django.utils.timezone import localtime
-
+from itertools import groupby
+from operator import attrgetter
 @login_required
 def view_nicu_vitals(request, ipd_id):
     ipd = get_object_or_404(IPD, id=ipd_id)
     vitals_list = NICUVitals.objects.filter(ipd=ipd).order_by('-date')
     fluid_totals = calculate_total_fluids(vitals_list)
-
+    grouped_vitals = {date: list(group) for date, group in groupby(vitals_list, key=attrgetter('date'))}
     patient = ipd.patient
     age = patient.age
     weight = patient.weight
@@ -1626,20 +1628,28 @@ def view_nicu_vitals(request, ipd_id):
             for vital in vitals_list
         ]
         return JsonResponse({"vitals": vitals_data, "fluid_totals": fluid_totals, "age": age, "weight": weight})
-
+    
     return render(request, 'hms/vitals/view_vitals.html', {
         'vitals_list': vitals_list,
         'ipd': ipd,
         'fluid_totals': fluid_totals,
         'age': age,
         'weight': weight,
+        'grouped_vitals':grouped_vitals
     })
 
 
 
+from collections import defaultdict
+from datetime import datetime
+
+from collections import defaultdict
+
+from collections import defaultdict
+
 def calculate_total_fluids(vitals_list):
     """
-    Calculate total input and output of fluids in specific time groups.
+    Calculate total input and output of fluids in specific time groups, grouped by date.
     """
     time_groups = {
         "Morning (08 AM - 12 PM)": ["08:00", "10:00", "12:00"],
@@ -1648,18 +1658,23 @@ def calculate_total_fluids(vitals_list):
         "Early Morning (02 AM - 06 AM)": ["02:00", "04:00", "06:00"],
     }
 
-    totals = {group: {"input": 0, "output": 0} for group in time_groups}
+    # Group vitals by date
+    date_wise_totals = defaultdict(lambda: {group: {"input": 0, "output": 0} for group in time_groups})
 
     for vital in vitals_list:
-        time_str = vital.time.strftime("%H:%M")
+        date_str = vital.date.strftime("%Y-%m-%d")  # Extract the date
+        time_str = vital.time.strftime("%H:%M")  # Extract the time
+
+        # Find the time group for the current vital
         for group, times in time_groups.items():
             if time_str in times:
-                totals[group]["input"] += (vital.iv_fluids or 0) + (vital.by_nasogastric or 0) + (vital.oral or 0) + (vital.ift or 0)
-                totals[group]["output"] += vital.urine_value or 0
+                # Calculate input and output for the current time group and date
+                date_wise_totals[date_str][group]["input"] += (
+                    (vital.iv_fluids or 0) + 
+                    (vital.by_nasogastric or 0) + 
+                    (vital.oral or 0) + 
+                    (vital.ift or 0)
+                )
+                date_wise_totals[date_str][group]["output"] += vital.urine_value or 0
 
-    return totals
-
-
-
-
-
+    return dict(date_wise_totals)  # Convert defaultdict to a regular dictionary

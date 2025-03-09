@@ -25,7 +25,7 @@
                 {% csrf_token %}
                 
                 <div class="table-responsive">
-                    <table class="table table-bordered table-hover">
+                    <table class="table table-bordered table-hover" id="vitalsTable">
                         <thead class="table-light">
                             <tr>
                                 <th class="fw-bold">Vitals</th>
@@ -52,7 +52,8 @@
                                                        placeholder="Enter {{ field_name|title }}" 
                                                        aria-label="{{ field_name|title }}"
                                                        data-bs-toggle="tooltip" data-bs-placement="top" 
-                                                       title="Enter {{ field_name|title }} in appropriate units">
+                                                       title="Enter {{ field_name|title }} in appropriate units"
+                                                       data-row="{{ forloop.parentloop.counter0 }}" data-col="{{ forloop.counter0 }}">
                                             {% endwith %}
                                         </td>
                                     {% endfor %}
@@ -70,7 +71,8 @@
                                 {% for time, label in time_slots %}
                                     <td>
                                         {% with "skin_color"|add:","|add:time as key %}
-                                            <select class="form-select" name="skin_color_{{ time }}" aria-label="Skin Color">
+                                            <select class="form-select" name="skin_color_{{ time }}" aria-label="Skin Color" 
+                                                    data-row="{{ numeric_fields|length }}" data-col="{{ forloop.counter0 }}">
                                                 {% for value, display in skin_color_choices %}
                                                     <option value="{{ value }}" {% if existing_vitals_dict|get_vital:key == value %}selected{% endif %}>
                                                         {{ display }}
@@ -93,7 +95,8 @@
                                 {% for time, label in time_slots %}
                                     <td>
                                         <!-- Urine Dropdown -->
-                                        <select name="urine_{{ time }}" class="urine-select form-select" data-time="{{ time }}">
+                                        <select name="urine_{{ time }}" class="urine-select form-select" data-time="{{ time }}" 
+                                                data-row="{{ numeric_fields|length|add:1 }}" data-col="{{ forloop.counter0 }}">
                                             {% for value, text in urine_choices %}
                                                 <option value="{{ value }}" 
                                                     {% if existing_vitals_dict|get_vital:time and existing_vitals_dict|get_vital:time.urine == value %}selected{% endif %}>
@@ -111,7 +114,8 @@
                                                style="display: {% if existing_vitals_dict|get_vital:time and existing_vitals_dict|get_vital:time.urine == 'ml' %}block{% else %}none{% endif %};" 
                                                step="0.1" 
                                                min="0"
-                                               value="{% if existing_vitals_dict|get_vital:time and existing_vitals_dict|get_vital:time.urine_value %}{{ existing_vitals_dict|get_vital:time.urine_value }}{% endif %}">
+                                               value="{% if existing_vitals_dict|get_vital:time and existing_vitals_dict|get_vital:time.urine_value %}{{ existing_vitals_dict|get_vital:time.urine_value }}{% endif %}"
+                                               data-row="{{ numeric_fields|length|add:1 }}" data-col="{{ forloop.counter0 }}">
                                     </td>
                                 {% endfor %}
                             </tr>
@@ -130,7 +134,8 @@
                                             {% with field_name|add:","|add:time as key %}
                                                 <div class="form-check form-switch">
                                                     <input type="checkbox" class="form-check-input" name="{{ field_name }}_{{ time }}" 
-                                                           {% if existing_vitals_dict|get_vital:key %}checked{% endif %}>
+                                                           {% if existing_vitals_dict|get_vital:key %}checked{% endif %}
+                                                           data-row="{{ numeric_fields|length|add:2|add:forloop.parentloop.counter0 }}" data-col="{{ forloop.counter0 }}">
                                                 </div>
                                             {% endwith %}
                                         </td>
@@ -191,6 +196,41 @@
                     inputBox.style.display = "none";  // Hide otherwise
                     inputBox.value = "";  // Clear value when hidden
                     inputBox.required = false;
+                }
+            });
+        });
+    });   
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const table = document.getElementById('vitalsTable');
+        const inputs = table.querySelectorAll('input, select');
+    
+        inputs.forEach(input => {
+            input.addEventListener('keydown', function (e) {
+                if (e.key === 'Tab') {
+                    e.preventDefault(); // Prevent default tab behavior
+    
+                    const currentRow = parseInt(input.getAttribute('data-row'));
+                    const currentCol = parseInt(input.getAttribute('data-col'));
+    
+                    // Find the next input in the same column
+                    let nextRow = currentRow + 1;
+                    let nextInput = table.querySelector(`input[data-row="${nextRow}"][data-col="${currentCol}"], 
+                                                         select[data-row="${nextRow}"][data-col="${currentCol}"]`);
+    
+                    // If no next input in the same column, move to the next column
+                    if (!nextInput) {
+                        nextRow = 0;
+                        nextCol = currentCol + 1;
+                        nextInput = table.querySelector(`input[data-row="${nextRow}"][data-col="${nextCol}"], 
+                                                         select[data-row="${nextRow}"][data-col="${nextCol}"]`);
+                    }
+    
+                    if (nextInput) {
+                        nextInput.focus();
+                    }
                 }
             });
         });
