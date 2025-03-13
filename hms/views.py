@@ -11,6 +11,7 @@ from django.utils import timezone
 from reportlab.pdfgen import canvas
 from django.http import JsonResponse
 from django.http import FileResponse
+from django.urls import reverse_lazy
 from django.http import HttpResponse
 from reportlab.pdfgen import canvas
 from django.shortcuts import render
@@ -30,14 +31,15 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
 from django.shortcuts import render, redirect,get_object_or_404
+from django.views.generic import ListView, CreateView, UpdateView
 from .models import (
     CustomUser, Patient, Doctor, Appointment, Billing, EmergencyCase, OPD, IPD, Expense, Employee, Room, PatientReport,Prescription,
-    License,Asset,Maintenance,AccountingRecord,Daybook,Balance,PatientTransfer,NICUVitals
+    License,Asset,Maintenance,AccountingRecord,Daybook,Balance,PatientTransfer,NICUVitals,NICUMedicationRecord
     
 )
 from .forms import (
     PatientRegistrationForm, ExpenseForm, BillingForm, OPDForm, DoctorForm, EmployeeForm, RoomForm, EmergencyCaseForm, ProfileUpdateForm,PatientReportForm,
-    PrescriptionForm,LicenseForm,AssetForm,MaintenanceForm,BalanceUpdateForm,DaybookEntryForm,NICUVitalsForm
+    PrescriptionForm,LicenseForm,AssetForm,MaintenanceForm,BalanceUpdateForm,DaybookEntryForm,NICUVitalsForm,NICUMedicationRecordForm
 )
 
 logger = logging.getLogger(__name__)
@@ -227,14 +229,14 @@ def patients(request):
     logger.info("Fetching all patients.")
     patients = Patient.objects.all()
     logger.info(f"Total patients retrieved: {len(patients)}")
-    return render(request, 'hms/patients.html', {'patients': patients})
+    return render(request, 'hms/patient/patients.html', {'patients': patients})
 
 @login_required
 def patient_detail(request, patient_code):
     logger.info(f"Fetching details for patient with code: {patient_code}")
     patient = get_object_or_404(Patient, patient_code=patient_code)
     logger.info(f"Patient found: {patient.user.full_name}")
-    return render(request, 'hms/patient_detail.html', {'patient': patient})
+    return render(request, 'hms/patient/patient_detail.html', {'patient': patient})
 
 @login_required
 def patient_profile(request, patient_code):
@@ -254,7 +256,7 @@ def patient_profile(request, patient_code):
         'reports': reports,
         'profile_picture': patient.profile_picture.url if patient.profile_picture else None  # Ensuring profile picture is included
     }
-    return render(request, 'hms/patient_profile.html', context)
+    return render(request, 'hms/patient/patient_profile.html', context)
 
 
 @login_required
@@ -272,7 +274,7 @@ def upload_patient_report(request, patient_code):
         form = PatientReportForm()
 
     context = {'form': form, 'patient': patient}
-    return render(request, 'hms/upload_patient_report.html', context)
+    return render(request, 'hms/patient/upload_patient_report.html', context)
 
 
 @login_required
@@ -333,7 +335,7 @@ def register_patient(request):
     else:
         form = PatientRegistrationForm()
 
-    return render(request, 'hms/register_patient.html', {'form': form})
+    return render(request, 'hms/patient/register_patient.html', {'form': form})
 
 
 @login_required
@@ -742,18 +744,36 @@ def ipd(request):
     room = Room.objects.all()
     return render(request, 'hms/ipd/ipd.html', {'ipds': ipds,'room':room})
 
+# def get_ipd_data(request):
+    # ipds = IPD.objects.all().values(
+    #     'id',
+    #     'patient__user__full_name', 
+    #     'room__room_number',
+    #     'patient__patient_code',
+    #     'calculate_total_cost',  # ✅ Get the room number
+    #     'bed_number',         # ✅ Get the bed number
+    #     'admitted_on', 
+    #     'reason_for_admission'
+    # )
+    # return JsonResponse(list(ipds), safe=False)
+
 def get_ipd_data(request):
-    ipds = IPD.objects.all().values(
-        'id',
-        'patient__user__full_name', 
-        'room__room_number',
-        'patient__patient_code',
-        'total_cost',  # ✅ Get the room number
-        'bed_number',         # ✅ Get the bed number
-        'admitted_on', 
-        'reason_for_admission'
-    )
-    return JsonResponse(list(ipds), safe=False)
+    ipds = IPD.objects.all()
+
+    ipd_data = []
+    for ipd in ipds:
+        ipd_data.append({
+            'id': ipd.id,
+            'patient__user__full_name': ipd.patient.user.full_name,
+            'room__room_number': ipd.room.room_number if ipd.room else "N/A",
+            'patient_code': ipd.patient.patient_code,
+            'bed_number': ipd.bed_number,
+            'admitted_on': ipd.admitted_on.strftime('%Y-%m-%d %H:%M:%S'),  
+            'reason_for_admission': ipd.reason_for_admission,
+            'total_cost': float(ipd.calculate_total_cost()),  # ✅ Call the method and convert it
+        })
+
+    return JsonResponse(ipd_data, safe=False)
 
 # ✅ View IPD Report
 def view_ipd_report(request, ipd_id):
@@ -1510,7 +1530,7 @@ def add_nicu_vitals(request, ipd_id):
         ("06:00", "6 AM"),
     ]
     URINE_CHOICES = [('', ''), ('nil', 'Nil'), ('ml', 'ML')]
-    numeric_fields = ['temperature', 'respiratory_rate', 'pulse_rate', 'cft', 'spo2', 'oxygen', 'iv_fluids', 'by_nasogastric', 'oral', 'ift']
+    numeric_fields = ['temperature (°F)', 'respiratory_rate(b/min)', 'pulse_rate(b/min)', 'cft(sec)', 'spo2 %', 'oxygen (lit./min)', 'iv_fluids(ml)', 'by_nasogastric (ml)', 'oral(ml) Katori & Spoon', 'ift(ML)']
     boolean_fields = ['seizure', 'retraction', 'breastfeeding', 'stool', 'vomiting']
     dropdown_fields = ['skin_color', 'urine']  # Adding skin_color dropdown field
 
@@ -1678,3 +1698,153 @@ def calculate_total_fluids(vitals_list):
                 date_wise_totals[date_str][group]["output"] += vital.urine_value or 0
 
     return dict(date_wise_totals)  # Convert defaultdict to a regular dictionary
+
+
+
+
+class NICUMedicationRecordListView(ListView):
+    model = NICUMedicationRecord
+    template_name = "hms/nicumedication/nicu_medication_list.html"
+    context_object_name = "medications"
+
+    def get_queryset(self):
+        ipd_id = self.kwargs.get("ipd_id")
+        return NICUMedicationRecord.objects.filter(ipd_admission_id=ipd_id)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        ipd_id = self.kwargs.get("ipd_id")
+
+        # Fetch the first medication record (if exists)
+        medications = context["medications"]
+        first_medication = medications.first() if medications.exists() else None
+
+        # Fetch the patient associated with the IPD admission
+        patient = None
+        if first_medication:
+            patient = first_medication.patient
+        else:
+            # If no medication records exist, fetch the patient directly from the IPD admission
+            try:
+                patient = Patient.objects.get(ipd__id=ipd_id)
+            except Patient.DoesNotExist:
+                patient = None
+
+        # Add patient details to the context
+        context["patient"] = patient
+        context["patient_name"] = patient.user.full_name if patient else "Unknown Patient"
+        context["ipd_id"] = ipd_id  # Pass IPD ID for 'Add Medication' button
+        return context
+
+
+class NICUMedicationRecordCreateView(CreateView):
+    model = NICUMedicationRecord
+    form_class = NICUMedicationRecordForm
+    template_name = "hms/nicumedication/nicu_medication_form.html"
+
+    def get_success_url(self):
+        return reverse_lazy("nicu_medication_list", kwargs={"ipd_id": self.kwargs["ipd_id"]})
+
+    def get_initial(self):
+        ipd = get_object_or_404(IPD, id=self.kwargs["ipd_id"])
+        return {"ipd_admission": ipd, "patient": ipd.patient}
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["ipd_id"] = self.kwargs["ipd_id"]  # Pass IPD ID explicitly for the template
+        return context
+
+    def form_valid(self, form):
+        ipd = get_object_or_404(IPD, id=self.kwargs["ipd_id"])
+        form.instance.ipd_admission = ipd
+        form.instance.patient = ipd.patient
+        return super().form_valid(form)
+
+
+from django.urls import reverse_lazy, reverse
+
+class NICUMedicationRecordUpdateView(UpdateView):
+    model = NICUMedicationRecord
+    form_class = NICUMedicationRecordForm
+    template_name = "hms/nicumedication/nicu_medication_form.html"
+
+    def get_success_url(self):
+        ipd_id = self.object.ipd_admission.id  # Ensure NICUMedicationRecord has a ForeignKey to IPD
+        return reverse("nicu_medication_list", kwargs={"ipd_id": ipd_id})
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["ipd_id"] = self.object.ipd_admission.id  # Pass ipd_id to the template
+        return context
+
+
+def delete_nicu_medication(request, pk):
+    record = get_object_or_404(NICUMedicationRecord, pk=pk)
+    ipd_id = record.ipd_admission.id  # Get the related IPD admission ID
+
+    if request.method == "POST":
+        record.delete()
+        return redirect("nicu_medication_list", ipd_id=ipd_id)  # Pass ipd_id to the URL
+
+    return render(request, "hms/nicumedication/nicu_medication_confirm_delete.html", {"record": record})
+
+
+
+
+
+
+
+
+
+from django.shortcuts import render, redirect, get_object_or_404
+from .models import Medicine, Diluent
+from .forms import MedicineForm, DiluentForm
+
+def manage_medicine_diluent(request):
+    medicine_form = MedicineForm()
+    diluent_form = DiluentForm()
+    medicines = Medicine.objects.all()
+    diluents = Diluent.objects.all()
+
+    if request.method == "POST":
+        if "add_medicine" in request.POST:
+            print("POST Data:", request.POST)
+            medicine_form = MedicineForm(request.POST)
+            if medicine_form.is_valid():
+                medicine_form.save()
+                messages.success(request, "Medicine added successfully!")
+                return redirect('manage_medicine_diluent')
+            else:
+                print("Medicine Form Errors:", medicine_form.errors)  # Debugging
+                messages.error(request, "Failed to add medicine. Please check the form for errors.")
+
+        elif "add_diluent" in request.POST:
+            diluent_form = DiluentForm(request.POST)
+            if diluent_form.is_valid():
+                diluent_form.save()
+                messages.success(request, "Diluent added successfully!")
+                return redirect('manage_medicine_diluent')
+            else:
+                print("Diluent Form Errors:", diluent_form.errors)  # Debugging
+                messages.error(request, "Failed to add diluent. Please check the form for errors.")
+
+    context = {
+        'medicine_form': medicine_form,
+        'diluent_form': diluent_form,
+        'medicines': medicines,
+        'diluents': diluents
+    }
+    return render(request, 'hms/medice_&_diluent/add_medicine_diluent.html', context)
+
+
+
+def delete_medicine(request, pk):
+    medicine = get_object_or_404(Medicine, pk=pk)
+    medicine.delete()
+    return redirect('manage_medicine_diluent')
+
+
+def delete_diluent(request, pk):
+    diluent = get_object_or_404(Diluent, pk=pk)
+    diluent.delete()
+    return redirect('manage_medicine_diluent')

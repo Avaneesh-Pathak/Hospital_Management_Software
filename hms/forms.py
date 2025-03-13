@@ -1,7 +1,7 @@
 from django import forms
 from django.utils import timezone
 from django.core.exceptions import ValidationError
-from .models import CustomUser,NICUVitals, Patient,Billing,Expense,OPD,Room, Doctor, Employee,EmergencyCase,PatientReport,Prescription,License,Asset,Maintenance,Daybook
+from .models import CustomUser,NICUVitals, Patient,Billing,Expense,OPD,Room, Doctor, Employee,EmergencyCase,PatientReport,Prescription,License,Asset,Maintenance,Daybook,NICUMedicationRecord,Medicine, Diluent
 
 class ProfileUpdateForm(forms.ModelForm):
     class Meta:
@@ -281,8 +281,6 @@ class BalanceUpdateForm(forms.Form):
     action = forms.ChoiceField(choices=ACTION_CHOICES, required=True)
     amount = forms.DecimalField(max_digits=10, decimal_places=2, required=True)
 
-    
-
 
 
 
@@ -317,6 +315,58 @@ class NICUVitalsForm(forms.ModelForm):
 
 
 
+class NICUMedicationRecordForm(forms.ModelForm):
+    class Meta:
+        model = NICUMedicationRecord
+        fields = [
+            "route", "medicine", "diluent", "dose_frequency", 
+            "other_frequency", "dilution_volume", "duration", "sign"
+        ]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # Placeholder for dilution volume
+        self.fields["dilution_volume"].widget.attrs["placeholder"] = "Enter custom dilution volume in mL"
+
+        # Hide 'other_frequency' field initially
+        self.fields["other_frequency"].widget.attrs.update({
+            "placeholder": "Specify custom frequency",
+            "style": "display: none;",
+        })
 
 
 
+
+class MedicineForm(forms.ModelForm):
+    class Meta:
+        model = Medicine
+        fields = ["name", "medicine_type", "standard_dose_per_kg"]
+        widgets = {
+            "medicine_type": forms.Select(choices=Medicine.MEDICINE_TYPE_CHOICES, attrs={"class": "form-control"}),
+            "standard_dose_per_kg": forms.NumberInput(attrs={"class": "form-control", "step": "0.01"}),
+        }
+        labels = {
+            "name": "Medicine Name",
+            "medicine_type": "Type of Medicine",
+            "standard_dose_per_kg": "Standard Dose (mg/kg/dose)",
+        }
+
+class DiluentForm(forms.ModelForm):
+    compatible_medicine_types = forms.ModelMultipleChoiceField(
+        queryset=Medicine.objects.all(),
+        widget=forms.CheckboxSelectMultiple,
+        required=False,
+        label="Compatible Medicine Types",
+    )
+
+    class Meta:
+        model = Diluent
+        fields = ["name", "compatible_medicine_types", "standard_volume_per_kg"]
+        widgets = {
+            "standard_volume_per_kg": forms.NumberInput(attrs={"class": "form-control", "step": "0.01"}),
+        }
+        labels = {
+            "name": "Diluent Name",
+            "standard_volume_per_kg": "Standard Volume (mL/kg/dose)",
+        }

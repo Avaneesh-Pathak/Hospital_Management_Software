@@ -315,31 +315,31 @@ class Room(models.Model):
 
 # IPD Model
 class IPD(models.Model):
-    patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
+    patient = models.ForeignKey("Patient", on_delete=models.CASCADE)
     room = models.ForeignKey(Room, on_delete=models.CASCADE, limit_choices_to={'is_available': True}, null=True, blank=True)
     admitted_on = models.DateTimeField(auto_now_add=True)
     discharge_date = models.DateTimeField(null=True, blank=True)
     reason_for_admission = models.TextField(null=True, blank=True)
     bed_number = models.IntegerField(null=True, blank=True)
     bed_price_per_day = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
-    total_cost = models.DecimalField(max_digits=10, decimal_places=2, default=0.00, editable=False)  # Total cost of the stay
-    transferred_to_hospital = models.CharField(max_length=255, null=True, blank=True)  # New field for transfer to another hospital
+    total_cost = models.DecimalField(max_digits=10, decimal_places=2, default=0.00, editable=False)
 
     def save(self, *args, **kwargs):
-        """Mark room as unavailable when a patient is admitted and assign bed price."""
+        """Automatically calculate total cost before saving."""
         if self.room and not self.bed_price_per_day:
             self.bed_price_per_day = self.room.bed_price_per_day  # Assign bed price from the room
-
-        if self.room:
-            self.room.is_available = False
-            self.room.save()
+        
+        self.calculate_total_cost()
 
         super().save(*args, **kwargs)
 
     def calculate_total_cost(self):
-        """Calculate the total cost of the stay based on the duration and bed price."""
-        if self.discharge_date and self.admitted_on and self.bed_price_per_day:
-            stay_duration = (self.discharge_date - self.admitted_on).days
+        """Calculate the total cost based on the duration and bed price."""
+        if self.admitted_on and self.bed_price_per_day:
+            end_date = self.discharge_date or timezone.now()
+            stay_duration = (end_date - self.admitted_on).days
+            if stay_duration == 0:
+                stay_duration = 1  # Ensure at least one day's charge
             self.total_cost = self.bed_price_per_day * stay_duration
         return self.total_cost
 
@@ -349,12 +349,12 @@ class IPD(models.Model):
             self.discharge_date = timezone.now()
 
         # Calculate total cost
-        self.total_cost = self.calculate_total_cost()
+        self.calculate_total_cost()
 
         # Mark room and bed as available
         if self.room:
-            self.room.discharge_patient_from_bed(self.bed_number)  # Mark the bed as available
-            self.room.update_availability()  # Update room availability
+            self.room.discharge_patient_from_bed(self.bed_number)
+            self.room.update_availability()
             self.room.save()
 
         # Save the IPD record
@@ -372,9 +372,7 @@ class IPD(models.Model):
             )
 
     def transfer_to_other_hospital(self, hospital_name):
-        """
-        Transfer the patient to another hospital and mark the current bed as available.
-        """
+        """Transfer the patient to another hospital and mark the current bed as available."""
         if not hospital_name:
             raise ValueError("Hospital name is required for transfer.")
 
@@ -386,14 +384,11 @@ class IPD(models.Model):
 
         # Update the IPD record
         self.transferred_to_hospital = hospital_name
-        self.discharge_date = timezone.now()  # Mark as discharged
+        self.discharge_date = timezone.now()
         self.save()
 
     def change_bed(self, new_room, new_bed_number):
-        """
-        Change the patient's bed to a new bed in a new or same room.
-        Mark the previous bed as available.
-        """
+        """Change the patient's bed to a new bed in a new or same room."""
         if not new_room.is_available:
             raise ValueError("The new room is not available.")
 
@@ -763,3 +758,117 @@ class AccountingRecord(models.Model):
 
     class Meta:
         ordering = ['-date']
+
+
+class Medicine(models.Model):
+    MEDICINE_TYPE_CHOICES = [
+        ("syrup", "Syrup"),
+        ("injection", "Injection"),
+        ("tablet", "Tablet"),
+        ("drop", "Drop"),
+        ("suspension", "Suspension"),
+        ("other", "Other"),
+    ]
+
+    name = models.CharField(max_length=100, unique=True)
+    medicine_type = models.CharField(max_length=20, choices=MEDICINE_TYPE_CHOICES, default="other")
+    standard_dose_per_kg = models.FloatField(help_text="Standard dose per kg for neonates (mg/kg)")
+
+    def __str__(self):
+        return f"{self.name} ({self.get_medicine_type_display()})"
+
+class Diluent(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+    compatible_medicine_types = models.ManyToManyField(Medicine, related_name="compatible_diluents", blank=True)
+    standard_volume_per_kg = models.FloatField(help_text="Standard diluent volume per kg (mL/kg)")
+
+    def __str__(self):
+        return self.name
+
+class NICUMedicationRecord(models.Model):
+    ROUTE_CHOICES = [
+        ("IV", "Intravenous (IV)"),
+        ("IM", "Intramuscular (IM)"),
+        ("SC", "Subcutaneous (SC)"),
+        ("PO", "Oral (PO)"),
+    ]
+
+    DOSE_FREQUENCY_CHOICES = [
+        ("OD", "Once a day (OD)"),
+        ("BD", "Twice a day (BD)"),
+        ("TDS", "Three times a day (TDS)"),
+        ("QID", "Four times a day (QID)"),
+        ("SOS", "As needed (SOS)"),
+        ("STAT", "Immediately (STAT)"),
+        ("OTHER", "Other"),
+    ]
+
+    patient = models.ForeignKey("Patient", on_delete=models.CASCADE)
+    ipd_admission = models.ForeignKey("IPD", on_delete=models.CASCADE, related_name="nicu_medications", null=True)
+    route = models.CharField(max_length=10, choices=ROUTE_CHOICES)
+    medicine = models.ForeignKey(Medicine, on_delete=models.CASCADE)
+    diluent = models.ForeignKey(Diluent, on_delete=models.SET_NULL, null=True, blank=True)
+
+    dilution_volume = models.FloatField(help_text="User-defined dilution volume (mL)", null=True, blank=True)
+
+    calculated_dose = models.FloatField(editable=False, help_text="Calculated dose (mg)")
+    calculated_diluent_volume = models.FloatField(editable=False, help_text="Calculated diluent volume (mL)")
+    calculated_infusion_rate = models.FloatField(editable=False, help_text="Calculated infusion rate (mL/hr)")
+
+    duration = models.FloatField(help_text="Duration of administration (hours)")
+    dose_frequency = models.CharField(max_length=10, choices=DOSE_FREQUENCY_CHOICES, default="OD", help_text="Select dose frequency")
+    other_frequency = models.CharField(max_length=100, blank=True, null=True, help_text="Specify if 'Other' is selected")
+
+    sign = models.CharField(max_length=100, help_text="Doctor's Signature")
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    def clean(self):
+        """
+        Validate inputs before saving.
+        """
+        if not self.patient:
+            raise ValidationError("Patient information is required.")
+
+        if not self.patient.weight or self.patient.weight <= 0:
+            raise ValidationError("Patient weight must be provided and greater than zero.")
+
+        if not self.medicine:
+            raise ValidationError("Medicine must be selected.")
+
+        if self.diluent and not self.dilution_volume and not self.diluent.standard_volume_per_kg:
+            raise ValidationError("Either dilution volume or standard diluent volume must be provided.")
+
+    def save(self, *args, **kwargs):
+        """
+        Perform calculations before saving.
+        """
+        self.clean()  # Validate inputs
+
+        patient_weight = self.patient.weight
+
+        # **Calculate Dose (mg)**
+        if self.medicine.standard_dose_per_kg is not None:
+            self.calculated_dose = round(patient_weight * self.medicine.standard_dose_per_kg, 2)
+        else:
+            self.calculated_dose = 0  # Default if missing data
+
+        # **Calculate Diluent Volume**
+        if self.dilution_volume is not None:
+            self.calculated_diluent_volume = round(self.dilution_volume, 2)
+        elif self.diluent and self.diluent.standard_volume_per_kg is not None:
+            self.calculated_diluent_volume = round(patient_weight * self.diluent.standard_volume_per_kg, 2)
+        else:
+            self.calculated_diluent_volume = 0  # Default if missing data
+
+        # **Calculate Infusion Rate**
+        if self.duration and self.duration > 0 and self.calculated_diluent_volume > 0:
+            self.calculated_infusion_rate = round(self.calculated_diluent_volume / self.duration, 2)
+        else:
+            self.calculated_infusion_rate = 0
+
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f"{self.medicine.name} ({self.get_route_display()}) - {self.timestamp}"
+
+

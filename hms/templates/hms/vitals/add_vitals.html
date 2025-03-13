@@ -41,6 +41,23 @@
                                     <i class="fas fa-thermometer-half me-2"></i>Vitals
                                 </td>
                             </tr>
+                            <tr>
+                                <td class="fw-bold">Temperature (°F)</td>
+                                {% for time, label in time_slots %}
+                                    <td>                            
+                                            {% with "temperature"|add:"_"|add:time as key %}
+                                                <input type="number" class="form-control" name="field_value"
+                                                       value="{{ existing_vitals_dict|get_vital:key|default:'' }}" step="0.1"
+                                                       placeholder="Enter Temperature"
+                                                       aria-label="Temperature (°F)"
+                                                       data-bs-toggle="tooltip" data-bs-placement="top"
+                                                       title="Enter Temperature in Fahrenheit"
+                                                       data-row="{{ forloop.parentloop.counter0 }}" data-col="{{ forloop.counter0 }}">
+                                            {% endwith %}
+                                    </td>
+                                {% endfor %}
+                            </tr>
+                            
                             {% for field_name in numeric_fields %}
                                 <tr>
                                     <td class="fw-bold">{{ field_name|title }}</td>
@@ -87,7 +104,7 @@
                             <!-- Section: Fluid Balance -->
                             <tr class="table-info">
                                 <td colspan="{{ time_slots|length|add:1 }}" class="fw-bold text-center bg-light">
-                                    <i class="fas fa-tint me-2"></i>Fluid Balance
+                                    <i class="fas fa-tint me-2"></i>Fluid Balance (Record Volumes and Times)
                                 </td>
                             </tr>
                             <tr>

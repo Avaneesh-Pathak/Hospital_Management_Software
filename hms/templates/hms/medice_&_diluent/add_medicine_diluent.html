@@ -1,0 +1,225 @@
+{% extends 'hms/base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="text-center mb-4">Manage Medicine & Diluent</h2>
+
+    <!-- Messages -->
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                <i class="fas {% if message.tags == 'success' %}fa-check-circle{% else %}fa-exclamation-circle{% endif %} me-2"></i>
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="row">
+        <!-- Medicine Form -->
+        <div class="col-md-6">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0"><i class="fas fa-pills me-2"></i>Add Medicine</h4>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label class="form-label">Medicine Name</label>
+                            <input type="text" class="form-control border border-secondary" id="medicineName" name="name" placeholder="Enter medicine name">
+                            <small class="form-text text-muted">Enter the name of the medicine.</small>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Type of Medicine</label>
+                            {{ medicine_form.medicine_type }}
+                            <small class="form-text text-muted">Select the form of the medicine (e.g., Syrup, Injection).</small>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Standard Dose (mg/kg/dose)</label>
+                            {{ medicine_form.standard_dose_per_kg }}
+                            <small class="form-text text-muted">Enter the standard dose per kg.</small>
+                        </div>
+                        <button type="submit" name="add_medicine" class="btn btn-primary w-100">
+                            <i class="fas fa-plus-circle me-2"></i>Add Medicine
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="card shadow-sm">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="mb-0"><i class="fas fa-list me-2"></i>Existing Medicines</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <input type="text" id="medicineSearch" class="form-control" placeholder="Search medicines...">
+                    </div>
+                    <table class="table table-hover" id="medicineTable">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Type</th>
+                                <th>Standard Dose (mg/kg/dose)</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for medicine in medicines %}
+                            <tr>
+                                <td>{{ medicine.name }}</td>
+                                <td>{{ medicine.get_medicine_type_display }}</td>
+                                <td>{{ medicine.standard_dose_per_kg }}</td>
+                                <td>
+                                    <a href="{% url 'delete_medicine' medicine.id %}" class="btn btn-sm btn-danger" title="Delete" data-bs-toggle="modal" data-bs-target="#deleteMedicineModal{{ medicine.id }}">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+                                    <!-- Delete Confirmation Modal -->
+                                    <div class="modal fade" id="deleteMedicineModal{{ medicine.id }}" tabindex="-1" aria-labelledby="deleteMedicineModalLabel" aria-hidden="true">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title" id="deleteMedicineModalLabel">Confirm Delete</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    Are you sure you want to delete "{{ medicine.name }}"?
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                    <a href="{% url 'delete_medicine' medicine.id %}" class="btn btn-danger">Delete</a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4" class="text-center">No medicines found.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Diluent Form -->
+        <div class="col-md-6">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-success text-white">
+                    <h4 class="mb-0"><i class="fas fa-flask me-2"></i>Add Diluent</h4>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label class="form-label">Diluent Name</label>
+                            <input type="text" class="form-control border border-secondary" id="diluentName" name="name" placeholder="Enter diluent name">
+                            <small class="form-text text-muted">Enter the name of the diluent.</small>
+                        </div>                        
+                        <div class="mb-3">
+                            <label class="form-label">Compatible Medicine Types</label>
+                            {{ diluent_form.compatible_medicine_types }}
+                            <small class="form-text text-muted">Select compatible medicine types.</small>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Standard Volume (mL/kg/dose)</label>
+                            {{ diluent_form.standard_volume_per_kg }}
+                            <small class="form-text text-muted">Enter the standard volume per kg.</small>
+                        </div>
+                        <button type="submit" name="add_diluent" class="btn btn-success w-100">
+                            <i class="fas fa-plus-circle me-2"></i>Add Diluent
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="card shadow-sm">
+                <div class="card-header bg-warning text-white">
+                    <h5 class="mb-0"><i class="fas fa-list me-2"></i>Existing Diluents</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <input type="text" id="diluentSearch" class="form-control" placeholder="Search diluents...">
+                    </div>
+                    <table class="table table-hover" id="diluentTable">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Compatible Medicines</th>
+                                <th>Standard Volume (mL/kg/dose)</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for diluent in diluents %}
+                            <tr>
+                                <td>{{ diluent.name }}</td>
+                                <td>
+                                    {% for medicine in diluent.compatible_medicine_types.all %}
+                                        <span class="badge bg-info">{{ medicine.name }}</span>
+                                    {% empty %}
+                                        <span class="text-muted">No compatible medicines</span>
+                                    {% endfor %}
+                                </td>
+                                <td>{{ diluent.standard_volume_per_kg }}</td>
+                                <td>
+                                    <a href="{% url 'delete_diluent' diluent.id %}" class="btn btn-sm btn-danger" title="Delete" data-bs-toggle="modal" data-bs-target="#deleteDiluentModal{{ diluent.id }}">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+                                    <!-- Delete Confirmation Modal -->
+                                    <div class="modal fade" id="deleteDiluentModal{{ diluent.id }}" tabindex="-1" aria-labelledby="deleteDiluentModalLabel" aria-hidden="true">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title" id="deleteDiluentModalLabel">Confirm Delete</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    Are you sure you want to delete "{{ diluent.name }}"?
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                    <a href="{% url 'delete_diluent' diluent.id %}" class="btn btn-danger">Delete</a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4" class="text-center">No diluents found.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Search Functionality -->
+<script>
+    document.getElementById('medicineSearch').addEventListener('input', function() {
+        const searchValue = this.value.toLowerCase();
+        const rows = document.querySelectorAll('#medicineTable tbody tr');
+        rows.forEach(row => {
+            const name = row.querySelector('td').textContent.toLowerCase();
+            row.style.display = name.includes(searchValue) ? '' : 'none';
+        });
+    });
+
+    document.getElementById('diluentSearch').addEventListener('input', function() {
+        const searchValue = this.value.toLowerCase();
+        const rows = document.querySelectorAll('#diluentTable tbody tr');
+        rows.forEach(row => {
+            const name = row.querySelector('td').textContent.toLowerCase();
+            row.style.display = name.includes(searchValue) ? '' : 'none';
+        });
+    });
+</script>
+{% endblock %}

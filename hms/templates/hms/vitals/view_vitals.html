@@ -263,9 +263,17 @@
                                 <!-- Section: Fluid Balance -->
                                 <tr class="table-info">
                                     <td colspan="{{ vitals|length|add:1 }}" class="fw-bold bg-light border border-dark">
-                                        <i class="fas fa-tint me-2"></i>Fluid Balance
+                                        <i class="fas fa-tint me-2"></i> Fluid Balance (Record Volumes and Times)
                                     </td>
                                 </tr>
+                                <!-- Section: Output -->
+                                <tr class="table-info">
+                                    <td colspan="{{ vitals|length|add:1 }}" class="fw-bold bg-light border border-dark">
+                                        <i class="fas fa-tint me-2"></i>Input
+                                    </td>
+                                </tr>
+                                <br>
+                                
                                 <tr>
                                     <td class="fw-bold text-center">IV Fluids (ml)</td>
                                     {% for vital in vitals %}

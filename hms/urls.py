@@ -6,7 +6,8 @@ from .views import (
     profile_view, patient_profile, user_logout, add_emergency_case, admit_emergency_patient, patient_detail,
     doctor_detail, generate_bill, add_expense, generate_bill_pdf, add_opd, update_opd, admit_patient, add_doctor,
     add_employee, add_room, employee_list, edit_employee, delete_employee, discharge_patient, view_ipd_report,
-    update_ipd_room,DaybookListView,DaybookCreateView,BalanceUpdateView
+    update_ipd_room,DaybookListView,DaybookCreateView,BalanceUpdateView,NICUMedicationRecordListView,NICUMedicationRecordCreateView,
+    NICUMedicationRecordUpdateView,delete_nicu_medication
 )
 
 urlpatterns = [
@@ -118,6 +119,18 @@ urlpatterns = [
 
     #Vitals
     path('nicu/add/<int:ipd_id>/', views.add_nicu_vitals, name='add_nicu_vitals'),
-    path('nicu/view/<int:ipd_id>/', views.view_nicu_vitals, name='view_nicu_vitals')
+    path('nicu/view/<int:ipd_id>/', views.view_nicu_vitals, name='view_nicu_vitals'),
+
+    #NICUMedicationRecord
+    
+    path("nicu/medications/<int:ipd_id>/", NICUMedicationRecordListView.as_view(), name="nicu_medication_list"),
+    path("nicu/medications/<int:ipd_id>/add/", NICUMedicationRecordCreateView.as_view(), name="nicu_medication_add"),
+    path("nicu-medications/edit/<int:pk>/", NICUMedicationRecordUpdateView.as_view(), name="nicu_medication_edit"),
+    path("nicu-medications/delete/<int:pk>/", delete_nicu_medication, name="nicu_medication_delete"),
+
+    #Medicne and Diluent
+    path('medicine-diluent/', views.manage_medicine_diluent, name='manage_medicine_diluent'),
+    path('delete-medicine/<int:pk>/', views.delete_medicine, name='delete_medicine'),
+    path('delete-diluent/<int:pk>/', views.delete_diluent, name='delete_diluent'),
 
 ]

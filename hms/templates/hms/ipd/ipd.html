@@ -37,21 +37,31 @@
                     <td class="px-6 py-4 text-l text-gray-700">{{ ipd.patient.user.full_name }}</td>
                     <td class="px-6 py-4 text-l text-gray-700">{{ ipd.room.room_number }}</td>
                     <td class="px-6 py-4 text-l text-gray-700">{{ ipd.bed_number }}</td>
-                    <td class="px-6 py-4 text-l text-gray-700">{{ ipd.total_cost }}</td>
+                    <td class="px-6 py-4 text-l text-gray-700">{{ ipd.calculate_total_cost  }}</td>
                     <td class="px-6 py-4 text-l text-gray-700">{{ ipd.admitted_on|date:"d M Y, H:i" }}</td>
                     <td class="px-6 py-4 text-l text-gray-700">{{ ipd.reason_for_admission }}</td>
                     <td class="px-6 py-4 text-l">
-                        <div class="flex space-x-4">
-                            <a href="{% url 'add_prescription' ipd.id %}" class="text-blue-500 hover:text-blue-700 hover:underline">Add Prescription</a>
-                            <a href="{% url 'upload_patient_report' ipd.patient.patient_code %}" class="text-green-500 hover:text-green-700 hover:underline">Upload Report</a>
-                            <a href="{% url 'view_ipd_report' ipd.id %}" class="text-purple-500 hover:text-purple-700 hover:underline font-semibold">View Report</a>
-                            <a href="{% url 'view_nicu_vitals' ipd.id %}" class="text-red-500 hover:text-red-700 hover:underline font-semibold">View NICU Vitals</a>
+                        <div class="relative inline-block text-left">
+                            <button onclick="toggleDropdown('dropdown-{{ ipd.id }}')" class="text-gray-500 hover:text-gray-700 focus:outline-none">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
+                                </svg>
+                            </button>
+                            <div id="dropdown-{{ ipd.id }}" class="hidden absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
+                                <div class="py-1">
+                                    <a href="{% url 'add_prescription' ipd.id %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Add Prescription</a>
+                                    <a href="{% url 'upload_patient_report' ipd.patient.patient_code %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Upload Report</a>
+                                    <a href="{% url 'view_ipd_report' ipd.id %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">View Report</a>
+                                    <a href="{% url 'view_nicu_vitals' ipd.id %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">View NICU Vitals</a>
+                                    <a href="{% url 'nicu_medication_list' ipd.id %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">View Medications</a>
+                                </div>
+                            </div>
                         </div>
                     </td>
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="6" class="px-6 py-4 text-sm text-center text-gray-500">No patients currently admitted.</td>
+                    <td colspan="7" class="px-6 py-4 text-sm text-center text-gray-500">No patients currently admitted.</td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -59,19 +69,46 @@
     </div>
 </div>
 
-<!-- JavaScript for Auto-Refresh -->
+<!-- Dropdown Script -->
 <script>
+    // Function to toggle dropdown visibility
+    function toggleDropdown(dropdownId) {
+        const dropdown = document.getElementById(dropdownId);
+        dropdown.classList.toggle('hidden');
+    }
+
+    // Close dropdowns when clicking outside
+    document.addEventListener('click', function(event) {
+        const dropdowns = document.querySelectorAll('.relative.inline-block.text-left');
+        dropdowns.forEach(dropdown => {
+            if (!dropdown.contains(event.target)) {
+                const menu = dropdown.querySelector('.hidden');
+                if (menu) {
+                    menu.classList.add('hidden');
+                }
+            }
+        });
+    });
+</script>
+
+<!-- Auto-Refresh Script -->
+<script>
+    // Function to fetch IPD data
     function fetchIPDData() {
+        // Find any currently open dropdown
+        let openDropdown = document.querySelector('.relative.inline-block.text-left .block');
+        let openDropdownId = openDropdown ? openDropdown.id : null;
+    
         fetch("{% url 'get_ipd_data' %}")  // API call to get updated IPD data
         .then(response => response.json())
         .then(data => {
             let tableBody = document.getElementById("ipd-table-body");
             tableBody.innerHTML = "";  // Clear table before inserting new data
-
+    
             if (data.length === 0) {
                 tableBody.innerHTML = `
                     <tr>
-                        <td colspan="6" class="px-6 py-4 text-sm text-center text-gray-500">No patients currently admitted.</td>
+                        <td colspan="7" class="px-6 py-4 text-sm text-center text-gray-500">No patients currently admitted.</td>
                     </tr>`;
             } else {
                 data.forEach(ipd => {
@@ -79,26 +116,42 @@
                     let row = `
                         <tr class="hover:bg-gray-50 transition duration-200">
                             <td class="px-6 py-4 text-l text-gray-700">${ipd.patient__user__full_name}</td>
-                            <td class="px-6 py-4 text-l text-gray-700">${ipd.room__room_number }</td>
+                            <td class="px-6 py-4 text-l text-gray-700">${ipd.room__room_number}</td>
                             <td class="px-6 py-4 text-l text-gray-700">${ipd.bed_number || 'N/A'}</td>
                             <td class="px-6 py-4 text-l text-gray-700">${ipd.total_cost || 'N/A'}</td>
                             <td class="px-6 py-4 text-l text-gray-700">${admittedOn}</td>
                             <td class="px-6 py-4 text-l text-gray-700">${ipd.reason_for_admission}</td>
                             <td class="px-6 py-4 text-l">
-                                <div class="flex space-x-4">
-                                    <a href="/ipd/${ipd.id}/add_prescription/" class="text-blue-500 hover:text-blue-700 hover:underline">Add Prescription</a>
-                                    <a href="/patient/${ipd.patient__patient_code}/upload-report/" class="text-green-500 hover:text-green-700 hover:underline">Upload Report</a>
-                                    <a href="/ipd/${ipd.id}/" class="text-purple-500 hover:text-purple-700 hover:underline font-semibold">View Report</a>
-                                    <a href="/nicu/view/${ipd.id}/" class="text-red-500 hover:text-red-700 hover:underline font-semibold">View NICU Vitals</a>
+                                <div class="relative inline-block text-left">
+                                    <button onclick="toggleDropdown('dropdown-${ipd.id}')" class="text-gray-500 hover:text-gray-700 focus:outline-none">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
+                                        </svg>
+                                    </button>
+                                    <div id="dropdown-${ipd.id}" class="hidden absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
+                                        <div class="py-1">
+                                            <a href="/ipd/${ipd.id}/add_prescription/" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Add Prescription</a>
+                                            <a href="/patient/${ipd.patient__patient_code}/upload-report/" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Upload Report</a>
+                                            <a href="/ipd/${ipd.id}/" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">View Report</a>
+                                            <a href="/nicu/view/${ipd.id}/" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">View NICU Vitals</a>
+                                            <a href="/nicu/medications/${ipd.id}/" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">View Medications</a>
+                                        </div>
+                                    </div>
                                 </div>
                             </td>
                         </tr>`;
                     tableBody.innerHTML += row;
                 });
+    
+                // Reopen the previously open dropdown
+                if (openDropdownId) {
+                    document.getElementById(openDropdownId)?.classList.remove('hidden');
+                }
             }
         })
         .catch(error => console.error("Error fetching IPD data:", error));
     }
+    
 
     // Fetch data every 5 seconds
     setInterval(fetchIPDData, 5000);

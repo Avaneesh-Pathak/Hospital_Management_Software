@@ -1,0 +1,84 @@
+{% extends "hms/base.html" %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto bg-white shadow-xl rounded-lg p-8 mt-8">
+    <!-- Header with Patient Name and Add Medication Button -->
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-2xl font-bold text-gray-800">NICU Medication Records for <span class="text-blue-600">{{ patient_name }}</span></h1>
+        <a href="{% url 'nicu_medication_add' ipd_id %}" class="bg-blue-600 text-white px-6 py-2.5 rounded-lg hover:bg-blue-700 transition duration-300 shadow-md flex items-center gap-2">
+            <i class="fas fa-plus"></i> Add Medication
+        </a>
+    </div>
+
+    <!-- Medication Table -->
+    <div class="overflow-x-auto rounded-lg shadow-sm">
+        <table class="min-w-full border-collapse">
+            <!-- Table Header -->
+            <thead class="bg-gray-50">
+                <tr class="text-gray-700 uppercase text-sm font-semibold">
+                    <th class="px-6 py-4 text-left">Medicine</th>
+                    <th class="px-6 py-4 text-left">Diluent (mL)</th>
+                    <th class="px-6 py-4 text-left">Diluent Type</th>
+                    <th class="px-6 py-4 text-left">Dose (mg)</th>
+                    <th class="px-6 py-4 text-left">Route</th>
+                    <th class="px-6 py-4 text-left">Dose Frequency</th>
+                    <th class="px-6 py-4 text-left">Infusion Rate (mL/hr)</th>
+                    <th class="px-6 py-4 text-left">Duration (hrs)</th>
+                    <th class="px-6 py-4 text-left">Doctor's Sign</th>
+                    <th class="px-6 py-4 text-left">Actions</th>
+                </tr>
+            </thead>
+            <!-- Table Body -->
+            <tbody class="divide-y divide-gray-200">
+                {% for medication in medications %}
+                <tr class="text-gray-700 hover:bg-gray-50 transition duration-200">
+                    <!-- Medicine -->
+                    <td class="px-6 py-4 font-medium">{{ medication.medicine }}</td>
+                    <!-- Diluent Volume -->
+                    <td class="px-6 py-4">{{ medication.calculated_diluent_volume }}</td>
+                    <!-- Diluent Type -->
+                    <td class="px-6 py-4">{{ medication.diluent }}</td>
+                    <!-- Dose -->
+                    <td class="px-6 py-4">{{ medication.calculated_dose }}</td>
+                    <!-- Route -->
+                    <td class="px-6 py-4">{{ medication.get_route_display }}</td>
+                    <!-- Dose Frequency -->
+                    <td class="px-6 py-4 font-medium">
+                        {% if medication.dose_frequency == "OTHER" %}
+                            {{ medication.other_frequency }}
+                        {% else %}
+                            {{ medication.get_dose_frequency_display }}
+                        {% endif %}
+                    </td>
+                    <!-- Infusion Rate -->
+                    <td class="px-6 py-4">{{ medication.calculated_infusion_rate }}</td>
+                    <!-- Duration -->
+                    <td class="px-6 py-4">{{ medication.duration }}</td>
+                    <!-- Doctor's Sign -->
+                    <td class="px-6 py-4 font-medium">{{ medication.sign }}</td>
+                    <!-- Actions -->
+                    <td class="px-6 py-4 flex items-center gap-3">
+                        <!-- Edit Button -->
+                        <a href="{% url 'nicu_medication_edit' medication.id %}" class="text-blue-600 hover:text-blue-800 transition duration-200" title="Edit">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                        <!-- Delete Button -->
+                        <form action="{% url 'nicu_medication_delete' medication.id %}" method="POST" onsubmit="return confirm('Are you sure you want to delete this record?')">
+                            {% csrf_token %}
+                            <button type="submit" class="text-red-600 hover:text-red-800 transition duration-200" title="Delete">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                {% empty %}
+                <!-- Empty State -->
+                <tr>
+                    <td colspan="10" class="px-6 py-4 text-center text-gray-500">No medication records found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

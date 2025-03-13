@@ -1,0 +1,73 @@
+{% extends "hms/base.html" %}
+
+{% block content %}
+<div class="container mx-auto p-6">
+    <!-- Page Title -->
+    <h2 class="text-3xl font-bold text-gray-800 mb-6">
+        {% if form.instance.pk %}Edit{% else %}Add{% endif %} NICU Medication
+    </h2>
+
+    <!-- Form -->
+    <form method="post" class="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300">
+        {% csrf_token %}
+
+        <!-- Form Fields -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {% for field in form %}
+            <div class="flex flex-col space-y-2">
+                <label for="{{ field.id_for_label }}" class="text-sm font-medium text-gray-700">
+                    {{ field.label }}
+                    {% if field.field.required %}<span class="text-red-500">*</span>{% endif %}
+                </label>
+
+                <!-- Special handling for Dose Frequency -->
+                {% if field.name == "dose_frequency" %}
+                    <select name="{{ field.name }}" id="{{ field.id_for_label }}" class="border border-gray-300 p-2 rounded-lg" onchange="toggleOtherFrequency(this)">
+                        {% for choice in field.field.choices %}
+                            <option value="{{ choice.0 }}" {% if field.value == choice.0 %}selected{% endif %}>{{ choice.1 }}</option>
+                        {% endfor %}
+                    </select>
+                {% elif field.name == "other_frequency" %}
+                    <input type="text" name="{{ field.name }}" id="{{ field.id_for_label }}" class="border border-gray-300 p-2 rounded-lg" placeholder="Specify custom frequency" {% if not form.instance.other_frequency %}style="display: none;"{% endif %}>
+                {% else %}
+                    {{ field }}
+                {% endif %}
+
+                {% if field.errors %}
+                <div class="text-sm text-red-600">
+                    {{ field.errors }}
+                </div>
+                {% endif %}
+                {% if field.help_text %}
+                <p class="text-xs text-gray-500">{{ field.help_text }}</p>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Form Buttons -->
+        <div class="mt-6 flex space-x-4">
+            <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition duration-200 ease-in-out transform hover:scale-105">
+                Save
+            </button>
+            <a href="{% url 'nicu_medication_list' ipd_id %}" class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition duration-200 ease-in-out transform hover:scale-105">
+                Cancel
+            </a>
+        </div>
+    </form>
+</div>
+
+<!-- JavaScript to Show/Hide "Other Frequency" Input -->
+<script>
+function toggleOtherFrequency(selectElement) {
+    var otherField = document.getElementById("id_other_frequency");
+    if (selectElement.value === "OTHER") {
+        otherField.style.display = "block";
+    } else {
+        otherField.style.display = "none";
+        otherField.value = "";
+    }
+}
+</script>
+
+{% endblock %}
