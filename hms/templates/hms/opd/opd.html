@@ -1,0 +1,156 @@
+{% extends 'hms/base.html' %}
+
+{% block content %}
+<div class="container mx-auto p-6">
+    <!-- Page Title -->
+    <h2 class="text-3xl font-bold text-gray-800 mb-6">📋 OPD Records</h2>
+
+    <!-- Messages -->
+    {% if messages %}
+        <div class="mb-6">
+            {% for message in messages %}
+                <div class="p-4 mb-4 text-sm rounded-lg {% if message.tags == 'error' %}bg-red-50 text-red-800{% else %}bg-green-50 text-green-800{% endif %}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <!-- Add OPD Button -->
+    <a href="{% url 'add_opd' %}" class="inline-block bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition duration-300 mb-6">
+        ➕ Add OPD Visit
+    </a>
+
+    <!-- OPD Records Table -->
+    <div class="overflow-x-auto bg-white rounded-lg shadow-lg">
+        <table class="min-w-full border-collapse">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Patient</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Doctor</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Diagnosis</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Symptoms</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Prescription</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Visit Type</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Payment Status</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                </tr>
+            </thead>
+            <tbody id="opd-table" class="divide-y divide-gray-200">
+                {% for opd in opds %}
+                <tr class="hover:bg-gray-50 transition duration-200">
+                    <td class="px-6 py-4 text-sm text-gray-700">{{ opd.patient.user.full_name }}</td>
+                    <td class="px-6 py-4 text-sm text-gray-700">{{ opd.doctor.user.full_name }}</td>
+                    <td class="px-6 py-4 text-sm text-gray-700">{{ opd.diagnosis }}</td>
+                    <td class="px-6 py-4 text-sm text-gray-700">{{ opd.symptoms}}</td>
+                    <td class="px-6 py-4 text-sm text-gray-700">{{ opd.prescription|default:"N/A" }}</td>
+                    <td class="px-6 py-4 text-sm text-gray-700">{{ opd.get_visit_type_display }}</td>
+                    <td class="px-6 py-4 text-sm text-gray-700">{{ opd.get_payment_status_display }}</td>
+                    <td class="px-6 py-4 text-sm text-gray-700">{{ opd.created_at|date:"Y-m-d H:i" }}</td>
+                    <td class="px-6 py-4 text-sm">
+                        <a href="{% url 'update_opd' opd.id %}" class="text-yellow-600 hover:text-yellow-800">✏️ Edit</a>
+                        <a href="{% url 'admit_patient' opd.id %}" class="text-green-600 hover:text-green-800 ml-4">🏥 Admit</a>
+                        <button onclick="viewReport('{{ opd.id }}')" class="text-blue-600 hover:text-blue-800 ml-4">📄 View Report</button>
+                    </td>
+                    
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="9" class="px-6 py-4 text-sm text-center text-gray-600">No OPD records found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- jQuery for Auto-Refresh -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function() {
+        function fetchOPD() {
+            console.log("Fetching OPD records..."); // Debugging log
+
+            $.ajax({
+                url: "{% url 'fetch_opd' %}", 
+                method: "GET",
+                dataType: "json",
+                success: function(response) {
+                    console.log("Response received:", response); // Debugging log
+
+                    if (response.error) {
+                        console.error("Server Error:", response.error);
+                        return;
+                    }
+
+                    let opdTable = $("#opd-table");
+                    opdTable.empty(); // Clear previous records
+
+                    if (response.opds.length === 0) {
+                        opdTable.append(`
+                            <tr>
+                                <td colspan="9" class="px-6 py-4 text-sm text-center text-gray-600">No OPD records found.</td>
+                            </tr>
+                        `);
+                        return;
+                    }
+
+                    response.opds.forEach(function(record) {
+                        opdTable.append(`
+                            <tr class="hover:bg-gray-50 transition duration-200">
+                                <td class="px-6 py-4 text-sm text-gray-700">${record.patient__user__full_name || 'N/A'}</td>
+                                <td class="px-6 py-4 text-sm text-gray-700">${record.doctor__user__full_name || 'N/A'}</td>
+                                <td class="px-6 py-4 text-sm text-gray-700">${record.diagnosis || 'N/A'}</td>
+                                <td class="px-6 py-4 text-sm text-gray-700">${record.symptoms || 'N/A'}</td>
+                                <td class="px-6 py-4 text-sm text-gray-700">${record.prescription || 'N/A'}</td>
+                                <td class="px-6 py-4 text-sm text-gray-700">${record.visit_type || 'N/A'}</td>
+                                <td class="px-6 py-4 text-sm text-gray-700">${record.payment_status || 'N/A'}</td>
+                                <td class="px-6 py-4 text-sm text-gray-700">${new Date(record.created_at).toLocaleString() || 'N/A'}</td>
+                                <td class="px-6 py-4 text-sm">
+                                    <a href="/opd/update/${record.id}/" class="text-yellow-600 hover:text-yellow-800">✏️ Edit</a>
+                                    <a href="/opd/admit/${record.id}/" class="text-green-600 hover:text-green-800 ml-4">🏥 Admit</a>
+                                    <!-- View Report Button -->
+                                    <button onclick="viewReport('${record.id}')" class="text-blue-600 hover:text-blue-800 ml-4">📄 View Report</button>
+                                </td>
+                            </tr>
+                        `);
+                    });
+                },
+                error: function(xhr, status, error) {
+                    console.error("AJAX Error:", xhr.responseText);
+                }
+            });
+        }
+
+        fetchOPD(); // Initial fetch
+        setInterval(fetchOPD, 5000); // Refresh every 5 seconds
+    });
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script>
+    function viewReport(patientId) {
+        // Open the report in a new tab
+        window.open(`/opd/report/${patientId}/`, '_blank');
+    }
+    function downloadPatientReport(patientId) {
+        // Fetch the patient-specific OPD report template
+        fetch(`/opd/report/${patientId}/`)
+            .then(response => response.text())
+            .then(html => {
+                // Convert HTML to PDF
+                html2pdf()
+                    .from(html)
+                    .set({
+                        margin: 10,
+                        filename: `opd_report_patient_${patientId}.pdf`,
+                        image: { type: 'jpeg', quality: 0.98 },
+                        html2canvas: { scale: 2 },
+                        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+                    })
+                    .save();
+            });
+    }
+</script>
+{% endblock %}

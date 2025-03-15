@@ -1,28 +1,36 @@
+# Import Statements
 import io
 import csv
 import datetime
 import logging
+from datetime import date
 from xhtml2pdf import pisa
 from decimal import Decimal
 from django.db import models
+from itertools import groupby
 from django.views import View
 from django.db.models import Q
+from operator import attrgetter
 from django.utils import timezone
+from collections import defaultdict
 from reportlab.pdfgen import canvas
 from django.http import JsonResponse
 from django.http import FileResponse
 from django.urls import reverse_lazy
 from django.http import HttpResponse
+from django.http import JsonResponse
 from reportlab.pdfgen import canvas
 from django.shortcuts import render
 from django.contrib import messages
 from django.utils.timezone import now
-from django.db.models import Count,Sum
-from datetime import datetime ,timedelta
+from django.db.models import Count, Sum
+from datetime import datetime, timedelta
 from reportlab.lib.pagesizes import letter
 from django.utils.timezone import localdate
 from django.core.paginator import Paginator
 from django.contrib.auth.models import User
+from django.utils.timezone import localtime
+from django.urls import reverse_lazy, reverse
 from django.utils.dateparse import parse_time
 from django.template.loader import get_template
 from django.db.models.functions import TruncDate
@@ -30,21 +38,23 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
-from django.shortcuts import render, redirect,get_object_or_404
+from django.shortcuts import render, redirect, get_object_or_404
 from django.views.generic import ListView, CreateView, UpdateView
+
+# Import Models and Forms
 from .models import (
-    CustomUser, Patient, Doctor, Appointment, Billing, EmergencyCase, OPD, IPD, Expense, Employee, Room, PatientReport,Prescription,
-    License,Asset,Maintenance,AccountingRecord,Daybook,Balance,PatientTransfer,NICUVitals,NICUMedicationRecord
-    
+    CustomUser, Patient, Doctor, Appointment, Billing, EmergencyCase, OPD, IPD, Expense, Employee, Room, PatientReport, Prescription,
+    License, Asset, Maintenance, AccountingRecord, Daybook, Balance, PatientTransfer, NICUVitals, NICUMedicationRecord, Medicine, Diluent
 )
 from .forms import (
-    PatientRegistrationForm, ExpenseForm, BillingForm, OPDForm, DoctorForm, EmployeeForm, RoomForm, EmergencyCaseForm, ProfileUpdateForm,PatientReportForm,
-    PrescriptionForm,LicenseForm,AssetForm,MaintenanceForm,BalanceUpdateForm,DaybookEntryForm,NICUVitalsForm,NICUMedicationRecordForm
+    PatientRegistrationForm, ExpenseForm, BillingForm, OPDForm, DoctorForm, EmployeeForm, RoomForm, EmergencyCaseForm, ProfileUpdateForm, PatientReportForm,
+    PrescriptionForm, LicenseForm, AssetForm, MaintenanceForm, BalanceUpdateForm, DaybookEntryForm, NICUVitalsForm, NICUMedicationRecordForm, MedicineForm, DiluentForm
 )
 
+# Logger Setup
 logger = logging.getLogger(__name__)
 
-
+# Authentication Views
 def signup(request):
     if request.method == "POST":
         full_name = request.POST['full_name']
@@ -69,7 +79,6 @@ def signup(request):
 
     return render(request, 'hms/auth/signup.html')
 
-
 def user_login(request):
     if request.method == "POST":
         username = request.POST['username']
@@ -84,12 +93,11 @@ def user_login(request):
 
     return render(request, 'hms/auth/login.html')
 
-
 def user_logout(request):
     logout(request)
     return redirect('login')
 
-
+# Profile Views
 @login_required
 def profile_view(request):
     user = request.user  # Get the logged-in user
@@ -101,8 +109,9 @@ def profile_view(request):
     else:
         form = ProfileUpdateForm(instance=user)
 
-    return render(request, "hms/profile.html", {"form": form})
+    return render(request, "hms/patient/profile.html", {"form": form})
 
+# Search Functionality
 def search(request):
     query = request.GET.get('q')  # Get the search query from the URL
     results = {}
@@ -155,6 +164,7 @@ def search(request):
 
     return render(request, 'hms/search_results.html', {'results': results, 'query': query})
 
+# Dashboard Views
 @login_required
 def dashboard(request):
     total_patients = Patient.objects.count()
@@ -180,10 +190,10 @@ def dashboard(request):
     daily_patient_labels = [entry['date'].strftime('%Y-%m-%d') for entry in patient_trend]
     daily_patient_data = [entry['count'] for entry in patient_trend]
 
-    # 🚀 Room Statistics
+    # Room Statistics
     total_rooms = Room.objects.count()
-    available_rooms_count = Room.objects.filter(is_available=True).count()  # ✅ Fixed
-    booked_rooms = total_rooms - available_rooms_count  # ✅ Fixed
+    available_rooms_count = Room.objects.filter(is_available=True).count()  # Fixed
+    booked_rooms = total_rooms - available_rooms_count  # Fixed
 
     # Count rooms by type and available rooms by type
     room_type_data = {}
@@ -211,19 +221,17 @@ def dashboard(request):
         'daily_patient_labels': daily_patient_labels,
         'daily_patient_data': daily_patient_data,
         'total_rooms': total_rooms,
-        'available_rooms_count': available_rooms_count,  # ✅ Fixed
-        'booked_rooms': booked_rooms,  # ✅ Fixed
+        'available_rooms_count': available_rooms_count,  # Fixed
+        'booked_rooms': booked_rooms,  # Fixed
         'room_type_data': room_type_data,  # Dictionary of room counts & available rooms by type
         'expiring_licenses': expiring_licenses,
         'expiring_assets': expiring_assets,
         'due_maintenance': due_maintenance,
-        
     }
 
     return render(request, 'hms/dashboard.html', context)
 
-
-
+# Patient Views
 @login_required
 def patients(request):
     logger.info("Fetching all patients.")
@@ -258,10 +266,16 @@ def patient_profile(request, patient_code):
     }
     return render(request, 'hms/patient/patient_profile.html', context)
 
-
 @login_required
 def upload_patient_report(request, patient_code):
     patient = get_object_or_404(Patient, patient_code=patient_code)
+
+    # Fetch the latest IPD record for the patient
+    ipd_record = IPD.objects.filter(patient=patient).order_by('-admitted_on').first()
+
+    if not ipd_record:
+        messages.error(request, "No IPD record found for this patient.")
+        return redirect('patient_profile', patient_code=patient_code)  # Redirect back to profile if no IPD record
 
     if request.method == "POST":
         form = PatientReportForm(request.POST, request.FILES)
@@ -269,7 +283,7 @@ def upload_patient_report(request, patient_code):
             report = form.save(commit=False)
             report.patient = patient
             report.save()
-            return redirect('view_ipd_report', patient_code=patient_code)  # Redirect to profile
+            return redirect('view_ipd_report', ipd_id=ipd_record.id)  # ✅ Correct redirect
     else:
         form = PatientReportForm()
 
@@ -337,7 +351,6 @@ def register_patient(request):
 
     return render(request, 'hms/patient/register_patient.html', {'form': form})
 
-
 @login_required
 def fetch_patients(request):
     patients = Patient.objects.select_related("user").values(
@@ -346,15 +359,16 @@ def fetch_patients(request):
     )
     return JsonResponse({"patients": list(patients)}, safe=False)
 
+# Doctor Views
 @login_required
 def doctors(request):
     doctors = Doctor.objects.all()
-    return render(request, 'hms/doctors.html', {'doctors': doctors})
+    return render(request, 'hms/doctor/doctors.html', {'doctors': doctors})
 
 @login_required
 def doctor_detail(request, doctor_id):
     doctor = get_object_or_404(Doctor, id=doctor_id)
-    return render(request, 'hms/doctor_detail.html', {'doctor': doctor})
+    return render(request, 'hms/doctor/doctor_detail.html', {'doctor': doctor})
 
 @login_required
 def add_doctor(request):
@@ -365,7 +379,7 @@ def add_doctor(request):
             return redirect('doctors')
     else:
         form = DoctorForm()
-    return render(request, 'hms/add_doctor.html', {'form': form})
+    return render(request, 'hms/doctor/add_doctor.html', {'form': form})
 
 @login_required
 def update_doctor(request, doctor_id):
@@ -378,20 +392,21 @@ def update_doctor(request, doctor_id):
             return redirect('doctors')
     else:
         form = DoctorForm(instance=doctor)
-    return render(request, 'hms/update_doctor.html', {'form': form, 'doctor': doctor})
+    return render(request, 'hms/doctor/update_doctor.html', {'form': form, 'doctor': doctor})
 
+# Appointment Views
 def appointments_update(request):
     doctors  = Doctor.objects.all()  
     appointments = Appointment.objects.all()
     print("Doctors in view:", doctors)  # Debugging line
-    return render(request, 'hms/appointments.html', {'appointments': appointments, 'doctors': doctors })
+    return render(request, 'hms/apt/appointments.html', {'appointments': appointments, 'doctors': doctors })
 
 @login_required
 def appointments(request):
     doctors  = Doctor.objects.all()  
     appointments = Appointment.objects.all()
     print("Doctors in view:", doctors)  # Debugging line
-    return render(request, 'hms/appointment_list.html', {'appointments': appointments, 'doctors': doctors })
+    return render(request, 'hms/apt/appointment_list.html', {'appointments': appointments, 'doctors': doctors })
 
 def fetch_appointments(request):
     appointments = Appointment.objects.select_related("doctor__user", "patient__user").values(
@@ -402,8 +417,7 @@ def fetch_appointments(request):
 @login_required
 def available_doctors(request):
     doctors = Doctor.objects.exclude(availability="").order_by("user__full_name")  # Assuming you have an 'is_available' field
-    return render(request, 'hms/available_doctors.html', {'doctors': doctors})
-
+    return render(request, 'hms/doctor/available_doctors.html', {'doctors': doctors})
 
 @login_required
 def book_appointment(request, doctor_id):
@@ -451,11 +465,10 @@ def book_appointment(request, doctor_id):
         messages.success(request, f"Appointment booked for {selected_date} at {selected_time}.")
         return redirect('appointment_success', doctor_id=doctor_id)
 
-    return render(request, 'hms/book_appointment.html', {'doctor': doctor, 'patient': patient})
+    return render(request, 'hms/apt/book_appointment.html', {'doctor': doctor, 'patient': patient})
 
 def appointment_success(request, doctor_id):
-    return render(request, 'hms/appointment_success.html', {'doctor_id': doctor_id})
-
+    return render(request, 'hms/apt/appointment_success.html', {'doctor_id': doctor_id})
 
 @login_required
 def update_appointment_status(request):
@@ -473,7 +486,7 @@ def update_appointment_status(request):
 
     return redirect("appointments")
 
-
+# Billing Views
 @login_required
 def billing(request):
     bills = Billing.objects.all()
@@ -481,9 +494,7 @@ def billing(request):
     # Add pending_amount calculation for each bill
     for bill in bills:
         bill.pending_amount = bill.total_amount - bill.paid_amount
-    return render(request, 'hms/billing.html', {'bills': bills})
-
-
+    return render(request, 'hms/bills/billing.html', {'bills': bills})
 
 @login_required
 def generate_bill(request, patient_code):
@@ -502,13 +513,12 @@ def generate_bill(request, patient_code):
     # Calculate pending amount
     pending_amount = bill.total_amount - bill.paid_amount
 
-    return render(request, 'hms/generate_bill.html', {
+    return render(request, 'hms/bills/generate_bill.html', {
         'patient': patient,
         'expenses': expenses,
         'bill': bill,
         'pending_amount': pending_amount
     })
-
 
 @login_required
 def generate_bill_pdf(request, patient_code):
@@ -581,10 +591,6 @@ def generate_bill_pdf(request, patient_code):
     
     return response
 
-
-
-
-
 @login_required
 def add_expense(request):
     if request.method == "POST":
@@ -601,9 +607,7 @@ def add_expense(request):
     else:
         form = ExpenseForm()
 
-    return render(request, 'hms/add_expense.html', {'form': form})  
-
-
+    return render(request, 'hms/expense/add_expense.html', {'form': form})  
 
 @login_required
 def pay_bill(request, billing_id):
@@ -631,16 +635,13 @@ def pay_bill(request, billing_id):
             messages.success(request, f"₹{paid_amount} added to the bill!")
             return redirect('billing')
 
-    return render(request, 'hms/pay_bill.html', {'billing': billing, 'pending_amount': pending_amount})
+    return render(request, 'hms/bills/pay_bill.html', {'billing': billing, 'pending_amount': pending_amount})
 
-
-
-
+# Emergency Views
 @login_required
 def emergency(request):
     emergencies = EmergencyCase.objects.all()
-    return render(request, 'hms/emergency.html', {'emergencies': emergencies})
-
+    return render(request, 'hms/emergency/emergency.html', {'emergencies': emergencies})
 
 def emergency_s(request):
     query = request.GET.get('q', '').strip()
@@ -663,8 +664,7 @@ def emergency_s(request):
     if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
         return JsonResponse(emergencies_list, safe=False)
 
-    return render(request, 'hms/emergency.html', {'emergencies': emergencies_list})
-
+    return render(request, 'hms/emergency/emergency.html', {'emergencies': emergencies_list})
 
 @login_required
 def add_emergency_case(request):
@@ -676,7 +676,7 @@ def add_emergency_case(request):
             return redirect("emergency")
     else:
         form = EmergencyCaseForm()
-    return render(request, "hms/add_emergency.html", {"form": form})
+    return render(request, "hms/emergency/add_emergency.html", {"form": form})
 
 @login_required
 def edit_emergency_case(request, emergency_id):
@@ -689,7 +689,7 @@ def edit_emergency_case(request, emergency_id):
             return redirect("emergency")
     else:
         form = EmergencyCaseForm(instance=emergency)
-    return render(request, "hms/edit_emergency.html", {"form": form})
+    return render(request, "hms/emergency/edit_emergency.html", {"form": form})
 
 @login_required
 def delete_emergency_case(request, emergency_id):
@@ -702,7 +702,7 @@ def delete_emergency_case(request, emergency_id):
         return redirect("emergency")
 
     # Render the confirmation page for GET requests
-    return render(request, 'hms/delete_emergency.html', {'emergency': emergency})
+    return render(request, 'hms/emergency/delete_emergency.html', {'emergency': emergency})
 
 @login_required
 def admit_emergency_patient(request, emergency_id):
@@ -734,28 +734,12 @@ def admit_emergency_patient(request, emergency_id):
     messages.error(request, "No available beds for admission!")
     return redirect("emergency")
 
-
-
-
-
+# IPD Views
 @login_required
 def ipd(request):
     ipds = IPD.objects.all()
     room = Room.objects.all()
     return render(request, 'hms/ipd/ipd.html', {'ipds': ipds,'room':room})
-
-# def get_ipd_data(request):
-    # ipds = IPD.objects.all().values(
-    #     'id',
-    #     'patient__user__full_name', 
-    #     'room__room_number',
-    #     'patient__patient_code',
-    #     'calculate_total_cost',  # ✅ Get the room number
-    #     'bed_number',         # ✅ Get the bed number
-    #     'admitted_on', 
-    #     'reason_for_admission'
-    # )
-    # return JsonResponse(list(ipds), safe=False)
 
 def get_ipd_data(request):
     ipds = IPD.objects.all()
@@ -770,12 +754,12 @@ def get_ipd_data(request):
             'bed_number': ipd.bed_number,
             'admitted_on': ipd.admitted_on.strftime('%Y-%m-%d %H:%M:%S'),  
             'reason_for_admission': ipd.reason_for_admission,
-            'total_cost': float(ipd.calculate_total_cost()),  # ✅ Call the method and convert it
+            'total_cost': float(ipd.calculate_total_cost()),  # Call the method and convert it
         })
 
     return JsonResponse(ipd_data, safe=False)
 
-# ✅ View IPD Report
+# View IPD Report
 def view_ipd_report(request, ipd_id):
     ipd = get_object_or_404(IPD, id=ipd_id)
     rooms = Room.objects.all()
@@ -783,7 +767,7 @@ def view_ipd_report(request, ipd_id):
     reports = PatientReport.objects.filter(patient=ipd.patient).order_by('-uploaded_at')  # Fetch reports
     return render(request, 'hms/ipd/view_ipd_report.html', {'ipd': ipd, 'rooms': rooms,'prescriptions':prescriptions,'reports': reports})
 
-    # ✅ Update IPD Room
+# Update IPD Room
 def update_ipd_room(request, ipd_id):
     ipd = get_object_or_404(IPD, id=ipd_id)
     if request.method == "POST":
@@ -794,8 +778,6 @@ def update_ipd_room(request, ipd_id):
         ipd.save()
         messages.success(request, "Room and bed updated successfully.")
     return redirect('view_ipd_report', ipd_id=ipd.id)
-
-
 
 @login_required
 def discharge_patient(request, patient_code):
@@ -812,7 +794,6 @@ def discharge_patient(request, patient_code):
 
     # Generate discharge summary PDF and return response
     return discharge_summary_pdf(request, patient_code, action="Discharged")
-
 
 def transfer_patient(request, patient_code):
     patient = get_object_or_404(Patient, patient_code=patient_code)
@@ -835,8 +816,7 @@ def transfer_patient(request, patient_code):
         "transfer": transfer,
     }
 
-    return render(request, "hms/transfer_summary.html", context)
-
+    return render(request, "hms/ipd/transfer_summary.html", context)
 
 def render_to_pdf(template_src, context_dict):
     template = get_template(template_src)
@@ -865,7 +845,7 @@ def discharge_summary_pdf(request, patient_code, action=None):
         "action": action,  # Include action in context if needed
     }
 
-    return render_to_pdf("hms/discharge_summary.html", context)
+    return render_to_pdf("hms/ipd/discharge_summary.html", context)
 
 def transfer_summary_pdf(request, patient_code):
     patient = get_object_or_404(Patient, patient_code=patient_code)
@@ -882,8 +862,7 @@ def transfer_summary_pdf(request, patient_code):
         "transfer": transfer,
     }
 
-    return render_to_pdf("hms/transfer_summary.html", context)
-
+    return render_to_pdf("hms/ipd/transfer_summary.html", context)
 
 def add_prescription(request, ipd_id):
     ipd = get_object_or_404(IPD, id=ipd_id)
@@ -900,13 +879,13 @@ def add_prescription(request, ipd_id):
     else:
         form = PrescriptionForm()
 
-    return render(request, 'hms/add_prescription.html', {'form': form, 'ipd': ipd})
+    return render(request, 'hms/opd/add_prescription.html', {'form': form, 'ipd': ipd})
 
-
+# OPD Views
 @login_required
 def opd(request):
     opds = OPD.objects.all()
-    return render(request, 'hms/opd.html', {'opds': opds})
+    return render(request, 'hms/opd/opd.html', {'opds': opds})
 
 def fetch_opd(request):
     try:
@@ -963,8 +942,7 @@ def add_opd(request):
 
     patients = Patient.objects.all()
     doctors = Doctor.objects.all()
-    return render(request, "hms/add_opd.html", {"patients": patients, "doctors": doctors})
-
+    return render(request, "hms/opd/add_opd.html", {"patients": patients, "doctors": doctors})
 
 @login_required
 def update_opd(request, opd_id):
@@ -994,14 +972,36 @@ def update_opd(request, opd_id):
         return redirect("opd")
 
     doctors = Doctor.objects.all()
-    return render(request, "hms/update_opd.html", {"opd": opd, "doctors": doctors})
+    return render(request, "hms/opd/update_opd.html", {"opd": opd, "doctors": doctors})
 
+
+
+def calculate_age(date_of_birth):
+    """Returns the age in days, months, or years based on the date of birth."""
+    if not date_of_birth:
+        return "N/A"
+    
+    today = date.today()
+    delta = today - date_of_birth  # Difference in days
+
+    if delta.days < 30:
+        return f"{delta.days} day(s) old" if delta.days > 0 else "Newborn"
+    elif delta.days < 365:
+        months = delta.days // 30
+        return f"{months} month(s) old"
+    else:
+        years = delta.days // 365
+        return f"{years} year(s) old"
 
 
 def opd_report_template(request, patient_id):
     # Fetch the OPD record for the specific patient
     opd = get_object_or_404(OPD, id=patient_id)
+    patient = opd.patient
     
+    # Calculate age dynamically
+    patient_age = calculate_age(patient.date_of_birth)
+
     # Prepare the context with all fields from the OPD model
     opd_visits = [
         {
@@ -1021,10 +1021,9 @@ def opd_report_template(request, patient_id):
         'patient_gender': opd.patient.gender,
         'patient_contact': opd.patient.contact_number,
         'opd_visits': opd_visits,
+        'patient_age': patient_age,  # Pass dynamically calculated age
     }
-    return render(request, 'hms/opd_report_template.html', context)
-
-
+    return render(request, 'hms/opd/opd_report_template.html', context)
 
 @login_required
 def admit_patient(request, opd_id):
@@ -1063,7 +1062,7 @@ def admit_patient(request, opd_id):
         messages.success(request, f"Patient admitted to Room {room.room_number}, Bed {bed_number}.")
         return redirect("ipd")
 
-    return render(request, "hms/admit_patient.html", {"opd": opd, "rooms": available_rooms})
+    return render(request, "hms/ipd/admit_patient.html", {"opd": opd, "rooms": available_rooms})
 
 def get_available_beds(request):
     room_id = request.GET.get("room_id")
@@ -1072,7 +1071,6 @@ def get_available_beds(request):
         available_beds = [bed for bed in range(1, room.total_beds + 1) if bed not in room.occupied_beds]
         return JsonResponse({"beds": [{"id": bed, "bed_number": f"Bed {bed}"} for bed in available_beds]})
     return JsonResponse({"beds": []})
-
 
 @login_required
 def move_appointments_to_opd():
@@ -1087,7 +1085,25 @@ def move_appointments_to_opd():
         appointment.status = 'completed'
         appointment.save()
 
+# Room Views@login_required
+def room_overview(request):
+    rooms = Room.objects.all()
 
+    for room in rooms:
+        room.total_beds_list = list(range(1, room.total_beds + 1))
+        room.bed_patient_info = {}
+
+        for bed_number in room.occupied_beds:
+            # Find the patient admitted to this bed in the IPD model
+            ipd_record = IPD.objects.filter(room=room, bed_number=bed_number).first()
+            if ipd_record:
+                room.bed_patient_info[bed_number] = {
+                    "name": ipd_record.patient.user.full_name,
+                    "admit_date": ipd_record.admitted_on,
+                    "cost": room.bed_price_per_day,
+                }
+
+    return render(request, 'hms/room/room_overview.html', {'rooms': rooms})
 
 @login_required
 def add_room(request):
@@ -1095,13 +1111,14 @@ def add_room(request):
         form = RoomForm(request.POST)
         if form.is_valid():
             form.save()
+            messages.success(request, "Room added successfully!")  # ✅ Success Message
             return redirect('add_room')
     else:
         form = RoomForm()
-    return render(request, 'hms/add_room.html', {'form': form})
 
+    return render(request, 'hms/room/add_room.html', {'form': form})
 
-
+# Employee Views
 @login_required
 def add_employee(request):
     if request.method == 'POST':
@@ -1111,19 +1128,13 @@ def add_employee(request):
             return redirect('employee_list')
     else:
         form = EmployeeForm()
-    return render(request, 'hms/add_employee.html', {'form': form})
+    return render(request, 'hms/employee/add_employee.html', {'form': form})
 
-
-
-# Employee List
 @login_required
 def employee_list(request):
     employees = Employee.objects.all()
-    return render(request, 'hms/employee_list.html', {'employees': employees})
+    return render(request, 'hms/employee/employee_list.html', {'employees': employees})
 
-
-
-# Edit Employee
 @login_required
 def edit_employee(request, pk):
     employee = get_object_or_404(Employee, pk=pk)
@@ -1134,18 +1145,15 @@ def edit_employee(request, pk):
             return redirect('employee_list')
     else:
         form = EmployeeForm(instance=employee)
-    return render(request, 'hms/add_employee.html', {'form': form})
+    return render(request, 'hms/employee/add_employee.html', {'form': form})
 
-# Delete Employee
 @login_required
 def delete_employee(request, pk):
     employee = get_object_or_404(Employee, pk=pk)
     if request.method == "POST":
         employee.delete()
         return redirect('employee_list')
-    return render(request, 'hms/confirm_delete.html', {'object': employee})
-
-
+    return render(request, 'hms/employee/confirm_delete.html', {'object': employee})
 
 @login_required
 def pay_salary(request, pk):
@@ -1154,14 +1162,12 @@ def pay_salary(request, pk):
         payment_date = request.POST.get('payment_date')  # Get payment date from form
         employee.pay_salary(payment_date)  # Pass payment_date to the method
         return redirect('employee_list')
-    return render(request, 'hms/pay_salary.html', {'employee': employee})
+    return render(request, 'hms/salary/pay_salary.html', {'employee': employee})
 
-
-
-
+# License Views
 def license_list(request):
     licenses = License.objects.all()
-    return render(request, 'hms/license_list.html', {'licenses': licenses})
+    return render(request, 'hms/license/license_list.html', {'licenses': licenses})
 
 def add_license(request):
     if request.method == 'POST':
@@ -1171,7 +1177,7 @@ def add_license(request):
             return redirect('license_list')
     else:
         form = LicenseForm()
-    return render(request, 'hms/license_form.html', {'form': form})
+    return render(request, 'hms/license/license_form.html', {'form': form})
 
 def edit_license(request, id):
     license_instance = get_object_or_404(License, id=id)
@@ -1182,18 +1188,17 @@ def edit_license(request, id):
             return redirect('license_list')
     else:
         form = LicenseForm(instance=license_instance)
-    return render(request, 'hms/license_form.html', {'form': form})
+    return render(request, 'hms/license/license_form.html', {'form': form})
 
 def delete_license(request, id):
     license = get_object_or_404(License, id=id)
     license.delete()
     return redirect('license_list')
 
-
 # Asset Views
 def asset_list(request):
     assets = Asset.objects.all()
-    return render(request, 'hms/asset_list.html', {'assets': assets})
+    return render(request, 'hms/asset/asset_list.html', {'assets': assets})
 
 def add_asset(request):
     if request.method == 'POST':
@@ -1203,7 +1208,7 @@ def add_asset(request):
             return redirect('asset_list')
     else:
         form = AssetForm()
-    return render(request, 'hms/asset_form.html', {'form': form, 'title': 'Add Asset'})
+    return render(request, 'hms/asset/asset_form.html', {'form': form, 'title': 'Add Asset'})
 
 def edit_asset(request, id):
     asset = get_object_or_404(Asset, id=id)
@@ -1214,18 +1219,17 @@ def edit_asset(request, id):
             return redirect('asset_list')
     else:
         form = AssetForm(instance=asset)
-    return render(request, 'hms/asset_form.html', {'form': form, 'title': 'Edit Asset'})
+    return render(request, 'hms/asset/asset_form.html', {'form': form, 'title': 'Edit Asset'})
 
 def delete_asset(request, id):
     asset = get_object_or_404(Asset, id=id)
     asset.delete()
     return redirect('asset_list')
 
-
 # Maintenance Views
 def maintenance_list(request):
     maintenance_records = Maintenance.objects.all()
-    return render(request, 'hms/maintenance_list.html', {'maintenance_records': maintenance_records})
+    return render(request, 'hms/maintenance/maintenance_list.html', {'maintenance_records': maintenance_records})
 
 def add_maintenance(request):
     if request.method == 'POST':
@@ -1235,7 +1239,7 @@ def add_maintenance(request):
             return redirect('maintenance_list')
     else:
         form = MaintenanceForm()
-    return render(request, 'hms/maintenance_form.html', {'form': form, 'title': 'Add Maintenance'})
+    return render(request, 'hms/maintenance/maintenance_form.html', {'form': form, 'title': 'Add Maintenance'})
 
 def edit_maintenance(request, id):
     maintenance = get_object_or_404(Maintenance, id=id)
@@ -1246,113 +1250,140 @@ def edit_maintenance(request, id):
             return redirect('maintenance_list')
     else:
         form = MaintenanceForm(instance=maintenance)
-    return render(request, 'hms/maintenance_form.html', {'form': form, 'title': 'Edit Maintenance'})
+    return render(request, 'hms/maintenance/maintenance_form.html', {'form': form, 'title': 'Edit Maintenance'})
 
 def delete_maintenance(request, id):
     maintenance = get_object_or_404(Maintenance, id=id)
     maintenance.delete()
     return redirect('maintenance_list')
 
-
-
+# Accounting Views
+@login_required
 def accounting_summary(request):
+    # Default to today's date if no date range is provided
     today = timezone.now().date()
-    start_date = request.GET.get('start_date')
-    end_date = request.GET.get('end_date')
+    start_date = request.GET.get('start_date', today)
+    end_date = request.GET.get('end_date', today)
 
-    # Convert to date objects if provided
-    if start_date and end_date:
-        start_date = timezone.datetime.strptime(start_date, "%Y-%m-%d").date()
-        end_date = timezone.datetime.strptime(end_date, "%Y-%m-%d").date()
-    else:
-        start_date = today
-        end_date = today
+    # Convert date strings to date objects
+    if isinstance(start_date, str):
+        start_date = datetime.strptime(start_date, "%Y-%m-%d").date()
+    if isinstance(end_date, str):
+        end_date = datetime.strptime(end_date, "%Y-%m-%d").date()
 
-    # Today's Income and Expense from AccountingRecord
-    today_income = AccountingRecord.objects.filter(
-        transaction_type='income', date__date=today
-    ).aggregate(total_income=Sum('amount'))['total_income'] or 0
+    # Ensure end_date is not before start_date
+    if end_date < start_date:
+        messages.error(request, "End date cannot be before start date.")
+        return redirect('accounting_summary')
 
-    today_expense = AccountingRecord.objects.filter(
-        transaction_type='expense', date__date=today
-    ).aggregate(total_expense=Sum('amount'))['total_expense'] or 0
+    # ----------------------------
+    # Income Calculations
+    # ----------------------------
 
-    # Today's Income and Expense from Daybook
-    daybook_entries_today = Daybook.objects.filter(date=today)
-    daybook_expense_today = daybook_entries_today.filter(activity__in=['pantry', 'fuel', 'office_expense', 'site_development', 'site_visit', 'printing', 'utility']).aggregate(total_expense=Sum('amount'))['total_expense'] or 0
+    # Income from OPD
+    opd_income = OPD.objects.filter(
+        visit_date__date__range=(start_date, end_date),
+        payment_status='paid'
+    ).aggregate(total_income=Sum('payment_amount'))['total_income'] or 0
 
-    # Total Today's Income and Expense
-    total_today_income = today_income
-    total_today_expense = today_expense + daybook_expense_today
-    total_today_savings = total_today_income - total_today_expense
+    # Income from IPD (Room charges)
+    ipd_income = IPD.objects.filter(
+        admitted_on__date__range=(start_date, end_date)
+    ).aggregate(total_income=Sum('total_cost'))['total_income'] or 0
 
-    # Income & Expense in a Date Range
-    range_income = AccountingRecord.objects.filter(
-        transaction_type='income', date__date__range=(start_date, end_date)
-    ).aggregate(total_income=Sum('amount'))['total_income'] or 0
+    # Income from Billing (Expenses paid by patients)
+    billing_income = Billing.objects.filter(
+        generated_on__date__range=(start_date, end_date),
+        status='paid'
+    ).aggregate(total_income=Sum('paid_amount'))['total_income'] or 0
 
-    range_expense = AccountingRecord.objects.filter(
-        transaction_type='expense', date__date__range=(start_date, end_date)
-    ).aggregate(total_expense=Sum('amount'))['total_expense'] or 0
+    # Total Income
+    total_income = opd_income + ipd_income + billing_income
 
-    # Excluding IPD and OPD
-    excluded_sources = ['ipd', 'opd']
-    other_income = AccountingRecord.objects.filter(
-        transaction_type='income'
-    ).exclude(source__in=excluded_sources).aggregate(total_income=Sum('amount'))['total_income'] or 0
+    # ----------------------------
+    # Expense Calculations
+    # ----------------------------
 
-    other_expense = AccountingRecord.objects.filter(
-        transaction_type='expense'
-    ).exclude(source__in=excluded_sources).aggregate(total_expense=Sum('amount'))['total_expense'] or 0
+    # Expenses from Daybook
+    daybook_expenses = Daybook.objects.filter(
+        date__range=(start_date, end_date)
+    ).aggregate(total_expenses=Sum('amount'))['total_expenses'] or 0
 
-    # Separate IPD & OPD Reports
-    ipd_income = AccountingRecord.objects.filter(
-        transaction_type='income', source='ipd', date__date__range=(start_date, end_date)
-    ).aggregate(total_income=Sum('amount'))['total_income'] or 0
+    # Salary Expenses
+    salary_expenses = AccountingRecord.objects.filter(
+        transaction_type='expense',
+        source='salary',
+        date__date__range=(start_date, end_date)
+    ).aggregate(total_expenses=Sum('amount'))['total_expenses'] or 0
 
-    opd_income = AccountingRecord.objects.filter(
-        transaction_type='income', source='opd', date__date__range=(start_date, end_date)
-    ).aggregate(total_income=Sum('amount'))['total_income'] or 0
+    # Other Expenses (from AccountingRecord)
+    other_expenses = AccountingRecord.objects.filter(
+        transaction_type='expense',
+        date__date__range=(start_date, end_date)
+    ).exclude(source='salary').aggregate(total_expenses=Sum('amount'))['total_expenses'] or 0
 
-    # Billing Information
-    total_billed = Billing.objects.filter(generated_on__date__range=(start_date, end_date)).aggregate(total_billed=Sum('total_amount'))['total_billed'] or 0
-    total_paid = Billing.objects.filter(generated_on__date__range=(start_date, end_date)).aggregate(total_paid=Sum('paid_amount'))['total_paid'] or 0
-    total_pending = total_billed - total_paid
+    # Total Expenses
+    total_expenses = daybook_expenses + salary_expenses + other_expenses
 
-    # Daybook Data
-    daybook_entries = Daybook.objects.filter(date__range=(start_date, end_date))
-    
-    daybook_expense = daybook_entries.filter(activity__in=['pantry', 'fuel', 'office_expense', 'site_development', 'site_visit', 'printing', 'utility']).aggregate(total_expense=Sum('amount'))['total_expense'] or 0
+    # ----------------------------
+    # Net Profit/Loss
+    # ----------------------------
+    net_profit = total_income - total_expenses
 
+    # ----------------------------
+    # Calculate Daily Net Profit
+    # ----------------------------
+    daily_profit = []
+    date_labels = []
+    current_date = start_date
+    while current_date <= end_date:
+        # Calculate daily income
+        daily_income = (
+            (OPD.objects.filter(visit_date__date=current_date, payment_status='paid')
+            .aggregate(total=Sum('payment_amount'))['total'] or 0) +
+            (IPD.objects.filter(admitted_on__date=current_date)
+            .aggregate(total=Sum('total_cost'))['total'] or 0) +
+            (Billing.objects.filter(generated_on__date=current_date, status='paid')
+            .aggregate(total=Sum('paid_amount'))['total'] or 0)
+        )
+
+
+        # Calculate daily expenses
+        daily_expenses = (
+            (Daybook.objects.filter(date=current_date).aggregate(total=Sum('amount'))['total'] or 0) +
+            (AccountingRecord.objects.filter(transaction_type='expense', date=current_date)
+            .aggregate(total=Sum('amount'))['total'] or 0)
+        )
+
+
+        # Calculate daily net profit
+        daily_net_profit = float(daily_income - daily_expenses)
+        daily_profit.append(daily_net_profit)
+        date_labels.append(current_date.strftime("%Y-%m-%d"))  # Format date as string
+        current_date += timedelta(days=1)
+
+    # ----------------------------
+    # Prepare Context
+    # ----------------------------
     context = {
-        'today_income': total_today_income,
-        'today_expense': total_today_expense,
-        'today_savings': total_today_savings,
-        'range_income': range_income,
-        'range_expense': range_expense,
-        'range_profit': range_income - range_expense,
-        'other_income': other_income,
-        'other_expense': other_expense,
-        'other_profit': other_income - other_expense,
-        'ipd_income': ipd_income,
+        'start_date': start_date.strftime("%Y-%m-%d"),
+        'end_date': end_date.strftime("%Y-%m-%d"),
         'opd_income': opd_income,
-        'total_billed': total_billed,
-        'total_paid': total_paid,
-        'total_pending': total_pending,
-        'daybook_expense': daybook_expense,
-        'start_date': start_date,
-        'end_date': end_date,
-        'daybook_entries': daybook_entries,
+        'ipd_income': ipd_income,
+        'billing_income': billing_income,
+        'total_income': total_income,
+        'daybook_expenses': daybook_expenses,
+        'salary_expenses': salary_expenses,
+        'other_expenses': other_expenses,
+        'total_expenses': total_expenses,
+        'net_profit': net_profit,
+        'daily_profit': daily_profit,  # Pass daily net profit data
+        'date_labels': date_labels,   # Pass date labels
     }
 
     return render(request, 'hms/accounting_summary.html', context)
 
-
-
-
-
-
-
+# Daybook Views
 class DaybookCreateView(LoginRequiredMixin, View):
     login_url = '/login/'
     template_name = 'hms/daybook/daybook_form.html'
@@ -1386,7 +1417,6 @@ class DaybookCreateView(LoginRequiredMixin, View):
             messages.success(request, f"Expense of {expense.amount} has been successfully added.")
             return redirect('daybook_list')
         return render(request, self.template_name, {'form': form, 'today': timezone.now().date()})
-
 
 class DaybookListView(LoginRequiredMixin, View):
     template_name = 'hms/daybook/daybook_list.html'
@@ -1453,7 +1483,6 @@ class DaybookListView(LoginRequiredMixin, View):
             Balance.objects.filter(user=request.user).delete()
             return redirect('daybook/daybook_list')
 
-
 def export_daybook_to_csv(request):
     start_date = request.GET.get('start_date')
     end_date = request.GET.get('end_date')
@@ -1474,8 +1503,6 @@ def export_daybook_to_csv(request):
         writer.writerow([entry.date, entry.activity, entry.custom_activity or '', entry.amount, entry.remark or ''])
 
     return response
-
-
 
 class BalanceUpdateView(LoginRequiredMixin, View):
     template_name = 'hms/daybook/update_balance.html'
@@ -1503,8 +1530,8 @@ class BalanceUpdateView(LoginRequiredMixin, View):
             messages.success(request, message)
             return redirect('daybook_list')
         return render(request, self.template_name, {'form': form})
-    
 
+# NICU Vitals Views
 @login_required
 def add_nicu_vitals(request, ipd_id):
     ipd = get_object_or_404(IPD, id=ipd_id)
@@ -1608,11 +1635,6 @@ def add_nicu_vitals(request, ipd_id):
         'urine_choices': URINE_CHOICES,  # Fixed variable name
     })
 
-
-from django.http import JsonResponse
-from django.utils.timezone import localtime
-from itertools import groupby
-from operator import attrgetter
 @login_required
 def view_nicu_vitals(request, ipd_id):
     ipd = get_object_or_404(IPD, id=ipd_id)
@@ -1658,15 +1680,6 @@ def view_nicu_vitals(request, ipd_id):
         'grouped_vitals':grouped_vitals
     })
 
-
-
-from collections import defaultdict
-from datetime import datetime
-
-from collections import defaultdict
-
-from collections import defaultdict
-
 def calculate_total_fluids(vitals_list):
     """
     Calculate total input and output of fluids in specific time groups, grouped by date.
@@ -1699,15 +1712,7 @@ def calculate_total_fluids(vitals_list):
 
     return dict(date_wise_totals)  # Convert defaultdict to a regular dictionary
 
-
-
-
-from django.shortcuts import get_object_or_404, redirect, render
-from django.urls import reverse_lazy, reverse
-from django.views.generic import ListView, CreateView, UpdateView
-from .models import NICUMedicationRecord, IPD, Patient
-from .forms import NICUMedicationRecordForm
-
+# NICU Medication Views
 class NICUMedicationRecordListView(ListView):
     """View to list all medications for a specific IPD admission."""
     model = NICUMedicationRecord
@@ -1742,7 +1747,6 @@ class NICUMedicationRecordListView(ListView):
         context["ipd_id"] = ipd_id  # For the "Add Medication" button
 
         return context
-
 
 class NICUMedicationRecordCreateView(CreateView):
     """View to add a new NICU medication record."""
@@ -1784,7 +1788,6 @@ class NICUMedicationRecordCreateView(CreateView):
         kwargs["ipd_admission"] = ipd  # Pass IPD admission to the form
         return kwargs
 
-
 class NICUMedicationRecordUpdateView(UpdateView):
     """View to update an existing NICU medication record."""
     model = NICUMedicationRecord
@@ -1802,7 +1805,6 @@ class NICUMedicationRecordUpdateView(UpdateView):
         context["ipd_id"] = self.object.ipd_admission.id
         return context
 
-
 def delete_nicu_medication(request, pk):
     """Delete a NICU medication record."""
     record = get_object_or_404(NICUMedicationRecord, pk=pk)
@@ -1814,11 +1816,7 @@ def delete_nicu_medication(request, pk):
 
     return render(request, "hms/nicumedication/nicu_medication_confirm_delete.html", {"record": record})
 
-
-from django.shortcuts import render, redirect, get_object_or_404
-from .models import Medicine, Diluent
-from .forms import MedicineForm, DiluentForm
-
+# Medicine and Diluent Views
 def manage_medicine_diluent(request):
     medicine_form = MedicineForm()
     diluent_form = DiluentForm()
@@ -1855,13 +1853,10 @@ def manage_medicine_diluent(request):
     }
     return render(request, 'hms/medice_&_diluent/add_medicine_diluent.html', context)
 
-
-
 def delete_medicine(request, pk):
     medicine = get_object_or_404(Medicine, pk=pk)
     medicine.delete()
     return redirect('manage_medicine_diluent')
-
 
 def delete_diluent(request, pk):
     diluent = get_object_or_404(Diluent, pk=pk)

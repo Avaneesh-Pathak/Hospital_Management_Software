@@ -127,8 +127,7 @@
         <ul class="space-y-2">
             {% for expense in expenses %}
             <li class="text-gray-700">
-                🛠 <strong>Category:</strong> {{ expense.get_category_display }} | 💰 <strong>Cost:</strong> ₹{{
-                expense.cost }}
+                🛠 <strong>Category:</strong> {{ expense.get_category_display }} | 💰 <strong>Cost:</strong> ₹{{expense.cost }}
             </li>
             {% endfor %}
         </ul>

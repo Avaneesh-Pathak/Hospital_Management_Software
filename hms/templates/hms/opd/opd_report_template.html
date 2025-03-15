@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OPD Report</title>
+    <style>
+        
+        .report-container {
+            width: 210mm; /* A4 width */
+            {% comment %} min-height: 297mm; /* A4 height */ {% endcomment %}
+            margin: 0 auto;
+            {% comment %} padding: 20mm; {% endcomment %}
+            box-sizing: border-box;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #e5e7eb;
+            padding-bottom: 20px;
+        }
+        .header img {
+            width: 100px; /* Adjust logo size */
+            margin-bottom: 10px;
+        }
+        .header h1 {
+            font-size: 28px;
+            margin: 0;
+            color: #1e3a8a;
+        }
+        .header p {
+            font-size: 14px;
+            color: #6b7280;
+            margin: 5px 0 0;
+        }
+        .section {
+            margin-bottom: 25px;
+        }
+        .section h2 {
+            font-size: 20px;
+            color: #1e3a8a;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #e5e7eb;
+            padding-bottom: 5px;
+        }
+        .section p {
+            font-size: 14px;
+            color: #374151;
+            margin: 5px 0;
+        }
+        .section p strong {
+            color: #111827;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        table th, table td {
+            border: 1px solid #e5e7eb;
+            padding: 10px;
+            text-align: left;
+            font-size: 14px;
+        }
+        table th {
+            background-color: #f3f4f6;
+            color: #111827;
+            font-weight: 600;
+        }
+        table td {
+            color: #374151;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 2px solid #e5e7eb;
+            font-size: 12px;
+            color: #6b7280;
+        }
+        .download-button {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        .download-button button {
+            background-color: #1e3a8a;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .download-button button:hover {
+            background-color: #153e75;
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+</head>
+<body>
+    <div class="report-container" id="opd-report">
+        <!-- Header -->
+        <div class="header">
+            <img src="/path/to/hospital-logo.png" alt="Hospital Logo"> <!-- Ensure this image is accessible -->
+            <h1>PM Advertiser</h1>
+            <p>123 Hospital Road, City, State, ZIP Code</p>
+            <p>Phone: +123 456 7890 | Email: info@pmadvertiser.com</p>
+        </div>
+
+        <!-- Visit Details -->
+        <div class="section visit-details">
+            <p><strong>Visit Date:</strong> {{ current_date }}</p>
+            <p><strong>Doctor:</strong> {{ opd_visits.0.doctor }}</p>
+        </div>
+
+        <!-- Patient Details -->
+        <div class="section patient-details">
+            <h2>Patient Information</h2>
+            <p><strong>Name:</strong> {{ patient_name }}</p>
+            <p><strong>Age:</strong> {{ patient_age }}</p>
+            <p><strong>Gender:</strong> {{ patient_gender }}</p>
+            <p><strong>Contact:</strong> {{ patient_contact }}</p>
+        </div>
+
+        <!-- OPD Visit Details -->
+        <div class="section opd-details">
+            <h2>OPD Visit Details</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Diagnosis</th>
+                        <th>Symptoms</th>
+                        <th>Prescription</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for visit in opd_visits %}
+                    <tr>
+                        <td>{{ visit.diagnosis }}</td>
+                        <td>{{ visit.symptoms }}</td>
+                        <td>{{ visit.prescription }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Visit Type and Follow-up Date -->
+        <div class="section visit-summary">
+            <p><strong>Visit Type:</strong> {{ opd_visits.0.visit_type }}</p>
+            <p><strong>Next Follow-up Date:</strong> {{ opd_visits.0.follow_up_date }}</p>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p>Hospital Management System | &copy; 2025</p>
+            <p>This report is generated automatically. For any discrepancies, please contact the administration.</p>
+        </div>
+    </div>
+
+    <!-- Download Button -->
+    <div class="download-button">
+        <button onclick="downloadPDF()">Download PDF</button>
+    </div>
+
+    <script>
+        function downloadPDF() {
+            const reportElement = document.getElementById("opd-report");
+            
+            // Ensure patient name is safe for filenames
+            const patientName = "{{ patient_name }}".replace(/\s+/g, '_').replace(/[^\w-]/g, '');
+            
+            html2pdf()
+                .from(reportElement)
+                .set({
+                    margin: 10,
+                    filename: `OPD_Report_${patientName}.pdf`,
+                    image: { type: 'jpeg', quality: 0.98 },
+                    html2canvas: { scale: 2 },
+                    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+                })
+                .toPdf()
+                .get('pdf')
+                .then(function (pdf) {
+                    pdf.autoPrint();
+                    window.open(pdf.output('bloburl'), '_blank'); // Open in new tab
+                })
+                .save();
+        }
+    </script>
+</body>
+</html>

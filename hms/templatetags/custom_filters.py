@@ -52,3 +52,9 @@ def subtract(value, arg):
         return value - arg
     except (ValueError, TypeError):
         return 0  # Return 0 if conversion fails
+    
+
+@register.filter
+def get_patient_info(bed_patient_info, bed_number):
+    """Returns patient details for the given bed number."""
+    return bed_patient_info.get(bed_number, {})

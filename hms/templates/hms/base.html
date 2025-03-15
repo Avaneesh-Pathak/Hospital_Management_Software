@@ -181,8 +181,8 @@
 
         <!-- Room Management -->
         <li>
-            <a href="{% url 'add_room' %}" class="sidebar-link flex items-center p-3 text-lg font-semibold text-white bg-blue-500 rounded-lg hover:bg-blue-600 hover:text-white transition duration-300">
-                ➕ Add Room
+            <a href="{% url 'room_overview' %}" class="sidebar-link flex items-center p-3 text-lg font-semibold text-white bg-blue-500 rounded-lg hover:bg-blue-600 hover:text-white transition duration-300">
+                🏥 Room Overview
             </a>
         </li>
 
@@ -210,12 +210,7 @@
             <a href="{% url 'daybook_list' %}" class="sidebar-link flex items-center p-3 text-lg font-semibold text-white bg-blue-700 rounded-lg hover:bg-blue-600 hover:text-white transition duration-300">
                 📒 Daybook
             </a>
-        </li>
-        {% comment %} <li>
-            <a href="{% url 'nicu_medication_list' %}" class="sidebar-link flex items-center p-3 text-lg font-semibold text-white bg-blue-700 rounded-lg hover:bg-blue-600 hover:text-white transition duration-300">
-                📋 NICU Medications
-            </a>
-        </li> {% endcomment %}
+        </li>        
         <li>
             <a href="{% url 'manage_medicine_diluent' %}" class="sidebar-link flex items-center p-3 text-lg font-semibold text-white bg-blue-700 rounded-lg hover:bg-blue-600 hover:text-white transition duration-300">
                 ➕ Add Medicine & Diluent

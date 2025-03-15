@@ -1,0 +1,72 @@
+{% extends 'hms/base.html' %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto bg-white p-6 rounded-lg shadow-md">
+    <h2 class="text-2xl font-bold text-center mb-4">Patient Bill Summary</h2>
+    <a href="{% url 'download_bill_pdf' patient.patient_code %}" 
+   class="block text-center bg-blue-500 text-white py-2 px-4 rounded mt-4 hover:bg-blue-700">
+    Download Bill as PDF
+</a>
+{% if messages %}
+        {% for message in messages %}
+            <p style="color: red;">{{ message }}</p>
+        {% endfor %}
+    {% endif %}
+
+    <!-- Patient Details -->
+    <div class="mb-4 border-b pb-2">
+        <h3 class="text-lg font-semibold">Patient Information</h3>
+        <p><strong>Full Name:</strong> {{ patient.user.full_name}}</p>
+        <p><strong>Patient Code:</strong> {{ patient.patient_code }}</p>
+        <p><strong>Phone Number:</strong> {{ patient.phone_number }}</p>
+        <p><strong>Address:</strong> {{ patient.address }}</p>
+        <p><strong>Blood Group:</strong> {{ patient.blood_group }}</p>
+    </div>
+
+    <!-- Expense Details -->
+    <div class="mb-4 border-b pb-2">
+        <h3 class="text-lg font-semibold">Billing Details</h3>
+        <table class="w-full border-collapse border border-gray-300">
+            <thead>
+                <tr class="bg-gray-200">
+                    <th class="border border-gray-300 px-4 py-2">#</th>
+                    <th class="border border-gray-300 px-4 py-2">Service/Item</th>
+                    <th class="border border-gray-300 px-4 py-2">Cost (₹)</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for expense in expenses %}
+                <tr>
+                    <td class="border border-gray-300 px-4 py-2">{{ forloop.counter }}</td>
+                    <td class="border border-gray-300 px-4 py-2">{{ expense.category }}</td>
+                    <td class="border border-gray-300 px-4 py-2">₹{{ expense.cost|floatformat:2 }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="3" class="text-center py-4">No expenses recorded.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Payment Summary -->
+    <div class="mt-4">
+        <h3 class="text-lg font-semibold">Payment Summary</h3>
+        <p><strong>Total Amount:</strong> ₹{{ bill.total_amount|floatformat:2 }}</p>
+        <p><strong>Paid Amount:</strong> ₹{{ bill.paid_amount|floatformat:2 }}</p>
+        <p><strong>Pending Amount:</strong> ₹{{ pending_amount|floatformat:2 }}</p>
+        <p><strong>Status:</strong> <span class="px-2 py-1 rounded text-white {% if bill.status == 'paid' %}bg-green-500{% else %}bg-red-500{% endif %}">
+            {{ bill.status|title }}
+        </span></p>
+    </div>
+
+    <!-- Payment Button -->
+    {% if bill.pending_amount > 0 %}
+    <a href="{% url 'pay_bill' bill.id %}" class="block text-center bg-blue-500 text-white py-2 px-4 rounded mt-4 hover:bg-blue-700">Make Payment</a>
+    {% endif %}
+
+    <!-- Back to Billing -->
+    <a href="{% url 'billing' %}" class="block text-center bg-gray-500 text-white py-2 px-4 rounded mt-2 hover:bg-gray-700">Back to Billing</a>
+</div>
+{% endblock %}

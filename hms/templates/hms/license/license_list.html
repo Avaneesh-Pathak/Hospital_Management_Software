@@ -1,0 +1,65 @@
+{% extends 'hms/base.html' %}
+{% block content %}
+
+<div class="container mx-auto p-6">
+    <div class="flex justify-between items-center mb-6">
+        <h2 class="text-2xl font-semibold text-gray-800">License Management</h2>
+        <a href="{% url 'add_license' %}" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+            + Add License
+        </a>
+    </div>
+
+    <div class="overflow-x-auto">
+        <table class="w-full border-collapse border border-gray-200 shadow-md bg-white">
+            <thead>
+                <tr class="bg-blue-600 text-white">
+                    <th class="py-3 px-4 text-left">Name</th>
+                    <th class="py-3 px-4 text-left">Type</th>
+                    <th class="py-3 px-4 text-left">Expiry Date</th>
+                    <th class="py-3 px-4 text-left">Document</th>
+                    <th class="py-3 px-4 text-left">Status</th>
+                    <th class="py-3 px-4 text-left">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for license in licenses %}
+                <tr class="border-b hover:bg-gray-100 transition">
+                    <td class="py-3 px-4">{{ license.name }}</td>
+                    <td class="py-3 px-4">{{ license.license_type }}</td>
+                    <td class="py-3 px-4">{{ license.expiry_date }}</td>
+                    <td class="py-3 px-4">
+                        {% if license.document %}
+                            <a href="{{ license.document.url }}" class="text-blue-600 hover:underline" target="_blank">
+                                View Document
+                            </a>
+                        {% else %}
+                            <span class="text-gray-500">No File</span>
+                        {% endif %}
+                    </td>
+                    <td class="py-3 px-4">
+                        <span class="px-3 py-1 rounded-full text-white font-semibold 
+                            {% if license.status == 'Active' %} bg-green-500 
+                            {% elif license.status == 'Expired' %} bg-red-500 
+                            {% else %} bg-yellow-500 {% endif %}">
+                            {{ license.status }}
+                        </span>
+                    </td>
+                    <td class="py-3 px-4">
+                        <a href="{% url 'edit_license' license.id %}" class="text-blue-500 hover:underline">Edit</a> |
+                        <a href="{% url 'delete_license' license.id %}" class="text-red-500 hover:underline"
+                           onclick="return confirm('Are you sure you want to delete this license?');">
+                            Delete
+                        </a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="text-center py-4 text-gray-600">No licenses found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}

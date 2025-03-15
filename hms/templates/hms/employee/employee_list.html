@@ -1,0 +1,61 @@
+{% extends 'hms/base.html' %}
+
+{% block content %}
+<div class="container mx-auto p-6">
+    <h2 class="text-3xl font-bold text-gray-800 mb-6">👥 Employee List</h2>
+
+    <!-- Add Employee Button -->
+    <a href="{% url 'add_employee' %}" 
+       class="inline-block bg-green-600 text-white px-6 py-2 rounded-md hover:bg-green-700 transition duration-300 mb-6">
+       ➕ Add New Employee
+    </a>
+
+    <!-- Employee Table -->
+    <div class="overflow-x-auto bg-white rounded-lg shadow-lg">
+        <table class="min-w-full border-collapse">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contact Number</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Hired Date</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Salary</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Last Payment</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Next Due</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200">
+                {% for employee in employees %}
+                <tr class="hover:bg-gray-50 transition duration-200">
+                    <td class="px-6 py-4 text-sm text-gray-700">{{ employee.user.full_name }}</td>
+                    <td class="px-6 py-4 text-sm text-gray-700">{{ employee.role }}</td>
+                    <td class="px-6 py-4 text-sm text-gray-700">{{ employee.contact_number }}</td>
+                    <td class="px-6 py-4 text-sm text-gray-700">{{ employee.hired_date }}</td>
+                    <td class="px-6 py-4 text-sm text-gray-700">₹{{ employee.salary }}</td>
+                    <td class="px-6 py-4 text-sm text-gray-700">{{ employee.last_payment_date|default:"Not Paid" }}</td>
+                    <td class="px-6 py-4 text-sm text-gray-700">{{ employee.next_due_date|default:"N/A" }}</td>
+                    <td class="px-6 py-4 text-sm">
+                        <!-- Edit Employee -->
+                        <a href="{% url 'edit_employee' employee.pk %}" 
+                           class="text-blue-600 hover:text-blue-800">✏️ Edit</a>
+
+                        <!-- Delete Employee -->
+                        <a href="{% url 'delete_employee' employee.pk %}" 
+                           class="text-red-600 hover:text-red-800 ml-4">🗑️ Delete</a>
+
+                        <!-- Pay Salary -->
+                        <a href="{% url 'pay_salary' employee.pk %}" 
+                           class="text-green-600 hover:text-green-800 ml-4">💰 Pay Salary</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="8" class="px-6 py-4 text-sm text-center text-gray-600">No employees found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,142 @@
+{% extends 'hms/base.html' %}
+{% load custom_filters %}
+
+{% block content %}
+
+<div class="container mt-4">
+    <h2 class="text-center fw-bold text-primary">🏥 Room & Bed Availability</h2>
+
+    <!-- Add Room Button -->
+    <div class="d-flex justify-content-end mb-3">
+        <a href="{% url 'add_room' %}" class="btn btn-primary fw-bold shadow-sm">
+            ➕ Add Room
+        </a>
+    </div>
+
+    <div class="row">
+        {% for room in rooms %}
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-lg border-0">
+                
+                <!-- Room Header -->
+                <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+                    <h5 class="fw-bold m-0">
+                        🚪 Room {{ room.room_number }} - {{ room.get_room_type_display }}
+                    </h5>
+                    <span class="badge bg-light text-dark">
+                        🛏️ {{ room.available_beds }}/{{ room.total_beds }} Beds Available
+                    </span>
+                </div>
+                
+                <!-- Room Details -->
+                <div class="card-body">
+                    <div class="bed-container d-flex flex-wrap justify-content-center">
+                        {% for bed_number in room.total_beds_list %}
+                            {% with patient_info=room.bed_patient_info|get_patient_info:bed_number %}
+                                {% if bed_number in room.occupied_beds %}
+                                    <div class="bed occupied" 
+                                         data-bs-toggle="popover" 
+                                         data-bs-html="true" 
+                                         title="Bed {{ bed_number }} - Occupied"
+                                         data-bs-content="
+                                            <strong>👤 Patient:</strong> {{ patient_info.name|default:'Unknown' }}<br>
+                                            <strong>📅 Admit Date:</strong> {{ patient_info.admit_date|default:'N/A' }}<br>
+                                            <strong>💰 Cost:</strong> ₹{{ patient_info.cost|default:'N/A' }}">
+                                        🛏️ <span>Bed {{ bed_number }}</span>
+                                    </div>
+                                {% else %}
+                                    <div class="bed available" 
+                                         data-bs-toggle="popover" 
+                                         title="Bed {{ bed_number }} - Available" 
+                                         data-bs-content="🛏️ Ready for new patient">
+                                        🛏️ <span>Bed {{ bed_number }}</span>
+                                    </div>
+                                {% endif %}
+                            {% endwith %}
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Enable Bootstrap Popovers -->
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'));
+
+        popoverTriggerList.forEach(function (popoverTriggerEl) {
+            var popover = new bootstrap.Popover(popoverTriggerEl, {
+                trigger: "manual",
+                html: true,
+            });
+
+            // Show popover on hover
+            popoverTriggerEl.addEventListener("mouseenter", function () {
+                popover.show();
+            });
+
+            // Hide popover when mouse leaves
+            popoverTriggerEl.addEventListener("mouseleave", function () {
+                popover.hide();
+            });
+
+            // Close popover when clicking outside
+            document.addEventListener("click", function (event) {
+                if (!popoverTriggerEl.contains(event.target)) {
+                    popover.hide();
+                }
+            });
+        });
+    });
+</script>
+
+<style>
+    .bed-container {
+        gap: 15px;
+        justify-content: center;
+    }
+
+    .bed {
+        width: 90px;
+        height: 90px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        font-size: 18px;
+    }
+
+    .bed:hover {
+        transform: scale(1.1);
+        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    .available {
+        background-color: #28a745; /* Green */
+        color: white;
+        border: 2px solid #28a745;
+    }
+
+    .occupied {
+        background-color: #3989ad; /* Soft Yellow */
+        color:white;
+        border: 2px solid #3989ad;
+    }
+
+    .card-header {
+        font-size: 18px;
+    }
+
+    .badge {
+        font-size: 14px;
+        padding: 8px;
+    }
+</style>
+
+{% endblock %}

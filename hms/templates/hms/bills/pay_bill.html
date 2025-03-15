@@ -1,0 +1,25 @@
+{% extends 'hms/base.html' %}
+{% block content %}
+
+<h2 class="text-2xl font-bold">Make a Payment</h2>
+{% if messages %}
+        {% for message in messages %}
+            <p style="color: red;">{{ message }}</p>
+        {% endfor %}
+    {% endif %}
+<form method="post" class="p-4 bg-white shadow-md rounded-lg">
+    {% csrf_token %}
+    <label class="block text-sm font-semibold">Total Bill: ₹{{ billing.total_amount }}</label>
+    <label class="block text-sm font-semibold">Paid Amount: ₹{{ billing.paid_amount }}</label>
+    <label class="block text-sm font-semibold">Pending Amount: ₹{{ pending_amount|floatformat:2 }}</label>
+    <label class="block text-sm font-semibold mt-2">Enter Amount to Pay:</label>
+    <input type="number" name="paid_amount" class="w-full p-2 border rounded" min="1" required>
+
+    <button type="submit" class="mt-4 px-4 py-2 bg-green-600 text-white rounded">Pay Now</button>
+</form>
+
+<a href="{% url 'billing' %}" class="mt-4 inline-block px-4 py-2 bg-gray-500 text-white rounded">
+    Back to Billing
+</a>
+
+{% endblock %}

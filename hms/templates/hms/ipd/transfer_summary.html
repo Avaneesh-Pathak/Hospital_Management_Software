@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Discharge Summary</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        .header { text-align: center; font-size: 24px; font-weight: bold; }
+        .section { margin-top: 20px; }
+        .table { width: 100%; border-collapse: collapse; }
+        .table, .table th, .table td { border: 1px solid black; padding: 8px; }
+    </style>
+</head>
+<body>
+
+    <div class="header">Discharge Summary</div>
+    <div class="section">
+        <strong>Patient Name:</strong> {{ patient.user.full_name }}<br>
+        <strong>Patient Code:</strong> {{ patient.patient_code }}<br>
+        <strong>Blood Group:</strong> {{ patient.blood_group }}<br>
+    </div>
+
+    <div class="section">
+        <strong>OPD Visits:</strong>
+        <table class="table">
+            <tr><th>Date</th><th>Diagnosis</th><th>Prescription</th></tr>
+            {% for visit in opd_visits %}
+            <tr>
+                <td>{{ visit.visit_date }}</td>
+                <td>{{ visit.diagnosis }}</td>
+                <td>{{ visit.prescription }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+
+    <div class="section">
+        <strong>Prescriptions:</strong>
+        <table class="table">
+            <tr><th>Medication</th><th>Dosage</th><th>Timing</th></tr>
+            {% for pres in prescriptions %}
+            <tr>
+                <td>{{ pres.medication }}</td>
+                <td>{{ pres.dosage }}</td>
+                <td>{{ pres.timing }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+
+</body>
+</html>

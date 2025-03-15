@@ -1,0 +1,97 @@
+{% extends 'hms/base.html' %}
+{% block content %}
+
+<div style="max-width: 600px; margin: 40px auto; padding: 25px; background: white; border-radius: 10px; 
+            box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.1); animation: fadeIn 0.5s ease-in-out;">
+
+    {% if messages %}
+        {% for message in messages %}
+            <p style="color: red; font-weight: bold; text-align: center;">{{ message }}</p>
+        {% endfor %}
+    {% endif %}
+
+    <h2 style="font-size: 28px; font-weight: bold; text-align: center; color: #2c3e50; margin-bottom: 20px;">
+        💰 Add Expense
+    </h2>
+
+    <form method="post" style="display: flex; flex-direction: column; gap: 15px;">
+        {% csrf_token %}
+
+        <div style="display: flex; flex-direction: column;">
+            <label for="{{ form.patient.id_for_label }}" style="font-weight: bold; font-size: 15px; color: #555;">
+                Patient Code:
+            </label>
+            {{ form.patient }}
+        </div>
+
+        <div style="display: flex; flex-direction: column;">
+            <label for="{{ form.category.id_for_label }}" style="font-weight: bold; font-size: 15px; color: #555;">
+                Expense Type:
+            </label>
+            {{ form.category }}
+        </div>
+
+        <div style="display: flex; flex-direction: column;">
+            <label for="{{ form.description.id_for_label }}" style="font-weight: bold; font-size: 15px; color: #555;">
+                Description:
+            </label>
+            {{ form.description }}
+        </div>
+
+        <div style="display: flex; flex-direction: column;">
+            <label for="{{ form.cost.id_for_label }}" style="font-weight: bold; font-size: 15px; color: #555;">
+                Cost (₹):
+            </label>
+            {{ form.cost }}
+        </div>
+
+        <button type="submit" style="width: 100%; background: linear-gradient(135deg, #007bff, #0056b3); 
+                                     color: white; padding: 12px; border: none; border-radius: 5px; 
+                                     font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.3s;">
+            ✅ Add Expense
+        </button>
+    </form>
+
+    <a href="{% url 'billing' %}" 
+       style="display: block; text-align: center; margin-top: 15px; font-size: 16px; font-weight: bold; 
+              color: #333; text-decoration: none; transition: 0.3s;">
+        🔙 Back to Billing
+    </a>
+</div>
+
+<style>
+    /* Adding a smooth fade-in effect */
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Enhancing input fields */
+    input, select, textarea {
+        width: 100%;
+        padding: 10px;
+        margin-top: 5px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        font-size: 14px;
+        transition: 0.3s ease-in-out;
+    }
+
+    input:focus, select:focus, textarea:focus {
+        border-color: #007bff;
+        outline: none;
+        box-shadow: 0px 0px 5px rgba(0, 123, 255, 0.5);
+    }
+
+    /* Making the button more interactive */
+    button:hover {
+        background: linear-gradient(135deg, #0056b3, #004494);
+    }
+
+    /* Improving the back button */
+    a:hover {
+        color: #007bff;
+    }
+</style>
+
+{% endblock %}

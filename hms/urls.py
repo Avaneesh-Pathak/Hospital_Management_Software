@@ -81,6 +81,7 @@ urlpatterns = [
 
     # Rooms and Beds
     path('add-room/', add_room, name='add_room'),
+    path('room-overview/', views.room_overview, name='room_overview'),
     path('get_available_beds/', get_available_beds, name='get_available_beds'),
 
     # Employees

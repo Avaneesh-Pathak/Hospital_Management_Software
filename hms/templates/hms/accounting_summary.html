@@ -1,185 +1,190 @@
 {% extends 'hms/base.html' %}
-{% block content %}
-<div class="container">
-    <h2 class="text-center my-4">📊 Accounting Summary</h2>
 
-    <!-- Date Filter Form -->
-    <div class="card mb-4">
-        <div class="card-header bg-primary text-white">
-            <h3 class="card-title">📅 Date Filter</h3>
-        </div>
+{% block content %}
+<div class="container-fluid">
+    <h2 class="text-center mb-4 fw-bold text-primary">Accounting Summary</h2>
+    
+    <!-- Date Range Filter -->
+    <div class="card shadow mb-4">
         <div class="card-body">
-            <form method="get">
-                <div class="form-row align-items-center">
-                    <div class="col-md-4">
-                        <label for="start_date">Start Date:</label>
-                        <input type="date" class="form-control" id="start_date" name="start_date" value="{{ start_date }}">
-                    </div>
-                    <div class="col-md-4">
-                        <label for="end_date">End Date:</label>
-                        <input type="date" class="form-control" id="end_date" name="end_date" value="{{ end_date }}">
-                    </div>
-                    <div class="col-md-4">
-                        <button type="submit" class="btn btn-primary mt-4">Filter</button>
-                    </div>
+            <form method="get" class="row g-3">
+                <div class="col-md-4">
+                    <label for="start_date" class="form-label">Start Date:</label>
+                    <input type="date" id="start_date" name="start_date" value="{{ start_date }}" class="form-control" required>
+                </div>
+                <div class="col-md-4">
+                    <label for="end_date" class="form-label">End Date:</label>
+                    <input type="date" id="end_date" name="end_date" value="{{ end_date }}" class="form-control" required>
+                </div>
+                <div class="col-md-4 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary w-100">Filter</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- Today's Summary -->
-    <div class="card mb-4">
-        <div class="card-header bg-success text-white">
-            <h3 class="card-title">📅 Today's Summary ({{ today }})</h3>
+    <!-- Key Metrics Cards -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card bg-success text-white shadow-lg">
+                <div class="card-body">
+                    <h5 class="card-title fw-bold">Total Income</h5>
+                    <h3 class="card-text">₹{{ total_income }}</h3>
+                </div>
+            </div>
         </div>
-        <div class="card-body">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div class="bg-green-50 p-4 rounded-lg">
-                    <p class="text-sm text-gray-600">Income</p>
-                    <p class="text-2xl font-bold text-green-700">₹{{ today_income }}</p>
+        <div class="col-md-4">
+            <div class="card bg-danger text-white shadow-lg">
+                <div class="card-body">
+                    <h5 class="card-title fw-bold">Total Expenses</h5>
+                    <h3 class="card-text">₹{{ total_expenses }}</h3>
                 </div>
-                <div class="bg-red-50 p-4 rounded-lg">
-                    <p class="text-sm text-gray-600">Expense</p>
-                    <p class="text-2xl font-bold text-red-700">₹{{ today_expense }}</p>
-                </div>
-                <div class="bg-blue-50 p-4 rounded-lg">
-                    <p class="text-sm text-gray-600">Savings</p>
-                    <p class="text-2xl font-bold text-blue-700">₹{{ today_savings }}</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-info text-white shadow-lg">
+                <div class="card-body">
+                    <h5 class="card-title fw-bold">Net Profit/Loss</h5>
+                    <h3 class="card-text">₹{{ net_profit }}</h3>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Range Summary -->
-    <div class="card mb-4">
-        <div class="card-header bg-warning text-dark">
-            <h3 class="card-title">📅 Range Summary ({{ start_date }} to {{ end_date }})</h3>
-        </div>
-        <div class="card-body">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div class="bg-green-50 p-4 rounded-lg">
-                    <p class="text-sm text-gray-600">Income</p>
-                    <p class="text-2xl font-bold text-green-700">₹{{ range_income }}</p>
+    <!-- Charts in One Row -->
+    <div class="row mb-4">
+        <!-- Income Breakdown (Pie Chart) -->
+        <div class="col-md-4">
+            <div class="card shadow h-100">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="card-title fw-bold">Income Breakdown</h5>
                 </div>
-                <div class="bg-red-50 p-4 rounded-lg">
-                    <p class="text-sm text-gray-600">Expense</p>
-                    <p class="text-2xl font-bold text-red-700">₹{{ range_expense }}</p>
-                </div>
-                <div class="bg-blue-50 p-4 rounded-lg">
-                    <p class="text-sm text-gray-600">Profit</p>
-                    <p class="text-2xl font-bold text-blue-700">₹{{ range_profit }}</p>
+                <div class="card-body">
+                    <canvas id="incomePieChart"></canvas>
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- Daybook Summary -->
-    <div class="card mb-4">
-        <div class="card-header bg-info text-white">
-            <h3 class="card-title">📅 Daybook Summary ({{ start_date }} to {{ end_date }})</h3>
-        </div>
-        <div class="card-body">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div class="bg-green-50 p-4 rounded-lg">
-                    <p class="text-sm text-gray-600">Income</p>
-                    <p class="text-2xl font-bold text-green-700">₹{{ daybook_income }}</p>
+        <!-- Expense Breakdown (Bar Chart) -->
+        <div class="col-md-4">
+            <div class="card shadow h-100">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="card-title fw-bold">Expense Breakdown</h5>
                 </div>
-                <div class="bg-red-50 p-4 rounded-lg">
-                    <p class="text-sm text-gray-600">Expense</p>
-                    <p class="text-2xl font-bold text-red-700">₹{{ daybook_expense }}</p>
-                </div>
-                <div class="bg-blue-50 p-4 rounded-lg">
-                    <p class="text-sm text-gray-600">Profit</p>
-                    <p class="text-2xl font-bold text-blue-700">₹{{ daybook_profit }}</p>
+                <div class="card-body">
+                    <canvas id="expenseBarChart"></canvas>
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- Excluding IPD & OPD -->
-<div class="card mb-4">
-    <div class="card-header bg-warning text-dark">
-        <h3 class="card-title">📂 Excluding IPD & OPD</h3>
-    </div>
-    <div class="card-body">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div class="bg-green-50 p-4 rounded-lg">
-                <p class="text-sm text-gray-600">💰 Other Income</p>
-                <p class="text-2xl font-bold text-green-700">₹{{ other_income }}</p>
-            </div>
-            <div class="bg-red-50 p-4 rounded-lg">
-                <p class="text-sm text-gray-600">💸 Other Expense</p>
-                <p class="text-2xl font-bold text-red-700">₹{{ other_expense }}</p>
-            </div>
-            <div class="bg-blue-50 p-4 rounded-lg">
-                <p class="text-sm text-gray-600">📈 Other Profit</p>
-                <p class="text-2xl font-bold text-blue-700">₹{{ other_profit }}</p>
+        <!-- Net Profit Over Time (Line Chart) -->
+        <div class="col-md-4">
+            <div class="card shadow h-100">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="card-title fw-bold">Net Profit Over Time</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="netProfitLineChart"></canvas>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Hospital Departmental Income -->
-<div class="card mb-4">
-    <div class="card-header bg-info text-white">
-        <h3 class="card-title">🏥 Hospital Departmental Income</h3>
-    </div>
-    <div class="card-body">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div class="bg-green-50 p-4 rounded-lg">
-                <p class="text-sm text-gray-600">🛏 IPD Income</p>
-                <p class="text-2xl font-bold text-green-700">₹{{ ipd_income }}</p>
-            </div>
-            <div class="bg-blue-50 p-4 rounded-lg">
-                <p class="text-sm text-gray-600">🩺 OPD Income</p>
-                <p class="text-2xl font-bold text-blue-700">₹{{ opd_income }}</p>
-            </div>
-        </div>
-    </div>
-</div>
+<!-- Include Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-<!-- Billing Information -->
-<div class="card mb-4">
-    <div class="card-header bg-info text-white">
-        <h3 class="card-title">💳 Billing Information</h3>
-    </div>
-    <div class="card-body">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div class="bg-green-50 p-4 rounded-lg">
-                <p class="text-sm text-gray-600">📜 Total Billed Amount</p>
-                <p class="text-2xl font-bold text-green-700">₹{{ total_billed }}</p>
-            </div>
-            <div class="bg-blue-50 p-4 rounded-lg">
-                <p class="text-sm text-gray-600">💵 Total Paid</p>
-                <p class="text-2xl font-bold text-blue-700">₹{{ total_paid }}</p>
-            </div>
-            <div class="bg-red-50 p-4 rounded-lg">
-                <p class="text-sm text-gray-600">🚨 Pending Payments</p>
-                <p class="text-2xl font-bold text-red-700">₹{{ total_pending }}</p>
-            </div>
-        </div>
-    </div>
-</div>
-</div>
-<style>
-    /* Custom CSS for Accounting Summary */
-    .card-header {
-        font-size: 1.25rem;
-        font-weight: bold;
-    }
+<script>
+    // Income Breakdown Pie Chart
+    const incomePieChart = new Chart(document.getElementById('incomePieChart'), {
+        type: 'pie',
+        data: {
+            labels: ['OPD Income', 'IPD Income', 'Billing Income'],
+            datasets: [{
+                data: [{{ opd_income }}, {{ ipd_income }}, {{ billing_income }}],
+                backgroundColor: ['#4CAF50', '#2196F3', '#FFC107'],
+                hoverOffset: 10, // Add hover effect
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false, // Allow chart to resize
+            plugins: {
+                legend: { position: 'bottom' },
+                title: { display: true, text: 'Income Breakdown', font: { size: 16 } },
+                tooltip: { enabled: true, mode: 'index' }
+            },
+            animation: {
+                duration: 2000, // Animation duration
+                easing: 'easeInOutQuad' // Smooth easing
+            }
+        }
+    });
 
-    .list-group-item {
-        font-size: 1.1rem;
-    }
+    // Expense Breakdown Bar Chart
+    const expenseBarChart = new Chart(document.getElementById('expenseBarChart'), {
+        type: 'bar',
+        data: {
+            labels: ['Daybook Expenses', 'Salary Expenses', 'Other Expenses'],
+            datasets: [{
+                label: 'Expenses',
+                data: [{{ daybook_expenses }}, {{ salary_expenses }}, {{ other_expenses }}],
+                backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56'],
+                borderColor: ['#FF6384', '#36A2EB', '#FFCE56'],
+                borderWidth: 1,
+                hoverOffset: 10, // Add hover effect
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false, // Allow chart to resize
+            plugins: {
+                legend: { display: false },
+                title: { display: true, text: 'Expense Breakdown', font: { size: 16 } },
+                tooltip: { enabled: true, mode: 'index' }
+            },
+            scales: {
+                y: { beginAtZero: true }
+            },
+            animation: {
+                duration: 2000, // Animation duration
+                easing: 'easeInOutQuad' // Smooth easing
+            }
+        }
+    });
 
-    .btn-primary {
-        background-color: #007bff;
-        border-color: #007bff;
-    }
-
-    .btn-primary:hover {
-        background-color: #0056b3;
-        border-color: #004085;
-    }
-</style>
+    // Net Profit Over Time Line Chart
+    const netProfitLineChart = new Chart(document.getElementById('netProfitLineChart'), {
+        type: 'line',
+        data: {
+            labels: {{ date_labels|safe }}, // Use date labels from backend
+            datasets: [{
+                label: 'Net Profit',
+                data: {{ daily_profit|safe }}, // Use daily profit data from backend
+                borderColor: '#4CAF50',
+                borderWidth: 2,
+                fill: false,
+                tension: 0.4, // Smooth curve
+                pointRadius: 5, // Add points
+                pointHoverRadius: 8, // Hover effect
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false, // Allow chart to resize
+            plugins: {
+                legend: { position: 'bottom' },
+                title: { display: true, text: 'Net Profit Over Time', font: { size: 16 } },
+                tooltip: { enabled: true, mode: 'index' }
+            },
+            scales: {
+                y: { beginAtZero: true }
+            },
+            animation: {
+                duration: 2000, // Animation duration
+                easing: 'easeInOutQuad' // Smooth easing
+            }
+        }
+    });
+</script>
 {% endblock %}
