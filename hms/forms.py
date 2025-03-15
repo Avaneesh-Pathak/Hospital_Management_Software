@@ -318,12 +318,16 @@ class NICUVitalsForm(forms.ModelForm):
 class NICUMedicationRecordForm(forms.ModelForm):
     class Meta:
         model = NICUMedicationRecord
+        exclude = ["patient", "ipd_admission"]  # Exclude these fields from the form
         fields = [
             "route", "medicine", "diluent", "dose_frequency", 
-            "other_frequency", "dilution_volume", "duration", "sign"
+            "other_frequency","dilution_volume", "duration", "sign"
         ]
 
     def __init__(self, *args, **kwargs):
+        self.ipd_admission = kwargs.pop("ipd_admission", None)  # Extract IPD object
+        if self.ipd_admission is None:
+            raise ValueError("IPD admission must be provided.")
         super().__init__(*args, **kwargs)
 
         # Placeholder for dilution volume
@@ -335,21 +339,42 @@ class NICUMedicationRecordForm(forms.ModelForm):
             "style": "display: none;",
         })
 
+    def save(self, commit=True):
+        """Auto-assign patient and IPD admission before saving."""
+        instance = super().save(commit=False)
+        if self.ipd_admission:
+            instance.ipd_admission = self.ipd_admission
+            instance.patient = self.ipd_admission.patient  # Assign patient from IPD
 
+        if commit:
+            instance.save()
+        return instance
+
+    def clean(self):
+        """Ensure patient and IPD admission are set before validation."""
+        cleaned_data = super().clean()
+        if not hasattr(self.instance, "patient") or self.instance.patient is None:
+            if self.ipd_admission:
+                self.instance.patient = self.ipd_admission.patient  # Assign patient from IPD
+            else:
+                raise forms.ValidationError("Patient information is required.")
+        return cleaned_data
 
 
 class MedicineForm(forms.ModelForm):
     class Meta:
         model = Medicine
-        fields = ["name", "medicine_type", "standard_dose_per_kg"]
+        fields = ["name", "medicine_type", "standard_dose_per_kg","concentration_mg_per_ml"]
         widgets = {
             "medicine_type": forms.Select(choices=Medicine.MEDICINE_TYPE_CHOICES, attrs={"class": "form-control"}),
             "standard_dose_per_kg": forms.NumberInput(attrs={"class": "form-control", "step": "0.01"}),
+            "concentration_mg_per_ml": forms.NumberInput(attrs={"class": "form-control", "step": "0.01"}),
         }
         labels = {
             "name": "Medicine Name",
             "medicine_type": "Type of Medicine",
             "standard_dose_per_kg": "Standard Dose (mg/kg/dose)",
+            "concentration_mg_per_ml": "Concentration (mg/mL)",
         }
 
 class DiluentForm(forms.ModelForm):

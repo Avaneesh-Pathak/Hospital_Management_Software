@@ -25,25 +25,36 @@
                 <div class="card-body">
                     <form method="post">
                         {% csrf_token %}
+                        
                         <div class="mb-3">
                             <label class="form-label">Medicine Name</label>
-                            <input type="text" class="form-control border border-secondary" id="medicineName" name="name" placeholder="Enter medicine name">
+                            <input type="text" class="form-control border border-secondary" id="medicineName" name="name" placeholder="Enter medicine name" required>
                             <small class="form-text text-muted">Enter the name of the medicine.</small>
                         </div>
+                    
                         <div class="mb-3">
                             <label class="form-label">Type of Medicine</label>
                             {{ medicine_form.medicine_type }}
                             <small class="form-text text-muted">Select the form of the medicine (e.g., Syrup, Injection).</small>
                         </div>
+                    
                         <div class="mb-3">
                             <label class="form-label">Standard Dose (mg/kg/dose)</label>
                             {{ medicine_form.standard_dose_per_kg }}
                             <small class="form-text text-muted">Enter the standard dose per kg.</small>
                         </div>
+                    
+                        <div class="mb-3">
+                            <label class="form-label">Concentration (mg/mL)</label>
+                            {{ medicine_form.concentration_mg_per_ml }}
+                            <small class="form-text text-muted">Required for liquid medicines like syrup, injection, drops, etc.</small>
+                        </div>
+                    
                         <button type="submit" name="add_medicine" class="btn btn-primary w-100">
-                            <i class="fas fa-plus-circle me-2"></i>Add Medicine
+                            <i class="fas fa-plus-circle me-2"></i> Add Medicine
                         </button>
                     </form>
+                    
                 </div>
             </div>
 

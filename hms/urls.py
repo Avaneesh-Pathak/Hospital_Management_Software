@@ -124,7 +124,7 @@ urlpatterns = [
     #NICUMedicationRecord
     
     path("nicu/medications/<int:ipd_id>/", NICUMedicationRecordListView.as_view(), name="nicu_medication_list"),
-    path("nicu/medications/<int:ipd_id>/add/", NICUMedicationRecordCreateView.as_view(), name="nicu_medication_add"),
+    path('nicu/medications/<int:ipd_id>/add/', NICUMedicationRecordCreateView.as_view(), name='nicu_medication_add'),
     path("nicu-medications/edit/<int:pk>/", NICUMedicationRecordUpdateView.as_view(), name="nicu_medication_edit"),
     path("nicu-medications/delete/<int:pk>/", delete_nicu_medication, name="nicu_medication_delete"),
 

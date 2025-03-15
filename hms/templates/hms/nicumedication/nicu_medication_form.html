@@ -10,6 +10,7 @@
     <!-- Form -->
     <form method="post" class="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300">
         {% csrf_token %}
+        <input type="hidden" name="ipd_admission" value="{{ ipd_id }}">
 
         <!-- Form Fields -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">

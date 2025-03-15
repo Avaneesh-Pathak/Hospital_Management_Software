@@ -760,6 +760,8 @@ class AccountingRecord(models.Model):
         ordering = ['-date']
 
 
+
+
 class Medicine(models.Model):
     MEDICINE_TYPE_CHOICES = [
         ("syrup", "Syrup"),
@@ -772,18 +774,24 @@ class Medicine(models.Model):
 
     name = models.CharField(max_length=100, unique=True)
     medicine_type = models.CharField(max_length=20, choices=MEDICINE_TYPE_CHOICES, default="other")
-    standard_dose_per_kg = models.FloatField(help_text="Standard dose per kg for neonates (mg/kg)")
+    # Standard dose is given in mg/kg/day (e.g., 5 mg/kg/day)
+    standard_dose_per_kg = models.FloatField(help_text="Standard dose per kg (mg/kg/day)", null=True)
+    # For liquids, the concentration tells how many mg per mL
+    concentration_mg_per_ml = models.FloatField(help_text="Concentration of the medicine (mg/mL)", null=True, blank=True)
 
     def __str__(self):
         return f"{self.name} ({self.get_medicine_type_display()})"
 
+
 class Diluent(models.Model):
     name = models.CharField(max_length=100, unique=True)
     compatible_medicine_types = models.ManyToManyField(Medicine, related_name="compatible_diluents", blank=True)
-    standard_volume_per_kg = models.FloatField(help_text="Standard diluent volume per kg (mL/kg)")
+    standard_volume_per_kg = models.FloatField(help_text="Standard diluent volume per kg (mL/kg)", null=True)
 
     def __str__(self):
         return self.name
+
+
 
 class NICUMedicationRecord(models.Model):
     ROUTE_CHOICES = [
@@ -806,69 +814,137 @@ class NICUMedicationRecord(models.Model):
     patient = models.ForeignKey("Patient", on_delete=models.CASCADE)
     ipd_admission = models.ForeignKey("IPD", on_delete=models.CASCADE, related_name="nicu_medications", null=True)
     route = models.CharField(max_length=10, choices=ROUTE_CHOICES)
-    medicine = models.ForeignKey(Medicine, on_delete=models.CASCADE)
-    diluent = models.ForeignKey(Diluent, on_delete=models.SET_NULL, null=True, blank=True)
-
+    medicine = models.ForeignKey("Medicine", on_delete=models.CASCADE)
+    diluent = models.ForeignKey("Diluent", on_delete=models.SET_NULL, null=True, blank=True)
     dilution_volume = models.FloatField(help_text="User-defined dilution volume (mL)", null=True, blank=True)
 
-    calculated_dose = models.FloatField(editable=False, help_text="Calculated dose (mg)")
-    calculated_diluent_volume = models.FloatField(editable=False, help_text="Calculated diluent volume (mL)")
-    calculated_infusion_rate = models.FloatField(editable=False, help_text="Calculated infusion rate (mL/hr)")
+    # Calculated Fields:
+    calculated_dose_per_day = models.FloatField(editable=False, null=True)
+    calculated_dose_per_dose = models.FloatField(editable=False, null=True)
+    calculated_volume_per_day = models.FloatField(editable=False, null=True)
+    calculated_volume_per_dose = models.FloatField(editable=False, null=True)
+    calculated_diluent_volume = models.FloatField(editable=False, null=True)
+    calculated_infusion_rate = models.FloatField(editable=False, null=True)
+    total_volume_ml = models.FloatField(editable=False, null=True)
+    calculated_dose_per_hour = models.FloatField(editable=False, null=True)
+    calculated_mg_per_kg_per_dose = models.FloatField(editable=False, null=True)
+    calculated_ml_per_kg_per_dose = models.FloatField(editable=False, null=True)
 
-    duration = models.FloatField(help_text="Duration of administration (hours)")
-    dose_frequency = models.CharField(max_length=10, choices=DOSE_FREQUENCY_CHOICES, default="OD", help_text="Select dose frequency")
-    other_frequency = models.CharField(max_length=100, blank=True, null=True, help_text="Specify if 'Other' is selected")
-
+    duration = models.FloatField(help_text="Duration of administration (hours)", null=True)
+    dose_frequency = models.CharField(max_length=10, choices=DOSE_FREQUENCY_CHOICES, default="OD")
+    other_frequency = models.CharField(max_length=100, blank=True, null=True)
     sign = models.CharField(max_length=100, help_text="Doctor's Signature")
     timestamp = models.DateTimeField(auto_now_add=True)
 
+    def get_dose_frequency_per_day(self):
+        """Returns the number of times the dose is given per day based on frequency."""
+        frequency_map = {
+            "OD": 1, "BD": 2, "TDS": 3, "QID": 4, "SOS": 1, "STAT": 1, "OTHER": 1
+        }
+        return frequency_map.get(self.dose_frequency, 1)
+
     def clean(self):
-        """
-        Validate inputs before saving.
-        """
-        if not self.patient:
-            raise ValidationError("Patient information is required.")
-
-        if not self.patient.weight or self.patient.weight <= 0:
+        """Validate inputs before saving."""
+        if not self.patient or not self.patient.weight or self.patient.weight <= 0:
             raise ValidationError("Patient weight must be provided and greater than zero.")
-
         if not self.medicine:
             raise ValidationError("Medicine must be selected.")
-
-        if self.diluent and not self.dilution_volume and not self.diluent.standard_volume_per_kg:
-            raise ValidationError("Either dilution volume or standard diluent volume must be provided.")
+        if self.route in ["IV"] and not self.duration:
+            raise ValidationError("Duration is required for IV medications.")
 
     def save(self, *args, **kwargs):
-        """
-        Perform calculations before saving.
-        """
+        """Perform pediatric dose calculations before saving."""
         self.clean()  # Validate inputs
 
         patient_weight = self.patient.weight
+        daily_doses = self.get_dose_frequency_per_day()
 
-        # **Calculate Dose (mg)**
-        if self.medicine.standard_dose_per_kg is not None:
-            self.calculated_dose = round(patient_weight * self.medicine.standard_dose_per_kg, 2)
+        # -------------------------------------------
+        # Calculate Total Daily Dose (mg/day)
+        # -------------------------------------------
+        if self.medicine.standard_dose_per_kg:
+            self.calculated_dose_per_day = round(patient_weight * self.medicine.standard_dose_per_kg, 2)
         else:
-            self.calculated_dose = 0  # Default if missing data
+            self.calculated_dose_per_day = 0
 
-        # **Calculate Diluent Volume**
-        if self.dilution_volume is not None:
-            self.calculated_diluent_volume = round(self.dilution_volume, 2)
-        elif self.diluent and self.diluent.standard_volume_per_kg is not None:
-            self.calculated_diluent_volume = round(patient_weight * self.diluent.standard_volume_per_kg, 2)
+        # -------------------------------------------
+        # Calculate Per Dose Amount (mg/dose)
+        # -------------------------------------------
+        if daily_doses > 0:
+            self.calculated_dose_per_dose = round(self.calculated_dose_per_day / daily_doses, 2)
         else:
-            self.calculated_diluent_volume = 0  # Default if missing data
+            self.calculated_dose_per_dose = 0
 
-        # **Calculate Infusion Rate**
-        if self.duration and self.duration > 0 and self.calculated_diluent_volume > 0:
-            self.calculated_infusion_rate = round(self.calculated_diluent_volume / self.duration, 2)
+        # -------------------------------------------
+        # Calculate Total Volume Per Day (mL/day)
+        # -------------------------------------------
+        if self.medicine.concentration_mg_per_ml:
+            self.calculated_volume_per_day = round(self.calculated_dose_per_day / self.medicine.concentration_mg_per_ml, 2)
         else:
-            self.calculated_infusion_rate = 0
+            self.calculated_volume_per_day = 0
+
+        # -------------------------------------------
+        # Calculate Volume Per Dose (mL/dose)
+        # -------------------------------------------
+        if daily_doses > 0:
+            self.calculated_volume_per_dose = round(self.calculated_volume_per_day / daily_doses, 2)
+        else:
+            self.calculated_volume_per_dose = 0
+
+        # -------------------------------------------
+        # Handle Different Routes
+        # -------------------------------------------
+        if self.route in ["IV"]:
+            # Infusion Rate Calculation
+            if self.duration:
+                self.calculated_infusion_rate = round(self.calculated_volume_per_day / self.duration, 2)
+            else:
+                self.calculated_infusion_rate = 0
+
+            # Dilution Volume
+            if self.calculated_infusion_rate and self.duration:
+                self.dilution_volume = round(self.calculated_infusion_rate * self.duration, 2)
+            else:
+                self.dilution_volume = self.calculated_volume_per_day
+
+        elif self.route in ["IM", "SC"]:
+            # IM & SC do not have an infusion rate
+            self.calculated_infusion_rate = 0  
+
+            # Use the provided dilution volume or assume undiluted
+            self.calculated_diluent_volume = round(self.dilution_volume, 2) if self.dilution_volume else 0 
+
+            # Ensure safe injection volume limits
+            if self.calculated_volume_per_dose > 5 and self.route == "IM":
+                raise ValidationError("IM injection volume exceeds 5 mL limit per site.")
+            elif self.calculated_volume_per_dose > 1.5 and self.route == "SC":
+                raise ValidationError("SC injection volume exceeds 1.5 mL limit per site.")
+
+        # -------------------------------------------
+        # Calculate Dose Per Hour (mg/hr)
+        # -------------------------------------------
+        if self.duration:
+            self.calculated_dose_per_hour = round(self.calculated_dose_per_day / self.duration, 2)
+        else:
+            self.calculated_dose_per_hour = 0
+
+        # -------------------------------------------
+        # Calculate mg per kg per dose (mg/kg/dose)
+        # -------------------------------------------
+        if patient_weight and daily_doses > 0:
+            self.calculated_mg_per_kg_per_dose = round(self.medicine.standard_dose_per_kg / daily_doses, 2)
+        else:
+            self.calculated_mg_per_kg_per_dose = 0
+
+        # -------------------------------------------
+        # Calculate mL per kg per dose (mL/kg/dose)
+        # -------------------------------------------
+        if self.medicine.concentration_mg_per_ml and daily_doses > 0:
+            self.calculated_ml_per_kg_per_dose = round((self.medicine.standard_dose_per_kg / daily_doses) / self.medicine.concentration_mg_per_ml, 2)
+        else:
+            self.calculated_ml_per_kg_per_dose = 0
 
         super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.medicine.name} ({self.get_route_display()}) - {self.timestamp}"
-
-

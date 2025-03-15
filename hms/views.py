@@ -1702,29 +1702,35 @@ def calculate_total_fluids(vitals_list):
 
 
 
+from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse_lazy, reverse
+from django.views.generic import ListView, CreateView, UpdateView
+from .models import NICUMedicationRecord, IPD, Patient
+from .forms import NICUMedicationRecordForm
+
 class NICUMedicationRecordListView(ListView):
+    """View to list all medications for a specific IPD admission."""
     model = NICUMedicationRecord
     template_name = "hms/nicumedication/nicu_medication_list.html"
     context_object_name = "medications"
 
     def get_queryset(self):
+        """Fetch all medications for the given IPD admission."""
         ipd_id = self.kwargs.get("ipd_id")
         return NICUMedicationRecord.objects.filter(ipd_admission_id=ipd_id)
 
     def get_context_data(self, **kwargs):
+        """Pass additional context: patient info and IPD ID."""
         context = super().get_context_data(**kwargs)
         ipd_id = self.kwargs.get("ipd_id")
 
-        # Fetch the first medication record (if exists)
+        # Get the first medication to find the patient
         medications = context["medications"]
         first_medication = medications.first() if medications.exists() else None
 
-        # Fetch the patient associated with the IPD admission
-        patient = None
-        if first_medication:
-            patient = first_medication.patient
-        else:
-            # If no medication records exist, fetch the patient directly from the IPD admission
+        # Fetch the patient either from medication or directly from IPD
+        patient = first_medication.patient if first_medication else None
+        if not patient:
             try:
                 patient = Patient.objects.get(ipd__id=ipd_id)
             except Patient.DoesNotExist:
@@ -1733,67 +1739,80 @@ class NICUMedicationRecordListView(ListView):
         # Add patient details to the context
         context["patient"] = patient
         context["patient_name"] = patient.user.full_name if patient else "Unknown Patient"
-        context["ipd_id"] = ipd_id  # Pass IPD ID for 'Add Medication' button
+        context["ipd_id"] = ipd_id  # For the "Add Medication" button
+
         return context
 
 
 class NICUMedicationRecordCreateView(CreateView):
+    """View to add a new NICU medication record."""
     model = NICUMedicationRecord
     form_class = NICUMedicationRecordForm
     template_name = "hms/nicumedication/nicu_medication_form.html"
 
     def get_success_url(self):
+        """Redirect to medication list after adding a record."""
         return reverse_lazy("nicu_medication_list", kwargs={"ipd_id": self.kwargs["ipd_id"]})
 
     def get_initial(self):
+        """Set initial data for the form, including IPD and patient."""
         ipd = get_object_or_404(IPD, id=self.kwargs["ipd_id"])
-        return {"ipd_admission": ipd, "patient": ipd.patient}
+        print(f"IPD: {ipd}, Patient: {getattr(ipd, 'patient', None)}")  # Debugging output
+        return {
+            "ipd_admission": ipd,
+            "patient": ipd.patient,  # Ensure patient is set
+        }
 
     def get_context_data(self, **kwargs):
+        """Pass IPD ID to the template for better form handling."""
         context = super().get_context_data(**kwargs)
-        context["ipd_id"] = self.kwargs["ipd_id"]  # Pass IPD ID explicitly for the template
+        context["ipd_id"] = self.kwargs["ipd_id"]
         return context
 
     def form_valid(self, form):
+        """Assign IPD and patient to the form instance before saving."""
         ipd = get_object_or_404(IPD, id=self.kwargs["ipd_id"])
-        form.instance.ipd_admission = ipd
-        form.instance.patient = ipd.patient
+        form.instance.ipd_admission = ipd  # Assign IPD admission
+        form.instance.patient = ipd.patient  # Assign patient from IPD
+        print(f"Form data before saving: {form.cleaned_data}")  # Debugging output
         return super().form_valid(form)
 
+    def get_form_kwargs(self):
+        """Pass IPD admission explicitly to the form."""
+        kwargs = super().get_form_kwargs()
+        ipd = get_object_or_404(IPD, id=self.kwargs["ipd_id"])
+        kwargs["ipd_admission"] = ipd  # Pass IPD admission to the form
+        return kwargs
 
-from django.urls import reverse_lazy, reverse
 
 class NICUMedicationRecordUpdateView(UpdateView):
+    """View to update an existing NICU medication record."""
     model = NICUMedicationRecord
     form_class = NICUMedicationRecordForm
     template_name = "hms/nicumedication/nicu_medication_form.html"
 
     def get_success_url(self):
-        ipd_id = self.object.ipd_admission.id  # Ensure NICUMedicationRecord has a ForeignKey to IPD
+        """Redirect to medication list after updating."""
+        ipd_id = self.object.ipd_admission.id
         return reverse("nicu_medication_list", kwargs={"ipd_id": ipd_id})
 
     def get_context_data(self, **kwargs):
+        """Pass IPD ID to the template for better form handling."""
         context = super().get_context_data(**kwargs)
-        context["ipd_id"] = self.object.ipd_admission.id  # Pass ipd_id to the template
+        context["ipd_id"] = self.object.ipd_admission.id
         return context
 
 
 def delete_nicu_medication(request, pk):
+    """Delete a NICU medication record."""
     record = get_object_or_404(NICUMedicationRecord, pk=pk)
-    ipd_id = record.ipd_admission.id  # Get the related IPD admission ID
+    ipd_id = record.ipd_admission.id
 
     if request.method == "POST":
         record.delete()
-        return redirect("nicu_medication_list", ipd_id=ipd_id)  # Pass ipd_id to the URL
+        return redirect("nicu_medication_list", ipd_id=ipd_id)
 
     return render(request, "hms/nicumedication/nicu_medication_confirm_delete.html", {"record": record})
-
-
-
-
-
-
-
 
 
 from django.shortcuts import render, redirect, get_object_or_404
