@@ -107,8 +107,8 @@
             <p class="text-gray-700">📝 <strong>Reason:</strong> {{ ipd_record.reason_for_admission }}</p>
             <p class="text-gray-700">📝 <strong>Total Cost of Bed:</strong> {{ ipd_record.calculate_total_cost }}</p>
             {% if not ipd_record.discharge_date %}
-            <a href="{% url 'discharge_patient' patient.patient_code %}" class="btn btn-danger">Discharge</a>
-            <a href="{% url 'transfer_patient' patient.patient_code %}" class="btn btn-warning">Transfer</a>
+            <a href="{% url 'discharge_summary_view' patient.patient_code %}"  class="btn btn-danger">Discharge</a>
+            <a href="{% url 'transfer_summary_view' patient.patient_code %}" class="btn btn-warning">Transfer</a>
             {% else %}
             <p class="text-success">Patient has been discharged on {{ ipd_record.discharge_date }}</p>
             <a href="{% url 'generate_summary_pdf' ipd_record.id %}" class="btn btn-info">Download Summary</a>

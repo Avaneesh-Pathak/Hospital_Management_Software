@@ -779,87 +779,88 @@ def update_ipd_room(request, ipd_id):
         messages.success(request, "Room and bed updated successfully.")
     return redirect('view_ipd_report', ipd_id=ipd.id)
 
-@login_required
-def discharge_patient(request, patient_code):
+
+def discharge_summary_view(request, patient_code):
+    """
+    Renders the discharge summary template with a download button.
+    """
     patient = get_object_or_404(Patient, patient_code=patient_code)
-    ipd_record = IPD.objects.filter(patient=patient, discharge_date__isnull=True).first()
-
-    if not ipd_record:
-        messages.error(request, "Patient is not currently admitted in IPD.")
-        return redirect("patients")
-
-    # Perform discharge
-    ipd_record.discharge()
-    messages.success(request, f"Patient {patient.user.full_name} has been discharged successfully.")
-
-    # Generate discharge summary PDF and return response
-    return discharge_summary_pdf(request, patient_code, action="Discharged")
-
-def transfer_patient(request, patient_code):
-    patient = get_object_or_404(Patient, patient_code=patient_code)
-
-    # Fetch OPD visits
-    opd_visits = OPD.objects.filter(patient=patient).order_by('-visit_date')
-
-    # Fetch IPD records and prescriptions
-    ipd_records = IPD.objects.filter(patient=patient)
-    prescriptions = Prescription.objects.filter(ipd__in=ipd_records).order_by('-timing')
-
-    # Fetch Transfer Details
-    transfer = PatientTransfer.objects.filter(patient=patient).order_by('-transfer_date').first()
 
     context = {
         "patient": patient,
-        "opd_visits": opd_visits,
-        "ipd_records": ipd_records,
-        "prescriptions": prescriptions,
-        "transfer": transfer,
+        "opd_visits": OPD.objects.filter(patient=patient).order_by('-visit_date'),
+        "ipd_records": IPD.objects.filter(patient=patient),
+        "prescriptions": Prescription.objects.filter(ipd__patient=patient).order_by('-timing'),
+        "action": "Discharged",
+    }
+
+    return render(request, "hms/ipd/discharge_summary.html", context)
+
+
+def transfer_summary_view(request, patient_code):
+    """
+    Renders the transfer summary template with a download button.
+    """
+    patient = get_object_or_404(Patient, patient_code=patient_code)
+
+    context = {
+        "patient": patient,
+        "opd_visits": OPD.objects.filter(patient=patient).order_by('-visit_date'),
+        "ipd_records": IPD.objects.filter(patient=patient),
+        "prescriptions": Prescription.objects.filter(ipd__patient=patient).order_by('-timing'),
+        "transfer": PatientTransfer.objects.filter(patient=patient).order_by('-transfer_date').first(),
     }
 
     return render(request, "hms/ipd/transfer_summary.html", context)
 
+
 def render_to_pdf(template_src, context_dict):
+    """
+    Utility function to generate a PDF from a template.
+    """
     template = get_template(template_src)
     html = template.render(context_dict)
     response = HttpResponse(content_type="application/pdf")
-    response["Content-Disposition"] = 'inline; filename="report.pdf"'
+    response["Content-Disposition"] = 'attachment; filename="report.pdf"'
 
     pisa_status = pisa.CreatePDF(html, dest=response)
-    
+
     if pisa_status.err:
+        logger.error(f"PDF generation failed for template {template_src}")
         return HttpResponse("Error generating PDF", status=500)
-    
+
     return response
 
-def discharge_summary_pdf(request, patient_code, action=None):
+
+def discharge_summary_pdf(request, patient_code):
+    """
+    Generates and downloads the discharge summary as a PDF.
+    """
     patient = get_object_or_404(Patient, patient_code=patient_code)
-    opd_visits = OPD.objects.filter(patient=patient).order_by('-visit_date')
-    ipd_records = IPD.objects.filter(patient=patient)
-    prescriptions = Prescription.objects.filter(ipd__in=ipd_records).order_by('-timing')
 
     context = {
         "patient": patient,
-        "opd_visits": opd_visits,
-        "ipd_records": ipd_records,
-        "prescriptions": prescriptions,
-        "action": action,  # Include action in context if needed
+        "opd_visits": OPD.objects.filter(patient=patient).order_by('-visit_date'),
+        "ipd_records": IPD.objects.filter(patient=patient),
+        "prescriptions": Prescription.objects.filter(ipd__patient=patient).order_by('-timing'),
+        "action": "Discharged",
     }
 
     return render_to_pdf("hms/ipd/discharge_summary.html", context)
 
+
 def transfer_summary_pdf(request, patient_code):
+    """
+    Generates and downloads the transfer summary as a PDF.
+    """
     patient = get_object_or_404(Patient, patient_code=patient_code)
-    opd_visits = OPD.objects.filter(patient=patient).order_by('-visit_date')
-    ipd_records = IPD.objects.filter(patient=patient)
-    prescriptions = Prescription.objects.filter(ipd__in=ipd_records).order_by('-timing')
-    transfer = PatientTransfer.objects.filter(patient=patient).order_by('-transfer_date').first()
 
     context = {
         "patient": patient,
-        "opd_visits": opd_visits,
-        "ipd_records": ipd_records,
-        "prescriptions": prescriptions,
-        "transfer": transfer,
+        "opd_visits": OPD.objects.filter(patient=patient).order_by('-visit_date'),
+        "ipd_records": IPD.objects.filter(patient=patient),
+        "prescriptions": Prescription.objects.filter(ipd__patient=patient).order_by('-timing'),
+        "transfer": PatientTransfer.objects.filter(patient=patient).order_by('-transfer_date').first(),
     }
 
     return render_to_pdf("hms/ipd/transfer_summary.html", context)

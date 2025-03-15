@@ -5,7 +5,7 @@ from .views import (
     user_login, get_ipd_data, book_appointment, update_appointment_status, appointment_success, available_doctors,
     profile_view, patient_profile, user_logout, add_emergency_case, admit_emergency_patient, patient_detail,
     doctor_detail, generate_bill, add_expense, generate_bill_pdf, add_opd, update_opd, admit_patient, add_doctor,
-    add_employee, add_room, employee_list, edit_employee, delete_employee, discharge_patient, view_ipd_report,
+    add_employee, add_room, employee_list, edit_employee, delete_employee, view_ipd_report,
     update_ipd_room,DaybookListView,DaybookCreateView,BalanceUpdateView,NICUMedicationRecordListView,NICUMedicationRecordCreateView,
     NICUMedicationRecordUpdateView,delete_nicu_medication
 )
@@ -58,10 +58,10 @@ urlpatterns = [
     path('ipd/<int:ipd_id>/add_prescription/', add_prescription, name='add_prescription'),
     path('ipd/<int:ipd_id>/', view_ipd_report, name='view_ipd_report'),
     path('ipd/<int:ipd_id>/update-room/', update_ipd_room, name='update_ipd_room'),
-    path('discharge/<str:patient_code>/', discharge_patient, name='discharge_patient'),
-    path('discharge_summary/<str:patient_code>/pdf/',views.discharge_summary_pdf, name='discharge_summary_pdf'),
-    path('transfer_patient/<str:patient_code>/', views.transfer_patient, name='transfer_patient'),
-    path('transfer_summary/<str:patient_code>/pdf/', views.transfer_summary_pdf, name='transfer_summary_pdf'),
+    path('ipd/discharge-summary/<str:patient_code>/', views.discharge_summary_view, name="discharge_summary_view"),
+    path('ipd/discharge-summary/pdf/<str:patient_code>/', views.discharge_summary_pdf, name="discharge_summary_pdf"),
+    path('ipd/transfer-summary/<str:patient_code>/', views.transfer_summary_view, name="transfer_summary_view"),
+    path('ipd/transfer-summary/pdf/<str:patient_code>/', views.transfer_summary_pdf, name="transfer_summary_pdf"),
 
 
     # Emergency

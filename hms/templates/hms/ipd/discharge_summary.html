@@ -1,74 +1,226 @@
-{% extends 'hms/base.html' %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Discharge Summary</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 20mm;
+        }
 
-{% block content %}
-<div class="container mt-4">
-    <h2>Discharge Summary</h2>
-    <hr>
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 10px; /* Reduced font size */
+            color: #333;
+            line-height: 1.4;
+            background: #fff;
+            margin: 0;
+            padding: 0;
+        }
 
-    <!-- Patient Details -->
-    <h4>Patient Information</h4>
-    <p><strong>Name:</strong> {{ patient.user.full_name }}</p>
-    <p><strong>Patient Code:</strong> {{ patient.patient_code }}</p>
-    <p><strong>Contact:</strong> {{ patient.contact_number }}</p>
-    <p><strong>Address:</strong> {{ patient.address }}</p>
-    <p><strong>Blood Group:</strong> {{ patient.blood_group }}</p>
+        .container {
+            width: 100%;
+            max-width: 794px; /* A4 width */
+            margin: 0 auto;
+            padding: 10px;
+            box-sizing: border-box;
+        }
 
-    <hr>
+        h1 {
+            text-align: center;
+            color: #002855;
+            font-size: 18px; /* Reduced font size */
+            margin-bottom: 10px;
+        }
 
-    <!-- OPD Visit History -->
-    <h4>OPD Visits</h4>
-    {% if opd_visits %}
-        <ul>
-            {% for visit in opd_visits %}
-                <li>
-                    <strong>Date:</strong> {{ visit.visit_date|date:"d-m-Y" }} | 
-                    <strong>Diagnosis:</strong> {{ visit.diagnosis }} | 
-                    <strong>Doctor:</strong> {{ visit.doctor.user.full_name }}
-                </li>
-            {% endfor %}
-        </ul>
-    {% else %}
-        <p>No OPD visits found.</p>
-    {% endif %}
+        h3 {
+            color: #002855;
+            font-size: 14px; /* Reduced font size */
+            margin-bottom: 10px;
+            border-bottom: 1px solid #002855;
+            padding-bottom: 5px;
+        }
 
-    <hr>
+        .section {
+            margin-bottom: 15px;
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+        }
 
-    <!-- IPD Records -->
-    <h4>IPD Admissions</h4>
-    {% if ipd_records %}
-        <ul>
-            {% for record in ipd_records %}
-                <li>
-                    <strong>Admission Date:</strong> {{ record.admission_date|date:"d-m-Y" }} | 
-                    <strong>Bed:</strong> {{ record.bed }} |
-                    <strong>Status:</strong> {{ record.status }}
-                </li>
-            {% endfor %}
-        </ul>
-    {% else %}
-        <p>No IPD records found.</p>
-    {% endif %}
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            table-layout: fixed; /* Ensures table fits within the page */
+        }
 
-    <hr>
+        th, td {
+            border: 1px solid #000;
+            padding: 5px; /* Reduced padding */
+            text-align: left;
+            font-size: 10px; /* Reduced font size */
+            word-wrap: break-word; /* Ensures long text wraps */
+        }
 
-    <!-- Prescriptions -->
-    <h4>Prescriptions</h4>
-    {% if prescriptions %}
-        <ul>
-            {% for prescription in prescriptions %}
-                <li>
-                    <strong>Medication:</strong> {{ prescription.medication }} |
-                    <strong>Dosage:</strong> {{ prescription.dosage }} |
-                    <strong>Time:</strong> {{ prescription.timing|date:"d-m-Y H:i" }}
-                </li>
-            {% endfor %}
-        </ul>
-    {% else %}
-        <p>No prescriptions found.</p>
-    {% endif %}
+        th {
+            background: #002855;
+            color: white;
+            font-weight: bold;
+        }
 
-    <hr>
+        .signature {
+            margin-top: 20px;
+            text-align: right;
+            font-size: 12px;
+        }
 
-    <a href="#" class="btn btn-primary">Print Summary</a>
-</div>
-{% endblock %}
+        .btn-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 8px 12px;
+            background: #007bff;
+            color: white;
+            text-decoration: none;
+            font-size: 12px;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            background: #0056b3;
+        }
+
+        /* Hide the download button when rendering as PDF */
+        @media print {
+            .btn-container {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>City General Hospital</h1>
+            <p>123 Hospital Road, City, State, ZIP Code</p>
+            <p>Phone: (123) 456-7890 | Email: info@citygeneralhospital.com</p>
+        </div>
+
+        <!-- Patient Information -->
+        <div class="section">
+            <h3>Patient Information</h3>
+            <p><strong>Name:</strong> {{ patient.user.full_name }}</p>
+            <p><strong>Age:</strong> {{ patient.age }}</p>
+            <p><strong>Patient Code:</strong> {{ patient.patient_code }}</p>
+            <p><strong>Discharge Date:</strong> {{ ipd_records.first.discharge_date|default:"-" }}</p>
+        </div>
+
+        <!-- OPD Visit History -->
+        <div class="section">
+            <h3>OPD Visit History</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 30%;">Visit Date</th>
+                        <th style="width: 30%;">Doctor</th>
+                        <th style="width: 40%;">Diagnosis</th>
+                        <th style="width: 40%;">Symptoms</th>
+                        <th style="width: 40%;">Prescription</th>
+                        <th style="width: 40%;">Payment Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for visit in opd_visits %}
+                    <tr>
+                        <td>{{ visit.visit_date|date:"F j, Y, g:i a" }}</td>
+                        <td>{{ visit.doctor.user.full_name|default:"Not available" }}</td>
+                        <td>{{ visit.diagnosis|default:"Pending diagnosis" }}</td>
+                        <td>{{ visit.symptoms }}</td>
+                        <td>{{ visit.prescription }}</td>
+                        <td>{{ visit.get_payment_status_display }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="3" style="text-align: center;">No OPD visits found.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- IPD Records -->
+        <div class="section">
+            <h3>IPD Records</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 30%;">Admission Date</th>
+                        <th style="width: 30%;">Reason for Admission</th>
+                        <th style="width: 30%;">Discharge Date</th>
+                        
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for record in ipd_records %}
+                    <tr>
+                        <td>{{ record.admitted_on }}</td>
+                        <td>{{ record.reason_for_admission }}</td>
+                        <td>{{ record.discharge_date|date:"F j, Y, g:i a"|default:"-" }}</td>
+                        
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="3" style="text-align: center;">No IPD records found.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Prescriptions -->
+        <div class="section">
+            <h3>Prescriptions</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 30%;">Date</th>
+                        <th style="width: 30%;">Medicine</th>
+                        <th style="width: 40%;">Dosage</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for prescription in prescriptions %}
+                    <tr>
+                        <td>{{ prescription.timing|date:"F j, Y, g:i a" }}</td>
+                        <td>{{ prescription.medication|default:"Not available" }}</td>
+                        <td>{{ prescription.dosage|default:"Not available" }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="3" style="text-align: center;">No prescriptions found.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Doctor's Signature -->
+        <div class="signature">
+            <p><strong>Doctor's Signature: _______________________</strong></p>
+        </div>
+
+        <!-- Download Button -->
+        <div class="btn-container">
+            <a href="{% url 'discharge_summary_pdf' patient.patient_code %}" class="btn">Download as PDF</a>
+        </div>
+    </div>
+</body>
+</html>
