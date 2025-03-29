@@ -1,7 +1,7 @@
 from django import forms
 from django.utils import timezone
 from django.core.exceptions import ValidationError
-from .models import CustomUser,NICUVitals, Patient,Billing,Expense,OPD,Room, Doctor, Employee,EmergencyCase,PatientReport,Prescription,License,Asset,Maintenance,Daybook,NICUMedicationRecord,Medicine, Diluent
+from .models import CustomUser,NICUVitals, Patient,Billing,Expense,OPD,Room, Doctor, Employee,EmergencyCase,PatientReport,Prescription,License,Asset,Maintenance,Daybook,NICUMedicationRecord,Medicine, Diluent,Vial
 
 class ProfileUpdateForm(forms.ModelForm):
     class Meta:
@@ -320,8 +320,8 @@ class NICUMedicationRecordForm(forms.ModelForm):
         model = NICUMedicationRecord
         exclude = ["patient", "ipd_admission"]  # Exclude these fields from the form
         fields = [
-            "route", "medicine", "diluent", "dose_frequency", 
-            "other_frequency","dilution_volume", "duration", "sign"
+            "route", "medicine", "diluent", "dose_frequency","other_frequency", "vial","dilution_volume",
+             "sign"
         ]
 
     def __init__(self, *args, **kwargs):
@@ -329,9 +329,6 @@ class NICUMedicationRecordForm(forms.ModelForm):
         if self.ipd_admission is None:
             raise ValueError("IPD admission must be provided.")
         super().__init__(*args, **kwargs)
-
-        # Placeholder for dilution volume
-        self.fields["dilution_volume"].widget.attrs["placeholder"] = "Enter custom dilution volume in mL"
 
         # Hide 'other_frequency' field initially
         self.fields["other_frequency"].widget.attrs.update({
@@ -387,11 +384,20 @@ class DiluentForm(forms.ModelForm):
 
     class Meta:
         model = Diluent
-        fields = ["name", "compatible_medicine_types", "standard_volume_per_kg"]
-        widgets = {
-            "standard_volume_per_kg": forms.NumberInput(attrs={"class": "form-control", "step": "0.01"}),
-        }
+        fields = ["name"]
+        # widgets = {
+        #     "standard_volume_per_kg": forms.NumberInput(attrs={"class": "form-control", "step": "0.01"}),
+        # }
         labels = {
             "name": "Diluent Name",
-            "standard_volume_per_kg": "Standard Volume (mL/kg/dose)",
+            # "standard_volume_per_kg": "Standard Volume (mL/kg/dose)",
+        }
+
+class VialForm(forms.ModelForm):
+    class Meta:
+        model = Vial
+        fields = ['size', 'unit']
+        widgets = {
+            'size': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Enter size'}),
+            'unit': forms.Select(attrs={'class': 'form-control'}),
         }

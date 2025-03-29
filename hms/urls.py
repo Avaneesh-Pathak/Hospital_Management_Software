@@ -133,5 +133,6 @@ urlpatterns = [
     path('medicine-diluent/', views.manage_medicine_diluent, name='manage_medicine_diluent'),
     path('delete-medicine/<int:pk>/', views.delete_medicine, name='delete_medicine'),
     path('delete-diluent/<int:pk>/', views.delete_diluent, name='delete_diluent'),
+    path('delete_vial/<int:pk>/', views.delete_vial, name='delete_vial'),
 
 ]

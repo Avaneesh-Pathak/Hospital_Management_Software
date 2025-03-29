@@ -16,19 +16,16 @@
         <table class="w-full border-collapse">
             <thead class="bg-blue-600 text-white">
                 <tr class="uppercase text-xs font-semibold">
-                    <th class="px-6 py-3">#</th>
+                    <th class="px-6 py-3">S.No.</th>
                     <th class="px-6 py-3 text-left">Medicine</th>
-                    <th class="px-6 py-3 text-center">Dose (mg)</th>
-                    <th class="px-6 py-3 text-center">Daily Dose (mg)</th>
-                    <th class="px-6 py-3 text-center">Per Dose (mg)</th>
-                    <th class="px-6 py-3 text-center">Dose per Hour (mg/hr)</th>
-                    <th class="px-6 py-3 text-center">Per kg per Dose (mg/kg)</th>
-                    <th class="px-6 py-3 text-center">Volume per Dose (mL)</th>
-                    <th class="px-6 py-3 text-center">Volume per kg per Dose (mL/kg)</th>
+                    <th class="px-6 py-3 text-center">Per Dose (mg/kg/dose)</th>
+                    <th class="px-6 py-3 text-center">Per kg per Dose (mg/kg/dose)</th>
+                    <th class="px-6 py-3 text-center">Vial</th>
+                    <th class="px-6 py-3 text-center">Dilution Volume</th>
+                    <th class="px-6 py-3 text-center">Diluent</th>
                     <th class="px-6 py-3 text-left">Route</th>
                     <th class="px-6 py-3 text-left">Dose Frequency</th>
                     <th class="px-6 py-3 text-center">Infusion Rate (mL/hr)</th>
-                    <th class="px-6 py-3 text-center">Total Volume (mL)</th>
                     <th class="px-6 py-3 text-left whitespace-nowrap">Doctor's Sign</th>
                     <th class="px-6 py-3 text-center">Actions</th>
                 </tr>
@@ -39,12 +36,10 @@
                     <td class="px-6 py-4 text-center">{{ forloop.counter }}</td>
                     <td class="px-6 py-4 font-medium">{{ medication.medicine }}</td>
                     <td class="px-6 py-4 text-center">{{ medication.calculated_dose_per_dose|default:"-" }}</td>
-                    <td class="px-6 py-4 text-center">{{ medication.calculated_dose_per_day|default:"-" }}</td>
-                    <td class="px-6 py-4 text-center">{{ medication.calculated_dose_per_dose|default:"-" }}</td>
-                    <td class="px-6 py-4 text-center">{{ medication.calculated_dose_per_hour|default:"-" }}</td>
                     <td class="px-6 py-4 text-center">{{ medication.calculated_mg_per_kg_per_dose|default:"-" }}</td>
-                    <td class="px-6 py-4 text-center">{{ medication.calculated_volume_per_dose|default:"-" }}</td>
-                    <td class="px-6 py-4 text-center">{{ medication.calculated_ml_per_kg_per_dose|default:"-" }}</td>
+                    <td class="px-6 py-4 text-center">{{ medication.vial}}</td>
+                    <td class="px-6 py-4 text-center">{{ medication.dilution_volume}}</td>
+                    <td class="px-6 py-4 text-center">{{ medication.diluent.name}}</td>
                     <td class="px-6 py-4">{{ medication.get_route_display }}</td>
                     <td class="px-6 py-4 font-medium">
                         {% if medication.dose_frequency == "OTHER" %}
@@ -53,17 +48,7 @@
                         {{ medication.get_dose_frequency_display }}
                         {% endif %}
                     </td>
-                    <td class="px-6 py-4 text-center">{{ medication.calculated_infusion_rate|default:"-" }}</td>
-                    <td class="px-6 py-4 text-center">
-                        {% if medication.dilution_volume %}
-                            {{ medication.dilution_volume }}
-                        {% elif medication.total_volume_ml %}
-                            {{ medication.total_volume_ml }}
-                        {% else %}
-                            -
-                        {% endif %}
-                    </td>
-                    
+                    <td class="px-6 py-4 text-center">{{ medication.calculated_infusion_rate}}</td>
                     <td class="px-6 py-4 font-medium whitespace-nowrap">{{ medication.sign }}</td>
                     <td class="px-6 py-4 text-center">
                         <a href="{% url 'nicu_medication_edit' medication.id %}" class="text-blue-600 hover:text-blue-800 transition duration-200" title="Edit">

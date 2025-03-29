@@ -785,12 +785,28 @@ class Medicine(models.Model):
 
 class Diluent(models.Model):
     name = models.CharField(max_length=100, unique=True)
-    compatible_medicine_types = models.ManyToManyField(Medicine, related_name="compatible_diluents", blank=True)
-    standard_volume_per_kg = models.FloatField(help_text="Standard diluent volume per kg (mL/kg)", null=True)
-
+    
     def __str__(self):
+        
         return self.name
 
+class Vial(models.Model):
+    VIAL_TYPE_CHOICES = [
+        ("mg", "mg"),
+        ("ml", "mL"),
+    ]
+
+    size = models.FloatField(help_text="Size of the vial (e.g., 1000, 500, 250, etc.)")
+    unit = models.CharField(max_length=2, choices=VIAL_TYPE_CHOICES, default="mg", help_text="Unit (mg or mL)")
+
+
+    def get_vial_size_in_ml(self):
+        if self.unit == "mg":
+            return self.size / 100  # Convert mg to mL (1 mL = 100 mg)
+        return self.size
+    
+    def __str__(self):
+        return f"{self.size} {self.get_unit_display()}"
 
 
 class NICUMedicationRecord(models.Model):
@@ -816,13 +832,14 @@ class NICUMedicationRecord(models.Model):
     route = models.CharField(max_length=10, choices=ROUTE_CHOICES)
     medicine = models.ForeignKey("Medicine", on_delete=models.CASCADE)
     diluent = models.ForeignKey("Diluent", on_delete=models.SET_NULL, null=True, blank=True)
+    vial = models.ForeignKey("Vial", on_delete=models.SET_NULL, null=True, blank=True)
     dilution_volume = models.FloatField(help_text="User-defined dilution volume (mL)", null=True, blank=True)
 
-    # Calculated Fields:
+    # Calculated Fields
     calculated_dose_per_day = models.FloatField(editable=False, null=True)
     calculated_dose_per_dose = models.FloatField(editable=False, null=True)
-    calculated_volume_per_day = models.FloatField(editable=False, null=True)
-    calculated_volume_per_dose = models.FloatField(editable=False, null=True)
+    # calculated_volume_per_day = models.FloatField(editable=False, null=True)
+    # calculated_volume_per_dose = models.FloatField(editable=False, null=True)
     calculated_diluent_volume = models.FloatField(editable=False, null=True)
     calculated_infusion_rate = models.FloatField(editable=False, null=True)
     total_volume_ml = models.FloatField(editable=False, null=True)
@@ -830,7 +847,6 @@ class NICUMedicationRecord(models.Model):
     calculated_mg_per_kg_per_dose = models.FloatField(editable=False, null=True)
     calculated_ml_per_kg_per_dose = models.FloatField(editable=False, null=True)
 
-    duration = models.FloatField(help_text="Duration of administration (hours)", null=True)
     dose_frequency = models.CharField(max_length=10, choices=DOSE_FREQUENCY_CHOICES, default="OD")
     other_frequency = models.CharField(max_length=100, blank=True, null=True)
     sign = models.CharField(max_length=100, help_text="Doctor's Signature")
@@ -843,108 +859,54 @@ class NICUMedicationRecord(models.Model):
         }
         return frequency_map.get(self.dose_frequency, 1)
 
+
     def clean(self):
         """Validate inputs before saving."""
         if not self.patient or not self.patient.weight or self.patient.weight <= 0:
             raise ValidationError("Patient weight must be provided and greater than zero.")
         if not self.medicine:
             raise ValidationError("Medicine must be selected.")
-        if self.route in ["IV"] and not self.duration:
-            raise ValidationError("Duration is required for IV medications.")
+        if self.route == "IV" and not self.get_dose_frequency_per_day():
+            raise ValidationError("Frequency is required for IV medications.")
 
     def save(self, *args, **kwargs):
-        """Perform pediatric dose calculations before saving."""
-        self.clean()  # Validate inputs
-
+        self.clean()
         patient_weight = self.patient.weight
         daily_doses = self.get_dose_frequency_per_day()
+        print(self.medicine)
+        # Calculate Dose Per Day (mg/day)
+        self.calculated_dose_per_day = round(patient_weight * self.medicine.standard_dose_per_kg)
 
-        # -------------------------------------------
-        # Calculate Total Daily Dose (mg/day)
-        # -------------------------------------------
-        if self.medicine.standard_dose_per_kg:
-            self.calculated_dose_per_day = round(patient_weight * self.medicine.standard_dose_per_kg, 2)
+        # Calculate Dose Per Dose (mg/dose)
+        self.calculated_dose_per_dose = round(self.calculated_dose_per_day / daily_doses)
+
+        # ✅ Calculate mg/kg/dose and mL/kg/dose
+        if patient_weight > 0:
+            self.calculated_mg_per_kg_per_dose = round(self.calculated_dose_per_dose / patient_weight, 2)
+
+        # ✅ Calculate Diluent Volume (mL) Based on Vial Type
+        if self.vial and self.vial.unit == "mg":
+            # Convert mg to mL using standard concentration
+            vial_volume_ml = self.vial.size / 100
         else:
-            self.calculated_dose_per_day = 0
+            vial_volume_ml = self.vial.size if self.vial else 0
 
-        # -------------------------------------------
-        # Calculate Per Dose Amount (mg/dose)
-        # -------------------------------------------
-        if daily_doses > 0:
-            self.calculated_dose_per_dose = round(self.calculated_dose_per_day / daily_doses, 2)
+        self.calculated_diluent_volume = round(vial_volume_ml, 2)
+
+        self.total_volume_ml = round(
+            (self.calculated_dose_per_dose / self.medicine.concentration_mg_per_ml if self.medicine.concentration_mg_per_ml else self.calculated_dose_per_dose / self.dilution_volume) 
+            + self.calculated_diluent_volume, 2)
+
+        # ✅ Calculate Accurate Infusion Rate for IV (Infusion Time = 1 Hour)
+        if self.route == "IV"  and self.total_volume_ml > 0:
+            # Convert 20 minutes to hours
+            # infusion_time_in_hours = 20 / 60, replace 1 with this to calculate for 20 mint
+            self.calculated_infusion_rate = round(self.total_volume_ml/1 , 2)  # mL/hr
         else:
-            self.calculated_dose_per_dose = 0
+            self.calculated_infusion_rate = 0
 
-        # -------------------------------------------
-        # Calculate Total Volume Per Day (mL/day)
-        # -------------------------------------------
-        if self.medicine.concentration_mg_per_ml:
-            self.calculated_volume_per_day = round(self.calculated_dose_per_day / self.medicine.concentration_mg_per_ml, 2)
-        else:
-            self.calculated_volume_per_day = 0
-
-        # -------------------------------------------
-        # Calculate Volume Per Dose (mL/dose)
-        # -------------------------------------------
-        if daily_doses > 0:
-            self.calculated_volume_per_dose = round(self.calculated_volume_per_day / daily_doses, 2)
-        else:
-            self.calculated_volume_per_dose = 0
-
-        # -------------------------------------------
-        # Handle Different Routes
-        # -------------------------------------------
-        if self.route in ["IV"]:
-            # Infusion Rate Calculation
-            if self.duration:
-                self.calculated_infusion_rate = round(self.calculated_volume_per_day / self.duration, 2)
-            else:
-                self.calculated_infusion_rate = 0
-
-            # Dilution Volume
-            if self.calculated_infusion_rate and self.duration:
-                self.dilution_volume = round(self.calculated_infusion_rate * self.duration, 2)
-            else:
-                self.dilution_volume = self.calculated_volume_per_day
-
-        elif self.route in ["IM", "SC"]:
-            # IM & SC do not have an infusion rate
-            self.calculated_infusion_rate = 0  
-
-            # Use the provided dilution volume or assume undiluted
-            self.calculated_diluent_volume = round(self.dilution_volume, 2) if self.dilution_volume else 0 
-
-            # Ensure safe injection volume limits
-            if self.calculated_volume_per_dose > 5 and self.route == "IM":
-                raise ValidationError("IM injection volume exceeds 5 mL limit per site.")
-            elif self.calculated_volume_per_dose > 1.5 and self.route == "SC":
-                raise ValidationError("SC injection volume exceeds 1.5 mL limit per site.")
-
-        # -------------------------------------------
-        # Calculate Dose Per Hour (mg/hr)
-        # -------------------------------------------
-        if self.duration:
-            self.calculated_dose_per_hour = round(self.calculated_dose_per_day / self.duration, 2)
-        else:
-            self.calculated_dose_per_hour = 0
-
-        # -------------------------------------------
-        # Calculate mg per kg per dose (mg/kg/dose)
-        # -------------------------------------------
-        if patient_weight and daily_doses > 0:
-            self.calculated_mg_per_kg_per_dose = round(self.medicine.standard_dose_per_kg / daily_doses, 2)
-        else:
-            self.calculated_mg_per_kg_per_dose = 0
-
-        # -------------------------------------------
-        # Calculate mL per kg per dose (mL/kg/dose)
-        # -------------------------------------------
-        if self.medicine.concentration_mg_per_ml and daily_doses > 0:
-            self.calculated_ml_per_kg_per_dose = round((self.medicine.standard_dose_per_kg / daily_doses) / self.medicine.concentration_mg_per_ml, 2)
-        else:
-            self.calculated_ml_per_kg_per_dose = 0
 
         super().save(*args, **kwargs)
 
-    def __str__(self):
-        return f"{self.medicine.name} ({self.get_route_display()}) - {self.timestamp}"
+def __str__(self):
+    return f"{self.medicine.name} ({self.get_route_display()}) - {self.timestamp}"

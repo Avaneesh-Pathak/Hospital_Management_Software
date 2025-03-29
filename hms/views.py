@@ -44,11 +44,11 @@ from django.views.generic import ListView, CreateView, UpdateView
 # Import Models and Forms
 from .models import (
     CustomUser, Patient, Doctor, Appointment, Billing, EmergencyCase, OPD, IPD, Expense, Employee, Room, PatientReport, Prescription,
-    License, Asset, Maintenance, AccountingRecord, Daybook, Balance, PatientTransfer, NICUVitals, NICUMedicationRecord, Medicine, Diluent
+    License, Asset, Maintenance, AccountingRecord, Daybook, Balance, PatientTransfer, NICUVitals, NICUMedicationRecord, Medicine, Diluent,Vial
 )
 from .forms import (
     PatientRegistrationForm, ExpenseForm, BillingForm, OPDForm, DoctorForm, EmployeeForm, RoomForm, EmergencyCaseForm, ProfileUpdateForm, PatientReportForm,
-    PrescriptionForm, LicenseForm, AssetForm, MaintenanceForm, BalanceUpdateForm, DaybookEntryForm, NICUVitalsForm, NICUMedicationRecordForm, MedicineForm, DiluentForm
+    PrescriptionForm, LicenseForm, AssetForm, MaintenanceForm, BalanceUpdateForm, DaybookEntryForm, NICUVitalsForm, NICUMedicationRecordForm, MedicineForm, DiluentForm,VialForm
 )
 
 # Logger Setup
@@ -1821,21 +1821,24 @@ def delete_nicu_medication(request, pk):
 def manage_medicine_diluent(request):
     medicine_form = MedicineForm()
     diluent_form = DiluentForm()
+    vial_form = VialForm()
+
     medicines = Medicine.objects.all()
     diluents = Diluent.objects.all()
+    vials = Vial.objects.all()
 
     if request.method == "POST":
+        # Add Medicine
         if "add_medicine" in request.POST:
-            print("POST Data:", request.POST)
             medicine_form = MedicineForm(request.POST)
             if medicine_form.is_valid():
                 medicine_form.save()
                 messages.success(request, "Medicine added successfully!")
                 return redirect('manage_medicine_diluent')
             else:
-                print("Medicine Form Errors:", medicine_form.errors)  # Debugging
                 messages.error(request, "Failed to add medicine. Please check the form for errors.")
-
+        
+        # Add Diluent
         elif "add_diluent" in request.POST:
             diluent_form = DiluentForm(request.POST)
             if diluent_form.is_valid():
@@ -1843,14 +1846,25 @@ def manage_medicine_diluent(request):
                 messages.success(request, "Diluent added successfully!")
                 return redirect('manage_medicine_diluent')
             else:
-                print("Diluent Form Errors:", diluent_form.errors)  # Debugging
                 messages.error(request, "Failed to add diluent. Please check the form for errors.")
+        
+        # Add Vial
+        elif "add_vial" in request.POST:
+            vial_form = VialForm(request.POST)
+            if vial_form.is_valid():
+                vial_form.save()
+                messages.success(request, "Vial added successfully!")
+                return redirect('manage_medicine_diluent')
+            else:
+                messages.error(request, "Failed to add vial. Please check the form for errors.")
 
     context = {
         'medicine_form': medicine_form,
         'diluent_form': diluent_form,
+        'vial_form': vial_form,
         'medicines': medicines,
-        'diluents': diluents
+        'diluents': diluents,
+        'vials': vials,
     }
     return render(request, 'hms/medice_&_diluent/add_medicine_diluent.html', context)
 
@@ -1862,4 +1876,10 @@ def delete_medicine(request, pk):
 def delete_diluent(request, pk):
     diluent = get_object_or_404(Diluent, pk=pk)
     diluent.delete()
+    return redirect('manage_medicine_diluent')
+
+def delete_vial(request, pk):
+    vial = get_object_or_404(Vial, pk=pk)
+    vial.delete()
+    messages.success(request, "Vial deleted successfully!")
     return redirect('manage_medicine_diluent')
