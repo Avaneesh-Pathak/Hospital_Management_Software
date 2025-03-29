@@ -164,6 +164,7 @@ def search(request):
 
     return render(request, 'hms/search_results.html', {'results': results, 'query': query})
 
+import json
 # Dashboard Views
 @login_required
 def dashboard(request):
@@ -187,39 +188,55 @@ def dashboard(request):
     )
 
     # Prepare data for Chart.js
-    daily_patient_labels = [entry['date'].strftime('%Y-%m-%d') for entry in patient_trend]
-    daily_patient_data = [entry['count'] for entry in patient_trend]
+    # daily_patient_labels = [entry['date'].strftime('%Y-%m-%d') for entry in patient_trend]
+    # daily_patient_data = [entry['count'] for entry in patient_trend]
+    # Create complete date range
+    date_counts = {entry['date']: entry['count'] for entry in patient_trend}
+    labels = []
+    data = []
+    days = 7
+    end_date = timezone.now().date()
+    start_date = end_date - timedelta(days=days-1)
 
+    for day in range(days):
+        current_date = start_date + timedelta(days=day)
+        labels.append(current_date.strftime('%Y-%m-%d'))
+        data.append(date_counts.get(current_date, 0))
     # Room Statistics
     total_rooms = Room.objects.count()
     available_rooms_count = Room.objects.filter(is_available=True).count()  # Fixed
     booked_rooms = total_rooms - available_rooms_count  # Fixed
 
     # Count rooms by type and available rooms by type
+    # In your dashboard_view function
     room_type_data = {}
     room_type_counts = Room.objects.values('room_type').annotate(total=Count('id'))
     available_rooms = Room.objects.filter(is_available=True).values('room_type').annotate(available=Count('id'))
 
     for room in room_type_counts:
-        room_type_data[room['room_type']] = {'total': room['total'], 'available': 0}
-
-    for room in available_rooms:
-        if room['room_type'] in room_type_data:
-            room_type_data[room['room_type']]['available'] = room['available']
+        total = room['total']
+        available = next((r['available'] for r in available_rooms if r['room_type'] == room['room_type']), 0)
+        percentage = (available / total) * 100 if total > 0 else 0
+        room_type_data[room['room_type']] = {
+                'total': total,
+                'available': available,
+                'percentage': round(percentage)
+            }
 
     expiring_licenses = License.objects.filter(expiry_date__lte=warning_period, expiry_date__gte=today)
     expiring_assets = Asset.objects.filter(warranty_expiry__lte=warning_period, warranty_expiry__gte=today)
     due_maintenance = Maintenance.objects.filter(next_due_date__lte=warning_period, next_due_date__gte=today)
 
     context = {
+        'now': now(),
         'total_patients': total_patients,
         'total_doctors': total_doctors,
         'total_appointments': total_appointments,
         'total_revenue': total_revenue,
         'emergency_cases_today': emergency_cases_today,
         'upcoming_appointments': upcoming_appointments,
-        'daily_patient_labels': daily_patient_labels,
-        'daily_patient_data': daily_patient_data,
+        'daily_patient_labels':  json.dumps(labels),
+        'daily_patient_data':  json.dumps(data),
         'total_rooms': total_rooms,
         'available_rooms_count': available_rooms_count,  # Fixed
         'booked_rooms': booked_rooms,  # Fixed
@@ -230,6 +247,25 @@ def dashboard(request):
     }
 
     return render(request, 'hms/dashboard.html', context)
+
+def patient_stats_api(request):
+    days = int(request.GET.get('days', 7))
+    today = datetime.today()
+    start_date = today - timedelta(days=days)
+
+    data = (
+        Patient.objects.filter(created_at__gte=start_date)
+        .extra(select={'day': 'DATE(created_at)'})
+        .values('day')
+        .annotate(count=Count('id'))
+        .order_by('day')
+    )
+
+    labels = [str(d['day']) for d in data]
+    counts = [d['count'] for d in data]
+
+    return JsonResponse({'labels': labels, 'data': counts})
+
 
 # Patient Views
 @login_required

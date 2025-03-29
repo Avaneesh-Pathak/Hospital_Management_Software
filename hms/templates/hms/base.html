@@ -13,44 +13,67 @@
         /* Custom CSS */
         body {
             font-family: 'Poppins', sans-serif;
+            transition: background-color 0.3s, color 0.3s;
         }
 
         /* Sidebar */
         #sidebar {
-            z-index: 1000; /* Ensure sidebar is above all content */
+            z-index: 1000;
             position: fixed;
             left: 0;
             top: 0;
             height: 100vh;
             width: 250px;
-            background-color: #1e3a8a; /* Dark blue */
+            background-color: #1e3a8a;
             color: white;
             transform: translateX(-100%);
             transition: transform 0.3s ease-in-out;
             overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: #3b82f6 #1e3a8a;
+        }
+
+        #sidebar::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        #sidebar::-webkit-scrollbar-track {
+            background: #1e3a8a;
+        }
+
+        #sidebar::-webkit-scrollbar-thumb {
+            background-color: #3b82f6;
+            border-radius: 4px;
         }
 
         /* Main Content */
         .main-content {
-            margin-left: 0; /* No margin by default */
+            margin-left: 0;
             transition: margin-left 0.3s ease-in-out;
             position: relative;
-            z-index: 1; /* Ensure main content is below the sidebar */
+            z-index: 1;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
 
         /* When sidebar is open */
         #sidebar.open {
             transform: translateX(0);
+            box-shadow: 4px 0 15px rgba(0, 0, 0, 0.1);
         }
 
         /* Adjust main content when sidebar is open */
         #sidebar.open + .main-content {
-            margin-left: 250px; /* Push main content to the right */
+            margin-left: 250px;
         }
 
         /* Sidebar Links */
         .sidebar-link {
             transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 12px;
         }
 
         .sidebar-link:hover {
@@ -59,285 +82,513 @@
 
         /* Dark Mode */
         .dark-mode {
-            background-color: #1a202c; /* Dark background */
-            color: #e2e8f0; /* Light text */
+            background-color: #1a202c;
+            color: #e2e8f0;
         }
 
         .dark-mode .sidebar {
-            background-color: #2d3748; /* Dark sidebar */
+            background-color: #2d3748;
         }
 
         .dark-mode .sidebar-link {
-            background-color: #4a5568; /* Dark sidebar links */
+            background-color: #4a5568;
             color: #e2e8f0;
         }
 
         .dark-mode .navbar {
-            background-color: #2d3748; /* Dark navbar */
+            background-color: #2d3748;
         }
 
         .dark-mode .footer {
-            background-color: #2d3748; /* Dark footer */
+            background-color: #2d3748;
+        }
+
+        /* Content container */
+        .content-container {
+            flex: 1;
+            padding-bottom: 60px; /* Space for footer */
+        }
+
+        /* Notification badge */
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background-color: #ef4444;
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            font-size: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            #sidebar.open + .main-content {
+                margin-left: 0;
+            }
+            
+            #sidebar {
+                width: 280px;
+            }
+            
+            .search-input {
+                width: 180px !important;
+            }
+        }
+
+        /* Animation for emergency button */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .emergency-pulse {
+            animation: pulse 2s infinite;
         }
     </style>
 </head>
 <body class="bg-gray-100 flex h-screen" onclick="closeSidebar(event)">
     <!-- Sidebar -->
-<aside id="sidebar" class="w-64 bg-blue-900 text-white h-screen fixed left-0 top-0 overflow-y-auto p-4 shadow-2xl transition-all duration-300 ease-in-out transform -translate-x-full">
-    <!-- Sidebar Header -->
-    <div class="flex justify-between items-center mb-8">
-        <h2 class="text-xl font-bold text-white">🏥 Hospital Management</h2>
-        <button id="closeSidebar" class="text-white text-2xl hover:text-gray-300 transition duration-300">✖</button>
-    </div>
+    <aside id="sidebar" class="w-64 bg-blue-900 text-white h-screen fixed left-0 top-0 overflow-y-auto p-4 shadow-2xl">
+        <!-- Sidebar Header -->
+        <div class="flex justify-between items-center mb-8">
+            <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                <i class="fas fa-hospital text-blue-300"></i>
+                <span>Hospital Management</span>
+            </h2>
 
-    <!-- Sidebar Links -->
-    <ul class="space-y-3">
-        <!-- Dashboard -->
-        <li>
-            <a href="{% url 'dashboard' %}" class="sidebar-link flex items-center p-3 text-lg font-semibold text-white bg-blue-700 rounded-lg hover:bg-blue-600 hover:text-white transition duration-300">
-                🏠 Dashboard
-            </a>
-        </li>
+            {% comment %} <button id="closeSidebar" class="text-white text-2xl hover:text-gray-300 transition duration-300 focus:outline-none">✖</button> {% endcomment %}
+        </div>
 
-        <!-- Patients -->
-        <li>
-            <a href="{% url 'patients' %}" class="sidebar-link flex items-center p-3 text-lg font-semibold text-white bg-blue-700 rounded-lg hover:bg-blue-600 hover:text-white transition duration-300">
-                🩺 Patients
-            </a>
-        </li>
-
-        <!-- Doctors -->
-        <li>
-            <a href="{% url 'doctors' %}" class="sidebar-link flex items-center p-3 text-lg font-semibold text-white bg-blue-700 rounded-lg hover:bg-blue-600 hover:text-white transition duration-300">
-                👨‍⚕️ Doctors
-            </a>
-        </li>
-
-        <!-- Appointments -->
-        <li>
-            <a href="{% url 'appointments' %}" class="sidebar-link flex items-center p-3 text-lg font-semibold text-white bg-blue-700 rounded-lg hover:bg-blue-600 hover:text-white transition duration-300">
-                📅 Appointments
-            </a>
-        </li>
-
-        <!-- Appointments Update -->
-        <li>
-            <a href="{% url 'appointments_update' %}" class="sidebar-link flex items-center p-3 text-lg font-semibold text-white bg-blue-700 rounded-lg hover:bg-blue-600 hover:text-white transition duration-300">
-                🔄 Appointments Update
-            </a>
-        </li>
-
-        <!-- Billing -->
-        <li>
-            <a href="{% url 'billing' %}" class="sidebar-link flex items-center p-3 text-lg font-semibold text-white bg-blue-700 rounded-lg hover:bg-blue-600 hover:text-white transition duration-300">
-                💰 Billing
-            </a>
-        </li>
-
-        <!-- Emergency Section -->
-        <li>
-            <a href="{% url 'emergency' %}" class="sidebar-link flex items-center p-3 text-lg font-semibold text-white bg-red-600 rounded-lg hover:bg-red-700 hover:text-white transition duration-300">
-                🚨 Emergency
-            </a>
-        </li>
-        <li>
-            <a href="{% url 'add_emergency_case' %}" class="sidebar-link flex items-center justify-center gap-2 bg-gradient-to-r from-red-500 to-red-700 text-white px-6 py-3 rounded-lg shadow-lg hover:from-red-600 hover:to-red-800 transform hover:scale-105 transition duration-300 ease-in-out">
-                🚑 Add Emergency Patient
-            </a>
-        </li>
-
-        <!-- IPD & OPD -->
-        <li>
-            <a href="{% url 'ipd' %}" class="sidebar-link flex items-center p-3 text-lg font-semibold text-white bg-purple-600 rounded-lg hover:bg-purple-700 hover:text-white transition duration-300">
-                🏥 IPD
-            </a>
-        </li>
-        <li>
-            <a href="{% url 'opd' %}" class="sidebar-link flex items-center p-3 text-lg font-semibold text-white bg-green-600 rounded-lg hover:bg-green-700 hover:text-white transition duration-300">
-                🩹 OPD
-            </a>
-        </li>
-
-        <!-- License Management -->
-        <li>
-            <a href="{% url 'license_list' %}" class="sidebar-link flex items-center p-3 text-lg font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition duration-300">
-                📜 License Management
-            </a>
-        </li>
-
-        <!-- Asset & Machine Store -->
-        <li>
-            <a href="{% url 'asset_list' %}" class="sidebar-link flex items-center p-3 text-lg font-semibold text-white bg-purple-600 rounded-lg hover:bg-purple-700 transition duration-300">
-                🏥 Asset & Machine Store
-            </a>
-        </li>
-
-        <!-- Maintenance -->
-        <li>
-            <a href="{% url 'maintenance_list' %}" class="sidebar-link flex items-center p-3 text-lg font-semibold text-white bg-yellow-600 rounded-lg hover:bg-yellow-700 transition duration-300">
-                🔧 Maintenance
-            </a>
-        </li>
-
-        <!-- Room Management -->
-        <li>
-            <a href="{% url 'room_overview' %}" class="sidebar-link flex items-center p-3 text-lg font-semibold text-white bg-blue-500 rounded-lg hover:bg-blue-600 hover:text-white transition duration-300">
-                🏥 Room Overview
-            </a>
-        </li>
-
-        <!-- Employee Management -->
-        <li>
-            <a href="{% url 'employee_list' %}" class="sidebar-link flex items-center p-3 text-lg font-semibold text-white bg-yellow-500 rounded-lg hover:bg-yellow-600 hover:text-white transition duration-300">
-                👨‍💼 Employee
-            </a>
-        </li>
-
-        <!-- Doctor Management -->
-        <li>
-            <a href="{% url 'add_doctor' %}" class="sidebar-link flex items-center p-3 text-lg font-semibold text-white bg-green-500 rounded-lg hover:bg-green-600 hover:text-white transition duration-300">
-                🩺 Add Doctor
-            </a>
-        </li>
-
-        <!-- Accounting -->
-        <li>
-            <a href="{% url 'accounting_summary' %}" class="sidebar-link flex items-center p-3 text-lg font-semibold text-white bg-blue-700 rounded-lg hover:bg-blue-600 hover:text-white transition duration-300">
-                💰 Accounting Summary
-            </a>
-        </li>
-        <li>
-            <a href="{% url 'daybook_list' %}" class="sidebar-link flex items-center p-3 text-lg font-semibold text-white bg-blue-700 rounded-lg hover:bg-blue-600 hover:text-white transition duration-300">
-                📒 Daybook
-            </a>
-        </li>        
-        <li>
-            <a href="{% url 'manage_medicine_diluent' %}" class="sidebar-link flex items-center p-3 text-lg font-semibold text-white bg-blue-700 rounded-lg hover:bg-blue-600 hover:text-white transition duration-300">
-                ➕ Add Medicine & Diluent
-            </a>
-        </li>
-        
-
-
-        <!-- Logout Button with Username -->
-        <li class="mt-8">
-            {% if user.is_authenticated %}
-                <a href="{% url 'logout' %}" class="sidebar-link flex items-center justify-center gap-2 bg-gradient-to-r from-gray-600 to-gray-800 text-white px-6 py-3 rounded-lg shadow-lg hover:from-gray-700 hover:to-gray-900 transform hover:scale-105 transition duration-300 ease-in-out">
-                    🔓 Logout ({{ user.username }})
+        <!-- Sidebar Links -->
+        <ul class="space-y-3">
+            <!-- Dashboard -->
+            <li>
+                <a href="{% url 'dashboard' %}" class="sidebar-link flex items-center p-3 text-lg font-semibold text-white bg-blue-700 rounded-lg hover:bg-blue-600 hover:text-white transition duration-300">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Dashboard</span>
                 </a>
-            {% else %}
-                <a href="{% url 'login' %}" class="sidebar-link flex items-center justify-center gap-2 bg-gradient-to-r from-green-500 to-green-700 text-white px-6 py-3 rounded-lg shadow-lg hover:from-green-600 hover:to-green-800 transform hover:scale-105 transition duration-300 ease-in-out">
-                    🔑 Login
+            </li>
+
+            <!-- Patients -->
+            <li>
+                <a href="{% url 'patients' %}" class="sidebar-link flex items-center p-3 text-lg font-semibold text-white bg-blue-700 rounded-lg hover:bg-blue-600 hover:text-white transition duration-300">
+                    <i class="fas fa-procedures"></i>
+                    <span>Patients</span>
+                    {% comment %} <span class="notification-badge">3</span> {% endcomment %}
                 </a>
-            {% endif %}
-        </li>
-    </ul>
-</aside>
+            </li>
+
+            <!-- Doctors -->
+            <li>
+                <a href="{% url 'doctors' %}" class="sidebar-link flex items-center p-3 text-lg font-semibold text-white bg-blue-700 rounded-lg hover:bg-blue-600 hover:text-white transition duration-300">
+                    <i class="fas fa-user-md"></i>
+                    <span>Doctors</span>
+                </a>
+            </li>
+
+            <!-- Appointments -->
+            <li>
+                <a href="{% url 'appointments' %}" class="sidebar-link flex items-center p-3 text-lg font-semibold text-white bg-blue-700 rounded-lg hover:bg-blue-600 hover:text-white transition duration-300">
+                    <i class="fas fa-calendar-check"></i>
+                    <span>Appointments</span>
+                    {% comment %} <span class="notification-badge">5</span> {% endcomment %}
+                </a>
+            </li>
+
+            <!-- Appointments Update -->
+            <li>
+                <a href="{% url 'appointments_update' %}" class="sidebar-link flex items-center p-3 text-lg font-semibold text-white bg-blue-700 rounded-lg hover:bg-blue-600 hover:text-white transition duration-300">
+                    <i class="fas fa-sync-alt"></i>
+                    <span>Appointments Update</span>
+                </a>
+            </li>
+
+            <!-- Billing -->
+            <li>
+                <a href="{% url 'billing' %}" class="sidebar-link flex items-center p-3 text-lg font-semibold text-white bg-blue-700 rounded-lg hover:bg-blue-600 hover:text-white transition duration-300">
+                    <i class="fas fa-money-bill-wave"></i>
+                    <span>Billing</span>
+                </a>
+            </li>
+
+            <!-- Emergency Section -->
+            <li>
+                <a href="{% url 'emergency' %}" class="sidebar-link flex items-center p-3 text-lg font-semibold text-white bg-red-600 rounded-lg hover:bg-red-700 hover:text-white transition duration-300 emergency-pulse">
+                    <i class="fas fa-ambulance"></i>
+                    <span>Emergency</span>
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'add_emergency_case' %}" class="sidebar-link flex items-center justify-center gap-2 bg-gradient-to-r from-red-500 to-red-700 text-white px-6 py-3 rounded-lg shadow-lg hover:from-red-600 hover:to-red-800 transform hover:scale-105 transition duration-300 ease-in-out">
+                    <i class="fas fa-plus-circle"></i>
+                    <span>Add Emergency Patient</span>
+                </a>
+            </li>
+
+            <!-- IPD & OPD -->
+            <li>
+                <a href="{% url 'ipd' %}" class="sidebar-link flex items-center p-3 text-lg font-semibold text-white bg-purple-600 rounded-lg hover:bg-purple-700 hover:text-white transition duration-300">
+                    <i class="fas fa-bed"></i>
+                    <span>IPD</span>
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'opd' %}" class="sidebar-link flex items-center p-3 text-lg font-semibold text-white bg-green-600 rounded-lg hover:bg-green-700 hover:text-white transition duration-300">
+                    <i class="fas fa-clinic-medical"></i>
+                    <span>OPD</span>
+                </a>
+            </li>
+
+            <!-- License Management -->
+            <li>
+                <a href="{% url 'license_list' %}" class="sidebar-link flex items-center p-3 text-lg font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition duration-300">
+                    <i class="fas fa-file-contract"></i>
+                    <span>License Management</span>
+                </a>
+            </li>
+
+            <!-- Asset & Machine Store -->
+            <li>
+                <a href="{% url 'asset_list' %}" class="sidebar-link flex items-center p-3 text-lg font-semibold text-white bg-purple-600 rounded-lg hover:bg-purple-700 transition duration-300">
+                    <i class="fas fa-laptop-medical"></i>
+                    <span>Asset & Machine Store</span>
+                </a>
+            </li>
+
+            <!-- Maintenance -->
+            <li>
+                <a href="{% url 'maintenance_list' %}" class="sidebar-link flex items-center p-3 text-lg font-semibold text-white bg-yellow-600 rounded-lg hover:bg-yellow-700 transition duration-300">
+                    <i class="fas fa-tools"></i>
+                    <span>Maintenance</span>
+                </a>
+            </li>
+
+            <!-- Room Management -->
+            <li>
+                <a href="{% url 'room_overview' %}" class="sidebar-link flex items-center p-3 text-lg font-semibold text-white bg-blue-500 rounded-lg hover:bg-blue-600 hover:text-white transition duration-300">
+                    <i class="fas fa-door-open"></i>
+                    <span>Room Overview</span>
+                </a>
+            </li>
+
+            <!-- Employee Management -->
+            <li>
+                <a href="{% url 'employee_list' %}" class="sidebar-link flex items-center p-3 text-lg font-semibold text-white bg-yellow-500 rounded-lg hover:bg-yellow-600 hover:text-white transition duration-300">
+                    <i class="fas fa-users"></i>
+                    <span>Employee</span>
+                </a>
+            </li>
+
+            <!-- Doctor Management -->
+            <li>
+                <a href="{% url 'add_doctor' %}" class="sidebar-link flex items-center p-3 text-lg font-semibold text-white bg-green-500 rounded-lg hover:bg-green-600 hover:text-white transition duration-300">
+                    <i class="fas fa-user-plus"></i>
+                    <span>Add Doctor</span>
+                </a>
+            </li>
+
+            <!-- Accounting -->
+            <li>
+                <a href="{% url 'accounting_summary' %}" class="sidebar-link flex items-center p-3 text-lg font-semibold text-white bg-blue-700 rounded-lg hover:bg-blue-600 hover:text-white transition duration-300">
+                    <i class="fas fa-calculator"></i>
+                    <span>Accounting Summary</span>
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'daybook_list' %}" class="sidebar-link flex items-center p-3 text-lg font-semibold text-white bg-blue-700 rounded-lg hover:bg-blue-600 hover:text-white transition duration-300">
+                    <i class="fas fa-book"></i>
+                    <span>Daybook</span>
+                </a>
+            </li>        
+            <li>
+                <a href="{% url 'manage_medicine_diluent' %}" class="sidebar-link flex items-center p-3 text-lg font-semibold text-white bg-blue-700 rounded-lg hover:bg-blue-600 hover:text-white transition duration-300">
+                    <i class="fas fa-pills"></i>
+                    <span>Add Medicine & Diluent</span>
+                </a>
+            </li>
+
+            <!-- Logout Button with Username -->
+            <li class="mt-8">
+                {% if user.is_authenticated %}
+                    <a href="{% url 'logout' %}" class="sidebar-link flex items-center justify-center gap-2 bg-gradient-to-r from-gray-600 to-gray-800 text-white px-6 py-3 rounded-lg shadow-lg hover:from-gray-700 hover:to-gray-900 transform hover:scale-105 transition duration-300 ease-in-out">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span>Logout ({{ user.username }})</span>
+                    </a>
+                {% else %}
+                    <a href="{% url 'login' %}" class="sidebar-link flex items-center justify-center gap-2 bg-gradient-to-r from-green-500 to-green-700 text-white px-6 py-3 rounded-lg shadow-lg hover:from-green-600 hover:to-green-800 transform hover:scale-105 transition duration-300 ease-in-out">
+                        <i class="fas fa-sign-in-alt"></i>
+                        <span>Login</span>
+                    </a>
+                {% endif %}
+            </li>
+        </ul>
+    </aside>
 
     <!-- Main Content -->
     <div class="main-content flex-1">
         <!-- Navbar -->
-        <nav class="bg-blue-800 p-2 text-white flex justify-between items-center shadow-lg">
+        <nav class="bg-blue-800 p-2 text-white flex justify-between items-center shadow-lg sticky top-0 z-50">
             <!-- Sidebar Toggle Button -->
-            <button id="toggleSidebar" class="text-white text-xl hover:text-gray-300 transition duration-300">☰</button>
+            <button id="toggleSidebar" class="text-white text-xl hover:text-gray-300 transition duration-300 focus:outline-none ml-2">
+                <i class="fas fa-bars"></i>
+            </button>
 
             <!-- Title -->
-            <h1 class="text-xl md:text-xl font-bold text-center flex-1">Hospital Management System</h1>
+            <h1 class="text-xl md:text-2xl font-bold text-center flex-1 flex items-center justify-center gap-2">
+                <i class="fas fa-hospital hidden md:inline-block"></i>
+                <span>Hospital Management System</span>
+            </h1>
 
-            <!-- Search Bar -->
-            <div class="relative">
-                <!-- Search Icon (For Small Screens) -->
-                <button id="searchToggle" class="sm:hidden text-white text-2xl focus:outline-none">
-                    🔍
-                </button>
-
+            <!-- Right Side Icons -->
+            <div class="flex items-center gap-4 mr-4">
+                
                 <!-- Search Bar -->
-                <form id="searchForm" action="{% url 'search' %}" method="get" 
-                      class="absolute top-10 right-0 bg-white p-1 rounded-lg shadow-lg hidden sm:flex sm:static sm:top-auto sm:right-auto sm:bg-transparent sm:p-0 sm:shadow-none">
-                    <input type="text" 
-                           name="q" 
-                           placeholder="Search patients, doctors, appointments..." 
-                           class="px-2 py-1 w-64 border border-gray-300 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-black"
-                           id="searchInput">
-                    <button type="submit" 
-                            class="bg-green-600 hover:bg-green-700 text-white px-2 py-1 rounded-r-lg transition duration-300">
-                        Search
-                    </button>
-                </form>
+                <div class="relative hidden md:block">
+                    <form id="searchForm" action="{% url 'search' %}" method="get" 
+                          class="flex items-center">
+                        <input type="text" 
+                               name="q" 
+                               placeholder="Search..." 
+                               class="search-input px-3 py-1 w-48 border border-gray-300 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-black transition duration-300">
+                        <button type="submit" 
+                                class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded-r-lg transition duration-300">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </form>
+                </div>
+                
+                <!-- Mobile Search Toggle -->
+                <button id="searchToggle" class="md:hidden text-white text-xl focus:outline-none">
+                    <i class="fas fa-search"></i>
+                </button>
             </div>
         </nav>
 
+        <!-- Mobile Search Bar -->
+        <div id="mobileSearchForm" class="bg-blue-700 p-2 hidden md:hidden">
+            <form action="{% url 'search' %}" method="get" class="flex">
+                <input type="text" 
+                       name="q" 
+                       placeholder="Search patients, doctors..." 
+                       class="flex-1 px-3 py-2 border border-gray-300 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-black">
+                <button type="submit" 
+                        class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-r-lg transition duration-300">
+                    Search
+                </button>
+            </form>
+        </div>
+
         <!-- Content -->
-        <div class="container mx-auto p-6">
+        <div class="content-container container mx-auto p-4 md:p-6">
             {% block content %}
+            <!-- Default content if no block is provided -->
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <h2 class="text-2xl font-bold text-blue-800 mb-4">Welcome to Hospital Management System</h2>
+                <p class="text-gray-700">Select an option from the sidebar to get started.</p>
+            </div>
             {% endblock %}
         </div>
+        
         <!-- Footer -->
-        <footer class="bg-blue-800 p-1 text-white text-center shadow-lg fixed bottom-0 left-0 w-full">
-            &copy; 2025 Hospital Management System. All rights reserved.
+        <footer class="bg-blue-800 p-3 text-white text-center shadow-lg mt-auto">
+            <div class="container mx-auto flex flex-col md:flex-row justify-between items-center">
+                <div class="mb-2 md:mb-0">
+                    &copy; 2025 Hospital Management System. All rights reserved.
+                </div>
+                <div class="flex gap-4">
+                    <a href="#" class="hover:text-blue-300 transition duration-300">Privacy Policy</a>
+                    <a href="#" class="hover:text-blue-300 transition duration-300">Terms of Service</a>
+                    <a href="#" class="hover:text-blue-300 transition duration-300">Contact Us</a>
+                </div>
+            </div>
         </footer>
-
     </div>
-    
+
+    <!-- Notification Dropdown (Hidden by default) -->
+    <div id="notificationDropdown" class="hidden absolute right-4 mt-2 w-72 bg-white rounded-md shadow-lg z-50 border border-gray-200">
+        <div class="p-3 border-b border-gray-200 bg-blue-600 text-white rounded-t-md">
+            <h3 class="font-semibold">Notifications (5)</h3>
+        </div>
+        <div class="max-h-60 overflow-y-auto">
+            <!-- Notification items -->
+            <a href="#" class="block px-4 py-3 border-b border-gray-100 hover:bg-gray-50 transition duration-150">
+                <div class="flex items-start">
+                    <div class="bg-blue-100 p-2 rounded-full mr-3">
+                        <i class="fas fa-calendar-check text-blue-600"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm font-medium text-gray-800">New appointment scheduled</p>
+                        <p class="text-xs text-gray-500">2 minutes ago</p>
+                    </div>
+                </div>
+            </a>
+            <a href="#" class="block px-4 py-3 border-b border-gray-100 hover:bg-gray-50 transition duration-150">
+                <div class="flex items-start">
+                    <div class="bg-red-100 p-2 rounded-full mr-3">
+                        <i class="fas fa-ambulance text-red-600"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm font-medium text-gray-800">Emergency case received</p>
+                        <p class="text-xs text-gray-500">15 minutes ago</p>
+                    </div>
+                </div>
+            </a>
+            <a href="#" class="block px-4 py-3 border-b border-gray-100 hover:bg-gray-50 transition duration-150">
+                <div class="flex items-start">
+                    <div class="bg-green-100 p-2 rounded-full mr-3">
+                        <i class="fas fa-file-invoice-dollar text-green-600"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm font-medium text-gray-800">Payment received</p>
+                        <p class="text-xs text-gray-500">1 hour ago</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="p-2 bg-gray-50 rounded-b-md text-center">
+            <a href="#" class="text-sm text-blue-600 hover:text-blue-800 font-medium">View all notifications</a>
+        </div>
+    </div>
 
     <script>
-        // Sidebar functionality
-        const sidebar = document.getElementById("sidebar");
-        const toggleButton = document.getElementById("toggleSidebar");
-        const closeButton = document.getElementById("closeSidebar");
-
-        toggleButton.addEventListener("click", (event) => {
-            event.stopPropagation();
-            sidebar.classList.toggle("open");
-        });
-
-        closeButton.addEventListener("click", (event) => {
-            event.stopPropagation();
-            sidebar.classList.remove("open");
-        });
-
-        function closeSidebar(event) {
-            if (!sidebar.contains(event.target) && !toggleButton.contains(event.target)) {
-                sidebar.classList.remove("open");
-            }
-        }
-
-        // Night Mode functionality
-        const nightModeToggle = document.getElementById("nightModeToggle");
-        const body = document.body;
-
-        // Check localStorage for night mode preference
-        if (localStorage.getItem("nightMode") === "enabled") {
-            body.classList.add("dark-mode");
-            nightModeToggle.textContent = "☀️"; // Sun icon for light mode
-        }
-
-        // Toggle night mode
-        nightModeToggle.addEventListener("click", () => {
-            body.classList.toggle("dark-mode");
-            if (body.classList.contains("dark-mode")) {
-                localStorage.setItem("nightMode", "enabled");
-                nightModeToggle.textContent = "☀️";
-            } else {
-                localStorage.setItem("nightMode", "disabled");
-                nightModeToggle.textContent = "🌙";
-            }
-        });
-    </script>
-
-    <!-- JavaScript for Search Bar Toggle -->
-    <script>
-        document.getElementById("searchToggle").addEventListener("click", function () {
-            var searchForm = document.getElementById("searchForm");
-            var searchInput = document.getElementById("searchInput");
+        // Wait for DOM to be fully loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get sidebar elements
+            const sidebar = document.getElementById("sidebar");
+            const toggleButton = document.getElementById("toggleSidebar");
+            const closeButton = document.getElementById("closeSidebar");
             
-            if (searchForm.classList.contains("hidden")) {
-                searchForm.classList.remove("hidden");
-                searchInput.classList.add("block"); // Ensure it's visible
-                searchInput.focus();
-            } else {
-                searchForm.classList.add("hidden");
-                searchInput.classList.remove("block");
+            // Check if elements exist
+            if (!sidebar || !toggleButton) {
+                console.error("Sidebar elements not found");
+                return;
+            }
+    
+            // Toggle sidebar function
+            function toggleSidebar() {
+                sidebar.classList.toggle("open");
+                // Update main content margin
+                const mainContent = document.querySelector(".main-content");
+                if (mainContent) {
+                    mainContent.style.marginLeft = sidebar.classList.contains("open") ? "250px" : "0";
+                }
+            }
+    
+            // Close sidebar function
+            function closeSidebar() {
+                sidebar.classList.remove("open");
+                const mainContent = document.querySelector(".main-content");
+                if (mainContent) {
+                    mainContent.style.marginLeft = "0";
+                }
+            }
+    
+            // Event listeners
+            toggleButton.addEventListener("click", function(e) {
+                e.stopPropagation();
+                toggleSidebar();
+            });
+    
+            if (closeButton) {
+                closeButton.addEventListener("click", function(e) {
+                    e.stopPropagation();
+                    closeSidebar();
+                });
+            }
+    
+            // Close when clicking outside
+            document.addEventListener("click", function(e) {
+                if (!sidebar.contains(e.target) && e.target !== toggleButton) {
+                    closeSidebar();
+                }
+            });
+    
+            // Handle responsive behavior
+            function handleResponsive() {
+                if (window.innerWidth >= 768) {
+                    sidebar.classList.add("open");
+                    const mainContent = document.querySelector(".main-content");
+                    if (mainContent) {
+                        mainContent.style.marginLeft = "250px";
+                    }
+                } else {
+                    sidebar.classList.remove("open");
+                    const mainContent = document.querySelector(".main-content");
+                    if (mainContent) {
+                        mainContent.style.marginLeft = "0";
+                    }
+                }
+            }
+    
+            // Initial check
+            handleResponsive();
+    
+            // Check on resize with debounce
+            let resizeTimer;
+            window.addEventListener('resize', function() {
+                clearTimeout(resizeTimer);
+                resizeTimer = setTimeout(handleResponsive, 100);
+            });
+    
+            // Night Mode functionality
+            const nightModeToggle = document.getElementById("nightModeToggle");
+            if (nightModeToggle) {
+                const body = document.body;
+                
+                // Check localStorage for night mode preference
+                if (localStorage.getItem("nightMode") === "enabled") {
+                    body.classList.add("dark-mode");
+                    nightModeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+                }
+    
+                // Toggle night mode
+                nightModeToggle.addEventListener("click", () => {
+                    body.classList.toggle("dark-mode");
+                    if (body.classList.contains("dark-mode")) {
+                        localStorage.setItem("nightMode", "enabled");
+                        nightModeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+                    } else {
+                        localStorage.setItem("nightMode", "disabled");
+                        nightModeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+                    }
+                });
+            }
+    
+            // Search Bar Toggle for mobile
+            const searchToggle = document.getElementById("searchToggle");
+            if (searchToggle) {
+                searchToggle.addEventListener("click", function() {
+                    const mobileSearchForm = document.getElementById("mobileSearchForm");
+                    if (mobileSearchForm) {
+                        mobileSearchForm.classList.toggle("hidden");
+                    }
+                });
+            }
+    
+            // Notification dropdown
+            const notificationBtn = document.getElementById("notificationBtn");
+            const notificationDropdown = document.getElementById("notificationDropdown");
+            if (notificationBtn && notificationDropdown) {
+                notificationBtn.addEventListener("click", function(e) {
+                    e.stopPropagation();
+                    notificationDropdown.classList.toggle("hidden");
+                });
+    
+                // Close dropdown when clicking outside
+                document.addEventListener("click", function() {
+                    notificationDropdown.classList.add("hidden");
+                });
+    
+                // Make dropdown clickable without closing
+                notificationDropdown.addEventListener("click", function(e) {
+                    e.stopPropagation();
+                });
             }
         });
     </script>

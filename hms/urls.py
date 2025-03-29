@@ -24,6 +24,7 @@ urlpatterns = [
     # Patients
     path('patients/', views.patients, name='patients'),
     path('api/patients/', fetch_patients, name='fetch_patients'),
+    path('api/patient-stats/', views.patient_stats_api, name='patient_stats_api'),
     path("patient/<str:patient_code>/profile/", views.patient_profile, name="patient_profile"),
     path('patient/<str:patient_code>/upload-report/', upload_patient_report, name='upload_patient_report'),
     path('register/', views.register_patient, name='register_patient'),

@@ -1,6 +1,6 @@
 {% extends 'hms/base.html' %}
 {% load static %}
-
+{% load tz %}
 {% block content %}
 <div class="container mx-auto p-6">
     <!-- Messages -->
@@ -13,161 +13,354 @@
             {% endfor %}
         </div>
     {% endif %}
-    <!-- Dashboard Overview -->
-    <h2 class="text-3xl font-bold text-gray-800 mb-8">Hospital Dashboard</h2>
-     <!-- Expiring Licenses -->
-     {% if expiring_licenses %}
-     <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4">
-         <h3 class="text-lg font-semibold">Expiring Licenses</h3>
-         <ul class="list-disc pl-5">
-             {% for license in expiring_licenses %}
-             <li>
-                 <strong>{{ license.name }}</strong> ({{ license.license_type }}) - 
-                 <span class="text-red-500">Expiring on {{ license.expiry_date }}</span>
-             </li>
-             {% endfor %}
-         </ul>
-     </div>
-     {% endif %}
- 
-     <!-- Expiring Assets -->
-     {% if expiring_assets %}
-     <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-4">
-         <h3 class="text-lg font-semibold">Expiring Warranties</h3>
-         <ul class="list-disc pl-5">
-             {% for asset in expiring_assets %}
-             <li>
-                 <strong>{{ asset.name }}</strong> ({{ asset.asset_type }}) - 
-                 <span class="text-yellow-500">Warranty expires on {{ asset.warranty_expiry }}</span>
-             </li>
-             {% endfor %}
-         </ul>
-     </div>
-     {% endif %}
- 
-     <!-- Due Maintenance -->
-     {% if due_maintenance %}
-     <div class="bg-blue-100 border-l-4 border-blue-500 text-blue-700 p-4 mb-4">
-         <h3 class="text-lg font-semibold">Upcoming Maintenance</h3>
-         <ul class="list-disc pl-5">
-             {% for maintenance in due_maintenance %}
-             <li>
-                 <strong>{{ maintenance.asset.name }}</strong> - 
-                 <span class="text-blue-500">Maintenance due on {{ maintenance.next_due_date }}</span>
-             </li>
-             {% endfor %}
-         </ul>
-     </div>
-     {% endif %}
-    <br>
+    
+    <!-- Dashboard Header -->
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
+        <h2 class="text-3xl font-bold text-gray-800">Hospital Dashboard</h2>
+        <div class="text-gray-600 mt-2 md:mt-0">
+            <span class="font-medium">Today:</span> {% now "F d, Y" %}
+        </div>
+    </div>
+
+    <!-- Alerts Section -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+        <!-- Expiring Licenses -->
+        {% if expiring_licenses %}
+        <div class="bg-white border-l-4 border-red-500 rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+            <div class="p-4">
+                <div class="flex items-center mb-2">
+                    <div class="p-2 bg-red-100 rounded-full mr-3">
+                        <svg class="w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-800">Expiring Licenses</h3>
+                </div>
+                <ul class="divide-y divide-gray-200">
+                    {% for license in expiring_licenses|slice:":3" %}
+                    <li class="py-2">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <p class="font-medium">{{ license.name }}</p>
+                                <p class="text-sm text-gray-600">{{ license.license_type }}</p>
+                            </div>
+                            <span class="text-sm font-medium text-red-500">
+                                {{ license.expiry_date|timeuntil }} left
+                            </span>
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% if expiring_licenses.count > 3 %}
+                <div class="mt-2 text-center">
+                    <a href="#" class="text-sm text-blue-600 hover:underline">+{{ expiring_licenses.count|add:"-3" }} more</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Expiring Assets -->
+        {% if expiring_assets %}
+        <div class="bg-white border-l-4 border-yellow-500 rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+            <div class="p-4">
+                <div class="flex items-center mb-2">
+                    <div class="p-2 bg-yellow-100 rounded-full mr-3">
+                        <svg class="w-6 h-6 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-800">Expiring Warranties</h3>
+                </div>
+                <ul class="divide-y divide-gray-200">
+                    {% for asset in expiring_assets|slice:":3" %}
+                    <li class="py-2">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <p class="font-medium">{{ asset.name }}</p>
+                                <p class="text-sm text-gray-600">{{ asset.asset_type }}</p>
+                            </div>
+                            <span class="text-sm font-medium text-yellow-600">
+                                {{ asset.warranty_expiry|timeuntil }} left
+                            </span>
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% if expiring_assets.count > 3 %}
+                <div class="mt-2 text-center">
+                    <a href="#" class="text-sm text-blue-600 hover:underline">+{{ expiring_assets.count|add:"-3" }} more</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Due Maintenance -->
+        {% if due_maintenance %}
+        <div class="bg-white border-l-4 border-blue-500 rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+            <div class="p-4">
+                <div class="flex items-center mb-2">
+                    <div class="p-2 bg-blue-100 rounded-full mr-3">
+                        <svg class="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-800">Upcoming Maintenance</h3>
+                </div>
+                <ul class="divide-y divide-gray-200">
+                    {% for maintenance in due_maintenance|slice:":3" %}
+                    <li class="py-2">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <p class="font-medium">{{ maintenance.asset.name }}</p>
+                                <p class="text-sm text-gray-600">Last: {{ maintenance.last_maintenance_date|date:"M d, Y" }}</p>
+                            </div>
+                            <span class="text-sm font-medium text-blue-600">
+                                Due in {{ maintenance.next_due_date|timeuntil }}
+                            </span>
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% if due_maintenance.count > 3 %}
+                <div class="mt-2 text-center">
+                    <a href="#" class="text-sm text-blue-600 hover:underline">+{{ due_maintenance.count|add:"-3" }} more</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
 
     <!-- Stats Cards -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-8">
-        <div class="bg-gradient-to-r from-blue-500 to-blue-600 text-white p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300">
-            <h3 class="text-lg font-semibold mb-2">Total Patients</h3>
-            <p class="text-4xl font-bold">{{ total_patients }}</p>
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 mb-8">
+        <div class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
+            <div class="flex items-center">
+                <div class="p-3 bg-blue-100 rounded-full mr-4">
+                    <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                    </svg>
+                </div>
+                <div>
+                    <p class="text-gray-500 text-sm">Total Patients</p>
+                    <p class="text-2xl font-bold text-gray-800">{{ total_patients }}</p>
+                </div>
+            </div>
         </div>
-        <div class="bg-gradient-to-r from-green-500 to-green-600 text-white p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300">
-            <h3 class="text-lg font-semibold mb-2">Total Doctors</h3>
-            <p class="text-4xl font-bold">{{ total_doctors }}</p>
+        
+        <div class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
+            <div class="flex items-center">
+                <div class="p-3 bg-green-100 rounded-full mr-4">
+                    <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+                    </svg>
+                </div>
+                <div>
+                    <p class="text-gray-500 text-sm">Total Doctors</p>
+                    <p class="text-2xl font-bold text-gray-800">{{ total_doctors }}</p>
+                </div>
+            </div>
         </div>
-        <div class="bg-gradient-to-r from-teal-500 to-teal-600 text-white p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300">
-            <h3 class="text-lg font-semibold mb-2">Total Appointments</h3>
-            <p class="text-4xl font-bold">{{ total_appointments }}</p>
+        
+        <div class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
+            <div class="flex items-center">
+                <div class="p-3 bg-purple-100 rounded-full mr-4">
+                    <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                    </svg>
+                </div>
+                <div>
+                    <p class="text-gray-500 text-sm">Total Appointments</p>
+                    <p class="text-2xl font-bold text-gray-800">{{ total_appointments }}</p>
+                </div>
+            </div>
         </div>
-        <div class="bg-gradient-to-r from-indigo-500 to-indigo-600 text-white p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300">
-            <h3 class="text-lg font-semibold mb-2">Total Revenue</h3>
-            <p class="text-4xl font-bold">₹{{ total_revenue }}</p>
+        
+        <div class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
+            <div class="flex items-center">
+                <div class="p-3 bg-indigo-100 rounded-full mr-4">
+                    <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                </div>
+                <div>
+                    <p class="text-gray-500 text-sm">Total Revenue</p>
+                    <p class="text-2xl font-bold text-gray-800">₹{{ total_revenue }}</p>
+                </div>
+            </div>
         </div>
-        <div class="bg-gradient-to-r from-red-500 to-red-600 text-white p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300">
-            <h3 class="text-lg font-semibold mb-2">Emergency Cases Today</h3>
-            <p class="text-4xl font-bold">{{ emergency_cases_today }}</p>
-        </div>
-    </div>
-    
-    <!-- Room Statistics -->
-    <h2 class="text-2xl font-bold text-gray-800 mt-8 mb-6">Room Statistics</h2>
-    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mb-8">
-        <div class="bg-gradient-to-r from-gray-600 to-gray-700 text-white p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300">
-            <h3 class="text-lg font-semibold mb-2">Total Rooms</h3>
-            <p class="text-4xl font-bold">{{ total_rooms }}</p>
-        </div>
-        <div class="bg-gradient-to-r from-green-500 to-green-600 text-white p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300">
-            <h3 class="text-lg font-semibold mb-2">Available Rooms</h3>
-            <p class="text-4xl font-bold">{{ available_rooms_count }}</p>
-        </div>
-        <div class="bg-gradient-to-r from-red-500 to-red-600 text-white p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300">
-            <h3 class="text-lg font-semibold mb-2">Booked Rooms</h3>
-            <p class="text-4xl font-bold">{{ booked_rooms }}</p>
+        
+        <div class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
+            <div class="flex items-center">
+                <div class="p-3 bg-red-100 rounded-full mr-4">
+                    <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                    </svg>
+                </div>
+                <div>
+                    <p class="text-gray-500 text-sm">Emergencies Today</p>
+                    <p class="text-2xl font-bold text-gray-800">{{ emergency_cases_today }}</p>
+                </div>
+            </div>
         </div>
     </div>
 
-    <!-- Rooms by Type -->
-    <h3 class="text-2xl font-bold text-gray-800 mt-8 mb-6">Rooms by Type</h3>
-    <div class="overflow-x-auto bg-white p-6 rounded-lg shadow-lg mb-8">
-        <table class="w-full border-collapse">
-            <thead>
-                <tr class="bg-gray-800 text-white">
-                    <th class="p-3 text-left">Room Type</th>
-                    <th class="p-3 text-left">Total Rooms</th>
-                    <th class="p-3 text-left">Available Rooms</th>
-                </tr>
-            </thead>
-            <tbody>
+    <!-- Main Content Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+        <!-- Patient Chart -->
+        <div class="bg-white p-6 rounded-lg shadow-md lg:col-span-2">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-bold text-gray-800">Patient Registration Trend</h2>
+                <div class="flex space-x-2">
+                    <button class="time-period-btn px-3 py-1 text-xs bg-blue-100 text-blue-600 rounded-full" data-days="7">7 Days</button>
+                    <button class="time-period-btn px-3 py-1 text-xs bg-gray-100 text-gray-600 rounded-full" data-days="30">30 Days</button>
+                    {% comment %} <button class="time-period-btn px-3 py-1 text-xs bg-gray-100 text-gray-600 rounded-full" data-days="90">90 Days</button> {% endcomment %}
+                </div>
+            </div>
+            
+            <div class="h-64 relative">
+                <canvas id="patientChart"></canvas>
+                <div id="chartMessage" class="absolute inset-0 flex items-center justify-center bg-white bg-opacity-80 hidden">
+                    <p class="text-gray-500" id="messageText">No data available</p>
+                </div>
+            </div>
+        </div>
+        
+
+        <!-- Room Availability -->
+        <div class="bg-white p-6 rounded-lg shadow-md">
+            <h2 class="text-xl font-bold text-gray-800 mb-6">Room Availability</h2>
+            <div class="space-y-4">
+                <div>
+                    <div class="flex justify-between mb-1">
+                        <span class="text-sm font-medium text-gray-700">Total Rooms</span>
+                        <span class="text-sm font-medium text-gray-700">{{ total_rooms }}</span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-2.5">
+                        <div class="bg-gray-600 h-2.5 rounded-full" style="width: 100%"></div>
+                    </div>
+                </div>
+                
+                <div>
+                    <div class="flex justify-between mb-1">
+                        <span class="text-sm font-medium text-green-600">Available</span>
+                        <span class="text-sm font-medium text-green-600">{{ available_rooms_count }}</span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-2.5">
+                        <div class="bg-green-500 h-2.5 rounded-full" style="width: {% widthratio available_rooms_count total_rooms 100 %}%"></div>
+                    </div>
+                </div>
+                
+                <div>
+                    <div class="flex justify-between mb-1">
+                        <span class="text-sm font-medium text-red-600">Occupied</span>
+                        <span class="text-sm font-medium text-red-600">{{ booked_rooms }}</span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-2.5">
+                        <div class="bg-red-500 h-2.5 rounded-full" style="width: {% widthratio booked_rooms total_rooms 100 %}%"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <h3 class="text-lg font-semibold text-gray-800 mt-6 mb-4">By Room Type</h3>
+            <div class="space-y-3">
                 {% for room_type, data in room_type_data.items %}
-                <tr class="border-b hover:bg-gray-50 transition duration-200">
-                    <td class="p-3">{{ room_type|title }}</td>
-                    <td class="p-3">{{ data.total }}</td>
-                    <td class="p-3">{{ data.available }}</td>
-                </tr>
-                {% empty %}
-                <tr>
-                    <td colspan="3" class="p-5 text-center text-gray-600">No rooms available</td>
-                </tr>
+                <div>
+                    <div class="flex justify-between text-sm mb-1">
+                        <span class="font-medium">{{ room_type }}</span>
+                        <span>{{ data.available }}/{{ data.total }} available</span>
+                    </div>
+                    <div class="h-2 rounded-full {% if data.percentage > 50 %}bg-green-500{% elif data.percentage > 25 %}bg-yellow-500{% else %}bg-red-500{% endif %}" 
+                    style="width: {{ data.percentage }}%"></div>
+                </div>
                 {% endfor %}
-            </tbody>
-        </table>
+            </div>
+        </div>
     </div>
 
-    <!-- Graph and Upcoming Appointments Side by Side -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-        <!-- Daily Patient Trends -->
-        <div class="bg-white p-6 rounded-lg shadow-lg">
-            <h2 class="text-2xl font-bold text-gray-800 mb-6">Daily Patient Trends</h2>
-            <canvas id="patientChart"></canvas>
-        </div>
-
+    <!-- Bottom Section -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <!-- Upcoming Appointments -->
-        <div class="bg-white p-6 rounded-lg shadow-lg">
-            <h2 class="text-2xl font-bold text-gray-800 mb-6">Upcoming Appointments</h2>
+        <div class="bg-white p-6 rounded-lg shadow-md">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-bold text-gray-800">Upcoming Appointments</h2>
+                <a href="{% url 'appointments' %}" class="text-sm text-blue-600 hover:underline">View All</a>
+            </div>
             <div class="overflow-x-auto">
-                <table class="w-full border-collapse">
-                    <thead>
-                        <tr class="bg-gray-800 text-white">
-                            <th class="p-3 text-left">Patient</th>
-                            <th class="p-3 text-left">Doctor</th>
-                            <th class="p-3 text-left">Date and Time</th>
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Patient</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Doctor</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Time</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        {% for appointment in upcoming_appointments %}
-                        <tr class="border-b hover:bg-gray-50 transition duration-200">
-                            <td class="p-3">
-                                <a href="{% url 'patient_profile' appointment.patient.patient_code %}" 
-                                   class="text-blue-600 hover:text-blue-800 hover:underline">
-                                    {{ appointment.patient.user.full_name }}
-                                </a>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        {% for appointment in upcoming_appointments|slice:":5" %}
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="flex items-center">
+                                    <div class="flex-shrink-0 h-10 w-10 bg-blue-100 rounded-full flex items-center justify-center">
+                                        <span class="text-blue-600 font-medium">{{ appointment.patient.user.full_name|first }}</span>
+                                    </div>
+                                    <div class="ml-4">
+                                        <div class="text-sm font-medium text-gray-900">{{ appointment.patient.user.full_name }}</div>
+                                        <div class="text-sm text-gray-500">{{ appointment.patient.patient_code }}</div>
+                                    </div>
+                                </div>
                             </td>
-                            <td class="p-3 text-green-600">{{ appointment.doctor.user.full_name }}</td>
-                            <td class="p-3 text-gray-700">{{ appointment.date }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm text-gray-900">Dr. {{ appointment.doctor.user.full_name }}</div>
+                                <div class="text-sm text-gray-500">{{ appointment.doctor.specialization }}</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm text-gray-900">{{ appointment.date|date:"M d" }}</div>
+                                <div class="text-sm text-gray-500">{{ appointment.date|time }}</div>
+                            </td>
                         </tr>
                         {% empty %}
                         <tr>
-                            <td colspan="3" class="p-5 text-center text-gray-600">No upcoming appointments</td>
+                            <td colspan="3" class="px-6 py-4 text-center text-sm text-gray-500">No upcoming appointments</td>
                         </tr>
                         {% endfor %}
                     </tbody>
                 </table>
+            </div>
+        </div>
+
+        <!-- Recent Transactions -->
+        <div class="bg-white p-6 rounded-lg shadow-md">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-bold text-gray-800">Recent Transactions</h2>
+                <a href="{% url 'billing' %}" class="text-sm text-blue-600 hover:underline">View All</a>
+            </div>
+            <div class="space-y-4">
+                {% for billing in recent_billings|slice:":5" %}
+                <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                    <div class="flex items-center">
+                        <div class="p-2 bg-{% if billing.payment_status == 'paid' %}green{% else %}orange{% endif %}-100 rounded-full mr-3">
+                            <svg class="w-5 h-5 text-{% if billing.payment_status == 'paid' %}green{% else %}orange{% endif %}-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                        </div>
+                        <div>
+                            <p class="text-sm font-medium text-gray-900">{{ billing.patient.user.full_name }}</p>
+                            <p class="text-xs text-gray-500">{{ billing.created_at|date:"M d, Y" }}</p>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-sm font-medium {% if billing.payment_status == 'paid' %}text-green-600{% else %}text-orange-600{% endif %}">
+                            ₹{{ billing.total_amount }}
+                        </p>
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-{% if billing.payment_status == 'paid' %}green{% else %}orange{% endif %}-100 text-{% if billing.payment_status == 'paid' %}green{% else %}orange{% endif %}-800">
+                            {{ billing.payment_status|title }}
+                        </span>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="text-center py-4 text-sm text-gray-500">No recent transactions</div>
+                {% endfor %}
             </div>
         </div>
     </div>
@@ -177,36 +370,105 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        var ctx = document.getElementById('patientChart').getContext('2d');
-        new Chart(ctx, {
+        const canvas = document.getElementById('patientChart');
+        const chartMessage = document.getElementById('chartMessage');
+        const messageText = document.getElementById('messageText');
+
+        // Ensure the canvas is available
+        if (!canvas || !canvas.getContext) {
+            console.error('Canvas not found or unsupported');
+            messageText.textContent = "Chart cannot be initialized.";
+            chartMessage.classList.remove('hidden');
+            return;
+        }
+
+        let initialLabels = [], initialData = [];
+
+        try {
+            initialLabels = JSON.parse('{{ daily_patient_labels|escapejs }}');
+            initialData = JSON.parse('{{ daily_patient_data|escapejs }}');
+        } catch (error) {
+            console.error('JSON parsing error:', error);
+            messageText.textContent = "Error loading chart data.";
+            chartMessage.classList.remove('hidden');
+            return;
+        }
+
+        function toggleChartVisibility(labels, data) {
+            const hasData = labels.length > 0 && data.length > 0;
+            chartMessage.classList.toggle('hidden', hasData);
+        }
+        toggleChartVisibility(initialLabels, initialData);
+
+        // Initialize chart
+        const ctx = canvas.getContext('2d');
+        const gradient = ctx.createLinearGradient(0, 0, 0, 300);
+        gradient.addColorStop(0, 'rgba(79, 70, 229, 0.3)');
+        gradient.addColorStop(1, 'rgba(79, 70, 229, 0)');
+
+        const chart = new Chart(ctx, {
             type: 'line',
             data: {
-                labels: {{ daily_patient_labels|safe }},
+                labels: initialLabels,
                 datasets: [{
-                    label: 'Daily New Patients',
-                    data: {{ daily_patient_data|safe }},
-                    backgroundColor: 'rgba(52, 152, 219, 0.2)',
-                    borderColor: 'rgba(52, 152, 219, 1)',
+                    label: 'Patient Registrations',
+                    data: initialData,
                     borderWidth: 3,
-                    pointBackgroundColor: 'rgba(41, 128, 185, 1)',
-                    pointBorderColor: 'white',
-                    pointRadius: 5,
-                    tension: 0.4,
-                    fill: true
+                    borderColor: 'rgba(79, 70, 241, 1)',
+                    backgroundColor: gradient,
+                    fill: true,
+                    tension: 0.3
                 }]
             },
             options: {
                 responsive: true,
-                plugins: {
-                    legend: { position: 'top' }
-                },
+                maintainAspectRatio: false,
                 scales: {
-                    x: { grid: { display: false }, ticks: { color: '#2c3e50' } },
-                    y: { beginAtZero: true, grid: { color: 'rgba(200, 200, 200, 0.2)' }, ticks: { color: '#2c3e50' } }
+                    y: {
+                        beginAtZero: true,
+                        ticks: { precision: 0 }
+                    }
                 }
             }
         });
+
+        // Function to update the chart dynamically
+        function updateChartData(days) {
+            messageText.textContent = "Loading data...";
+            chartMessage.classList.remove('hidden');
+
+            fetch(`/api/patient-stats/?days=${days}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (!data.labels || !data.data) {
+                        throw new Error('Invalid API data format');
+                    }
+
+                    chart.data.labels = data.labels;
+                    chart.data.datasets[0].data = data.data;
+                    chart.update();
+
+                    toggleChartVisibility(data.labels, data.data);
+                })
+                .catch(error => {
+                    console.error('Error loading chart data:', error);
+                    messageText.textContent = "Error loading data.";
+                    chartMessage.classList.remove('hidden');
+                });
+        }
+
+        // Attach event listeners to buttons
+        document.querySelectorAll('.time-period-btn').forEach(button => {
+            button.addEventListener('click', function () {
+                updateChartData(this.getAttribute('data-days'));
+            });
+        });
     });
+</script>
+
+<script>
+    console.log('Labels:', '{{ daily_patient_labels|escapejs }}');
+    console.log('Data:', '{{ daily_patient_data|escapejs }}');
 </script>
 
 {% endblock %}

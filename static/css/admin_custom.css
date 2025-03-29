@@ -1,0 +1,49 @@
+body {
+    background-color: #f4f7f6;
+}
+
+.module h2 {
+    color: #007bff !important;
+}
+
+.dashboard-card {
+    transition: transform 0.2s;
+}
+
+.dashboard-card:hover {
+    transform: scale(1.05);
+}
+
+/* Dashboard Styling */
+.dashboard-container {
+    margin-top: 20px;
+  }
+  
+  /* Summary Cards */
+  .card {
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease-in-out;
+  }
+  .card:hover {
+    transform: scale(1.05);
+  }
+  
+  /* Card Titles */
+  .card h5 {
+    font-size: 18px;
+    font-weight: 600;
+  }
+  
+  /* Dashboard Headings */
+  h1 {
+    font-weight: bold;
+  }
+  
+  /* Charts */
+  canvas {
+    background: #fff;
+    border-radius: 10px;
+    padding: 10px;
+  }
+  
