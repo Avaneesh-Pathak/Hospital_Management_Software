@@ -994,7 +994,9 @@ def fetch_opd(request):
         opd_records = OPD.objects.select_related("patient__user", "doctor__user").values(
             "id", 
             "patient__user__full_name", 
+            'patient__patient_code',
             "doctor__user__full_name", 
+            "doctor__specialization", 
             "created_at",   # Use 'created_at' instead of 'visit_date'
             "diagnosis", 
             "symptoms", 
@@ -1011,7 +1013,9 @@ def fetch_opd(request):
             formatted_records.append({
                 "id": record["id"],
                 "patient__user__full_name": record["patient__user__full_name"],
+                "patient__patient_code": record["patient__patient_code"],
                 "doctor__user__full_name": record["doctor__user__full_name"],
+                "doctor__specialization": record["doctor__specialization"],
                 "created_at": record["created_at"].strftime("%Y-%m-%d %H:%M:%S"),  # Format datetime
                 "diagnosis": record["diagnosis"],
                 "symptoms": record["symptoms"] or "N/A",  # Handle null values
