@@ -7,7 +7,7 @@ from .views import (
     doctor_detail, generate_bill, add_expense, generate_bill_pdf, add_opd, update_opd, admit_patient, add_doctor,
     add_employee, add_room, employee_list, edit_employee, delete_employee, view_ipd_report,
     update_ipd_room,DaybookListView,DaybookCreateView,BalanceUpdateView,NICUMedicationRecordListView,NICUMedicationRecordCreateView,
-    NICUMedicationRecordUpdateView,delete_nicu_medication
+    NICUMedicationRecordUpdateView,delete_nicu_medication,NICUFluidAddView,NICUFluidUpdateView,NICUFluidDeleteView,
 )
 
 urlpatterns = [
@@ -55,6 +55,7 @@ urlpatterns = [
 
     # IPD
     path('ipd/', views.ipd, name='ipd'),
+    path('ipd/add/', views.add_ipd, name='add_ipd'),
     path('get-ipd-data/', get_ipd_data, name='get_ipd_data'),
     path('ipd/<int:ipd_id>/add_prescription/', add_prescription, name='add_prescription'),
     path('ipd/<int:ipd_id>/', view_ipd_report, name='view_ipd_report'),
@@ -82,6 +83,7 @@ urlpatterns = [
 
     # Rooms and Beds
     path('add-room/', add_room, name='add_room'),
+    path('ajax/get-beds/', views.get_available_beds, name='get_available_beds'),
     path('room-overview/', views.room_overview, name='room_overview'),
     path('get_available_beds/', get_available_beds, name='get_available_beds'),
 
@@ -135,5 +137,11 @@ urlpatterns = [
     path('delete-medicine/<int:pk>/', views.delete_medicine, name='delete_medicine'),
     path('delete-diluent/<int:pk>/', views.delete_diluent, name='delete_diluent'),
     path('delete_vial/<int:pk>/', views.delete_vial, name='delete_vial'),
+
+    #Fluid Form
+    path("ipd/<int:ipd_id>/fluid/add/", NICUFluidAddView.as_view(), name="add_nicu_fluid"),
+    path("fluid/<int:pk>/edit/", NICUFluidUpdateView.as_view(), name="update_nicu_fluid"),
+    path('fluid/<int:pk>/delete/', views.NICUFluidDeleteView.as_view(), name='nicu_fluid_delete'),
+
 
 ]

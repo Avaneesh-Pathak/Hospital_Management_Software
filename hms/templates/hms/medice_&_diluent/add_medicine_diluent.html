@@ -77,6 +77,7 @@
                                     <th style="padding: 0.75rem;">Name</th>
                                     <th style="padding: 0.75rem;">Type</th>
                                     <th style="padding: 0.75rem;">Standard Dose</th>
+                                    <th style="padding: 0.75rem;">Concentration</th>
                                     <th style="padding: 0.75rem;">Action</th>
                                 </tr>
                             </thead>
@@ -86,6 +87,7 @@
                                     <td style="padding: 0.75rem;">{{ medicine.name }}</td>
                                     <td style="padding: 0.75rem;">{{ medicine.get_medicine_type_display }}</td>
                                     <td style="padding: 0.75rem;">{{ medicine.standard_dose_per_kg }}</td>
+                                    <td style="padding: 0.75rem;">{{ medicine.concentration_mg_per_ml }}</td>
                                     <td style="padding: 0.75rem;">
                                         <a href="{% url 'delete_medicine' medicine.id %}" class="btn btn-sm btn-danger" title="Delete" style="padding: 0.25rem 0.5rem;">
                                             <i class="fas fa-trash"></i>

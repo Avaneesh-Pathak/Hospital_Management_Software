@@ -1,0 +1,138 @@
+{% extends "hms/base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto p-6 bg-white rounded-xl shadow-md">
+    <!-- Form Header -->
+    <div class="mb-8">
+        <h2 class="text-3xl font-bold text-gray-800">Admit Patient</h2>
+        <p class="text-gray-600 mt-2">Fill in the details below to manually admit a patient</p>
+    </div>
+
+    <!-- Admission Form -->
+    <form method="post" class="space-y-6">
+        {% csrf_token %}
+
+        <!-- Patient Selection -->
+        <div class="space-y-2">
+            <label for="patient" class="block text-sm font-medium text-gray-700">Select Patient</label>
+            <div class="relative">
+                <select name="patient" id="patient" class="block w-full px-4 py-3 pr-8 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white appearance-none" required>
+                    <option value="">Select a patient...</option>
+                    {% for p in patients %}
+                    <option value="{{ p.id }}">{{ p.user.full_name }} (ID: {{ p.patient_code }})</option>
+                    {% endfor %}
+                </select>
+                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l4-4 4 4m0 6l-4 4-4-4"></path>
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        <!-- Room and Bed Selection -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Room Selection -->
+            <div class="space-y-2">
+                <label for="room-select" class="block text-sm font-medium text-gray-700">Select Room</label>
+                <div class="relative">
+                    <select name="room" id="room-select" class="block w-full px-4 py-3 pr-8 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white appearance-none" required>
+                        <option value="">Select a room...</option>
+                        {% for room in rooms %}
+                        <option value="{{ room.id }}">{{ room.room_number }} ({{ room.get_room_type_display }})</option>
+                        {% endfor %}
+                    </select>
+                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l4-4 4 4m0 6l-4 4-4-4"></path>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bed Selection -->
+            <div class="space-y-2">
+                <label for="bed-select" class="block text-sm font-medium text-gray-700">Select Bed</label>
+                <div class="relative">
+                    <select name="bed_number" id="bed-select" class="block w-full px-4 py-3 pr-8 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white appearance-none" required disabled>
+                        <option value="">Select a room first...</option>
+                    </select>
+                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l4-4 4 4m0 6l-4 4-4-4"></path>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Reason for Admission -->
+        <div class="space-y-2">
+            <label for="reason" class="block text-sm font-medium text-gray-700">Reason for Admission</label>
+            <textarea name="reason_for_admission" id="reason" rows="4" class="block w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Enter the reason for admission..." required></textarea>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="flex justify-end pt-4">
+            <button type="submit" class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                </svg>
+                Admit Patient
+            </button>
+        </div>
+    </form>
+</div>
+
+<!-- JavaScript -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+$(document).ready(function() {
+    // Room selection change handler
+    $('#room-select').change(function() {
+        var roomId = $(this).val();
+        var bedSelect = $('#bed-select');
+        
+        if (!roomId) {
+            bedSelect.empty().append('<option value="">Select a room first...</option>').prop('disabled', true);
+            return;
+        }
+
+        bedSelect.empty().append('<option value="">Loading beds...</option>').prop('disabled', true);
+        
+        $.ajax({
+            url: '{% url "get_available_beds" %}',
+            data: { 'room_id': roomId },
+            success: function(data) {
+                bedSelect.empty();
+                if (data.beds && data.beds.length > 0) {
+                    bedSelect.append('<option value="">Select a bed...</option>');
+                    data.beds.forEach(function(bed) {
+                        bedSelect.append($('<option>', {
+                            value: bed.id,
+                            text: bed.bed_number
+                        }));
+                    });
+                    bedSelect.prop('disabled', false);
+                } else {
+                    bedSelect.append('<option value="">No available beds</option>');
+                    bedSelect.prop('disabled', true);
+                }
+            },
+            error: function() {
+                bedSelect.empty().append('<option value="">Error loading beds</option>');
+            }
+        });
+    });
+
+    // Form styling on focus
+    $('select, textarea').focus(function() {
+        $(this).parent().find('label').addClass('text-blue-600');
+    }).blur(function() {
+        $(this).parent().find('label').removeClass('text-blue-600');
+    });
+});
+</script>
+
+{% endblock %}

@@ -39,16 +39,16 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
 from django.shortcuts import render, redirect, get_object_or_404
-from django.views.generic import ListView, CreateView, UpdateView
+from django.views.generic import ListView, CreateView, UpdateView,DeleteView
 
 # Import Models and Forms
 from .models import (
     CustomUser, Patient, Doctor, Appointment, Billing, EmergencyCase, OPD, IPD, Expense, Employee, Room, PatientReport, Prescription,
-    License, Asset, Maintenance, AccountingRecord, Daybook, Balance, PatientTransfer, NICUVitals, NICUMedicationRecord, Medicine, Diluent,Vial
+    License, Asset, Maintenance, AccountingRecord, Daybook, Balance, PatientTransfer, NICUVitals, NICUMedicationRecord, Medicine, Diluent,Vial,FluidRequirement
 )
 from .forms import (
     PatientRegistrationForm, ExpenseForm, BillingForm, OPDForm, DoctorForm, EmployeeForm, RoomForm, EmergencyCaseForm, ProfileUpdateForm, PatientReportForm,
-    PrescriptionForm, LicenseForm, AssetForm, MaintenanceForm, BalanceUpdateForm, DaybookEntryForm, NICUVitalsForm, NICUMedicationRecordForm, MedicineForm, DiluentForm,VialForm
+    PrescriptionForm, LicenseForm, AssetForm, MaintenanceForm, BalanceUpdateForm, DaybookEntryForm, NICUVitalsForm, NICUMedicationRecordForm, MedicineForm, DiluentForm,VialForm,NICUFluidForm,IPDForm
 )
 
 # Logger Setup
@@ -777,6 +777,70 @@ def ipd(request):
     room = Room.objects.all()
     return render(request, 'hms/ipd/ipd.html', {'ipds': ipds,'room':room})
 
+@login_required
+def add_ipd(request):
+    available_rooms = Room.objects.filter(available_beds__gt=0)
+
+    if request.method == "POST":
+        room_id = request.POST.get("room")
+        bed_number = request.POST.get("bed_number")
+        patient_id = request.POST.get("patient")
+        reason = request.POST.get("reason_for_admission")
+
+        if not all([room_id, bed_number, patient_id]):
+            messages.error(request, "Please fill all required fields.")
+            return redirect("add_ipd")
+
+        room = get_object_or_404(Room, id=room_id)
+        bed_number = int(bed_number)
+
+        if bed_number in room.occupied_beds:
+            messages.error(request, "This bed is already occupied.")
+            return redirect("add_ipd")
+
+        room.occupied_beds.append(bed_number)
+        room.update_availability()
+
+        patient = get_object_or_404(Patient, id=patient_id)
+
+        ipd = IPD.objects.create(
+            patient=patient,
+            room=room,
+            bed_number=bed_number,
+            reason_for_admission=reason,
+            bed_price_per_day=room.bed_price_per_day
+        )
+
+        messages.success(request, f"Patient admitted to Room {room.room_number}, Bed {bed_number}.")
+        return redirect("ipd")
+
+    patients = Patient.objects.all()
+    return render(request, "hms/ipd/add_ipd.html", {
+        "rooms": available_rooms,
+        "patients": patients
+    })
+
+
+def get_available_beds(request):
+    room_id = request.GET.get("room_id")
+    try:
+        room = Room.objects.get(id=room_id)
+        occupied = room.occupied_beds or []
+        available_beds = []
+
+        for i in range(1, room.total_beds + 1):
+            if i not in occupied:
+                available_beds.append({
+                    "id": i,
+                    "bed_number": f"Bed {i}"
+                })
+
+        return JsonResponse({"beds": available_beds})
+    except Room.DoesNotExist:
+        return JsonResponse({"beds": []})
+
+
+
 def get_ipd_data(request):
     ipds = IPD.objects.all()
 
@@ -786,7 +850,7 @@ def get_ipd_data(request):
             'id': ipd.id,
             'patient__user__full_name': ipd.patient.user.full_name,
             'room__room_number': ipd.room.room_number if ipd.room else "N/A",
-            'patient_code': ipd.patient.patient_code,
+            'patient__patient_code': ipd.patient.patient_code,
             'bed_number': ipd.bed_number,
             'admitted_on': ipd.admitted_on.strftime('%Y-%m-%d %H:%M:%S'),  
             'reason_for_admission': ipd.reason_for_admission,
@@ -1782,6 +1846,8 @@ class NICUMedicationRecordListView(ListView):
         context["patient"] = patient
         context["patient_name"] = patient.user.full_name if patient else "Unknown Patient"
         context["ipd_id"] = ipd_id  # For the "Add Medication" button
+        context['fluid_data'] = FluidRequirement.objects.filter(ipd_admission=ipd_id)
+
 
         return context
 
@@ -1807,7 +1873,9 @@ class NICUMedicationRecordCreateView(CreateView):
     def get_context_data(self, **kwargs):
         """Pass IPD ID to the template for better form handling."""
         context = super().get_context_data(**kwargs)
+        ipd = get_object_or_404(IPD, id=self.kwargs["ipd_id"]) 
         context["ipd_id"] = self.kwargs["ipd_id"]
+        context["prescriptions"] = Prescription.objects.filter(ipd=ipd)
         return context
 
     def form_valid(self, form):
@@ -1832,14 +1900,25 @@ class NICUMedicationRecordUpdateView(UpdateView):
     template_name = "hms/nicumedication/nicu_medication_form.html"
 
     def get_success_url(self):
-        """Redirect to medication list after updating."""
-        ipd_id = self.object.ipd_admission.id
-        return reverse("nicu_medication_list", kwargs={"ipd_id": ipd_id})
+        """Redirect to medication list after successful update."""
+        ipd_admission = getattr(self.object, 'ipd_admission', None)
+        if ipd_admission:
+            return reverse("nicu_medication_list", kwargs={"ipd_id": ipd_admission.id})
+        return reverse("nicu_medication_list")
+
+    def get_form_kwargs(self):
+        """Pass IPD admission to the form for validation."""
+        kwargs = super().get_form_kwargs()
+        record = self.get_object()
+        if not record.ipd_admission:
+            raise ValueError("IPD admission is missing for this record.")
+        kwargs["ipd_admission"] = record.ipd_admission
+        return kwargs
 
     def get_context_data(self, **kwargs):
-        """Pass IPD ID to the template for better form handling."""
+        """Add IPD ID to the template context for better UI handling."""
         context = super().get_context_data(**kwargs)
-        context["ipd_id"] = self.object.ipd_admission.id
+        context["ipd_id"] = getattr(self.object.ipd_admission, 'id', None)
         return context
 
 def delete_nicu_medication(request, pk):
@@ -1919,3 +1998,67 @@ def delete_vial(request, pk):
     vial.delete()
     messages.success(request, "Vial deleted successfully!")
     return redirect('manage_medicine_diluent')
+
+
+
+class NICUFluidListView(ListView):
+    model = FluidRequirement
+    template_name = "hms/nicumedication/nicu_medication_list.html"
+    context_object_name = "fluid_data"
+
+    def get_queryset(self):
+        ipd_id = self.kwargs.get("ipd_id")
+        return FluidRequirement.objects.filter(ipd_admission_id=ipd_id)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        ipd_id = self.kwargs.get("ipd_id")
+        context["ipd_id"] = ipd_id
+        context["fluid_data"] = FluidRequirement.objects.filter(ipd_admission_id=ipd_id)  # Ensure this key is used in template
+        return context
+
+class NICUFluidAddView(CreateView):
+    model = FluidRequirement
+    form_class = NICUFluidForm
+    template_name = "hms/nicumedication/nicu_fluid_form.html"
+
+    def get_success_url(self):
+        return reverse_lazy("nicu_medication_list", kwargs={"ipd_id": self.kwargs["ipd_id"]})
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["ipd_id"] = self.kwargs["ipd_id"]
+        return context
+
+    def form_valid(self, form):
+        ipd_id = self.kwargs.get("ipd_id")
+        form.instance.ipd_admission_id = ipd_id
+        return super().form_valid(form)
+
+
+class NICUFluidUpdateView(UpdateView):
+    model = FluidRequirement
+    form_class = NICUFluidForm
+    template_name = "hms/nicumedication/nicu_fluid_form.html"
+
+    def get_success_url(self):
+        ipd_id = self.object.ipd_admission_id
+        return reverse_lazy("nicu_medication_list", kwargs={"ipd_id": ipd_id})
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["ipd_id"] = self.object.ipd_admission_id
+        return context
+
+
+
+
+class NICUFluidDeleteView(DeleteView):
+    model = FluidRequirement
+    template_name = "hms/nicumedication/nicu_fluid_confirm_delete.html"
+
+    def get_success_url(self):
+        ipd_id = self.object.ipd_admission_id
+        return reverse_lazy("nicu_medication_list", kwargs={"ipd_id": ipd_id})
+
+

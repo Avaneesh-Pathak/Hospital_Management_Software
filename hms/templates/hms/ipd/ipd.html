@@ -2,14 +2,37 @@
 
 {% block content %}
 <div class="container mx-auto p-6">
-    <!-- Page Title -->
-    <h2 class="text-3xl font-bold text-gray-800 mb-6">IPD Patients</h2>
+    <!-- Page Title with Add and Refresh Buttons -->
+<div class="flex flex-col md:flex-row justify-between items-center mb-6 space-y-3 md:space-y-0">
+    <h2 class="text-3xl font-bold text-gray-800">IPD Patients</h2>
+
+    <div class="flex space-x-3">
+        <a href="{% url 'add_ipd' %}" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition duration-200">
+            + Add IPD
+        </a>
+
+        <button onclick="fetchIPDData()" class="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-200">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd" />
+            </svg>
+            Refresh
+        </button>
+    </div>
+</div>
+
 
     <!-- Messages -->
     {% if messages %}
-        <div class="mb-6">
+        <div class="mb-6 space-y-2">
             {% for message in messages %}
-                <div class="p-4 mb-4 text-sm rounded-lg {% if message.tags == 'error' %}bg-red-50 text-red-800{% else %}bg-green-50 text-green-800{% endif %}">
+                <div class="p-4 text-sm rounded-lg flex items-center {% if message.tags == 'error' %}bg-red-50 text-red-800{% else %}bg-green-50 text-green-800{% endif %}">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                        {% if message.tags == 'error' %}
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                        {% else %}
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                        {% endif %}
+                    </svg>
                     {{ message }}
                 </div>
             {% endfor %}
@@ -17,43 +40,97 @@
     {% endif %}
 
     <!-- IPD Patients Table -->
-    <div class="overflow-x-auto bg-white rounded-lg shadow-lg">
-        <table class="min-w-full">
-            <thead class="bg-blue-600 text-white">
+    <div class="overflow-x-auto bg-white rounded-xl shadow-md">
+        <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gradient-to-r from-blue-600 to-blue-500 text-white">
                 <tr>
-                    <th class="px-6 py-3 text-center text-l font-medium uppercase tracking-wider">Patient Name</th>
-                    <th class="px-6 py-3 text-center text-l font-medium uppercase tracking-wider">Room Number</th>
-                    <th class="px-6 py-3 text-center text-l font-medium uppercase tracking-wider">Bed Number</th>
-                    <th class="px-6 py-3 text-center text-l font-medium uppercase tracking-wider">Total Stay Cost</th>
-                    <th class="px-6 py-3 text-center text-l font-medium uppercase tracking-wider">Admitted On</th>
-                    <th class="px-6 py-3 text-center text-l font-medium uppercase tracking-wider">Reason for Admission</th>
-                    <th class="px-6 py-3 text-center text-l font-medium uppercase tracking-wider">Actions</th>
+                    <th class="px-6 py-4 text-left text-sm font-semibold uppercase tracking-wider">Patient Name</th>
+                    <th class="px-6 py-4 text-left text-sm font-semibold uppercase tracking-wider">Room No.</th>
+                    <th class="px-6 py-4 text-left text-sm font-semibold uppercase tracking-wider">Bed No.</th>
+                    <th class="px-6 py-4 text-left text-sm font-semibold uppercase tracking-wider">Total Cost</th>
+                    <th class="px-6 py-4 text-left text-sm font-semibold uppercase tracking-wider">Admitted On</th>
+                    <th class="px-6 py-4 text-left text-sm font-semibold uppercase tracking-wider">Admission Reason</th>
+                    <th class="px-6 py-4 text-right text-sm font-semibold uppercase tracking-wider">Actions</th>
                 </tr>
             </thead>
             
-            <tbody id="ipd-table-body" class="divide-y divide-gray-200 text-center">
+            <tbody id="ipd-table-body" class="bg-white divide-y divide-gray-200">
                 {% for ipd in ipds %}
-                <tr class="hover:bg-gray-50 transition duration-200">
-                    <td class="px-6 py-4 text-l text-gray-700">{{ ipd.patient.user.full_name }}</td>
-                    <td class="px-6 py-4 text-l text-gray-700">{{ ipd.room.room_number }}</td>
-                    <td class="px-6 py-4 text-l text-gray-700">{{ ipd.bed_number }}</td>
-                    <td class="px-6 py-4 text-l text-gray-700">{{ ipd.calculate_total_cost  }}</td>
-                    <td class="px-6 py-4 text-l text-gray-700">{{ ipd.admitted_on|date:"d M Y, H:i" }}</td>
-                    <td class="px-6 py-4 text-l text-gray-700">{{ ipd.reason_for_admission }}</td>
-                    <td class="px-6 py-4 text-l">
+                <tr class="hover:bg-blue-50 transition duration-150 ease-in-out">
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0 h-10 w-10 bg-blue-100 rounded-full flex items-center justify-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                </svg>
+                            </div>
+                            <div class="ml-4">
+                                <div class="text-sm font-medium text-gray-900">{{ ipd.patient.user.full_name }}</div>
+                                <div class="text-xs text-gray-500">ID: {{ ipd.patient.patient_code }}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
+                            {{ ipd.room.room_number }}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ ipd.bed_number }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                        ₹{{ ipd.calculate_total_cost|floatformat:2 }}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {{ ipd.admitted_on|date:"d M Y, H:i" }}
+                    </td>
+                    <td class="px-6 py-4 text-sm text-gray-500 max-w-xs truncate">
+                        {{ ipd.reason_for_admission }}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                         <div class="relative inline-block text-left">
-                            <button onclick="toggleDropdown('dropdown-{{ ipd.id }}')" class="text-gray-500 hover:text-gray-700 focus:outline-none">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
+                            <button type="button" onclick="toggleDropdown('dropdown-{{ ipd.id }}')" 
+                                class="inline-flex justify-center items-center w-8 h-8 rounded-full bg-gray-100 text-gray-500 hover:bg-blue-100 hover:text-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200"
+                                aria-expanded="false" aria-haspopup="true">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z" />
                                 </svg>
                             </button>
-                            <div id="dropdown-{{ ipd.id }}" class="hidden absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
+                            
+                            <div id="dropdown-{{ ipd.id }}" 
+                                class="hidden origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 divide-y divide-gray-100 focus:outline-none z-10"
+                                style="min-width: 14rem;">
                                 <div class="py-1">
-                                    <a href="{% url 'add_prescription' ipd.id %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Add Prescription</a>
-                                    <a href="{% url 'upload_patient_report' ipd.patient.patient_code %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Upload Report</a>
-                                    <a href="{% url 'view_ipd_report' ipd.id %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">View Report</a>
-                                    <a href="{% url 'view_nicu_vitals' ipd.id %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">View NICU Vitals</a>
-                                    <a href="{% url 'nicu_medication_list' ipd.id %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">View Medications</a>
+                                    <a href="{% url 'add_prescription' ipd.id %}" class="group flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-gray-400 group-hover:text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                        </svg>
+                                        Add Prescription
+                                    </a>
+                                    <a href="{% url 'upload_patient_report' ipd.patient.patient_code %}" class="group flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-gray-400 group-hover:text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                                        </svg>
+                                        Upload Report
+                                    </a>
+                                    <a href="{% url 'view_ipd_report' ipd.id %}" class="group flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-gray-400 group-hover:text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                        </svg>
+                                        View Report
+                                    </a>
+                                </div>
+                                <div class="py-1">
+                                    <a href="{% url 'view_nicu_vitals' ipd.id %}" class="group flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-gray-400 group-hover:text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                                        </svg>
+                                        View NICU Vitals
+                                    </a>
+                                    <a href="{% url 'nicu_medication_list' ipd.id %}" class="group flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-gray-400 group-hover:text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                                        </svg>
+                                        View Medications
+                                    </a>
                                 </div>
                             </div>
                         </div>
@@ -61,7 +138,14 @@
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="7" class="px-6 py-4 text-sm text-center text-gray-500">No patients currently admitted.</td>
+                    <td colspan="7" class="px-6 py-4 text-center text-sm text-gray-500">
+                        <div class="flex flex-col items-center justify-center py-8">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            <span class="mt-2 block text-sm font-medium text-gray-600">No patients currently admitted</span>
+                        </div>
+                    </td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -71,90 +155,183 @@
 
 <!-- Dropdown Script -->
 <script>
-    // Function to toggle dropdown visibility
-    function toggleDropdown(dropdownId) {
+    // Track currently open dropdown
+    let currentlyOpenDropdown = null;
+
+    function toggleDropdown(dropdownId, event) {
+        event.stopPropagation(); // Prevent event from bubbling up
+        
         const dropdown = document.getElementById(dropdownId);
-        dropdown.classList.toggle('hidden');
+        const isHidden = dropdown.classList.contains('hidden');
+
+        // Close all dropdowns first
+        closeAllDropdowns();
+
+        // Open the clicked dropdown if it was hidden
+        if (isHidden) {
+            dropdown.classList.remove('hidden');
+            currentlyOpenDropdown = dropdownId;
+            
+            // Position the dropdown to prevent overflow
+            positionDropdown(dropdown);
+            
+            // Add click outside handler
+            document.addEventListener('click', handleClickOutside);
+        }
     }
 
-    // Close dropdowns when clicking outside
-    document.addEventListener('click', function(event) {
-        const dropdowns = document.querySelectorAll('.relative.inline-block.text-left');
-        dropdowns.forEach(dropdown => {
-            if (!dropdown.contains(event.target)) {
-                const menu = dropdown.querySelector('.hidden');
-                if (menu) {
-                    menu.classList.add('hidden');
-                }
-            }
+    function closeAllDropdowns() {
+        document.querySelectorAll('[id^="dropdown-"]').forEach(el => {
+            el.classList.add('hidden');
         });
-    });
+        currentlyOpenDropdown = null;
+        document.removeEventListener('click', handleClickOutside);
+    }
+
+    function handleClickOutside(event) {
+        if (!event.target.closest('.relative.inline-block.text-left')) {
+            closeAllDropdowns();
+        }
+    }
+
+    function positionDropdown(dropdown) {
+        const rect = dropdown.getBoundingClientRect();
+        const viewportWidth = window.innerWidth;
+        
+        // Check if dropdown would overflow right edge
+        if (rect.right > viewportWidth) {
+            dropdown.style.right = 'auto';
+            dropdown.style.left = '0';
+        }
+    }
 </script>
 
 <!-- Auto-Refresh Script -->
 <script>
     // Function to fetch IPD data
     function fetchIPDData() {
-        // Find any currently open dropdown
-        let openDropdown = document.querySelector('.relative.inline-block.text-left .block');
-        let openDropdownId = openDropdown ? openDropdown.id : null;
-    
-        fetch("{% url 'get_ipd_data' %}")  // API call to get updated IPD data
-        .then(response => response.json())
-        .then(data => {
-            let tableBody = document.getElementById("ipd-table-body");
-            tableBody.innerHTML = "";  // Clear table before inserting new data
-    
-            if (data.length === 0) {
-                tableBody.innerHTML = `
-                    <tr>
-                        <td colspan="7" class="px-6 py-4 text-sm text-center text-gray-500">No patients currently admitted.</td>
-                    </tr>`;
-            } else {
-                data.forEach(ipd => {
-                    let admittedOn = new Date(ipd.admitted_on).toLocaleString();
-                    let row = `
-                        <tr class="hover:bg-gray-50 transition duration-200">
-                            <td class="px-6 py-4 text-l text-gray-700">${ipd.patient__user__full_name}</td>
-                            <td class="px-6 py-4 text-l text-gray-700">${ipd.room__room_number}</td>
-                            <td class="px-6 py-4 text-l text-gray-700">${ipd.bed_number || 'N/A'}</td>
-                            <td class="px-6 py-4 text-l text-gray-700">${ipd.total_cost || 'N/A'}</td>
-                            <td class="px-6 py-4 text-l text-gray-700">${admittedOn}</td>
-                            <td class="px-6 py-4 text-l text-gray-700">${ipd.reason_for_admission}</td>
-                            <td class="px-6 py-4 text-l">
+        // Store the currently open dropdown ID before refresh
+        const openDropdownBeforeRefresh = currentlyOpenDropdown;
+
+        fetch("{% url 'get_ipd_data' %}")
+            .then(response => response.json())
+            .then(data => {
+                let tableBody = document.getElementById("ipd-table-body");
+                tableBody.innerHTML = "";
+
+                if (data.length === 0) {
+                    tableBody.innerHTML = `
+                        <tr>
+                            <td colspan="7" class="px-6 py-4 text-center text-sm text-gray-500">
+                                <div class="flex flex-col items-center justify-center py-8">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                    <span class="mt-2 block text-sm font-medium text-gray-600">No patients currently admitted</span>
+                                </div>
+                            </td>
+                        </tr>`;
+                } else {
+                    data.forEach(ipd => {
+                        let admittedOn = new Date(ipd.admitted_on).toLocaleString();
+                        // Check if this dropdown should be open after refresh
+                        const shouldBeOpen = openDropdownBeforeRefresh === `dropdown-${ipd.id}`;
+                        
+                        let row = `
+                        <tr class="hover:bg-blue-50 transition duration-150 ease-in-out">
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="flex items-center">
+                                    <div class="flex-shrink-0 h-10 w-10 bg-blue-100 rounded-full flex items-center justify-center">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                        </svg>
+                                    </div>
+                                    <div class="ml-4">
+                                        <div class="text-sm font-medium text-gray-900">${ipd.patient__user__full_name}</div>
+                                        <div class="text-xs text-gray-500">ID: ${ipd.patient__patient_code}</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
+                                    ${ipd.room__room_number}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${ipd.bed_number || 'N/A'}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                ₹${ipd.total_cost ? parseFloat(ipd.total_cost).toFixed(2) : '0.00'}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                ${admittedOn}
+                            </td>
+                            <td class="px-6 py-4 text-sm text-gray-500 max-w-xs truncate">
+                                ${ipd.reason_for_admission}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                 <div class="relative inline-block text-left">
-                                    <button onclick="toggleDropdown('dropdown-${ipd.id}')" class="text-gray-500 hover:text-gray-700 focus:outline-none">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
+                                    <button type="button" onclick="toggleDropdown('dropdown-${ipd.id}', event)" 
+                                        class="inline-flex justify-center items-center w-8 h-8 rounded-full bg-gray-100 text-gray-500 hover:bg-blue-100 hover:text-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200"
+                                        aria-expanded="false" aria-haspopup="true">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z" />
                                         </svg>
                                     </button>
-                                    <div id="dropdown-${ipd.id}" class="hidden absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
+                                    
+                                    <div id="dropdown-${ipd.id}" 
+                                        class="${shouldBeOpen ? '' : 'hidden'} origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 divide-y divide-gray-100 focus:outline-none z-10"
+                                        style="min-width: 14rem;">
                                         <div class="py-1">
-                                            <a href="/ipd/${ipd.id}/add_prescription/" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Add Prescription</a>
-                                            <a href="/patient/${ipd.patient__patient_code}/upload-report/" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Upload Report</a>
-                                            <a href="/ipd/${ipd.id}/" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">View Report</a>
-                                            <a href="/nicu/view/${ipd.id}/" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">View NICU Vitals</a>
-                                            <a href="/nicu/medications/${ipd.id}/" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">View Medications</a>
+                                            <a href="/ipd/${ipd.id}/add_prescription/" class="group flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-gray-400 group-hover:text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                                </svg>
+                                                Add Prescription
+                                            </a>
+                                            <a href="/patient/${ipd.patient__patient_code}/upload-report/" class="group flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-gray-400 group-hover:text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                                                </svg>
+                                                Upload Report
+                                            </a>
+                                            <a href="/ipd/${ipd.id}/" class="group flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-gray-400 group-hover:text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                                </svg>
+                                                View Report
+                                            </a>
+                                        </div>
+                                        <div class="py-1">
+                                            <a href="/nicu/view/${ipd.id}/" class="group flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-gray-400 group-hover:text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                                                </svg>
+                                                View NICU Vitals
+                                            </a>
+                                            <a href="/nicu/medications/${ipd.id}/" class="group flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-gray-400 group-hover:text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                                                </svg>
+                                                View Medications
+                                            </a>
                                         </div>
                                     </div>
                                 </div>
                             </td>
                         </tr>`;
-                    tableBody.innerHTML += row;
-                });
-    
-                // Reopen the previously open dropdown
-                if (openDropdownId) {
-                    document.getElementById(openDropdownId)?.classList.remove('hidden');
-                }
-            }
-        })
-        .catch(error => console.error("Error fetching IPD data:", error));
-    }
-    
+                        tableBody.innerHTML += row;
+                    });
 
-    // Fetch data every 5 seconds
-    setInterval(fetchIPDData, 5000);
+                    // Update the currently open dropdown reference if it was reopened
+                    if (openDropdownBeforeRefresh) {
+                        currentlyOpenDropdown = openDropdownBeforeRefresh;
+                    }
+                }
+            })
+            .catch(error => console.error("Error fetching IPD data:", error));
+    }
+
+    // Fetch data every 30 seconds
+    setInterval(fetchIPDData, 30000);
 
     // Fetch data immediately on page load
     document.addEventListener("DOMContentLoaded", fetchIPDData);

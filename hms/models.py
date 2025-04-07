@@ -73,7 +73,7 @@ class Patient(models.Model):
     gender = models.CharField(max_length=10, choices=CustomUser.GENDER_CHOICES, blank=True, null=True)
     aadhar_number = models.CharField(max_length=12, unique=True, validators=[MinLengthValidator(12)], blank=True, null=True)
     blood_group = models.CharField(max_length=3, blank=True, null=True, choices=BLOOD_GROUP_CHOICES)
-    weight = models.PositiveBigIntegerField(blank=True,null=True)
+    weight = models.DecimalField(max_digits=6, decimal_places=2,blank=True,null=True)
     email = models.EmailField(unique=True, blank=True, null=True)
 
     # Medical Information
@@ -769,6 +769,7 @@ class Medicine(models.Model):
         ("tablet", "Tablet"),
         ("drop", "Drop"),
         ("suspension", "Suspension"),
+        ("fluid", "Fluid"), 
         ("other", "Other"),
     ]
 
@@ -829,6 +830,7 @@ class NICUMedicationRecord(models.Model):
 
     patient = models.ForeignKey("Patient", on_delete=models.CASCADE)
     ipd_admission = models.ForeignKey("IPD", on_delete=models.CASCADE, related_name="nicu_medications", null=True)
+    prescription = models.ForeignKey("Prescription", on_delete=models.CASCADE, related_name="Prescription", null=True)
     route = models.CharField(max_length=10, choices=ROUTE_CHOICES)
     medicine = models.ForeignKey("Medicine", on_delete=models.CASCADE)
     diluent = models.ForeignKey("Diluent", on_delete=models.SET_NULL, null=True, blank=True)
@@ -838,18 +840,21 @@ class NICUMedicationRecord(models.Model):
     # Calculated Fields
     calculated_dose_per_day = models.FloatField(editable=False, null=True)
     calculated_dose_per_dose = models.FloatField(editable=False, null=True)
-    # calculated_volume_per_day = models.FloatField(editable=False, null=True)
-    # calculated_volume_per_dose = models.FloatField(editable=False, null=True)
     calculated_diluent_volume = models.FloatField(editable=False, null=True)
     calculated_infusion_rate = models.FloatField(editable=False, null=True)
     total_volume_ml = models.FloatField(editable=False, null=True)
     calculated_dose_per_hour = models.FloatField(editable=False, null=True)
     calculated_mg_per_kg_per_dose = models.FloatField(editable=False, null=True)
     calculated_ml_per_kg_per_dose = models.FloatField(editable=False, null=True)
-
+    calculated_ml = models.FloatField(editable=False, null=True)
+    frequency_of_dose = models.IntegerField(blank=True, null=True)
+    frequency_of_dose_given = models.FloatField(editable=False, null=True)
+    calculated_dose_per_dose_ml = models.FloatField(editable=False, null=True)
+    take = models.FloatField(editable=False, null=True)
+    set_in_mchine = models.FloatField(editable=False,null=True)
     dose_frequency = models.CharField(max_length=10, choices=DOSE_FREQUENCY_CHOICES, default="OD")
     other_frequency = models.CharField(max_length=100, blank=True, null=True)
-    sign = models.CharField(max_length=100, help_text="Doctor's Signature")
+    sign = models.CharField(max_length=100, help_text="Doctor's Signature",null=True)
     timestamp = models.DateTimeField(auto_now_add=True)
 
     def get_dose_frequency_per_day(self):
@@ -859,7 +864,7 @@ class NICUMedicationRecord(models.Model):
         }
         return frequency_map.get(self.dose_frequency, 1)
 
-
+    
     def clean(self):
         """Validate inputs before saving."""
         if not self.patient or not self.patient.weight or self.patient.weight <= 0:
@@ -869,44 +874,178 @@ class NICUMedicationRecord(models.Model):
         if self.route == "IV" and not self.get_dose_frequency_per_day():
             raise ValidationError("Frequency is required for IV medications.")
 
-    def save(self, *args, **kwargs):
+    def save(self, *args, **kwargs): 
         self.clean()
         patient_weight = self.patient.weight
         daily_doses = self.get_dose_frequency_per_day()
-        print(self.medicine)
+
         # Calculate Dose Per Day (mg/day)
-        self.calculated_dose_per_day = round(patient_weight * self.medicine.standard_dose_per_kg)
+        self.calculated_dose_per_day = round(Decimal(patient_weight) * Decimal(self.medicine.standard_dose_per_kg), 2)
 
         # Calculate Dose Per Dose (mg/dose)
         self.calculated_dose_per_dose = round(self.calculated_dose_per_day / daily_doses)
 
-        # ✅ Calculate mg/kg/dose and mL/kg/dose
+        # ✅ Calculate mg/kg/dose
         if patient_weight > 0:
             self.calculated_mg_per_kg_per_dose = round(self.calculated_dose_per_dose / patient_weight, 2)
 
-        # ✅ Calculate Diluent Volume (mL) Based on Vial Type
-        if self.vial and self.vial.unit == "mg":
-            # Convert mg to mL using standard concentration
-            vial_volume_ml = self.vial.size / 100
+        # ✅ Skip calculation for Oral, Syrup, and Suspension
+        if self.medicine.medicine_type in ["syrup", "suspension", "oral"]:
+            self.vial = None
+            self.calculated_dose_per_dose_ml = None
+            self.dilution_volume = None
+            self.diluent = None
+            self.calculated_ml = None
+            self.calculated_infusion_rate = None
+            self.frequency_of_dose = None
+            self.frequency_of_dose_given = None
+            self.set_in_mchine = None
+            self.calculated_dose_per_dose = self.calculated_dose_per_day
+            self.calculated_mg_per_kg_per_dose = round(self.calculated_dose_per_dose / patient_weight, 2)
+            print(f"Skipping dilution calculations for {self.medicine.medicine_type}")
+
         else:
-            vial_volume_ml = self.vial.size if self.vial else 0
+            if self.vial.unit == "mg":
+                self.calculated_dose_per_dose_ml = self.vial.size/100
+                print("vial size",self.vial.size)
+                print("calculated_dose_per_dose_ml",self.calculated_dose_per_dose_ml)
 
-        self.calculated_diluent_volume = round(vial_volume_ml, 2)
+            
+            self.take = self.calculated_dose_per_day / 100
 
-        self.total_volume_ml = round(
-            (self.calculated_dose_per_dose / self.medicine.concentration_mg_per_ml if self.medicine.concentration_mg_per_ml else self.calculated_dose_per_dose / self.dilution_volume) 
-            + self.calculated_diluent_volume, 2)
+            # ✅ Normal Calculation for other medicine types
+            # self.calculated_dose_per_dose_ml = self.calculated_dose_per_dose / 100
 
-        # ✅ Calculate Accurate Infusion Rate for IV (Infusion Time = 1 Hour)
-        if self.route == "IV"  and self.total_volume_ml > 0:
-            # Convert 20 minutes to hours
-            # infusion_time_in_hours = 20 / 60, replace 1 with this to calculate for 20 mint
-            self.calculated_infusion_rate = round(self.total_volume_ml/1 , 2)  # mL/hr
-        else:
-            self.calculated_infusion_rate = 0
+            # ✅ Injection Calculation
+            if self.medicine.medicine_type == "injection":
+                self.calculated_ml = self.dilution_volume + (self.calculated_dose_per_dose / 100)
+                self.frequency_of_dose_given = (self.calculated_ml / self.frequency_of_dose)
+                self.set_in_mchine = (self.frequency_of_dose_given * 60)
 
+            # ✅ Drops Calculation
+            elif self.medicine.medicine_type == "drop":
+                DROP_VOLUME_ML = 0.05
+                if self.medicine.concentration_mg_per_ml:
+                    self.calculated_ml = round(self.calculated_dose_per_dose / self.medicine.concentration_mg_per_ml, 2)
+                    self.calculated_drops = round(self.calculated_ml / DROP_VOLUME_ML)
+                else:
+                    self.calculated_ml = 0
+                    self.calculated_drops = 0
+
+            # ✅ Tablet Calculation
+            elif self.medicine.medicine_type == "tablet":
+                self.calculated_tablets = round(self.calculated_dose_per_dose / self.medicine.concentration_mg_per_ml, 1)
+
+            # ✅ Special handling for Dopamine and Dobutamine
+            elif self.medicine.name.lower() in ['dopamine', 'dobutamine']:
+
+                dose_mcg_per_kg_min = self.medicine.standard_dose_per_kg  # assuming this field will store mcg/kg/min for these drugs
+                weight_kg = patient_weight
+                    # Default vial concentration: 250mg in 50ml = 5 mg/ml = 5000 mcg/ml
+                concentration_mg_per_ml = self.medicine.concentration_mg_per_ml or 5
+                concentration_mcg_per_ml = concentration_mg_per_ml * 1000
+
+               # Calculate Infusion Rate (mL/hr) using standard NICU formula
+                infusion_rate_ml_hr = (dose_mcg_per_kg_min * weight_kg * 60) / concentration_mcg_per_ml
+
+                self.calculated_infusion_rate = round(infusion_rate_ml_hr, 2)
+
+                # Optional: Also calculate total volume and set_in_mchine
+                self.calculated_ml = round(infusion_rate_ml_hr * 24, 2)  # for 24 hrs
+                self.set_in_mchine = round(self.calculated_ml, 2)
+
+            # ✅ Infusion Rate for IV
+            if self.route == "IV":
+                self.calculated_infusion_rate = round(self.calculated_ml / 60, 2)
+            else:
+                self.calculated_infusion_rate = 0
 
         super().save(*args, **kwargs)
 
+
+
 def __str__(self):
     return f"{self.medicine.name} ({self.get_route_display()}) - {self.timestamp}"
+
+
+
+
+
+
+class FluidRequirement(models.Model):
+    patient = models.ForeignKey("Patient", on_delete=models.CASCADE, null=True)
+    ipd_admission = models.ForeignKey("IPD", on_delete=models.CASCADE, related_name="fluid_requirements", null=True)
+    medicine = models.ForeignKey(
+        "Medicine",
+        on_delete=models.CASCADE,
+        limit_choices_to={"medicine_type": "fluid"},
+        related_name="fluid_requirements",
+        null=True
+    )
+
+    # These are auto-filled
+    birth_weight_category = models.CharField(max_length=20, choices=[("≤1500g", "≤1500g"), (">1500g", ">1500g")])
+    day_after_birth = models.IntegerField()
+    fluid_ml_per_kg_per_day = models.FloatField()
+    calculated_ml = models.FloatField(null=True, blank=True)
+    calculated_ml_hr = models.FloatField(null=True, blank=True,editable=False)
+
+    def save(self, *args, **kwargs):
+        patient = self.ipd_admission.patient
+
+        weight = patient.weight
+        dob = patient.date_of_birth
+        days_after_birth = (timezone.now().date() - dob).days
+
+        # Determine weight category
+        weight_category = "≤1500g" if weight <= 1.5 else ">1500g"
+
+        # After 6 days, default to 150 mL/kg/day
+        if days_after_birth > 6:
+            ml_per_kg = 150
+        else:
+            # Get reference fluid value (no IPD or medicine assigned)
+            reference = FluidRequirement.objects.filter(
+                birth_weight_category=weight_category,
+                day_after_birth=days_after_birth,
+                ipd_admission__isnull=True,
+                medicine__isnull=True
+            ).first()
+            ml_per_kg = reference.fluid_ml_per_kg_per_day if reference else 150  # fallback
+            print("refrence",reference)
+            print("ml_per_kg",ml_per_kg)
+
+        self.birth_weight_category = weight_category
+        self.day_after_birth = days_after_birth
+        self.fluid_ml_per_kg_per_day = ml_per_kg
+        self.calculated_ml = round(float(ml_per_kg) * float(weight), 2)
+        self.calculated_ml_hr = round(self.calculated_ml / 24, 2)
+
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        if self.ipd_admission and self.ipd_admission.patient and self.ipd_admission.patient.user:
+            patient_name = self.ipd_admission.patient.user.full_name or "Unnamed Patient"
+        else:
+            patient_name = "Unknown Patient"
+        
+        return f"{patient_name} - Day {self.day_after_birth}"
+
+
+# FluidRequirement.objects.bulk_create([
+#     # For preterm neonates birth weight ≤1500g
+#     FluidRequirement(birth_weight_category="≤1500g", day_after_birth=1, fluid_ml_per_kg_per_day=80),
+#     FluidRequirement(birth_weight_category="≤1500g", day_after_birth=2, fluid_ml_per_kg_per_day=90),
+#     FluidRequirement(birth_weight_category="≤1500g", day_after_birth=3, fluid_ml_per_kg_per_day=100),
+#     FluidRequirement(birth_weight_category="≤1500g", day_after_birth=4, fluid_ml_per_kg_per_day=120),
+#     FluidRequirement(birth_weight_category="≤1500g", day_after_birth=5, fluid_ml_per_kg_per_day=140),
+#     FluidRequirement(birth_weight_category="≤1500g", day_after_birth=6, fluid_ml_per_kg_per_day=150),
+    
+#     # For term/preterm neonates birth weight >1500g
+#     FluidRequirement(birth_weight_category=">1500g", day_after_birth=1, fluid_ml_per_kg_per_day=60),
+#     FluidRequirement(birth_weight_category=">1500g", day_after_birth=2, fluid_ml_per_kg_per_day=80),
+#     FluidRequirement(birth_weight_category=">1500g", day_after_birth=3, fluid_ml_per_kg_per_day=100),
+#     FluidRequirement(birth_weight_category=">1500g", day_after_birth=4, fluid_ml_per_kg_per_day=120),
+#     FluidRequirement(birth_weight_category=">1500g", day_after_birth=5, fluid_ml_per_kg_per_day=140),
+#     FluidRequirement(birth_weight_category=">1500g", day_after_birth=6, fluid_ml_per_kg_per_day=160),
+# ])

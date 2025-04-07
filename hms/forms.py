@@ -1,7 +1,7 @@
 from django import forms
 from django.utils import timezone
 from django.core.exceptions import ValidationError
-from .models import CustomUser,NICUVitals, Patient,Billing,Expense,OPD,Room, Doctor, Employee,EmergencyCase,PatientReport,Prescription,License,Asset,Maintenance,Daybook,NICUMedicationRecord,Medicine, Diluent,Vial
+from .models import CustomUser,NICUVitals, Patient,Billing,Expense,OPD,Room, Doctor, Employee,EmergencyCase,PatientReport,Prescription,License,Asset,Maintenance,Daybook,NICUMedicationRecord,Medicine, Diluent,Vial,FluidRequirement,IPD
 
 class ProfileUpdateForm(forms.ModelForm):
     class Meta:
@@ -65,6 +65,38 @@ class ExpenseForm(forms.ModelForm):
         model = Expense
         fields = ['patient', 'category', 'description', 'cost']
 
+class IPDForm(forms.ModelForm):
+    class Meta:
+        model = IPD
+        fields = ['patient', 'room', 'bed_number', 'reason_for_admission']
+        widgets = {
+            'reason_for_admission': forms.Textarea(attrs={'rows': 3, 'class': 'form-control'}),
+            'patient': forms.Select(attrs={'class': 'form-control'}),
+            'room': forms.Select(attrs={'class': 'form-control', 'id': 'id_room'}),
+            'bed_number': forms.Select(attrs={'class': 'form-control'}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super(IPDForm, self).__init__(*args, **kwargs)
+
+        if 'room' in self.data:
+            try:
+                room_id = int(self.data.get('room'))
+                room = Room.objects.get(id=room_id)
+                occupied = room.occupied_beds
+                total = room.total_beds
+                available = [(i, f"Bed {i}") for i in range(1, total + 1) if i not in occupied]
+                self.fields['bed_number'].choices = available
+            except (ValueError, TypeError, Room.DoesNotExist):
+                pass
+        elif self.instance.pk:
+            room = self.instance.room
+            total = room.total_beds
+            occupied = room.occupied_beds
+            available = [(i, f"Bed {i}") for i in range(1, total + 1) if i not in occupied or i == self.instance.bed_number]
+            self.fields['bed_number'].choices = available
+        else:
+            self.fields['bed_number'].choices = []
 
 class OPDForm(forms.ModelForm):
     class Meta:
@@ -318,14 +350,15 @@ class NICUVitalsForm(forms.ModelForm):
 class NICUMedicationRecordForm(forms.ModelForm):
     class Meta:
         model = NICUMedicationRecord
-        exclude = ["patient", "ipd_admission"]  # Exclude these fields from the form
+        exclude = ["patient", "ipd_admission","prescription"]  # Still exclude these, set manually
         fields = [
-            "route", "medicine", "diluent", "dose_frequency","other_frequency", "vial","dilution_volume",
-             "sign"
+              # ✅ Include this
+            "route", "medicine", "diluent", "dose_frequency", "other_frequency",
+            "vial", "dilution_volume", "frequency_of_dose", "sign"
         ]
 
     def __init__(self, *args, **kwargs):
-        self.ipd_admission = kwargs.pop("ipd_admission", None)  # Extract IPD object
+        self.ipd_admission = kwargs.pop("ipd_admission", None)
         if self.ipd_admission is None:
             raise ValueError("IPD admission must be provided.")
         super().__init__(*args, **kwargs)
@@ -336,16 +369,19 @@ class NICUMedicationRecordForm(forms.ModelForm):
             "style": "display: none;",
         })
 
+        # ✅ Filter prescriptions for the current IPD
+        # self.fields["prescription"].queryset = Prescription.objects.filter(ipd=self.ipd_admission)
+
     def save(self, commit=True):
         """Auto-assign patient and IPD admission before saving."""
         instance = super().save(commit=False)
-        if self.ipd_admission:
-            instance.ipd_admission = self.ipd_admission
-            instance.patient = self.ipd_admission.patient  # Assign patient from IPD
+        instance.ipd_admission = self.ipd_admission
+        instance.patient = self.ipd_admission.patient
 
         if commit:
             instance.save()
         return instance
+
 
     def clean(self):
         """Ensure patient and IPD admission are set before validation."""
@@ -401,3 +437,12 @@ class VialForm(forms.ModelForm):
             'size': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Enter size'}),
             'unit': forms.Select(attrs={'class': 'form-control'}),
         }
+
+class NICUFluidForm(forms.ModelForm):
+    class Meta:
+        model = FluidRequirement
+        fields = ["medicine"]  # Only show medicine
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["medicine"].queryset = Medicine.objects.filter(medicine_type="fluid")

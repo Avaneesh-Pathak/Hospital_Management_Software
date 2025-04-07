@@ -11,7 +11,7 @@ from .models import (
     Patient, Asset, License, Maintenance, Doctor, Appointment, 
     AccountingRecord, EmergencyCase, IPD, OPD, Billing, CustomUser, 
     Room, Expense, Employee, PatientReport, Daybook, Balance, NICUVitals, 
-    NICUMedicationRecord, Medicine, Diluent, Vial
+    NICUMedicationRecord, Medicine, Diluent, Vial, FluidRequirement
 )
 
 class CustomAdminSite(admin.AdminSite):
@@ -120,3 +120,4 @@ admin_site.register(NICUMedicationRecord)
 admin_site.register(Medicine)
 admin_site.register(Diluent)
 admin_site.register(Vial)
+admin_site.register(FluidRequirement)

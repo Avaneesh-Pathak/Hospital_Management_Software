@@ -1,74 +1,316 @@
 {% extends "hms/base.html" %}
 
 {% block content %}
-<div class="container mx-auto p-6">
-    <!-- Page Title -->
-    <h2 class="text-3xl font-bold text-gray-800 mb-6">
-        {% if form.instance.pk %}Edit{% else %}Add{% endif %} NICU Medication
-    </h2>
-
-    <!-- Form -->
-    <form method="post" class="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300">
-        {% csrf_token %}
-        <input type="hidden" name="ipd_admission" value="{{ ipd_id }}">
-
-        <!-- Form Fields -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {% for field in form %}
-            <div class="flex flex-col space-y-2">
-                <label for="{{ field.id_for_label }}" class="text-sm font-medium text-gray-700">
-                    {{ field.label }}
-                    {% if field.field.required %}<span class="text-red-500">*</span>{% endif %}
-                </label>
-
-                <!-- Special handling for Dose Frequency -->
-                {% if field.name == "dose_frequency" %}
-                    <select name="{{ field.name }}" id="{{ field.id_for_label }}" class="border border-gray-300 p-2 rounded-lg" onchange="toggleOtherFrequency(this)">
-                        {% for choice in field.field.choices %}
-                            <option value="{{ choice.0 }}" {% if field.value == choice.0 %}selected{% endif %}>{{ choice.1 }}</option>
-                        {% endfor %}
-                    </select>
-                {% elif field.name == "other_frequency" %}
-                    <input type="text" name="{{ field.name }}" id="{{ field.id_for_label }}" class="border border-gray-300 p-2 rounded-lg" placeholder="Specify custom frequency" {% if not form.instance.other_frequency %}style="display: none;"{% endif %}>
-                {% else %}
-                    {{ field }}
-                {% endif %}
-
-                {% if field.errors %}
-                <div class="text-sm text-red-600">
-                    {{ field.errors }}
-                </div>
-                {% endif %}
-                {% if field.help_text %}
-                <p class="text-xs text-gray-500">{{ field.help_text }}</p>
-                {% endif %}
-            </div>
-            {% endfor %}
-        </div>
-
-        <!-- Form Buttons -->
-        <div class="mt-6 flex space-x-4">
-            <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition duration-200 ease-in-out transform hover:scale-105">
-                Save
-            </button>
-            <a href="{% url 'nicu_medication_list' ipd_id %}" class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition duration-200 ease-in-out transform hover:scale-105">
-                Cancel
-            </a>
-        </div>
-    </form>
+<div class="container mx-auto px-4 py-8 max-w-4xl">
+    <!-- Page Header -->
+    <div class="mb-8">
+        <h2 class="text-3xl font-bold text-gray-800 mb-2">
+            {% if form.instance.pk %}Edit{% else %}Add New{% endif %} NICU Medication Record
+        </h2>
+        <p class="text-gray-600">Please fill in the required details for medication administration</p>
+    </div>
+    <h4>Select from existing prescriptions:</h4>
+<div class="prescription-list">
+  {% for p in prescriptions %}
+    <button
+      type="button"
+      class="btn btn-outline-primary m-1 prescription-select"
+      data-medicine="{{ p.medication }}"
+      data-dosage="{{ p.dosage }}"
+      data-timing="{{ p.timing }}"
+    >
+      {{ p.medication }} ({{ p.dosage }}) @ {{ p.timing|date:"H:i d-m" }}
+    </button>
+  {% empty %}
+    <p>No prescriptions available for this IPD.</p>
+  {% endfor %}
 </div>
 
-<!-- JavaScript to Show/Hide "Other Frequency" Input -->
+      
+    <!-- Form Card -->
+    <div class="bg-white rounded-xl shadow-md overflow-hidden">
+        <form method="post" class="p-6">
+            {% csrf_token %}
+            <input type="hidden" name="ipd_admission" value="{{ ipd_id }}">
+
+            <!-- Main Form Sections -->
+            <div class="space-y-8">
+                <!-- Route and Basic Info Section -->
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-gray-200">
+                        <i class="fas fa-route mr-2 text-blue-500"></i>Administration Details
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Medicine Field - Improved Dropdown -->
+                        <div class="form-group">
+                            <label for="{{ form.medicine.id_for_label }}" class="form-label">
+                                {{ form.medicine.label }} <span class="text-red-500">*</span>
+                            </label>
+                            <select name="{{ form.medicine.name }}" id="{{ form.medicine.id_for_label }}" 
+                                    class="form-select">
+                                {% for choice in form.medicine.field.choices %}
+                                    <option value="{{ choice.0 }}" {% if form.medicine.value == choice.0 %}selected{% endif %}>{{ choice.1 }}</option>
+                                {% endfor %}
+                            </select>
+                            {% if form.medicine.errors %}
+                            <div class="form-error">
+                                {{ form.medicine.errors }}
+                            </div>
+                            {% endif %}
+                        </div>
+                        <!-- Route Field -->
+                        <div class="form-group">
+                            <label for="{{ form.route.id_for_label }}" class="form-label">
+                                {{ form.route.label }} <span class="text-red-500">*</span>
+                            </label>
+                            <select name="{{ form.route.name }}" id="{{ form.route.id_for_label }}" 
+                                    class="form-select" onchange="toggleFieldsBasedOnRoute(this.value)">
+                                {% for choice in form.route.field.choices %}
+                                    <option value="{{ choice.0 }}" {% if form.route.value == choice.0 %}selected{% endif %}>{{ choice.1 }}</option>
+                                {% endfor %}
+                            </select>
+                            {% if form.route.errors %}
+                            <div class="form-error">
+                                {{ form.route.errors }}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        
+                    </div>
+                </div>
+
+                <!-- Dosage Section -->
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-gray-200">
+                        <i class="fas fa-prescription-bottle-alt mr-2 text-blue-500"></i>Dosage Information
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Dose Frequency Field -->
+                        <div class="form-group">
+                            <label for="{{ form.dose_frequency.id_for_label }}" class="form-label">
+                                {{ form.dose_frequency.label }} <span class="text-red-500">*</span>
+                            </label>
+                            <select name="{{ form.dose_frequency.name }}" id="{{ form.dose_frequency.id_for_label }}" 
+                                    class="form-select" onchange="toggleOtherFrequency(this)">
+                                {% for choice in form.dose_frequency.field.choices %}
+                                    <option value="{{ choice.0 }}" {% if form.dose_frequency.value == choice.0 %}selected{% endif %}>{{ choice.1 }}</option>
+                                {% endfor %}
+                            </select>
+                            {% if form.dose_frequency.errors %}
+                            <div class="form-error">
+                                {{ form.dose_frequency.errors }}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Other Frequency Field -->
+                        <div class="form-group border border-gray-200 p-4 rounded-md" id="other_frequency_container" 
+                        style="display: {% if form.other_frequency.value %}block{% else %}none{% endif %};">
+                        <label for="{{ form.other_frequency.id_for_label }}" class="form-label">
+                        {{ form.other_frequency.label }}
+                        </label>
+                        <input type="text" name="{{ form.other_frequency.name }}" 
+                            id="{{ form.other_frequency.id_for_label }}" 
+                            class="form-input border border-gray-300 rounded-md px-3 py-2 w-full focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
+                            placeholder="Specify custom frequency" 
+                            value="{{ form.other_frequency.value|default_if_none:'' }}">
+                        {% if form.other_frequency.errors %}
+                        <div class="form-error">
+                        {{ form.other_frequency.errors }}
+                        </div>
+                        {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- IV/IM/SC Specific Fields -->
+                <div id="non_oral_fields">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-gray-200">
+                        <i class="fas fa-syringe mr-2 text-blue-500"></i>Preparation Details
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Diluent Field -->
+                        <div class="form-group">
+                            <label for="{{ form.diluent.id_for_label }}" class="form-label">
+                                {{ form.diluent.label }}
+                                {% if form.diluent.field.required %}<span class="text-red-500">*</span>{% endif %}
+                            </label>
+                            <select name="{{ form.diluent.name }}" id="{{ form.diluent.id_for_label }}" 
+                                    class="form-select">
+                                {% for choice in form.diluent.field.choices %}
+                                    <option value="{{ choice.0 }}" {% if form.diluent.value == choice.0 %}selected{% endif %}>{{ choice.1 }}</option>
+                                {% endfor %}
+                            </select>
+                            {% if form.diluent.errors %}
+                            <div class="form-error">
+                                {{ form.diluent.errors }}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Vial Field -->
+                        <div class="form-group border border-gray-200 p-4 rounded-md">
+                            <label for="{{ form.vial.id_for_label }}" class="form-label">
+                                {{ form.vial.label }}
+                                {% if form.vial.field.required %}<span class="text-red-500">*</span>{% endif %}
+                            </label>
+                            
+                            {{ form.vial}}
+                        
+                            {% if form.vial.errors %}
+                            <div class="form-error text-red-500 mt-1">
+                                {{ form.vial.errors }}
+                            </div>
+                            {% endif %}
+                        </div>
+                        
+
+                        <!-- Dilution Volume Field -->
+<div class="form-group border border-gray-200 p-4 rounded-md">
+    <label for="{{ form.dilution_volume.id_for_label }}" class="form-label">
+        {{ form.dilution_volume.label }}
+        {% if form.dilution_volume.field.required %}<span class="text-red-500">*</span>{% endif %}
+    </label>
+    <input type="text" name="{{ form.dilution_volume.name }}" 
+       id="{{ form.dilution_volume.id_for_label }}" 
+       class="form-input border border-gray-300 rounded-md px-3 py-2 w-full focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+       placeholder="Enter Volume in mL"
+       value="{{ form.dilution_volume.value|default_if_none:'' }}">
+
+    {% if form.dilution_volume.errors %}
+    <div class="form-error">
+        {{ form.dilution_volume.errors }}
+    </div>
+    {% endif %}
+</div>
+
+                        <!-- Frequency of Dose Field -->
+<div class="form-group border border-gray-200 p-4 rounded-md">
+    <label for="{{ form.frequency_of_dose.id_for_label }}" class="form-label">
+        {{ form.frequency_of_dose.label }}
+        {% if form.frequency_of_dose.field.required %}<span class="text-red-500">*</span>{% endif %}
+    </label>
+    <input type="text" name="{{ form.frequency_of_dose.name }}" 
+           id="{{ form.frequency_of_dose.id_for_label }}" 
+           class="form-input border border-gray-300 rounded-md px-3 py-2 w-full focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
+           placeholder="E.g. every 6 hours"
+           value="{{ form.frequency_of_dose.value|default_if_none:'' }}">
+    {% if form.frequency_of_dose.errors %}
+    <div class="form-error">
+        {{ form.frequency_of_dose.errors }}
+    </div>
+    {% endif %}
+</div>
+                    </div>
+                </div>
+
+                <!-- Signature Section -->
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-gray-200">
+                        <i class="fas fa-signature mr-2 text-blue-500"></i>Authorization
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Sign Field -->
+                        <div class="form-group border border-gray-200 p-4 rounded-md">
+                            <label for="{{ form.sign.id_for_label }}" class="form-label">
+                                Nurse Notes <span class="text-red-500">*</span>
+                            </label>
+                            <input type="text" name="{{ form.sign.name }}" 
+                                id="{{ form.sign.id_for_label }}" 
+                                class="form-input border border-gray-300 rounded-md px-3 py-2 w-full focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
+                                placeholder="Nurse Notes"
+                                value="{{ form.sign.value|default_if_none:'' }}">
+                            {% if form.sign.errors %}
+                            <div class="form-error">
+                                {{ form.sign.errors }}
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Form Actions -->
+<div class="mt-8 flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4">
+    <a href="{% url 'nicu_medication_list' ipd_id %}" 
+       class="px-5 py-2 text-white bg-red-500 hover:bg-red-600 transition duration-300 rounded-lg shadow-md flex items-center">
+        <i class="fas fa-times mr-2"></i> Cancel
+    </a>
+    
+    <button type="submit" 
+            class="px-5 py-2 text-white bg-blue-600 hover:bg-blue-700 transition duration-300 rounded-lg shadow-md flex items-center">
+        <i class="fas fa-save mr-2"></i> Save Record
+    </button>
+</div>
+
+        </form>
+    </div>
+</div>
+
+<style>
+    /* Form Styles */
+    .form-label {
+        @apply block text-sm font-medium text-gray-700 mb-1;
+    }
+    
+    .form-input {
+        @apply w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500;
+    }
+    
+    .form-select {
+        @apply w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 pr-10 bg-white;
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+        background-position: right 0.5rem center;
+        background-repeat: no-repeat;
+        background-size: 1.5em 1.5em;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+    
+    .form-error {
+        @apply mt-1 text-sm text-red-600;
+    }
+    
+    /* Button Styles */
+    .btn-primary {
+        @apply inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500;
+    }
+    
+    .btn-secondary {
+        @apply inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md shadow-sm text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 text-center;
+    }
+    
+    /* Form Group */
+    .form-group {
+        @apply mb-4;
+    }
+</style>
+
 <script>
-function toggleOtherFrequency(selectElement) {
-    var otherField = document.getElementById("id_other_frequency");
-    if (selectElement.value === "OTHER") {
-        otherField.style.display = "block";
+function toggleFieldsBasedOnRoute(routeValue) {
+    const nonOralFields = document.getElementById("non_oral_fields");
+    if (routeValue === "PO") {
+        nonOralFields.style.display = "none";
     } else {
-        otherField.style.display = "none";
-        otherField.value = "";
+        nonOralFields.style.display = "block";
     }
 }
-</script>
 
+function toggleOtherFrequency(selectElement) {
+    var otherFieldContainer = document.getElementById("other_frequency_container");
+    if (selectElement.value === "OTHER") {
+        otherFieldContainer.style.display = "block";
+    } else {
+        otherFieldContainer.style.display = "none";
+        document.getElementById("id_other_frequency").value = "";
+    }
+}
+
+// Initialize fields visibility on page load
+document.addEventListener('DOMContentLoaded', function() {
+    const routeSelect = document.getElementById("id_route");
+    toggleFieldsBasedOnRoute(routeSelect.value);
+});
+</script>
 {% endblock %}
