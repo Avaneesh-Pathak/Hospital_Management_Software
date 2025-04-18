@@ -1,5 +1,5 @@
 from django import template
-
+from ..models import Medicine
 register = template.Library()
 
 @register.filter

@@ -1,329 +1,874 @@
 {% extends 'hms/base.html' %}
 
 {% block content %}
-<div class="container mt-4" style="max-width: 1200px; margin: 0 auto;">
-    <h2 class="text-center mb-4">Manage Medicine & Diluent</h2>
-
-    <!-- Toggle Buttons -->
-    <div class="text-center mb-4">
-        <div style="display: flex; justify-content: center; gap: 10px;">
-            <button type="button" class="btn btn-primary" id="medicineBtn" style="min-width: 120px;">Medicine</button>
-            <button type="button" class="btn btn-success" id="diluentBtn" style="min-width: 120px;">Diluent</button>
-            <button type="button" class="btn btn-info" id="vialBtn" style="min-width: 120px;">Vial</button>
-        </div>
-    </div>
-
-    <!-- Messages -->
-    {% if messages %}
-        {% for message in messages %}
-            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert" style="max-width: 800px; margin: 0 auto 20px;">
-                <i class="fas {% if message.tags == 'success' %}fa-check-circle{% else %}fa-exclamation-circle{% endif %} me-2"></i>
-                {{ message }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-        {% endfor %}
-    {% endif %}
-
+<div class="container-fluid px-4 py-4">
     <div class="row justify-content-center">
-        <!-- Medicine Section -->
-        <div class="col-lg-8" id="medicineSection">
-            <div class="card shadow-sm mb-4" style="margin: 0 auto;">
-                <div class="card-header bg-primary text-white">
-                    <h4 class="mb-0"><i class="fas fa-pills me-2"></i>Add Medicine</h4>
+        <div class="col-xl-10 col-lg-12">
+            <!-- Header Section -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2 class="mb-1 fw-bold">
+                        <i class="fas fa-pills me-2 text-primary"></i>
+                        Pharmacy Management
+                    </h2>
+                    <p class="text-muted mb-0">Manage medicines, diluents, and vial configurations</p>
                 </div>
-                <div class="card-body" style="padding: 2rem;">
-                    <form method="post" style="max-width: 600px; margin: 0 auto;">
-                        {% csrf_token %}
-                        
-                        <div class="mb-3">
-                            <label class="form-label">Medicine Name</label>
-                            <input type="text" class="form-control border border-secondary" id="medicineName" name="name" placeholder="Enter medicine name" required style="padding: 0.5rem;">
-                        </div>
-                    
-                        <div class="mb-3">
-                            <label class="form-label">Type of Medicine</label>
-                            {{ medicine_form.medicine_type }}
-                        </div>
-                    
-                        <div class="mb-3">
-                            <label class="form-label">Standard Dose (mg/kg/dose)</label>
-                            {{ medicine_form.standard_dose_per_kg }}
-                        </div>
-                    
-                        <div class="mb-3">
-                            <label class="form-label">Concentration (mg/mL)</label>
-                            {{ medicine_form.concentration_mg_per_ml }}
-                        </div>
-                    
-                        <button type="submit" name="add_medicine" class="btn btn-primary w-100" style="padding: 0.5rem; font-size: 1rem;">
-                            <i class="fas fa-plus-circle me-2"></i> Add Medicine
-                        </button>
-                    </form>
+                <div class="btn-group" role="group">
+                    <button type="button" class="btn btn-outline-primary active" id="medicineBtn">
+                        <i class="fas fa-pills me-1"></i> Medicines
+                    </button>
+                    <button type="button" class="btn btn-outline-success" id="diluentBtn">
+                        <i class="fas fa-flask me-1"></i> Diluents
+                    </button>
+                    <button type="button" class="btn btn-outline-info" id="vialBtn">
+                        <i class="fas fa-vial me-1"></i> Vials
+                    </button>
                 </div>
             </div>
 
-            <div class="card shadow-sm" style="margin: 0 auto;">
-                <div class="card-header bg-secondary text-white">
-                    <h5 class="mb-0"><i class="fas fa-list me-2"></i>Existing Medicines</h5>
-                </div>
-                <div class="card-body" style="padding: 2rem;">
-                    <div class="mb-3">
-                        <input type="text" id="medicineSearch" class="form-control" placeholder="Search medicines..." style="padding: 0.5rem;">
-                    </div>
-                    <div style="overflow-x: auto;">
-                        <table class="table table-hover" id="medicineTable" style="min-width: 600px;">
-                            <thead>
-                                <tr>
-                                    <th style="padding: 0.75rem;">Name</th>
-                                    <th style="padding: 0.75rem;">Type</th>
-                                    <th style="padding: 0.75rem;">Standard Dose</th>
-                                    <th style="padding: 0.75rem;">Concentration</th>
-                                    <th style="padding: 0.75rem;">Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for medicine in medicines %}
-                                <tr>
-                                    <td style="padding: 0.75rem;">{{ medicine.name }}</td>
-                                    <td style="padding: 0.75rem;">{{ medicine.get_medicine_type_display }}</td>
-                                    <td style="padding: 0.75rem;">{{ medicine.standard_dose_per_kg }}</td>
-                                    <td style="padding: 0.75rem;">{{ medicine.concentration_mg_per_ml }}</td>
-                                    <td style="padding: 0.75rem;">
-                                        <a href="{% url 'delete_medicine' medicine.id %}" class="btn btn-sm btn-danger" title="Delete" style="padding: 0.25rem 0.5rem;">
-                                            <i class="fas fa-trash"></i>
-                                        </a>
-                                    </td>
-                                </tr>
-                                {% empty %}
-                                <tr>
-                                    <td colspan="4" class="text-center" style="padding: 0.75rem;">No medicines found.</td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
+            <!-- Messages Section -->
+            {% if messages %}
+            <div class="mb-4">
+                {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show border-0 shadow-sm" role="alert">
+                    <div class="d-flex align-items-center">
+                        <i class="fas {% if message.tags == 'success' %}fa-check-circle{% else %}fa-exclamation-circle{% endif %} me-2"></i>
+                        <div>{{ message }}</div>
+                        <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
                 </div>
+                {% endfor %}
             </div>
-        </div>
+            {% endif %}
 
-        <!-- Diluent Section -->
-        <div class="col-lg-8" id="diluentSection" style="display: none;">
-            <div class="card shadow-sm mb-4">
-                <div class="card-header bg-success text-white">
-                    <h4 class="mb-0"><i class="fas fa-flask me-2"></i>Add Diluent</h4>
+            <!-- Error Messages -->
+            {% if medicine_form.errors %}
+            <div class="alert alert-danger border-0 shadow-sm mb-4">
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <strong>Medicine Form Errors:</strong>
                 </div>
-                <div class="card-body">
-                    <form method="post">
-                        {% csrf_token %}
-                        <div class="mb-3">
-                            <label class="form-label">Diluent Name</label>
-                            <input type="text" class="form-control border border-secondary" id="diluentName" name="name" placeholder="Enter diluent name">
-                            <small class="form-text text-muted">Enter the name of the diluent.</small>
-                        </div>                        
-                        {% comment %} <div class="mb-3">
-                            <label class="form-label">Compatible Medicine Types</label>
-                            {{ diluent_form.compatible_medicine_types }}
-                            <small class="form-text text-muted">Select compatible medicine types.</small>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Standard Volume (mL/kg/dose)</label>
-                            {{ diluent_form.standard_volume_per_kg }}
-                            <small class="form-text text-muted">Enter the standard volume per kg.</small>
-                        </div> {% endcomment %}
-                        <button type="submit" name="add_diluent" class="btn btn-success w-100">
-                            <i class="fas fa-plus-circle me-2"></i>Add Diluent
-                        </button>
-                    </form>
-                </div>
+                <ul class="mt-2 mb-0 ps-4">
+                    {% for field in medicine_form %}
+                        {% for error in field.errors %}
+                            <li><strong>{{ field.label }}:</strong> {{ error }}</li>
+                        {% endfor %}
+                    {% endfor %}
+                    {% for error in medicine_form.non_field_errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
             </div>
+            {% endif %}
 
-            <div class="card shadow-sm">
-                <div class="card-header bg-warning text-white">
-                    <h5 class="mb-0"><i class="fas fa-list me-2"></i>Existing Diluents</h5>
+            {% if vial_formset.errors %}
+            <div class="alert alert-danger border-0 shadow-sm mb-4">
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <strong>Vial Form Errors:</strong>
                 </div>
-                <div class="card-body">
-                    <div class="mb-3">
-                        <input type="text" id="diluentSearch" class="form-control" placeholder="Search diluents...">
-                    </div>
-                    <table class="table table-hover" id="diluentTable">
-                        <thead>
-                            <tr>
-                                <th>Name</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for diluent in diluents %}
-                            <tr>
-                                <td>{{ diluent.name }}</td>
-                                <td>
-                                    <a href="{% url 'delete_diluent' diluent.id %}" class="btn btn-sm btn-danger" title="Delete" data-bs-toggle="modal" data-bs-target="#deleteDiluentModal{{ diluent.id }}">
-                                        <i class="fas fa-trash"></i>
-                                    </a>
-                                    <!-- Delete Confirmation Modal -->
-                                    <div class="modal fade" id="deleteDiluentModal{{ diluent.id }}" tabindex="-1" aria-labelledby="deleteDiluentModalLabel" aria-hidden="true">
-                                        <div class="modal-dialog">
-                                            <div class="modal-content">
-                                                <div class="modal-header">
-                                                    <h5 class="modal-title" id="deleteDiluentModalLabel">Confirm Delete</h5>
-                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                                </div>
-                                                <div class="modal-body">
-                                                    Are you sure you want to delete "{{ diluent.name }}"?
-                                                </div>
-                                                <div class="modal-footer">
-                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                                    <a href="{% url 'delete_diluent' diluent.id %}" class="btn btn-danger">Delete</a>
-                                                </div>
+                <ul class="mt-2 mb-0 ps-4">
+                    {% for form in vial_formset %}
+                        {% for field in form %}
+                            {% for error in field.errors %}
+                                <li><strong>{{ field.label }}:</strong> {{ error }}</li>
+                            {% endfor %}
+                        {% endfor %}
+                        {% for error in form.non_field_errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    {% endfor %}
+                    {% for error in vial_formset.non_form_errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+
+            {% if diluent_form.errors %}
+            <div class="alert alert-danger border-0 shadow-sm mb-4">
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <strong>Diluent Form Errors:</strong>
+                </div>
+                <ul class="mt-2 mb-0 ps-4">
+                    {% for field in diluent_form %}
+                        {% for error in field.errors %}
+                            <li><strong>{{ field.label }}:</strong> {{ error }}</li>
+                        {% endfor %}
+                    {% endfor %}
+                    {% for error in diluent_form.non_field_errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+
+            <!-- Medicine Section -->
+            <div id="medicineSection">
+                <div class="row g-4">
+                    <!-- Add New Medicine Section -->
+                    <div class="col-lg-6">
+                        <div class="card border-0 shadow-sm h-100">
+                            <div class="card-header bg-primary bg-opacity-10 border-bottom border-primary border-opacity-25">
+                                <h5 class="mb-0 fw-bold text-primary">
+                                    <i class="fas fa-plus-circle me-2"></i>
+                                    Add New Medicine
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <form method="post" class="needs-validation" novalidate>
+                                    {% csrf_token %}
+                                    <!-- Medicine Name -->
+                                    <div class="mb-3">
+                                        <label for="id_name" class="form-label fw-bold">Medicine Name</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-light">
+                                                <i class="fas fa-tag text-primary"></i>
+                                            </span>
+                                            <input type="text" class="form-control" id="id_name" name="name" 
+                                                   placeholder="e.g., Amoxicillin" required>
+                                        </div>
+                                    </div>
+
+                                    <!-- Medicine Type & Injection Option -->
+                                    <div class="row g-2">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="id_medicine_type" class="form-label fw-bold">Type</label>
+                                            <select name="medicine_type" id="id_medicine_type" class="form-select" required>
+                                                {% for value, label in medicine_form.fields.medicine_type.choices %}
+                                                    <option value="{{ value }}"
+                                                        {% if medicine_form.medicine_type.value == value %}selected{% endif %}>
+                                                        {{ label }}
+                                                    </option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <div class="form-check form-switch pt-4" id="liquid-injection-checkbox" style="display: none;">
+                                                <input type="checkbox" name="is_liquid_injection" id="id_is_liquid_injection" 
+                                                       class="form-check-input" role="switch">
+                                                <label for="id_is_liquid_injection" class="form-check-label fw-bold">Liquid Injection</label>
                                             </div>
                                         </div>
                                     </div>
-                                </td>
-                            </tr>
-                            {% empty %}
-                            <tr>
-                                <td colspan="4" class="text-center">No diluents found.</td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+
+                                    <!-- Dose & Concentration -->
+                                    <div class="row g-2">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="id_standard_dose_per_kg" class="form-label fw-bold">Standard Dose</label>
+                                            <div class="input-group">
+                                                <input type="number" step="0.01" name="standard_dose_per_kg" id="id_standard_dose_per_kg" 
+                                                       class="form-control" value="{{ medicine_form.standard_dose_per_kg.value|default_if_none:'' }}" required>
+                                                <span class="input-group-text bg-light">mg/kg</span>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label for="id_concentration_mg_per_ml" class="form-label fw-bold">Concentration</label>
+                                            <div class="input-group">
+                                                <input type="number" step="0.01" name="concentration_mg_per_ml" id="id_concentration_mg_per_ml" 
+                                                       class="form-control" value="{{ medicine_form.concentration_mg_per_ml.value|default_if_none:'' }}" required>
+                                                <span class="input-group-text bg-light">mg/mL</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Submit Button for Medicine -->
+                                    <button type="submit" name="add_medicine" class="btn btn-primary w-100 mt-3 py-2 fw-bold">
+                                        <i class="fas fa-save me-2"></i> Save Medicine
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Add Vials to Existing Medicine Section -->
+                    <div class="col-lg-6">
+                        <div class="card border-0 shadow-sm h-100">
+                            <div class="card-header bg-info bg-opacity-10 border-bottom border-info border-opacity-25">
+                                <h5 class="mb-0 fw-bold text-info">
+                                    <i class="fas fa-vial me-2"></i>
+                                    Add Vials to Medicine
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <form method="post" novalidate>
+                                    {% csrf_token %}
+                                    <!-- Select Medicine Dropdown -->
+                                    <div class="mb-3">
+                                        <label class="form-label fw-bold">Select Medicine</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-light">
+                                                <i class="fas fa-search text-muted"></i>
+                                            </span>
+                                            <select name="selected_medicine" class="form-select" required>
+                                                <option value="">-- Select Medicine --</option>
+                                                {% for med in medicines %}
+                                                    <option value="{{ med.id }}">{{ med.name }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <!-- Vial Formset -->
+                                    <div class="mb-3">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <label class="form-label fw-bold mb-0">Vial Configurations</label>
+                                            <button type="button" class="btn btn-sm btn-outline-info" id="add-vial-btn">
+                                                <i class="fas fa-plus me-1"></i> Add Vial
+                                            </button>
+                                        </div>
+                                        {{ vial_formset.management_form }}
+                                        <div id="vial-forms-container" class="border rounded p-2 bg-light bg-opacity-10">
+                                            {% for form in vial_formset %}
+                                            <div class="vial-entry mb-3 p-3 border rounded bg-white">
+                                                <div class="row g-2 align-items-end">
+                                                    <div class="col-md-5">
+                                                        <label class="form-label small fw-bold">Strength</label>
+                                                        <div class="input-group">
+                                                            <input type="number" class="form-control" name="{{ form.strength_mg.html_name }}" 
+                                                                   value="{{ form.strength_mg.value|default_if_none:'' }}" step="0.01">
+                                                            <span class="input-group-text bg-light">mg</span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-5">
+                                                        <label class="form-label small fw-bold">Volume</label>
+                                                        <div class="input-group">
+                                                            <input type="number" class="form-control" name="{{ form.volume_ml.html_name }}" 
+                                                                   value="{{ form.volume_ml.value|default_if_none:'' }}" step="0.01">
+                                                            <span class="input-group-text bg-light">mL</span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-2">
+                                                        <button type="button" class="btn btn-outline-danger w-100 remove-vial">
+                                                            <i class="fas fa-trash-alt"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                                <!-- Show calculated concentration -->
+                                                <div class="mt-2 text-end">
+                                                    <small class="text-muted">Concentration: <span class="fw-bold text-dark">
+                                                        {{ form.concentration.value|default_if_none:"Calculated" }}
+                                                    </span> mg/mL</small>
+                                                </div>
+                                            </div>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+
+                                    <!-- Submit Button for Vials -->
+                                    <button type="submit" name="add_vials_to_medicine" class="btn btn-info w-100 py-2 fw-bold">
+                                        <i class="fas fa-save me-2"></i> Save Vials
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Medicine List Section -->
+                <div class="card border-0 shadow-sm mt-4">
+                    <div class="card-header bg-white border-bottom">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0 fw-bold">
+                                <i class="fas fa-list-ul text-primary me-2"></i>
+                                Medicine Inventory
+                            </h5>
+                            <div class="w-50">
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light">
+                                        <i class="fas fa-search text-muted"></i>
+                                    </span>
+                                    <input type="text" id="medicineSearch" class="form-control" placeholder="Search medicines...">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0" id="medicineTable">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th class="ps-4">Name</th>
+                                        <th class="text-center">Type</th>
+                                        <th class="text-center">Dose</th>
+                                        <th class="text-center">Conc.</th>
+                                        <th>Vials</th>
+                                        <th class="text-end pe-4">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for medicine in medicines %}
+                                    <tr class="align-middle">
+                                        <td class="ps-4 fw-bold">
+                                            <i class="fas fa-pills text-primary me-2"></i>
+                                            {{ medicine.name }}
+                                        </td>
+                                        <td class="text-center">
+                                            <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-2">
+                                                {{ medicine.get_medicine_type_display }}
+                                            </span>
+                                        </td>
+                                        <td class="text-center fw-bold">
+                                            {{ medicine.standard_dose_per_kg|floatformat:2 }}
+                                            <div class="small text-muted">mg/kg/day</div>
+                                        </td>
+                                        <td class="text-center fw-bold">
+                                            {{ medicine.concentration_mg_per_ml|floatformat:2 }}
+                                            <div class="small text-muted">mg/mL</div>
+                                        </td>
+                                        <td>
+                                            {% if medicine.vials.exists %}
+                                                <div class="d-flex flex-wrap gap-2">
+                                                    {% for vial in medicine.vials.all %}
+                                                    <span class="badge bg-info bg-opacity-10 text-dark border border-info border-opacity-25 px-3 py-2">
+                                                        <i class="fas fa-vial me-1"></i>
+                                                        {{ vial.strength_mg }}mg/{{ vial.volume_ml }}mL
+                                                    </span>
+                                                    {% endfor %}
+                                                </div>
+                                            {% else %}
+                                                <span class="badge bg-secondary bg-opacity-10 text-secondary px-3 py-2">
+                                                    No vials
+                                                </span>
+                                            {% endif %}
+                                        </td>
+                                        <td class="text-end pe-4">
+                                            <div class="btn-group btn-group-sm" role="group">
+                                                <a href="#" class="btn btn-outline-primary rounded-start-2">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                                <a href="{% url 'delete_medicine' medicine.id %}" 
+                                                   class="btn btn-outline-danger rounded-end-2"
+                                                   data-bs-toggle="tooltip" title="Delete">
+                                                    <i class="fas fa-trash-alt"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% empty %}
+                                    <tr>
+                                        <td colspan="6" class="text-center py-5">
+                                            <div class="py-4">
+                                                <i class="fas fa-pills fa-3x mb-3 text-muted opacity-25"></i>
+                                                <h5 class="fw-bold text-muted">No Medicines Found</h5>
+                                                <p class="text-muted">Add your first medicine using the form above</p>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Vial Section -->
-        <div class="col-lg-8" id="vialSection" style="display: none;">
-            <div class="card shadow-sm mb-4">
-                <div class="card-header bg-info text-white">
-                    <h4 class="mb-0"><i class="fas fa-prescription-bottle-alt me-2"></i>Add Vial</h4>
-                </div>
-                <div class="card-body">
-                    <form method="post">
-                        {% csrf_token %}
-                        <div class="mb-3">
-                            <label class="form-label">Vial Size</label>
-                            {{ vial_form.size }}
-                            <small class="form-text text-muted">Enter the size of the vial (e.g., 100mg, 5mL).</small>
+            <!-- Diluent Section -->
+            <div id="diluentSection" style="display: none;">
+                <div class="row g-4">
+                    <!-- Add Diluent Form -->
+                    <div class="col-lg-5">
+                        <div class="card border-0 shadow-sm h-100">
+                            <div class="card-header bg-success bg-opacity-10 border-bottom border-success border-opacity-25">
+                                <h5 class="mb-0 fw-bold text-success">
+                                    <i class="fas fa-plus-circle me-2"></i>
+                                    Add New Diluent
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <form method="post">
+                                    {% csrf_token %}
+                                    <div class="mb-3">
+                                        <label class="form-label fw-bold">Diluent Name</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-light">
+                                                <i class="fas fa-tag text-success"></i>
+                                            </span>
+                                            <input type="text" class="form-control" name="name" placeholder="e.g., Sterile Water">
+                                        </div>
+                                    </div>
+                                    <button type="submit" name="add_diluent" class="btn btn-success w-100 py-2 fw-bold">
+                                        <i class="fas fa-save me-2"></i> Save Diluent
+                                    </button>
+                                </form>
+                            </div>
                         </div>
-                        <div class="mb-3">
-                            <label class="form-label">Unit</label>
-                            {{ vial_form.unit }}
-                            <small class="form-text text-muted">Choose mg or mL for the vial size.</small>
+                    </div>
+
+                    <!-- Diluent List -->
+                    <div class="col-lg-7">
+                        <div class="card border-0 shadow-sm h-100">
+                            <div class="card-header bg-white border-bottom">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h5 class="mb-0 fw-bold">
+                                        <i class="fas fa-list-ul text-success me-2"></i>
+                                        Diluent Inventory
+                                    </h5>
+                                    <div class="w-50">
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-light">
+                                                <i class="fas fa-search text-muted"></i>
+                                            </span>
+                                            <input type="text" id="diluentSearch" class="form-control" placeholder="Search diluents...">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-body p-0">
+                                <div class="table-responsive">
+                                    <table class="table table-hover mb-0" id="diluentTable">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th class="ps-4">Name</th>
+                                                <th class="text-end pe-4">Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for diluent in diluents %}
+                                            <tr>
+                                                <td class="ps-4">
+                                                    <i class="fas fa-flask text-success me-2"></i>
+                                                    {{ diluent.name }}
+                                                </td>
+                                                <td class="text-end pe-4">
+                                                    <div class="btn-group btn-group-sm" role="group">
+                                                        <a href="#" class="btn btn-outline-success rounded-start-2">
+                                                            <i class="fas fa-edit"></i>
+                                                        </a>
+                                                        <a href="{% url 'delete_diluent' diluent.id %}" 
+                                                           class="btn btn-outline-danger rounded-end-2"
+                                                           data-bs-toggle="modal" data-bs-target="#deleteDiluentModal{{ diluent.id }}">
+                                                            <i class="fas fa-trash-alt"></i>
+                                                        </a>
+                                                    </div>
+                                                    
+                                                    <!-- Delete Confirmation Modal -->
+                                                    <div class="modal fade" id="deleteDiluentModal{{ diluent.id }}" tabindex="-1" aria-hidden="true">
+                                                        <div class="modal-dialog">
+                                                            <div class="modal-content border-0 shadow">
+                                                                <div class="modal-header border-0">
+                                                                    <h5 class="modal-title fw-bold">Confirm Delete</h5>
+                                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                                </div>
+                                                                <div class="modal-body py-4">
+                                                                    <div class="d-flex align-items-center">
+                                                                        <i class="fas fa-exclamation-triangle text-warning me-3 fa-2x"></i>
+                                                                        <div>
+                                                                            <p class="mb-1 fw-bold">Are you sure you want to delete this diluent?</p>
+                                                                            <p class="mb-0 text-muted">"{{ diluent.name }}" will be permanently removed.</p>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="modal-footer border-0">
+                                                                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                                    <a href="{% url 'delete_diluent' diluent.id %}" class="btn btn-danger">Delete</a>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            {% empty %}
+                                            <tr>
+                                                <td colspan="2" class="text-center py-5">
+                                                    <div class="py-4">
+                                                        <i class="fas fa-flask fa-3x mb-3 text-muted opacity-25"></i>
+                                                        <h5 class="fw-bold text-muted">No Diluents Found</h5>
+                                                        <p class="text-muted">Add your first diluent using the form</p>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
                         </div>
-                        <button type="submit" name="add_vial" class="btn btn-info w-100">
-                            <i class="fas fa-plus-circle me-2"></i>Add Vial
-                        </button>
-                    </form>
+                    </div>
                 </div>
             </div>
 
-            <div class="card shadow-sm">
-                <div class="card-header bg-secondary text-white">
-                    <h5 class="mb-0"><i class="fas fa-list me-2"></i>Existing Vials</h5>
-                </div>
-                <div class="card-body">
-                    <table class="table table-hover">
-                        <thead>
-                            <tr>
-                                <th>Size</th>
-                                <th>Unit</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for vial in vials %}
-                            <tr>
-                                <td>{{ vial.size }}</td>
-                                <td>{{ vial.unit }}</td>
-                                <td>
-                                    <a href="{% url 'delete_vial' vial.id %}" class="btn btn-sm btn-danger" title="Delete Vial">
-                                        <i class="fas fa-trash"></i>
-                                    </a>
-                                </td>
-                            </tr>
-                            {% empty %}
-                            <tr>
-                                <td colspan="3" class="text-center">No vials available.</td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+            <!-- Vial Section -->
+            <div id="vialSection" style="display: none;">
+                <div class="row g-4">
+                    <!-- Add Vial Form -->
+                    <div class="col-lg-5">
+                        <div class="card border-0 shadow-sm h-100">
+                            <div class="card-header bg-info bg-opacity-10 border-bottom border-info border-opacity-25">
+                                <h5 class="mb-0 fw-bold text-info">
+                                    <i class="fas fa-plus-circle me-2"></i>
+                                    Add New Vial
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <form method="post">
+                                    {% csrf_token %}
+                                    <div class="mb-3">
+                                        <label class="form-label fw-bold">Vial Size</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-light">
+                                                <i class="fas fa-prescription-bottle text-info"></i>
+                                            </span>
+                                            <input type="number" class="form-control" name="size" placeholder="e.g., 100">
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label fw-bold">Unit</label>
+                                        <select name="unit" class="form-select">
+                                            <option value="mg">Milligrams (mg)</option>
+                                            <option value="mL">Milliliters (mL)</option>
+                                        </select>
+                                    </div>
+                                    <button type="submit" name="add_vial" class="btn btn-info w-100 py-2 fw-bold">
+                                        <i class="fas fa-save me-2"></i> Save Vial
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Vial List -->
+                    <div class="col-lg-7">
+                        <div class="card border-0 shadow-sm h-100">
+                            <div class="card-header bg-white border-bottom">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h5 class="mb-0 fw-bold">
+                                        <i class="fas fa-list-ul text-info me-2"></i>
+                                        Vial Inventory
+                                    </h5>
+                                    <div class="w-50">
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-light">
+                                                <i class="fas fa-search text-muted"></i>
+                                            </span>
+                                            <input type="text" id="vialSearch" class="form-control" placeholder="Search vials...">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-body p-0">
+                                <div class="table-responsive">
+                                    <table class="table table-hover mb-0" id="vialTable">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th class="ps-4">Size</th>
+                                                <th>Unit</th>
+                                                <th class="text-end pe-4">Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for vial in vials %}
+                                            <tr>
+                                                <td class="ps-4">
+                                                    <i class="fas fa-prescription-bottle-alt text-info me-2"></i>
+                                                    {{ vial.size }}
+                                                </td>
+                                                <td>
+                                                    <span class="badge bg-info bg-opacity-10 text-dark px-3 py-2">
+                                                        {{ vial.unit }}
+                                                    </span>
+                                                </td>
+                                                <td class="text-end pe-4">
+                                                    <div class="btn-group btn-group-sm" role="group">
+                                                        <a href="#" class="btn btn-outline-info rounded-start-2">
+                                                            <i class="fas fa-edit"></i>
+                                                        </a>
+                                                        <a href="{% url 'delete_vial' vial.id %}" 
+                                                           class="btn btn-outline-danger rounded-end-2">
+                                                            <i class="fas fa-trash-alt"></i>
+                                                        </a>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            {% empty %}
+                                            <tr>
+                                                <td colspan="3" class="text-center py-5">
+                                                    <div class="py-4">
+                                                        <i class="fas fa-prescription-bottle-alt fa-3x mb-3 text-muted opacity-25"></i>
+                                                        <h5 class="fw-bold text-muted">No Vials Found</h5>
+                                                        <p class="text-muted">Add your first vial using the form</p>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Search Functionality and Toggle Script -->
 <script>
-    // Search functionality
-    document.getElementById('medicineSearch').addEventListener('input', function() {
-        const searchValue = this.value.toLowerCase();
-        const rows = document.querySelectorAll('#medicineTable tbody tr');
-        rows.forEach(row => {
-            const name = row.querySelector('td').textContent.toLowerCase();
-            row.style.display = name.includes(searchValue) ? '' : 'none';
-        });
-    });
+    document.addEventListener("DOMContentLoaded", function () {
+        const addVialBtn = document.getElementById("add-vial-btn");
+        const vialContainer = document.getElementById("vial-forms-container");
+        const totalForms = document.getElementById('id_vial-TOTAL_FORMS');
 
-    document.getElementById('diluentSearch').addEventListener('input', function() {
-        const searchValue = this.value.toLowerCase();
-        const rows = document.querySelectorAll('#diluentTable tbody tr');
-        rows.forEach(row => {
-            const name = row.querySelector('td').textContent.toLowerCase();
-            row.style.display = name.includes(searchValue) ? '' : 'none';
-        });
-    });
+        // Function to update total forms count
+        function updateTotalForms() {
+            totalForms.value = vialContainer.querySelectorAll('.vial-entry').length;
+        }
 
-    // Toggle sections
-    document.addEventListener('DOMContentLoaded', function() {
-        const medicineBtn = document.getElementById('medicineBtn');
-        const diluentBtn = document.getElementById('diluentBtn');
-        const vialBtn = document.getElementById('vialBtn');
-        
-        const medicineSection = document.getElementById('medicineSection');
-        const diluentSection = document.getElementById('diluentSection');
-        const vialSection = document.getElementById('vialSection');
+        // Add new vial form
+        addVialBtn.addEventListener("click", function () {
+            const vialEntries = vialContainer.querySelectorAll('.vial-entry');
+            const newEntry = vialEntries[vialEntries.length - 1].cloneNode(true);
 
-        // Button click handlers
-        medicineBtn.addEventListener('click', function() {
-            medicineSection.style.display = 'block';
-            diluentSection.style.display = 'none';
-            vialSection.style.display = 'none';
-            setActiveButton(medicineBtn);
+            newEntry.querySelectorAll('input').forEach(input => {
+                // Adjust names for proper formset management
+                let name = input.getAttribute('name');
+                if(name) {
+                    const newIndex = vialEntries.length;
+                    name = name.replace(/\-\d+\-/, `-${newIndex}-`);
+                    input.setAttribute('name', name);
+                }
+                input.value = "";
+            });
+
+            vialContainer.appendChild(newEntry);
+            updateTotalForms();
         });
 
-        diluentBtn.addEventListener('click', function() {
-            medicineSection.style.display = 'none';
-            diluentSection.style.display = 'block';
-            vialSection.style.display = 'none';
-            setActiveButton(diluentBtn);
+        // Delegate event for removing vial entry
+        vialContainer.addEventListener("click", function (e) {
+            if (e.target.closest(".remove-vial")) {
+                const vialEntries = vialContainer.querySelectorAll('.vial-entry');
+                if (vialEntries.length > 1) {
+                    e.target.closest('.vial-entry').remove();
+                    updateTotalForms();
+                }
+            }
         });
 
-        vialBtn.addEventListener('click', function() {
-            medicineSection.style.display = 'none';
-            diluentSection.style.display = 'none';
-            vialSection.style.display = 'block';
-            setActiveButton(vialBtn);
+        // Auto-dismiss alerts
+        document.querySelectorAll('.alert').forEach(alert => {
+            setTimeout(() => {
+                alert.classList.remove("show");
+                alert.classList.add("fade");
+                setTimeout(() => alert.remove(), 300);
+            }, 5000);
         });
 
-        // Set active button style
-        function setActiveButton(activeBtn) {
-            [medicineBtn, diluentBtn, vialBtn].forEach(btn => {
-                btn.style.fontWeight = btn === activeBtn ? 'bold' : 'normal';
-                btn.style.boxShadow = btn === activeBtn ? 'inset 0 0 5px rgba(0,0,0,0.3)' : 'none';
+        // Toggle sections
+        const sections = {
+            'medicineBtn': 'medicineSection',
+            'diluentBtn': 'diluentSection',
+            'vialBtn': 'vialSection'
+        };
+
+        showSection('medicineSection');
+        setActiveButton('medicineBtn');
+
+        Object.keys(sections).forEach(btnId => {
+            document.getElementById(btnId).addEventListener('click', function () {
+                hideAllSections();
+                showSection(sections[btnId]);
+                setActiveButton(btnId);
+            });
+        });
+
+        function hideAllSections() {
+            Object.values(sections).forEach(sectionId => {
+                document.getElementById(sectionId).style.display = 'none';
             });
         }
 
-        // Initialize with Medicine section active
-        setActiveButton(medicineBtn);
+        function showSection(sectionId) {
+            document.getElementById(sectionId).style.display = 'block';
+        }
+
+        function setActiveButton(activeBtnId) {
+            Object.keys(sections).forEach(btnId => {
+                const btn = document.getElementById(btnId);
+                if (btnId === activeBtnId) {
+                    btn.classList.remove('btn-outline-primary', 'btn-outline-success', 'btn-outline-info');
+                    btn.classList.add('active', btnId.includes('medicine') ? 'btn-primary' : btnId.includes('diluent') ? 'btn-success' : 'btn-info');
+                } else {
+                    btn.classList.remove('active', 'btn-primary', 'btn-success', 'btn-info');
+                    btn.classList.add(btnId.includes('medicine') ? 'btn-outline-primary' : btnId.includes('diluent') ? 'btn-outline-success' : 'btn-outline-info');
+                }
+            });
+        }
+
+        // Search functionality
+        function setupSearch(inputId, tableId) {
+            document.getElementById(inputId)?.addEventListener('input', function () {
+                const searchValue = this.value.toLowerCase();
+                const rows = document.querySelectorAll(`#${tableId} tbody tr`);
+                rows.forEach(row => {
+                    const text = row.textContent.toLowerCase();
+                    row.style.display = text.includes(searchValue) ? '' : 'none';
+                });
+            });
+        }
+
+        setupSearch('medicineSearch', 'medicineTable');
+        setupSearch('diluentSearch', 'diluentTable');
+        setupSearch('vialSearch', 'vialTable');
+
+        // Medicine type and vial section toggling
+        const medicineTypeSelect = document.getElementById('id_medicine_type');
+        const liquidCheckboxDiv = document.getElementById('liquid-injection-checkbox');
+        const vialSection = document.getElementById('vial-section');
+
+        function toggleSections() {
+            const isInjection = medicineTypeSelect.value === 'injection';
+            liquidCheckboxDiv.style.display = isInjection ? 'block' : 'none';
+            vialSection.style.display = isInjection ? 'block' : 'none';
+        }
+
+        if (medicineTypeSelect) {
+            medicineTypeSelect.addEventListener('change', toggleSections);
+            toggleSections(); // Initialize
+        }
+
+        // Vial concentration calculation
+        document.querySelectorAll(".vial-entry").forEach(entry => {
+            const strengthInput = entry.querySelector('input[name$="strength_mg"]');
+            const volumeInput = entry.querySelector('input[name$="volume_ml"]');
+            
+            function calculateConcentration() {
+                const strength = parseFloat(strengthInput.value);
+                const volume = parseFloat(volumeInput.value);
+                const concentrationSpan = entry.querySelector('.fw-bold');
+                
+                if (!isNaN(strength) && !isNaN(volume) && volume > 0) {
+                    concentrationSpan.textContent = (strength / volume).toFixed(2);
+                } else {
+                    concentrationSpan.textContent = "Calculated";
+                }
+            }
+
+            strengthInput?.addEventListener("input", calculateConcentration);
+            volumeInput?.addEventListener("input", calculateConcentration);
+        });
     });
 </script>
 
 <style>
+    body {
+        background-color: #f8f9fa;
+    }
+    
+    .card {
+        border-radius: 0.75rem;
+        overflow: hidden;
+        border: none;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    
+    .card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 0.5rem 1.25rem rgba(0, 0, 0, 0.1) !important;
+    }
+    
+    .card-header {
+        padding: 1.25rem 1.5rem;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    }
+    
+    .table th {
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 0.5px;
+        padding: 1rem 1.5rem;
+        color: #6c757d;
+        background-color: #f8f9fa;
+    }
+    
+    .table td {
+        padding: 1.25rem 1.5rem;
+        vertical-align: middle;
+        border-top: 1px solid rgba(0, 0, 0, 0.03);
+    }
+    
+    .badge {
+        padding: 0.5em 0.75em;
+        font-weight: 500;
+        border-radius: 0.5rem;
+    }
+    
+    .vial-entry {
+        background-color: white;
+        transition: all 0.2s;
+        border: 1px solid rgba(0, 0, 0, 0.05) !important;
+    }
+    
+    .vial-entry:hover {
+        background-color: #f8f9fa;
+        border-color: rgba(0, 0, 0, 0.1) !important;
+    }
+    
     .btn-group .btn.active {
-        font-weight: bold;
-        box-shadow: inset 0 0 5px rgba(0,0,0,0.3);
+        box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .form-control, .form-select {
+        padding: 0.625rem 0.875rem;
+        border-radius: 0.5rem;
+        border: 1px solid #dee2e6;
+    }
+    
+    .form-control:focus, .form-select:focus {
+        border-color: #86b7fe;
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
+    }
+    
+    .input-group-text {
+        padding: 0.625rem 0.875rem;
+        background-color: #f8f9fa;
+        border-radius: 0.5rem 0 0 0.5rem;
+        border: 1px solid #dee2e6;
+    }
+    
+    .btn {
+        border-radius: 0.5rem;
+        padding: 0.625rem 1.25rem;
+        font-weight: 500;
+        transition: all 0.2s;
+    }
+    
+    .btn-sm {
+        padding: 0.375rem 0.75rem;
+    }
+    
+    .btn-group-sm > .btn {
+        padding: 0.375rem 0.75rem;
+    }
+    
+    .rounded-start-2 {
+        border-top-left-radius: 0.5rem !important;
+        border-bottom-left-radius: 0.5rem !important;
+    }
+    
+    .rounded-end-2 {
+        border-top-right-radius: 0.5rem !important;
+        border-bottom-right-radius: 0.5rem !important;
+    }
+    
+    .modal-content {
+        border-radius: 0.75rem;
+    }
+    
+    .alert {
+        border-radius: 0.75rem;
+    }
+    
+    .table-hover tbody tr:hover {
+        background-color: rgba(0, 0, 0, 0.015);
+    }
+    
+    .form-switch .form-check-input {
+        width: 2.5em;
+        height: 1.25em;
+        margin-left: -0.5em;
     }
 </style>
 {% endblock %}

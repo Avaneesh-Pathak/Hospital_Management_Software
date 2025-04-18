@@ -1,20 +1,28 @@
 {% extends "hms/base.html" %}
 
 {% block content %}
-<div class="w-full bg-white shadow-xl rounded-lg p-8 mt-8">
+<div class="w-full bg-white shadow-xl rounded-xl p-6 mt-6">
     <!-- Header Section -->
     <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
-        <div>
-            <h1 class="text-2xl font-bold text-gray-800">NICU Medication Records</h1>
-            <p class="text-gray-600 mt-1">Patient: <span class="font-medium text-blue-600">{{ patient_name }}</span></p>
+        <div class="flex items-center gap-4">
+            <div class="bg-blue-100 p-3 rounded-xl">
+                <i class="fas fa-pills text-blue-600 text-xl"></i>
+            </div>
+            <div>
+                <h1 class="text-2xl font-bold text-gray-800">NICU Medication Records</h1>
+                <p class="text-gray-600 mt-1 flex items-center">
+                    <i class="fas fa-user-injured mr-2"></i>
+                    Patient: <span class="font-medium text-blue-600 ml-1">{{ patient_name }}</span>
+                </p>
+            </div>
         </div>
         <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
-            <a href="{% url 'nicu_medication_add' ipd_id %}"
-                class="btn-primary flex items-center justify-center gap-2">
+            <a href="{% url 'nicu_medication_create' ipd_id %}"
+                class="btn-primary flex items-center justify-center gap-2 px-5 py-2.5">
                 <i class="fas fa-pills"></i> Add Medication
             </a>
             <a href="{% url 'add_nicu_fluid' ipd_id=ipd_id %}"
-                class="btn-secondary flex items-center justify-center gap-2">
+                class="btn-secondary flex items-center justify-center gap-2 px-5 py-2.5">
                 <i class="fas fa-tint"></i> Add Fluid
             </a>
         </div>
@@ -22,23 +30,26 @@
 
     <!-- Medication Table Section -->
     <div class="mb-12">
-        <div class="flex justify-between items-center mb-4">
-            <h2 class="text-xl font-semibold text-gray-800">Medication Administration</h2>
-            <div class="text-sm text-gray-500">
-                Showing {{ medications|length }} record{{ medications|pluralize }}
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-3">
+            <div class="flex items-center gap-3">
+                <h2 class="text-xl font-semibold text-gray-800">Medication Administration</h2>
+                <span class="badge-primary">{{ medications|length }} record{{ medications|pluralize }}</span>
+            </div>
+            <div class="relative w-full sm:w-64">
+                <input type="text" placeholder="Search medications..." class="search-input">
+                <i class="fas fa-search search-icon"></i>
             </div>
         </div>
 
-        <div class="overflow-x-auto rounded-lg border border-gray-200 shadow-sm">
-            <table class="w-full border-collapse">
-                <thead class="bg-blue-600 text-white">
-                    <tr class="uppercase text-xs font-semibold">
-                        <th class="px-6 py-3">S.No.</th>
+        <div class="overflow-x-auto rounded-xl border border-gray-100 shadow-sm">
+            <table class="w-full min-w-max">
+                <thead class="bg-gradient-to-r from-blue-600 to-blue-700 text-white">
+                    <tr class="text-xs font-semibold tracking-wider">
+                        <th class="px-6 py-3 text-center">S.No.</th>
                         <th class="px-6 py-3 text-left">Medicine</th>
                         <th class="px-6 py-3 text-center">Dose (mg/kg/day)</th>
                         <th class="px-6 py-3 text-center">Per Dose (mg/kg/dose)</th>
-                        {% comment %} <th class="px-6 py-3 text-center">Per kg per Dose (mg/kg/dose)</th> {% endcomment %}
-                        {% comment %} <th class="px-6 py-3 text-center">Syrup Volume per Dose(ml/dose)</th> {% endcomment %}
+                        <th class="px-6 py-3 text-center">Take from medicine vial</th>
                         <th class="px-6 py-3 text-center">Vial</th>
                         <th class="px-6 py-3 text-center">Dilute In</th>
                         <th class="px-6 py-3 text-center">Take from vial</th>
@@ -50,37 +61,35 @@
                         <th class="px-6 py-3 text-center">Infusion Rate</th>
                         <th class="px-6 py-3 text-center">Fluid given in</th>
                         <th class="px-6 py-3 text-center">Fluid given</th>
-                        <th class="px-6 py-3 text-center">Set machne at </th>
+                        <th class="px-6 py-3 text-center">Set machine at</th>
                         <th class="px-6 py-3 text-left whitespace-nowrap">Notes</th>
                         <th class="px-6 py-3 text-center">Actions</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-gray-200 text-sm">
+                <tbody class="divide-y divide-gray-100 text-sm">
                     {% for medication in medications %}
-                    <tr class="text-gray-700 hover:bg-blue-50 transition duration-200">
-                        <td class="px-6 py-4 text-center">{{ forloop.counter }}</td>
-                        <td class="px-6 py-4 font-medium">{{ medication.medicine }}</td>
+                    <tr class="text-gray-700 hover:bg-blue-50 transition-colors group">
+                        <td class="px-6 py-4 text-center font-medium">{{ forloop.counter }}</td>
+                        <td class="px-6 py-4 font-medium text-blue-600">{{ medication.medicine }}</td>
                         <td class="px-6 py-4 text-center">{{ medication.calculated_dose_per_day|floatformat:2 }} mg</td>
                         <td class="px-6 py-4 text-center">{{ medication.calculated_dose_per_dose|floatformat:2 }} mg</td>
-                        {% comment %} <td class="px-6 py-4 text-center">{{ medication.calculated_mg_per_kg_per_dose|floatformat:2 }}</td> {% endcomment %}
-                        {% comment %} <td class="px-6 py-4 text-center">{{
-                            medication.calculated_ml_per_kg_per_dose|floatformat:2 }}</td> {% endcomment %}
-                        <td class="px-6 py-4 text-center">{{ medication.vial}}</td>
-                        <td class="px-6 py-4 text-center">{{ medication.calculated_dose_per_dose_ml}} ml</td>
-                        <td class="px-6 py-4 text-center">{{ medication.take}} ml</td>
-                        <td class="px-6 py-4 text-center">{{ medication.dilution_volume}} ml</td>
-                        <td class="px-6 py-4 text-center">{{ medication.diluent.name}}</td>
+                        <td class="px-6 py-4 text-center">{{ medication.take_from_medicine_vial|floatformat:2 }} ml</td>
+                        <td class="px-6 py-4 text-center">{{ medication.vial }}</td>
+                        <td class="px-6 py-4 text-center">{{ medication.calculated_dose_per_dose_ml }} ml</td>
+                        <td class="px-6 py-4 text-center">{{ medication.take }} ml</td>
+                        <td class="px-6 py-4 text-center">{{ medication.dilution_volume }} ml</td>
+                        <td class="px-6 py-4 text-center">{{ medication.diluent.name }}</td>
                         <td class="px-6 py-4">{{ medication.get_route_display }}</td>
-                        <td class="px-6 py-4 font-medium">
+                        <td class="px-6 py-4">
                             {% if medication.dose_frequency == "OTHER" %}
-                            {{ medication.other_frequency }}
+                            <span class="badge-secondary">{{ medication.other_frequency }}</span>
                             {% else %}
-                            {{ medication.get_dose_frequency_display }}
+                            <span class="badge-primary">{{ medication.get_dose_frequency_display }}</span>
                             {% endif %}
                         </td>
-                        <td class="px-6 py-4 text-center">{{ medication.calculated_ml}} ml</td>
-                        <td class="px-6 py-4 text-center">{{ medication.calculated_infusion_rate}} ml/hr</td>
-                        <td class="px-6 py-4 text-center">{{ medication.frequency_of_dose}} min</td>
+                        <td class="px-6 py-4 text-center">{{ medication.calculated_ml|floatformat:2 }} ml</td>
+                        <td class="px-6 py-4 text-center">{{ medication.calculated_infusion_rate }} ml/hr</td>
+                        <td class="px-6 py-4 text-center">{{ medication.frequency_of_dose }} min</td>
                         <td class="px-6 py-4 text-center">{{ medication.frequency_of_dose_given|floatformat:2 }} ml/min</td>
                         <td class="px-6 py-4 text-center">{{ medication.set_in_mchine|floatformat:2 }} ml/hr</td>
                         <td class="px-6 py-4 font-medium whitespace-nowrap">{{ medication.sign }}</td>
@@ -98,10 +107,19 @@
                                 </button>
                             </form>
                         </td>
+                        </td>
                     </tr>
                     {% empty %}
                     <tr>
-                        <td colspan="14" class="px-6 py-4 text-center text-gray-500">No medication records found.</td>
+                        <td colspan="18" class="px-6 py-8 text-center text-gray-500">
+                            <div class="flex flex-col items-center justify-center gap-2">
+                                <i class="fas fa-pills text-3xl text-gray-300"></i>
+                                <p>No medication records found</p>
+                                <a href="{% url 'nicu_medication_add' ipd_id %}" class="btn-primary mt-2 inline-flex items-center gap-2">
+                                    <i class="fas fa-plus"></i> Add First Medication
+                                </a>
+                            </div>
+                        </td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -111,53 +129,49 @@
 
     <!-- Fluid Requirements Section -->
     <div>
-        <div class="flex justify-between items-center mb-4">
-            <h2 class="text-xl font-semibold text-gray-800">Fluid Management</h2>
-            <div class="text-sm text-gray-500">
-                {{ fluid_data|length }} entr{{ fluid_data|pluralize:"y,ies" }}
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-3">
+            <div class="flex items-center gap-3">
+                <h2 class="text-xl font-semibold text-gray-800">Fluid Management</h2>
+                <span class="badge-secondary">{{ fluid_data|length }} entr{{ fluid_data|pluralize:"y,ies" }}</span>
+            </div>
+            <div class="relative w-full sm:w-64">
+                <input type="text" placeholder="Search fluids..." class="search-input">
+                <i class="fas fa-search search-icon"></i>
             </div>
         </div>
 
-        <div class="overflow-x-auto rounded-lg border border-gray-200 shadow-sm">
+        <div class="overflow-x-auto rounded-xl border border-gray-100 shadow-sm">
             <table class="w-full min-w-max">
-                <thead class="bg-green-600 text-white">
-                    <tr>
-                        <th class="px-4 py-3 text-left text-sm font-medium">Weight</th>
-                        <th class="px-4 py-3 text-left text-sm font-medium">Medicine</th>
-                        <th class="px-4 py-3 text-left text-sm font-medium">Day</th>
-                        <th class="px-4 py-3 text-left text-sm font-medium">Requirement</th>
-                        <th class="px-4 py-3 text-center text-sm font-medium">Calculated</th>
-                        <th class="px-4 py-3 text-center text-sm font-medium">Fluid (ml/hr)</th>
-                        <th class="px-4 py-3 text-center text-sm font-medium">Actions</th>
+                <thead class="bg-gradient-to-r from-green-600 to-green-700 text-white">
+                    <tr class="text-xs font-semibold tracking-wider">
+                        <th class="px-6 py-3 text-left">Weight</th>
+                        <th class="px-6 py-3 text-left">Medicine</th>
+                        <th class="px-6 py-3 text-left">Day</th>
+                        <th class="px-6 py-3 text-left">Requirement</th>
+                        <th class="px-6 py-3 text-center">Calculated</th>
+                        <th class="px-6 py-3 text-center">Fluid (ml/hr)</th>
+                        <th class="px-6 py-3 text-center">Actions</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-gray-200 bg-white">
+                <tbody class="divide-y divide-gray-100">
                     {% for fluid in fluid_data %}
-                    <tr class="hover:bg-green-50 transition-colors">
-                        <td class="px-4 py-3 text-sm">
-                            {{ fluid.birth_weight_category }}
-                        </td>
-                        <td class="px-4 py-3 text-sm">
-                            {{ fluid.medicine }}
-                        </td>
-                        <td class="px-4 py-3 text-sm">
-                            Day {{ fluid.day_after_birth }}
-                        </td>
-                        <td class="px-4 py-3 text-sm">
-                            {{ fluid.fluid_ml_per_kg_per_day }} mL/kg/day
-                        </td>
-                        <td class="px-4 py-3 text-center text-sm">
+                    <tr class="text-gray-700 hover:bg-green-50 transition-colors group">
+                        <td class="px-6 py-4 font-medium">{{ fluid.birth_weight_category }}</td>
+                        <td class="px-6 py-4 font-medium text-green-600">{{ fluid.medicine }}</td>
+                        <td class="px-6 py-4">Day {{ fluid.day_after_birth }}</td>
+                        <td class="px-6 py-4">{{ fluid.fluid_ml_per_kg_per_day }} mL/kg/day</td>
+                        <td class="px-6 py-4 text-center">
                             {% if fluid.calculated_ml %}
-                            {{ fluid.calculated_ml|floatformat:2 }} mL
+                            <span class="font-medium">{{ fluid.calculated_ml|floatformat:2 }} mL</span>
                             {% else %}
-                            -
+                            <span class="text-gray-400">-</span>
                             {% endif %}
                         </td>
-                        <td class="px-4 py-3 text-center text-sm">
+                        <td class="px-6 py-4 text-center">
                             {% if fluid.calculated_ml_hr %}
-                            {{ fluid.calculated_ml_hr|floatformat:2 }} mL
+                            <span class="font-medium">{{ fluid.calculated_ml_hr|floatformat:2 }} mL/hr</span>
                             {% else %}
-                            -
+                            <span class="text-gray-400">-</span>
                             {% endif %}
                         </td>
                         <td class="px-6 py-4 text-center">
@@ -176,8 +190,14 @@
                     </tr>
                     {% empty %}
                     <tr>
-                        <td colspan="4" class="px-4 py-6 text-center text-gray-500">
-                            No fluid records found.
+                        <td colspan="7" class="px-6 py-8 text-center text-gray-500">
+                            <div class="flex flex-col items-center justify-center gap-2">
+                                <i class="fas fa-tint text-3xl text-gray-300"></i>
+                                <p>No fluid records found</p>
+                                <a href="{% url 'add_nicu_fluid' ipd_id=ipd_id %}" class="btn-secondary mt-2 inline-flex items-center gap-2">
+                                    <i class="fas fa-plus"></i> Add First Fluid
+                                </a>
+                            </div>
                         </td>
                     </tr>
                     {% endfor %}
@@ -190,11 +210,29 @@
 <style>
     /* Button Styles */
     .btn-primary {
-        @apply bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors shadow-sm;
+        @apply bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors shadow-sm flex items-center justify-center;
     }
     
     .btn-secondary {
-        @apply bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors shadow-sm;
+        @apply bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors shadow-sm flex items-center justify-center;
+    }
+
+    /* Badge Styles */
+    .badge-primary {
+        @apply bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full;
+    }
+    
+    .badge-secondary {
+        @apply bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full;
+    }
+
+    /* Search Input */
+    .search-input {
+        @apply w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all;
+    }
+    
+    .search-icon {
+        @apply absolute left-3 top-2.5 text-gray-400;
     }
 
     /* Table Styles */
@@ -207,52 +245,39 @@
     }
     
     td, th {
-        @apply px-4 py-3;
-    }
-    
-    tbody tr {
-        @apply hover:bg-gray-50 transition-colors;
-    }
-
-    /* Tooltip Styles */
-    .tooltip {
-        @apply relative cursor-pointer;
-    }
-    
-    .tooltip:hover::after {
-        @apply opacity-100 visible;
-    }
-    
-    .tooltip::after {
-        @apply absolute bottom-full left-1/2 transform -translate-x-1/2 px-2 py-1 bg-gray-800 text-white text-xs rounded whitespace-nowrap;
-        content: attr(title);
-        opacity: 0;
-        visibility: hidden;
-        transition: all 0.2s ease;
-        z-index: 10;
+        @apply px-6 py-4;
     }
 
     /* Responsive adjustments */
     @media (max-width: 768px) {
-        .flex-col-mobile {
-            @apply flex-col;
+        .table-responsive {
+            @apply block;
         }
         
-        .w-full-mobile {
-            @apply w-full;
+        th, td {
+            @apply px-3 py-2 text-sm;
         }
     }
 </style>
 
 <script>
-// Add confirmation for delete actions
 document.addEventListener('DOMContentLoaded', function() {
-    const deleteForms = document.querySelectorAll('form[onsubmit]');
-    deleteForms.forEach(form => {
-        form.addEventListener('submit', function(e) {
-            if (!confirm(this.getAttribute('onsubmit').replace('return ', ''))) {
+    // Enhanced delete confirmation
+    const deleteButtons = document.querySelectorAll('form[onsubmit] button[type="submit"]');
+    deleteButtons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            if (!confirm(this.closest('form').getAttribute('onsubmit').replace('return ', ''))) {
                 e.preventDefault();
             }
+        });
+    });
+
+    // Simple search functionality (would need implementation)
+    const searchInputs = document.querySelectorAll('.search-input');
+    searchInputs.forEach(input => {
+        input.addEventListener('input', function() {
+            // Implement search filtering here
+            console.log('Search for:', this.value);
         });
     });
 });

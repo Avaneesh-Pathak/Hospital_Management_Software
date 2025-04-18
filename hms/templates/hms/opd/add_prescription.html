@@ -1,69 +1,152 @@
 {% extends 'hms/base.html' %}
 
 {% block content %}
-<div class="container mx-auto p-6">
-    <!-- Page Title -->
-    <h2 class="text-3xl font-bold text-gray-800 mb-6">Add Prescription for {{ ipd.patient.user.full_name }}</h2>
+<div class="container mx-auto p-4 md:p-8 max-w-3xl">
+    <!-- Page Header -->
+    <div class="mb-8">
+        <h2 class="text-3xl font-bold text-gray-800 mb-2">Add Prescription</h2>
+        <p class="text-gray-600">For patient: <span class="font-semibold text-blue-600">{{ ipd.patient.user.full_name }}</span></p>
+    </div>
 
-    <!-- Prescription Form -->
-    <div class="bg-white p-6 rounded-lg shadow-md">
-        <form method="POST" class="space-y-6">
-            {% csrf_token %}
+    <!-- Prescription Form Card -->
+    <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+        <div class="p-6 md:p-8">
+            <form method="POST" class="space-y-6">
+                {% csrf_token %}
 
-            <!-- Medication Field -->
-            <div>
-                <label for="{{ form.medication.id_for_label }}" class="block text-gray-600 font-medium mb-2">Medication</label>
-                <input
-                    type="text"
-                    name="{{ form.medication.name }}"
-                    id="{{ form.medication.id_for_label }}"
-                    class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    value="{{ form.medication.value|default:'' }}"
-                    placeholder="Enter medication"
-                >
-                {% if form.medication.errors %}
-                    <p class="text-red-500 text-sm mt-1">{{ form.medication.errors|join:", " }}</p>
-                {% endif %}
-            </div>
+                <!-- Form Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Medication Field -->
+                    <div class="md:col-span-2">
+                        <label for="{{ form.medication.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">Medication</label>
+                        <div class="relative">
+                            <input
+                                type="text"
+                                name="{{ form.medication.name }}"
+                                id="{{ form.medication.id_for_label }}"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                                value="{{ form.medication.value|default:'' }}"
+                                placeholder="e.g. Paracetamol"
+                            >
+                            {% if form.medication.errors %}
+                                <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                    <svg class="h-5 w-5 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                                    </svg>
+                                </div>
+                            {% endif %}
+                        </div>
+                        {% if form.medication.errors %}
+                            <p class="mt-1 text-sm text-red-600">{{ form.medication.errors|join:", " }}</p>
+                        {% endif %}
+                    </div>
 
-            <!-- Dosage Field -->
-            <div>
-                <label for="{{ form.dosage.id_for_label }}" class="block text-gray-600 font-medium mb-2">Dosage</label>
-                <input
-                    type="text"
-                    name="{{ form.dosage.name }}"
-                    id="{{ form.dosage.id_for_label }}"
-                    class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    value="{{ form.dosage.value|default:'' }}"
-                    placeholder="Enter dosage"
-                >
-                {% if form.dosage.errors %}
-                    <p class="text-red-500 text-sm mt-1">{{ form.dosage.errors|join:", " }}</p>
-                {% endif %}
-            </div>
+                    <!-- Concentration Field -->
+                    <div>
+                        <label for="{{ form.concentration_mg_per_ml.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">Concentration (mg/ml)</label>
+                        <div class="relative">
+                            <input
+                                type="text"
+                                name="{{ form.concentration_mg_per_ml.name }}"
+                                id="{{ form.concentration_mg_per_ml.id_for_label }}"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                                value="{{ form.concentration_mg_per_ml.value|default:'' }}"
+                                placeholder="e.g. 500"
+                            >
+                            {% if form.concentration_mg_per_ml.errors %}
+                                <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                    <svg class="h-5 w-5 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                                    </svg>
+                                </div>
+                            {% endif %}
+                        </div>
+                        {% if form.concentration_mg_per_ml.errors %}
+                            <p class="mt-1 text-sm text-red-600">{{ form.concentration_mg_per_ml.errors|join:", " }}</p>
+                        {% endif %}
+                    </div>
 
-            <!-- Timing Field -->
-            <div>
-                <label for="{{ form.timing.id_for_label }}" class="block text-gray-600 font-medium mb-2">Timing</label>
-                <input
-                    type="datetime-local"
-                    name="{{ form.timing.name }}"
-                    id="{{ form.timing.id_for_label }}"
-                    class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    value="{{ form.timing.value|default:'' }}"
-                >
-                {% if form.timing.errors %}
-                    <p class="text-red-500 text-sm mt-1">{{ form.timing.errors|join:", " }}</p>
-                {% endif %}
-            </div>
+                    <!-- Dosage Field -->
+                    <div>
+                        <label for="{{ form.dosage.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">Dosage</label>
+                        <div class="relative">
+                            <input
+                                type="text"
+                                name="{{ form.dosage.name }}"
+                                id="{{ form.dosage.id_for_label }}"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                                value="{{ form.dosage.value|default:'' }}"
+                                placeholder="e.g. 1 tablet"
+                            >
+                            {% if form.dosage.errors %}
+                                <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                    <svg class="h-5 w-5 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                                    </svg>
+                                </div>
+                            {% endif %}
+                        </div>
+                        {% if form.dosage.errors %}
+                            <p class="mt-1 text-sm text-red-600">{{ form.dosage.errors|join:", " }}</p>
+                        {% endif %}
+                    </div>
 
-            <!-- Submit Button -->
-            <div>
-                <button type="submit" class="bg-blue-500 text-white px-6 py-2 rounded-md hover:bg-blue-600 transition duration-300">
-                    Add Prescription
-                </button>
-            </div>
-        </form>
+                    <!-- Dose Frequency Field -->
+                    <div>
+                        <label for="{{ form.dose_frequency.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">Frequency</label>
+                        <select
+                            name="{{ form.dose_frequency.name }}"
+                            id="{{ form.dose_frequency.id_for_label }}"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                        >
+                            {% for value, label in form.dose_frequency.field.choices %}
+                                <option value="{{ value }}" {% if form.dose_frequency.value == value %}selected{% endif %}>{{ label }}</option>
+                            {% endfor %}
+                        </select>
+                        {% if form.dose_frequency.errors %}
+                            <p class="mt-1 text-sm text-red-600">{{ form.dose_frequency.errors|join:", " }}</p>
+                        {% endif %}
+                    </div>
+
+                    <!-- Timing Field -->
+                    <div>
+                        <label for="{{ form.timing.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">Administration Time</label>
+                        <div class="relative">
+                            <input
+                                type="datetime-local"
+                                name="{{ form.timing.name }}"
+                                id="{{ form.timing.id_for_label }}"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                                value="{{ form.timing.value|default:'' }}"
+                            >
+                            {% if form.timing.errors %}
+                                <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                    <svg class="h-5 w-5 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                                    </svg>
+                                </div>
+                            {% endif %}
+                        </div>
+                        {% if form.timing.errors %}
+                            <p class="mt-1 text-sm text-red-600">{{ form.timing.errors|join:", " }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Form Actions -->
+                <div class="pt-4 flex justify-end">
+                    <button
+                        type="submit"
+                        class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-lg shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition"
+                    >
+                        <svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clip-rule="evenodd" />
+                        </svg>
+                        Add Prescription
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 {% endblock %}

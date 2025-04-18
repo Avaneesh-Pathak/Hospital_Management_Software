@@ -28,6 +28,8 @@
                         <tr class="bg-gray-100">
                             <th class="border p-3 text-left text-gray-600">Medication</th>
                             <th class="border p-3 text-left text-gray-600">Dosage</th>
+                            <th class="border p-3 text-left text-gray-600">Concentration</th>
+                            <th class="border p-3 text-left text-gray-600">Dose Frequency</th>
                             <th class="border p-3 text-left text-gray-600">Timing</th>
                         </tr>
                     </thead>
@@ -36,6 +38,8 @@
                             <tr class="hover:bg-gray-50">
                                 <td class="border p-3 text-gray-700">{{ prescription.medication }}</td>
                                 <td class="border p-3 text-gray-700">{{ prescription.dosage }}</td>
+                                <td class="border p-3 text-gray-700">{{ prescription.concentration_mg_per_ml }}</td>
+                                <td class="border p-3 text-gray-700">{{ prescription.dose_frequency }}</td>
                                 <td class="border p-3 text-gray-700">{{ prescription.timing|date:"d M Y, h:i A" }}</td>
                             </tr>
                         {% endfor %}

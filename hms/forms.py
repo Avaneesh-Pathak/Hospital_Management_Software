@@ -1,7 +1,8 @@
 from django import forms
 from django.utils import timezone
+from django.forms import inlineformset_factory
 from django.core.exceptions import ValidationError
-from .models import CustomUser,NICUVitals, Patient,Billing,Expense,OPD,Room, Doctor, Employee,EmergencyCase,PatientReport,Prescription,License,Asset,Maintenance,Daybook,NICUMedicationRecord,Medicine, Diluent,Vial,FluidRequirement,IPD
+from .models import CustomUser,NICUVitals, Patient,Billing,Expense,OPD,Room, Doctor, Employee,EmergencyCase,PatientReport,Prescription,License,Asset,Maintenance,Daybook,NICUMedicationRecord,Medicine, Diluent,Vial,FluidRequirement,IPD,MedicineVial
 
 class ProfileUpdateForm(forms.ModelForm):
     class Meta:
@@ -230,15 +231,22 @@ class EmergencyCaseForm(forms.ModelForm):
 class PrescriptionForm(forms.ModelForm):
     class Meta:
         model = Prescription
-        fields = ['medication', 'dosage', 'timing']
+        fields = ['medication','concentration_mg_per_ml', 'dosage','dose_frequency','timing']
         widgets = {
             'medication': forms.TextInput(attrs={
                 'class': 'w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500',
                 'placeholder': 'Enter medication',
             }),
+            'concentration_mg_per_ml': forms.TextInput(attrs={
+                'class': 'w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500',
+                'placeholder': 'Enter concentration',
+            }),
             'dosage': forms.TextInput(attrs={
                 'class': 'w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500',
                 'placeholder': 'Enter dosage',
+            }),
+            'dose_frequency': forms.Select(attrs={
+                'class': 'w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500',
             }),
             'timing': forms.DateTimeInput(attrs={
                 'type': 'datetime-local',
@@ -350,11 +358,10 @@ class NICUVitalsForm(forms.ModelForm):
 class NICUMedicationRecordForm(forms.ModelForm):
     class Meta:
         model = NICUMedicationRecord
-        exclude = ["patient", "ipd_admission","prescription"]  # Still exclude these, set manually
+        exclude = ["patient", "ipd_admission", "prescription"]
         fields = [
-              # ✅ Include this
-            "route", "medicine", "diluent", "dose_frequency", "other_frequency",
-            "vial", "dilution_volume", "frequency_of_dose", "sign"
+            "route", "medicine", "medicine_vial", "diluent", "dose_frequency", 
+            "other_frequency", "vial", "dilution_volume", "frequency_of_dose", "sign"
         ]
 
     def __init__(self, *args, **kwargs):
@@ -362,18 +369,27 @@ class NICUMedicationRecordForm(forms.ModelForm):
         if self.ipd_admission is None:
             raise ValueError("IPD admission must be provided.")
         super().__init__(*args, **kwargs)
-
+        # Make medicine_vial optional
+        self.fields["medicine_vial"].required = False
         # Hide 'other_frequency' field initially
         self.fields["other_frequency"].widget.attrs.update({
             "placeholder": "Specify custom frequency",
             "style": "display: none;",
         })
 
-        # ✅ Filter prescriptions for the current IPD
-        # self.fields["prescription"].queryset = Prescription.objects.filter(ipd=self.ipd_admission)
+        # Optionally filter medicine_vial based on initial medicine (optional)
+        if "medicine" in self.data:
+            try:
+                medicine_id = int(self.data.get("medicine"))
+                self.fields["medicine_vial"].queryset = MedicineVial.objects.filter(medicine_id=medicine_id)
+            except (ValueError, TypeError):
+                self.fields["medicine_vial"].queryset = MedicineVial.objects.none()
+        elif self.instance.pk and self.instance.medicine:
+            self.fields["medicine_vial"].queryset = MedicineVial.objects.filter(medicine=self.instance.medicine)
+        else:
+            self.fields["medicine_vial"].queryset = MedicineVial.objects.none()
 
     def save(self, commit=True):
-        """Auto-assign patient and IPD admission before saving."""
         instance = super().save(commit=False)
         instance.ipd_admission = self.ipd_admission
         instance.patient = self.ipd_admission.patient
@@ -382,13 +398,11 @@ class NICUMedicationRecordForm(forms.ModelForm):
             instance.save()
         return instance
 
-
     def clean(self):
-        """Ensure patient and IPD admission are set before validation."""
         cleaned_data = super().clean()
         if not hasattr(self.instance, "patient") or self.instance.patient is None:
             if self.ipd_admission:
-                self.instance.patient = self.ipd_admission.patient  # Assign patient from IPD
+                self.instance.patient = self.ipd_admission.patient
             else:
                 raise forms.ValidationError("Patient information is required.")
         return cleaned_data
@@ -397,18 +411,47 @@ class NICUMedicationRecordForm(forms.ModelForm):
 class MedicineForm(forms.ModelForm):
     class Meta:
         model = Medicine
-        fields = ["name", "medicine_type", "standard_dose_per_kg","concentration_mg_per_ml"]
+        fields = ["name", "medicine_type", "standard_dose_per_kg","concentration_mg_per_ml", "is_liquid_injection"]
         widgets = {
             "medicine_type": forms.Select(choices=Medicine.MEDICINE_TYPE_CHOICES, attrs={"class": "form-control"}),
             "standard_dose_per_kg": forms.NumberInput(attrs={"class": "form-control", "step": "0.01"}),
             "concentration_mg_per_ml": forms.NumberInput(attrs={"class": "form-control", "step": "0.01"}),
+            "is_liquid_injection": forms.CheckboxInput(attrs={"class": "form-check-input", "id": "id_is_liquid_injection"}),
         }
         labels = {
             "name": "Medicine Name",
             "medicine_type": "Type of Medicine",
             "standard_dose_per_kg": "Standard Dose (mg/kg/dose)",
             "concentration_mg_per_ml": "Concentration (mg/mL)",
+            "is_liquid_injection": "Is it a Liquid Injection?",
         }
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # Only show "is_liquid_injection" checkbox if type is "injection"
+        if self.data.get("medicine_type") != "injection" and (
+            not self.instance or self.instance.medicine_type != "injection"
+        ):
+            self.fields.pop("is_liquid_injection")
+
+class MedicineVialForm(forms.ModelForm):
+    class Meta:
+        model = MedicineVial
+        fields = ["strength_mg", "volume_ml"]
+        widgets = {
+            "strength_mg": forms.NumberInput(attrs={"class": "form-control", "step": "0.1"}),
+            "volume_ml": forms.NumberInput(attrs={"class": "form-control", "step": "0.1"}),
+        }
+        labels = {
+            "strength_mg": "Strength (mg)",
+            "volume_ml": "Volume (mL)",
+        }
+
+MedicineVialFormSet = inlineformset_factory(
+    Medicine, MedicineVial, form=MedicineVialForm,
+    extra=1, can_delete=True
+)
+
 
 class DiluentForm(forms.ModelForm):
     compatible_medicine_types = forms.ModelMultipleChoiceField(

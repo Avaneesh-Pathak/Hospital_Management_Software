@@ -472,7 +472,18 @@ class PatientTransfer(models.Model):
 
 
 class Prescription(models.Model):
+    DOSE_FREQUENCY_CHOICES = [
+        ("OD", "Once a day (OD)"),
+        ("BD", "Twice a day (BD)"),
+        ("TDS", "Three times a day (TDS)"),
+        ("QID", "Four times a day (QID)"),
+        ("SOS", "As needed (SOS)"),
+        ("STAT", "Immediately (STAT)"),
+        ("OTHER", "Other"),
+    ]
     ipd = models.ForeignKey(IPD, on_delete=models.CASCADE, related_name="prescriptions")
+    dose_frequency = models.CharField(max_length=10, choices=DOSE_FREQUENCY_CHOICES, default="OD")
+    concentration_mg_per_ml = models.FloatField(help_text="Concentration of the medicine (mg/mL)", null=True, blank=True)
     medication = models.CharField(max_length=255)
     dosage = models.CharField(max_length=100)
     timing = models.DateTimeField()
@@ -773,8 +784,9 @@ class Medicine(models.Model):
         ("other", "Other"),
     ]
 
-    name = models.CharField(max_length=100, unique=True)
+    name = models.CharField(max_length=100)
     medicine_type = models.CharField(max_length=20, choices=MEDICINE_TYPE_CHOICES, default="other")
+    is_liquid_injection = models.BooleanField(default=False, help_text="Only for injections: Check if this is a ready-to-use liquid injection")
     # Standard dose is given in mg/kg/day (e.g., 5 mg/kg/day)
     standard_dose_per_kg = models.FloatField(help_text="Standard dose per kg (mg/kg/day)", null=True)
     # For liquids, the concentration tells how many mg per mL
@@ -783,6 +795,17 @@ class Medicine(models.Model):
     def __str__(self):
         return f"{self.name} ({self.get_medicine_type_display()})"
 
+class MedicineVial(models.Model):
+    medicine = models.ForeignKey(Medicine, related_name='vials', on_delete=models.CASCADE)
+    strength_mg = models.FloatField(help_text="Total mg in the vial (e.g., 500)")
+    volume_ml = models.FloatField(help_text="Total mL in the vial (e.g., 2)")
+    
+    @property
+    def concentration(self):
+        return round(self.strength_mg / self.volume_ml, 2)  # mg per mL
+
+    def __str__(self):
+        return f"{self.medicine.name} {int(self.strength_mg)}mg/{self.volume_ml}mL"
 
 class Diluent(models.Model):
     name = models.CharField(max_length=100, unique=True)
@@ -831,10 +854,11 @@ class NICUMedicationRecord(models.Model):
     patient = models.ForeignKey("Patient", on_delete=models.CASCADE)
     ipd_admission = models.ForeignKey("IPD", on_delete=models.CASCADE, related_name="nicu_medications", null=True)
     prescription = models.ForeignKey("Prescription", on_delete=models.CASCADE, related_name="Prescription", null=True)
-    route = models.CharField(max_length=10, choices=ROUTE_CHOICES)
     medicine = models.ForeignKey("Medicine", on_delete=models.CASCADE)
     diluent = models.ForeignKey("Diluent", on_delete=models.SET_NULL, null=True, blank=True)
     vial = models.ForeignKey("Vial", on_delete=models.SET_NULL, null=True, blank=True)
+    medicine_vial = models.ForeignKey("MedicineVial", on_delete=models.SET_NULL, null=True, blank=True)
+    route = models.CharField(max_length=10, choices=ROUTE_CHOICES)
     dilution_volume = models.FloatField(help_text="User-defined dilution volume (mL)", null=True, blank=True)
 
     # Calculated Fields
@@ -849,7 +873,9 @@ class NICUMedicationRecord(models.Model):
     calculated_ml = models.FloatField(editable=False, null=True)
     frequency_of_dose = models.IntegerField(blank=True, null=True)
     frequency_of_dose_given = models.FloatField(editable=False, null=True)
+    take_from_medicine_vial = models.FloatField(editable=False, null=True)
     calculated_dose_per_dose_ml = models.FloatField(editable=False, null=True)
+    dose_per_day_mg = models.FloatField(editable=False, null=True)
     take = models.FloatField(editable=False, null=True)
     set_in_mchine = models.FloatField(editable=False,null=True)
     dose_frequency = models.CharField(max_length=10, choices=DOSE_FREQUENCY_CHOICES, default="OD")
@@ -875,92 +901,177 @@ class NICUMedicationRecord(models.Model):
             raise ValidationError("Frequency is required for IV medications.")
 
     def save(self, *args, **kwargs): 
-        self.clean()
-        patient_weight = self.patient.weight
-        daily_doses = self.get_dose_frequency_per_day()
-
-        # Calculate Dose Per Day (mg/day)
-        self.calculated_dose_per_day = round(Decimal(patient_weight) * Decimal(self.medicine.standard_dose_per_kg), 2)
-
-        # Calculate Dose Per Dose (mg/dose)
-        self.calculated_dose_per_dose = round(self.calculated_dose_per_day / daily_doses)
-
-        # ✅ Calculate mg/kg/dose
-        if patient_weight > 0:
-            self.calculated_mg_per_kg_per_dose = round(self.calculated_dose_per_dose / patient_weight, 2)
-
-        # ✅ Skip calculation for Oral, Syrup, and Suspension
-        if self.medicine.medicine_type in ["syrup", "suspension", "oral"]:
-            self.vial = None
-            self.calculated_dose_per_dose_ml = None
-            self.dilution_volume = None
-            self.diluent = None
-            self.calculated_ml = None
-            self.calculated_infusion_rate = None
-            self.frequency_of_dose = None
-            self.frequency_of_dose_given = None
-            self.set_in_mchine = None
-            self.calculated_dose_per_dose = self.calculated_dose_per_day
-            self.calculated_mg_per_kg_per_dose = round(self.calculated_dose_per_dose / patient_weight, 2)
-            print(f"Skipping dilution calculations for {self.medicine.medicine_type}")
-
-        else:
-            if self.vial.unit == "mg":
-                self.calculated_dose_per_dose_ml = self.vial.size/100
-                print("vial size",self.vial.size)
-                print("calculated_dose_per_dose_ml",self.calculated_dose_per_dose_ml)
-
+        try:
             
-            self.take = self.calculated_dose_per_day / 100
+            print("🚀 Starting save method")
+            # Make sure 'medicine_vial' is set
+            # if self.medicine_vial is None and self.medicine.medicine_type == 'injection' and self.route == "IV":
+            #     raise ValidationError("Please select a medicine vial for IV injections.")
+                # Make sure the 'medicine_vial' field is properly set
+            # if not self.medicine_vial:
+            #     self.medicine_vial = self.cleaned_data.get('medicine_vial', None)
+            self.clean()
+            print("✅ Cleaned successfully")
+            print(f"medicine_vial value before saving: {self.medicine_vial}")
 
-            # ✅ Normal Calculation for other medicine types
-            # self.calculated_dose_per_dose_ml = self.calculated_dose_per_dose / 100
+            patient_weight = self.patient.weight
+            print(f"👶 Patient weight: {patient_weight} kg")
 
-            # ✅ Injection Calculation
-            if self.medicine.medicine_type == "injection":
-                self.calculated_ml = self.dilution_volume + (self.calculated_dose_per_dose / 100)
-                self.frequency_of_dose_given = (self.calculated_ml / self.frequency_of_dose)
-                self.set_in_mchine = (self.frequency_of_dose_given * 60)
+            daily_doses = self.get_dose_frequency_per_day()
+            print(f"📅 Daily doses: {daily_doses}")
 
-            # ✅ Drops Calculation
-            elif self.medicine.medicine_type == "drop":
-                DROP_VOLUME_ML = 0.05
-                if self.medicine.concentration_mg_per_ml:
-                    self.calculated_ml = round(self.calculated_dose_per_dose / self.medicine.concentration_mg_per_ml, 2)
-                    self.calculated_drops = round(self.calculated_ml / DROP_VOLUME_ML)
-                else:
-                    self.calculated_ml = 0
-                    self.calculated_drops = 0
+            self.calculated_dose_per_day = round(Decimal(patient_weight) * Decimal(self.medicine.standard_dose_per_kg), 2)
+            print(f"💊 Dose per day: {self.calculated_dose_per_day} mg/day")
 
-            # ✅ Tablet Calculation
-            elif self.medicine.medicine_type == "tablet":
-                self.calculated_tablets = round(self.calculated_dose_per_dose / self.medicine.concentration_mg_per_ml, 1)
+            self.calculated_dose_per_dose = round(self.calculated_dose_per_day / daily_doses, 2)
+            print(f"💉 Dose per dose: {self.calculated_dose_per_dose} mg/dose")
 
-            # ✅ Special handling for Dopamine and Dobutamine
-            elif self.medicine.name.lower() in ['dopamine', 'dobutamine']:
+            if patient_weight > 0:
+                self.calculated_mg_per_kg_per_dose = round(self.calculated_dose_per_dose / patient_weight, 2)
+                print(f"📐 mg/kg/dose: {self.calculated_mg_per_kg_per_dose}")
+            
+            if self.medicine.medicine_type in ["syrup", "suspension", "oral"]:
+                print(f"⛔ Skipping dilution calculations for {self.medicine.medicine_type}")
+                self.vial = None
+                self.calculated_dose_per_dose_ml = None
+                self.dilution_volume = None
+                self.diluent = None
+                self.calculated_ml = None
+                self.calculated_infusion_rate = None
+                self.frequency_of_dose = None
+                self.frequency_of_dose_given = None
+                self.set_in_mchine = None
+                self.calculated_dose_per_dose = self.calculated_dose_per_day
+                self.calculated_mg_per_kg_per_dose = round(self.calculated_dose_per_dose / patient_weight, 2)
 
-                dose_mcg_per_kg_min = self.medicine.standard_dose_per_kg  # assuming this field will store mcg/kg/min for these drugs
-                weight_kg = patient_weight
-                    # Default vial concentration: 250mg in 50ml = 5 mg/ml = 5000 mcg/ml
-                concentration_mg_per_ml = self.medicine.concentration_mg_per_ml or 5
-                concentration_mcg_per_ml = concentration_mg_per_ml * 1000
-
-               # Calculate Infusion Rate (mL/hr) using standard NICU formula
-                infusion_rate_ml_hr = (dose_mcg_per_kg_min * weight_kg * 60) / concentration_mcg_per_ml
-
-                self.calculated_infusion_rate = round(infusion_rate_ml_hr, 2)
-
-                # Optional: Also calculate total volume and set_in_mchine
-                self.calculated_ml = round(infusion_rate_ml_hr * 24, 2)  # for 24 hrs
-                self.set_in_mchine = round(self.calculated_ml, 2)
-
-            # ✅ Infusion Rate for IV
-            if self.route == "IV":
-                self.calculated_infusion_rate = round(self.calculated_ml / 60, 2)
             else:
-                self.calculated_infusion_rate = 0
+                if self.vial:
+                    if self.vial.unit == "mg":
+                        self.calculated_dose_per_dose_ml = self.vial.size / 100
+                        print(f"🧪 Vial size: {self.vial.size} mg")
+                        print(f"🧮 Dose per dose in mL: {self.calculated_dose_per_dose_ml}")
+                else:
+                    print("⚠️ No vial selected")
 
-        super().save(*args, **kwargs)
+                self.take = self.calculated_dose_per_day / 100
+                print(f"📤 Total daily take: {self.take} units")
+
+                if self.medicine.medicine_type == "injection":
+                    if self.medicine.is_liquid_injection:
+                        print("💉 Liquid injection – skipping dilution")
+                        # self.dilution_volume = None
+                        # self.diluent = None
+                        # self.vial = None
+                        # self.take = None
+                        # self.calculated_dose_per_dose_ml = None
+                        # print("medicne vial",self.medicine_vial)
+                        print("Selected vial:",self.medicine_vial)
+
+                        self.required_dose = self.calculated_dose_per_day
+                        print(f"💊 Required dose per dose: {self.required_dose} mg")
+                        if self.medicine_vial:
+                            print(f"Selected vial: {self.medicine_vial}")
+                        else:
+                            print("No vial selected.")
+
+                        # Fetch concentration from the selected vial (either Medicine or MedicineVial)
+                        if self.medicine_vial:
+                            # self.take = None
+                            concentration_per_ml = self.medicine_vial.concentration  # Concentration from the selected vial
+                            concentration_in_point = concentration_per_ml/10
+                            self.take_from_medicine_vial = self.required_dose/Decimal(concentration_in_point)
+                            print(f"💉 Concentration per ml from vial: {concentration_per_ml} mg/ml")
+                            print(f"💉 concentration_in_point per ml from vial: {concentration_in_point} mg/ml")
+                            print(f"💉 take_from_medicine_vial : {self.take_from_medicine_vial} mg/ml")
+                            print(f"🧪 Draw {self.take_from_medicine_vial:.2f} points (i.e., {self.take_from_medicine_vial * Decimal('0.1'):.2f} mL) from vial")
+                            
+
+                        else:
+                            concentration_per_ml = self.medicine.concentration_mg_per_ml  # Fallback to the concentration in Medicine
+                            print(f"💉 Fallback concentration per ml from Medicine: {concentration_per_ml} mg/ml")
+
+                        # Step 2: Calculate the required volume (based on vial concentration)
+                        # Use the concentration to determine the required volume to be administered
+                        required_ml = round((Decimal(self.required_dose) * Decimal('0.1')) / Decimal(concentration_per_ml), 2)  # Adjusted for concentration
+                        print(f"🧪 Required volume from vial: {required_ml} ml")
+                        
+                        # Step 3: Calculate the diluent volume (if applicable)
+                        if self.dilution_volume:
+                            self.calculated_ml = float(self.take_from_medicine_vial) + self.dilution_volume  # Add dilution volume to the required volume
+                            print(f"💧 Volume after dilution: {self.calculated_ml} ml")
+                        else:
+                            self.calculated_ml = self.take_from_medicine_vial  # If no dilution, just use the required volume
+                            print(f"💧 Volume to administer: {self.calculated_ml} ml")
+
+
+
+                        self.calculated_ml_day = round(float(self.calculated_dose_per_dose) / (self.medicine_vial.concentration or 1), 2)
+                        print(f"Calculated mL/day: {self.calculated_ml_day}")
+                        self.calculated_ml = self.calculated_ml_day/24
+                        print(f"Calculated mL/hour: {self.calculated_ml}")
+                        self.after_dilution = float(self.dilution_volume) + float(self.calculated_ml)
+                        print(f"Calculated mL/hour after_dilution: {self.after_dilution}")
+                        self.frequency_of_dose_given = round(self.calculated_ml / (self.frequency_of_dose or 1), 2)
+                        print(f"Frequency of dose given (mL): {self.frequency_of_dose_given}")
+                        self.set_in_mchine = round(self.frequency_of_dose_given * 60, 2)
+                        print(f"Infusion rate (mL/hour) set in machine: {self.set_in_mchine}")
+                        self.calculated_infusion_rate = round(self.after_dilution / 24, 2)
+                        print(f"Infusion rate (mL/hour) calculated_infusion_rate: {self.calculated_infusion_rate}")
+                        self.frequency_of_dose_given = round(self.calculated_infusion_rate / (self.frequency_of_dose or 1), 2)
+                        self.set_in_mchine = round(self.frequency_of_dose_given * 60, 2)
+                    else:
+                        self.calculated_ml = (self.dilution_volume) + float((self.calculated_dose_per_dose / 100))
+                        self.frequency_of_dose_given = round(self.calculated_ml / (self.frequency_of_dose or 1), 2)
+                        self.set_in_mchine = round(self.frequency_of_dose_given * 60, 2)
+
+                    print(f"💧 Calculated ML: {self.calculated_ml}")
+                    print(f"🕒 Frequency of dose given: {self.frequency_of_dose_given}")
+                    print(f"⚙️ Set in machine: {self.set_in_mchine}")
+
+                elif self.medicine.medicine_type == "drop":
+                    DROP_VOLUME_ML = 0.05
+                    if self.medicine.concentration_mg_per_ml:
+                        self.calculated_ml = round(self.calculated_dose_per_dose / self.medicine.concentration_mg_per_ml, 2)
+                        self.calculated_drops = round(self.calculated_ml / DROP_VOLUME_ML)
+                    else:
+                        self.calculated_ml = 0
+                        self.calculated_drops = 0
+                    print(f"💧 Drops: {self.calculated_drops}")
+
+                elif self.medicine.medicine_type == "tablet":
+                    self.calculated_tablets = round(self.calculated_dose_per_dose / (self.medicine.concentration_mg_per_ml or 1), 1)
+                    print(f"💊 Tablets per dose: {self.calculated_tablets}")
+
+                elif self.medicine.name.lower() in ['dopamine', 'dobutamine']:
+                    dose_mcg_per_kg_min = self.medicine.standard_dose_per_kg
+                    weight_kg = patient_weight
+                    concentration_mg_per_ml = self.medicine.concentration_mg_per_ml or 5
+                    concentration_mcg_per_ml = concentration_mg_per_ml * 1000
+
+                    infusion_rate_ml_hr = dose_mcg_per_kg_min * weight_kg * 1.444
+                    self.calculated_infusion_rate = round(infusion_rate_ml_hr, 2)
+                    self.calculated_ml = round(infusion_rate_ml_hr * 24, 2)
+                    self.set_in_mchine = round(self.calculated_ml, 2)
+
+                    print(f"🧪 {self.medicine.name} infusion rate: {self.calculated_infusion_rate} mL/hr")
+                    print(f"📦 24-hour volume: {self.calculated_ml}")
+
+                # Final infusion rate for IV if not set already
+                if self.route == "IV":
+                    if not self.calculated_infusion_rate and self.calculated_ml:
+                        self.calculated_infusion_rate = round(self.calculated_ml / 60, 2)
+                        print(f"⚗️ Final IV infusion rate: {self.calculated_infusion_rate}")
+                    elif not self.calculated_ml:
+                        self.calculated_infusion_rate = 0
+                        print("⚠️ No ML calculated, infusion rate set to 0")
+
+            print("✅ Save completed. Saving to database...")
+            super().save(*args, **kwargs)
+            print("🧾 Saved successfully")
+
+        except Exception as e:
+            print(f"❌ Error in save(): {str(e)}")
+            raise  # Optional: re-raise for visibility in logs or debugging
 
 
 

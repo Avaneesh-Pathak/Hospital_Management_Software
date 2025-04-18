@@ -30,20 +30,20 @@
             transition: transform 0.3s ease-in-out;
             overflow-y: auto;
             scrollbar-width: thin;
-            scrollbar-color: #3b82f6 #1e3a8a;
+            scrollbar-color: #4a5568 #1a202c;
         }
 
         #sidebar::-webkit-scrollbar {
-            width: 8px;
+            width: 6px;
         }
 
         #sidebar::-webkit-scrollbar-track {
-            background: #1e3a8a;
+            background: #1a202c;
         }
 
         #sidebar::-webkit-scrollbar-thumb {
-            background-color: #3b82f6;
-            border-radius: 4px;
+            background-color: #4a5568;
+            border-radius: 3px;
         }
 
         /* Main Content */
@@ -147,188 +147,226 @@
             100% { transform: scale(1); }
         }
 
+        /* Emergency pulse animation */
+        @keyframes emergency-pulse {
+            0%, 100% {
+                box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+            }
+            70% {
+                box-shadow: 0 0 0 8px rgba(239, 68, 68, 0);
+            }
+        }
+
         .emergency-pulse {
-            animation: pulse 2s infinite;
+            animation: emergency-pulse 2s infinite;
+        }
+        /* Smooth transitions */
+        .transition-all {
+            transition-property: all;
+        }
+        /* Active link indicator */
+        .sidebar-link.active {
+            background-color: #2d3748;
+            border-left: 3px solid #4299e1;
+        }
+
+        /* Hover effects */
+        .group:hover .group-hover\:text-blue-400 {
+            color: #60a5fa;
         }
     </style>
 </head>
 <body class="bg-gray-100 flex h-screen" onclick="closeSidebar(event)">
     <!-- Sidebar -->
-    <aside id="sidebar" class="w-64 bg-blue-900 text-white h-screen fixed left-0 top-0 overflow-y-auto p-4 shadow-2xl">
-        <!-- Sidebar Header -->
-        <div class="flex justify-between items-center mb-8">
-            <h2 class="text-xl font-bold text-white flex items-center gap-2">
-                <i class="fas fa-hospital text-blue-300"></i>
-                <span>Hospital Management</span>
-            </h2>
+<aside id="sidebar" class="w-64 bg-gray-900 text-gray-100 h-screen fixed left-0 top-0 overflow-y-auto shadow-xl transition-all duration-300">
+    <!-- Sidebar Header -->
+    <div class="flex justify-between items-center p-6 border-b border-gray-700">
+        <h2 class="text-xl font-bold text-white flex items-center gap-3">
+            <i class="fas fa-hospital text-blue-400"></i>
+            <span class="bg-gradient-to-r from-blue-400 to-blue-600 bg-clip-text text-transparent">Hospital Management</span>
+        </h2>
+    </div>
 
-            {% comment %} <button id="closeSidebar" class="text-white text-2xl hover:text-gray-300 transition duration-300 focus:outline-none">✖</button> {% endcomment %}
-        </div>
-
-        <!-- Sidebar Links -->
-        <ul class="space-y-3">
-            <!-- Dashboard -->
+    <!-- Sidebar Links -->
+    <div class="p-4">
+        <ul class="space-y-2">
+            <!-- Main Sections -->
+            <li class="mb-4 mt-2">
+                <span class="text-xs font-semibold uppercase text-gray-400 tracking-wider">Main</span>
+            </li>
             <li>
-                <a href="{% url 'dashboard' %}" class="sidebar-link flex items-center p-3 text-lg font-semibold text-white bg-blue-700 rounded-lg hover:bg-blue-600 hover:text-white transition duration-300">
-                    <i class="fas fa-tachometer-alt"></i>
-                    <span>Dashboard</span>
+                <a href="{% url 'dashboard' %}" class="flex items-center p-3 text-sm font-medium rounded-lg transition-all duration-200 hover:bg-gray-800 hover:text-white group">
+                    <i class="fas fa-tachometer-alt w-5 text-center text-gray-400 group-hover:text-blue-400"></i>
+                    <span class="ml-3">Dashboard</span>
                 </a>
             </li>
 
-            <!-- Patients -->
+            <!-- Patient Management -->
+            <li class="mb-4 mt-6">
+                <span class="text-xs font-semibold uppercase text-gray-400 tracking-wider">Patient Management</span>
+            </li>
             <li>
-                <a href="{% url 'patients' %}" class="sidebar-link flex items-center p-3 text-lg font-semibold text-white bg-blue-700 rounded-lg hover:bg-blue-600 hover:text-white transition duration-300">
-                    <i class="fas fa-procedures"></i>
-                    <span>Patients</span>
-                    {% comment %} <span class="notification-badge">3</span> {% endcomment %}
+                <a href="{% url 'patients' %}" class="flex items-center p-3 text-sm font-medium rounded-lg transition-all duration-200 hover:bg-gray-800 hover:text-white group">
+                    <i class="fas fa-procedures w-5 text-center text-gray-400 group-hover:text-green-400"></i>
+                    <span class="ml-3">Patients</span>
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'appointments' %}" class="flex items-center p-3 text-sm font-medium rounded-lg transition-all duration-200 hover:bg-gray-800 hover:text-white group">
+                    <i class="fas fa-calendar-check w-5 text-center text-gray-400 group-hover:text-purple-400"></i>
+                    <span class="ml-3">Appointments</span>
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'appointments_update' %}" class="flex items-center p-3 text-sm font-medium rounded-lg transition-all duration-200 hover:bg-gray-800 hover:text-white group">
+                    <i class="fas fa-sync-alt w-5 text-center text-gray-400 group-hover:text-yellow-400"></i>
+                    <span class="ml-3">Appointments Update</span>
                 </a>
             </li>
 
-            <!-- Doctors -->
+            <!-- Medical Services -->
+            <li class="mb-4 mt-6">
+                <span class="text-xs font-semibold uppercase text-gray-400 tracking-wider">Medical Services</span>
+            </li>
             <li>
-                <a href="{% url 'doctors' %}" class="sidebar-link flex items-center p-3 text-lg font-semibold text-white bg-blue-700 rounded-lg hover:bg-blue-600 hover:text-white transition duration-300">
-                    <i class="fas fa-user-md"></i>
-                    <span>Doctors</span>
+                <a href="{% url 'ipd' %}" class="flex items-center p-3 text-sm font-medium rounded-lg transition-all duration-200 hover:bg-gray-800 hover:text-white group">
+                    <i class="fas fa-bed w-5 text-center text-gray-400 group-hover:text-indigo-400"></i>
+                    <span class="ml-3">IPD</span>
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'opd' %}" class="flex items-center p-3 text-sm font-medium rounded-lg transition-all duration-200 hover:bg-gray-800 hover:text-white group">
+                    <i class="fas fa-clinic-medical w-5 text-center text-gray-400 group-hover:text-teal-400"></i>
+                    <span class="ml-3">OPD</span>
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'manage_medicine_diluent' %}" class="flex items-center p-3 text-sm font-medium rounded-lg transition-all duration-200 hover:bg-gray-800 hover:text-white group">
+                    <i class="fas fa-pills w-5 text-center text-gray-400 group-hover:text-blue-400"></i>
+                    <span class="ml-3">Medicine & Diluent</span>
                 </a>
             </li>
 
-            <!-- Appointments -->
+            <!-- Staff Management -->
+            <li class="mb-4 mt-6">
+                <span class="text-xs font-semibold uppercase text-gray-400 tracking-wider">Staff Management</span>
+            </li>
             <li>
-                <a href="{% url 'appointments' %}" class="sidebar-link flex items-center p-3 text-lg font-semibold text-white bg-blue-700 rounded-lg hover:bg-blue-600 hover:text-white transition duration-300">
-                    <i class="fas fa-calendar-check"></i>
-                    <span>Appointments</span>
-                    {% comment %} <span class="notification-badge">5</span> {% endcomment %}
+                <a href="{% url 'doctors' %}" class="flex items-center p-3 text-sm font-medium rounded-lg transition-all duration-200 hover:bg-gray-800 hover:text-white group">
+                    <i class="fas fa-user-md w-5 text-center text-gray-400 group-hover:text-blue-400"></i>
+                    <span class="ml-3">Doctors</span>
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'add_doctor' %}" class="flex items-center p-3 text-sm font-medium rounded-lg transition-all duration-200 hover:bg-gray-800 hover:text-white group">
+                    <i class="fas fa-user-plus w-5 text-center text-gray-400 group-hover:text-green-400"></i>
+                    <span class="ml-3">Add Doctor</span>
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'employee_list' %}" class="flex items-center p-3 text-sm font-medium rounded-lg transition-all duration-200 hover:bg-gray-800 hover:text-white group">
+                    <i class="fas fa-users w-5 text-center text-gray-400 group-hover:text-yellow-400"></i>
+                    <span class="ml-3">Employees</span>
                 </a>
             </li>
 
-            <!-- Appointments Update -->
+            <!-- Facility Management -->
+            <li class="mb-4 mt-6">
+                <span class="text-xs font-semibold uppercase text-gray-400 tracking-wider">Facility Management</span>
+            </li>
             <li>
-                <a href="{% url 'appointments_update' %}" class="sidebar-link flex items-center p-3 text-lg font-semibold text-white bg-blue-700 rounded-lg hover:bg-blue-600 hover:text-white transition duration-300">
-                    <i class="fas fa-sync-alt"></i>
-                    <span>Appointments Update</span>
+                <a href="{% url 'room_overview' %}" class="flex items-center p-3 text-sm font-medium rounded-lg transition-all duration-200 hover:bg-gray-800 hover:text-white group">
+                    <i class="fas fa-door-open w-5 text-center text-gray-400 group-hover:text-purple-400"></i>
+                    <span class="ml-3">Room Overview</span>
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'asset_list' %}" class="flex items-center p-3 text-sm font-medium rounded-lg transition-all duration-200 hover:bg-gray-800 hover:text-white group">
+                    <i class="fas fa-laptop-medical w-5 text-center text-gray-400 group-hover:text-blue-400"></i>
+                    <span class="ml-3">Assets & Machines</span>
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'maintenance_list' %}" class="flex items-center p-3 text-sm font-medium rounded-lg transition-all duration-200 hover:bg-gray-800 hover:text-white group">
+                    <i class="fas fa-tools w-5 text-center text-gray-400 group-hover:text-orange-400"></i>
+                    <span class="ml-3">Maintenance</span>
                 </a>
             </li>
 
-            <!-- Billing -->
+            <!-- Financial -->
+            <li class="mb-4 mt-6">
+                <span class="text-xs font-semibold uppercase text-gray-400 tracking-wider">Financial</span>
+            </li>
             <li>
-                <a href="{% url 'billing' %}" class="sidebar-link flex items-center p-3 text-lg font-semibold text-white bg-blue-700 rounded-lg hover:bg-blue-600 hover:text-white transition duration-300">
-                    <i class="fas fa-money-bill-wave"></i>
-                    <span>Billing</span>
+                <a href="{% url 'billing' %}" class="flex items-center p-3 text-sm font-medium rounded-lg transition-all duration-200 hover:bg-gray-800 hover:text-white group">
+                    <i class="fas fa-money-bill-wave w-5 text-center text-gray-400 group-hover:text-green-400"></i>
+                    <span class="ml-3">Billing</span>
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'accounting_summary' %}" class="flex items-center p-3 text-sm font-medium rounded-lg transition-all duration-200 hover:bg-gray-800 hover:text-white group">
+                    <i class="fas fa-calculator w-5 text-center text-gray-400 group-hover:text-blue-400"></i>
+                    <span class="ml-3">Accounting</span>
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'daybook_list' %}" class="flex items-center p-3 text-sm font-medium rounded-lg transition-all duration-200 hover:bg-gray-800 hover:text-white group">
+                    <i class="fas fa-book w-5 text-center text-gray-400 group-hover:text-purple-400"></i>
+                    <span class="ml-3">Daybook</span>
                 </a>
             </li>
 
             <!-- Emergency Section -->
+            <li class="mb-4 mt-6">
+                <span class="text-xs font-semibold uppercase text-gray-400 tracking-wider">Emergency</span>
+            </li>
             <li>
-                <a href="{% url 'emergency' %}" class="sidebar-link flex items-center p-3 text-lg font-semibold text-white bg-red-600 rounded-lg hover:bg-red-700 hover:text-white transition duration-300 emergency-pulse">
-                    <i class="fas fa-ambulance"></i>
-                    <span>Emergency</span>
+                <a href="{% url 'emergency' %}" class="flex items-center p-3 text-sm font-medium rounded-lg transition-all duration-200 bg-gradient-to-r from-red-900 to-red-700 hover:from-red-800 hover:to-red-600 text-white group">
+                    <i class="fas fa-ambulance w-5 text-center text-white"></i>
+                    <span class="ml-3">Emergency</span>
                 </a>
             </li>
             <li>
-                <a href="{% url 'add_emergency_case' %}" class="sidebar-link flex items-center justify-center gap-2 bg-gradient-to-r from-red-500 to-red-700 text-white px-6 py-3 rounded-lg shadow-lg hover:from-red-600 hover:to-red-800 transform hover:scale-105 transition duration-300 ease-in-out">
-                    <i class="fas fa-plus-circle"></i>
-                    <span>Add Emergency Patient</span>
-                </a>
-            </li>
-
-            <!-- IPD & OPD -->
-            <li>
-                <a href="{% url 'ipd' %}" class="sidebar-link flex items-center p-3 text-lg font-semibold text-white bg-purple-600 rounded-lg hover:bg-purple-700 hover:text-white transition duration-300">
-                    <i class="fas fa-bed"></i>
-                    <span>IPD</span>
-                </a>
-            </li>
-            <li>
-                <a href="{% url 'opd' %}" class="sidebar-link flex items-center p-3 text-lg font-semibold text-white bg-green-600 rounded-lg hover:bg-green-700 hover:text-white transition duration-300">
-                    <i class="fas fa-clinic-medical"></i>
-                    <span>OPD</span>
+                <a href="{% url 'add_emergency_case' %}" class="flex items-center justify-between p-3 text-sm font-medium rounded-lg transition-all duration-200 bg-gradient-to-r from-red-800 to-red-600 hover:from-red-700 hover:to-red-500 text-white group">
+                    <div class="flex items-center">
+                        <i class="fas fa-plus-circle w-5 text-center text-white"></i>
+                        <span class="ml-3">Add Emergency</span>
+                    </div>
+                    <span class="text-xs bg-white text-red-600 px-2 py-1 rounded-full">New</span>
                 </a>
             </li>
 
-            <!-- License Management -->
+            <!-- Administration -->
+            <li class="mb-4 mt-6">
+                <span class="text-xs font-semibold uppercase text-gray-400 tracking-wider">Administration</span>
+            </li>
             <li>
-                <a href="{% url 'license_list' %}" class="sidebar-link flex items-center p-3 text-lg font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition duration-300">
-                    <i class="fas fa-file-contract"></i>
-                    <span>License Management</span>
+                <a href="{% url 'license_list' %}" class="flex items-center p-3 text-sm font-medium rounded-lg transition-all duration-200 hover:bg-gray-800 hover:text-white group">
+                    <i class="fas fa-file-contract w-5 text-center text-gray-400 group-hover:text-yellow-400"></i>
+                    <span class="ml-3">Licenses</span>
                 </a>
             </li>
 
-            <!-- Asset & Machine Store -->
-            <li>
-                <a href="{% url 'asset_list' %}" class="sidebar-link flex items-center p-3 text-lg font-semibold text-white bg-purple-600 rounded-lg hover:bg-purple-700 transition duration-300">
-                    <i class="fas fa-laptop-medical"></i>
-                    <span>Asset & Machine Store</span>
-                </a>
-            </li>
-
-            <!-- Maintenance -->
-            <li>
-                <a href="{% url 'maintenance_list' %}" class="sidebar-link flex items-center p-3 text-lg font-semibold text-white bg-yellow-600 rounded-lg hover:bg-yellow-700 transition duration-300">
-                    <i class="fas fa-tools"></i>
-                    <span>Maintenance</span>
-                </a>
-            </li>
-
-            <!-- Room Management -->
-            <li>
-                <a href="{% url 'room_overview' %}" class="sidebar-link flex items-center p-3 text-lg font-semibold text-white bg-blue-500 rounded-lg hover:bg-blue-600 hover:text-white transition duration-300">
-                    <i class="fas fa-door-open"></i>
-                    <span>Room Overview</span>
-                </a>
-            </li>
-
-            <!-- Employee Management -->
-            <li>
-                <a href="{% url 'employee_list' %}" class="sidebar-link flex items-center p-3 text-lg font-semibold text-white bg-yellow-500 rounded-lg hover:bg-yellow-600 hover:text-white transition duration-300">
-                    <i class="fas fa-users"></i>
-                    <span>Employee</span>
-                </a>
-            </li>
-
-            <!-- Doctor Management -->
-            <li>
-                <a href="{% url 'add_doctor' %}" class="sidebar-link flex items-center p-3 text-lg font-semibold text-white bg-green-500 rounded-lg hover:bg-green-600 hover:text-white transition duration-300">
-                    <i class="fas fa-user-plus"></i>
-                    <span>Add Doctor</span>
-                </a>
-            </li>
-
-            <!-- Accounting -->
-            <li>
-                <a href="{% url 'accounting_summary' %}" class="sidebar-link flex items-center p-3 text-lg font-semibold text-white bg-blue-700 rounded-lg hover:bg-blue-600 hover:text-white transition duration-300">
-                    <i class="fas fa-calculator"></i>
-                    <span>Accounting Summary</span>
-                </a>
-            </li>
-            <li>
-                <a href="{% url 'daybook_list' %}" class="sidebar-link flex items-center p-3 text-lg font-semibold text-white bg-blue-700 rounded-lg hover:bg-blue-600 hover:text-white transition duration-300">
-                    <i class="fas fa-book"></i>
-                    <span>Daybook</span>
-                </a>
-            </li>        
-            <li>
-                <a href="{% url 'manage_medicine_diluent' %}" class="sidebar-link flex items-center p-3 text-lg font-semibold text-white bg-blue-700 rounded-lg hover:bg-blue-600 hover:text-white transition duration-300">
-                    <i class="fas fa-pills"></i>
-                    <span>Add Medicine & Diluent</span>
-                </a>
-            </li>
-
-            <!-- Logout Button with Username -->
-            <li class="mt-8">
+            <!-- User Section -->
+            <li class="mt-8 pt-4 border-t border-gray-700">
                 {% if user.is_authenticated %}
-                    <a href="{% url 'logout' %}" class="sidebar-link flex items-center justify-center gap-2 bg-gradient-to-r from-gray-600 to-gray-800 text-white px-6 py-3 rounded-lg shadow-lg hover:from-gray-700 hover:to-gray-900 transform hover:scale-105 transition duration-300 ease-in-out">
-                        <i class="fas fa-sign-out-alt"></i>
-                        <span>Logout ({{ user.username }})</span>
+                    <a href="{% url 'logout' %}" class="flex items-center justify-between p-3 text-sm font-medium rounded-lg transition-all duration-200 bg-gray-800 hover:bg-gray-700 text-white group">
+                        <div class="flex items-center">
+                            <i class="fas fa-sign-out-alt w-5 text-center text-gray-400 group-hover:text-red-400"></i>
+                            <span class="ml-3">Logout</span>
+                        </div>
+                        <span class="text-xs bg-blue-600 text-white px-2 py-1 rounded-full">{{ user.username }}</span>
                     </a>
                 {% else %}
-                    <a href="{% url 'login' %}" class="sidebar-link flex items-center justify-center gap-2 bg-gradient-to-r from-green-500 to-green-700 text-white px-6 py-3 rounded-lg shadow-lg hover:from-green-600 hover:to-green-800 transform hover:scale-105 transition duration-300 ease-in-out">
-                        <i class="fas fa-sign-in-alt"></i>
-                        <span>Login</span>
+                    <a href="{% url 'login' %}" class="flex items-center p-3 text-sm font-medium rounded-lg transition-all duration-200 bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-500 hover:to-blue-700 text-white group">
+                        <i class="fas fa-sign-in-alt w-5 text-center text-white"></i>
+                        <span class="ml-3">Login</span>
                     </a>
                 {% endif %}
             </li>
         </ul>
-    </aside>
+    </div>
+</aside>
 
     <!-- Main Content -->
     <div class="main-content flex-1">

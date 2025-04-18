@@ -1,4 +1,5 @@
 from django.urls import path
+# from . import api
 from . import views
 from .views import (
     signup, upload_patient_report, add_prescription, get_available_beds, fetch_patients, fetch_opd, fetch_appointments,
@@ -23,7 +24,7 @@ urlpatterns = [
 
     # Patients
     path('patients/', views.patients, name='patients'),
-    path('api/patients/', fetch_patients, name='fetch_patients'),
+    path("api/fetch-patients/", views.fetch_patients, name="fetch_patients"),
     path('api/patient-stats/', views.patient_stats_api, name='patient_stats_api'),
     path("patient/<str:patient_code>/profile/", views.patient_profile, name="patient_profile"),
     path('patient/<str:patient_code>/upload-report/', upload_patient_report, name='upload_patient_report'),
@@ -126,17 +127,21 @@ urlpatterns = [
     path('nicu/view/<int:ipd_id>/', views.view_nicu_vitals, name='view_nicu_vitals'),
 
     #NICUMedicationRecord
-    
     path("nicu/medications/<int:ipd_id>/", NICUMedicationRecordListView.as_view(), name="nicu_medication_list"),
+    path("nicu/medication/add/<int:ipd_id>/", NICUMedicationRecordCreateView.as_view(), name="nicu_medication_create"),
     path('nicu/medications/<int:ipd_id>/add/', NICUMedicationRecordCreateView.as_view(), name='nicu_medication_add'),
     path("nicu-medications/edit/<int:pk>/", NICUMedicationRecordUpdateView.as_view(), name="nicu_medication_edit"),
     path("nicu-medications/delete/<int:pk>/", delete_nicu_medication, name="nicu_medication_delete"),
 
     #Medicne and Diluent
     path('medicine-diluent/', views.manage_medicine_diluent, name='manage_medicine_diluent'),
+    path("ajax/get-vials/", views.get_vials_for_medicine, name="get_vials_for_medicine"),
+    path('ajax/filter-medicines/', views.filter_medicines, name='filter_medicines'),
     path('delete-medicine/<int:pk>/', views.delete_medicine, name='delete_medicine'),
     path('delete-diluent/<int:pk>/', views.delete_diluent, name='delete_diluent'),
     path('delete_vial/<int:pk>/', views.delete_vial, name='delete_vial'),
+    path('api/medicines/', views.medicine_list_api, name='medicine-list-api'),
+    path('api/medicines/<int:pk>/', views.medicine_detail_api, name='medicine-detail-api'),
 
     #Fluid Form
     path("ipd/<int:ipd_id>/fluid/add/", NICUFluidAddView.as_view(), name="add_nicu_fluid"),

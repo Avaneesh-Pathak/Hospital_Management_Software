@@ -4,56 +4,106 @@
 {% block content %}
 
 <div class="container mt-4">
-    <h2 class="text-center fw-bold text-primary">🏥 Room & Bed Availability</h2>
-
-    <!-- Add Room Button -->
-    <div class="d-flex justify-content-end mb-3">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold text-primary mb-0">
+            <i class="fas fa-hospital-alt me-2"></i> Room & Bed Availability Dashboard
+        </h2>
         <a href="{% url 'add_room' %}" class="btn btn-primary fw-bold shadow-sm">
-            ➕ Add Room
+            <i class="fas fa-plus me-2"></i>Add Room
         </a>
     </div>
 
     <div class="row">
         {% for room in rooms %}
-        <div class="col-md-6 mb-4">
-            <div class="card shadow-lg border-0">
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow-lg border-0 h-100">
                 
-                <!-- Room Header -->
-                <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
-                    <h5 class="fw-bold m-0">
-                        🚪 Room {{ room.room_number }} - {{ room.get_room_type_display }}
-                    </h5>
-                    <span class="badge bg-light text-dark">
-                        🛏️ {{ room.available_beds }}/{{ room.total_beds }} Beds Available
-                    </span>
+                <!-- Room Header with Status Indicator -->
+                <div class="card-header {% if room.available_beds == 0 %}bg-danger{% else %}bg-dark{% endif %} text-white d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="fw-bold m-0">
+                            <i class="fas fa-door-open me-2"></i>Room {{ room.room_number }}
+                        </h5>
+                        <small class="d-block mt-1">
+                            <i class="fas fa-tag me-1"></i>{{ room.get_room_type_display }}
+                            {% if room.available_beds == 0 %}
+                            <span class="badge bg-warning text-dark ms-2">FULL</span>
+                            {% endif %}
+                        </small>
+                    </div>
+                    <div class="text-end">
+                        <span class="badge bg-light text-dark fs-6">
+                            <i class="fas fa-bed me-1"></i>{{ room.available_beds }}/{{ room.total_beds }} Available
+                        </span>
+                    </div>
                 </div>
                 
                 <!-- Room Details -->
                 <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div>
+                            <span class="text-muted"><i class="fas fa-rupee-sign me-1"></i>Per Bed Cost:</span>
+                            <strong>₹{{ room.bed_price_per_day }}</strong>
+                        </div>
+                        <div>
+                            <span class="text-muted"><i class="fas fa-expand me-1"></i>Size:</span>
+                            <strong>{{ room.size }} sq.ft</strong>
+                        </div>
+                    </div>
+                    
+                    <hr>
+                    
+                    <h6 class="fw-bold text-center mb-3 text-muted">
+                        <i class="fas fa-bed me-2"></i>Bed Status
+                    </h6>
+                    
                     <div class="bed-container d-flex flex-wrap justify-content-center">
                         {% for bed_number in room.total_beds_list %}
                             {% with patient_info=room.bed_patient_info|get_patient_info:bed_number %}
                                 {% if bed_number in room.occupied_beds %}
-                                    <div class="bed occupied" 
+                                    <div class="bed occupied position-relative" 
                                          data-bs-toggle="popover" 
                                          data-bs-html="true" 
-                                         title="Bed {{ bed_number }} - Occupied"
+                                         title="<i class='fas fa-bed me-2'></i>Bed {{ bed_number }} - Occupied"
                                          data-bs-content="
-                                            <strong>👤 Patient:</strong> {{ patient_info.name|default:'Unknown' }}<br>
-                                            <strong>📅 Admit Date:</strong> {{ patient_info.admit_date|default:'N/A' }}<br>
-                                            <strong>💰 Cost:</strong> ₹{{ patient_info.cost|default:'N/A' }}">
-                                        🛏️ <span>Bed {{ bed_number }}</span>
+                                            <div class='patient-info'>
+                                                <p class='mb-1'><i class='fas fa-user me-2'></i><strong>Patient:</strong> {{ patient_info.name|default:'Unknown' }}</p>
+                                                <p class='mb-1'><i class='fas fa-calendar-alt me-2'></i><strong>Admit Date:</strong> {{ patient_info.admit_date|default:'N/A' }}</p>
+                                                <p class='mb-0'><i class='fas fa-rupee-sign me-2'></i><strong>Cost:</strong> ₹{{ patient_info.cost|default:'N/A' }}</p>
+                                            </div>">
+                                        <span class="bed-number">Bed {{ bed_number }}</span>
+                                        <div class="bed-status occupied-status">
+                                            <i class="fas fa-user"></i>
+                                        </div>
                                     </div>
                                 {% else %}
-                                    <div class="bed available" 
+                                    <div class="bed available position-relative" 
                                          data-bs-toggle="popover" 
-                                         title="Bed {{ bed_number }} - Available" 
-                                         data-bs-content="🛏️ Ready for new patient">
-                                        🛏️ <span>Bed {{ bed_number }}</span>
+                                         title="<i class='fas fa-bed me-2'></i>Bed {{ bed_number }} - Available" 
+                                         data-bs-content="<i class='fas fa-check-circle me-2 text-success'></i>Ready for new patient">
+                                        <span class="bed-number">Bed {{ bed_number }}</span>
+                                        <div class="bed-status available-status">
+                                            <i class="fas fa-check"></i>
+                                        </div>
                                     </div>
                                 {% endif %}
                             {% endwith %}
                         {% endfor %}
+                    </div>
+                </div>
+                
+                <!-- Card Footer with Actions -->
+                <div class="card-footer bg-light d-flex justify-content-between">
+                    <small class="text-muted">
+                        <i class="fas fa-info-circle me-1"></i>Last updated: {{ room.updated_at|date:"M d, Y H:i" }}
+                    </small>
+                    <div>
+                        {% comment %} <a href="{% url 'edit_room' room.id %}" class="btn btn-sm btn-outline-primary me-1">
+                            <i class="fas fa-edit"></i>
+                        </a> {% endcomment %}
+                        {% comment %} <a href="{% url 'delete_room' room.id %}" class="btn btn-sm btn-outline-danger">
+                            <i class="fas fa-trash-alt"></i>
+                        </a> {% endcomment %}
                     </div>
                 </div>
             </div>
@@ -66,76 +116,112 @@
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'));
+        
+        var popoverOptions = {
+            trigger: 'hover',
+            html: true,
+            container: 'body',
+            placement: 'auto',
+            boundary: 'viewport',
+            sanitize: false
+        };
 
         popoverTriggerList.forEach(function (popoverTriggerEl) {
-            var popover = new bootstrap.Popover(popoverTriggerEl, {
-                trigger: "manual",
-                html: true,
-            });
-
-            // Show popover on hover
-            popoverTriggerEl.addEventListener("mouseenter", function () {
-                popover.show();
-            });
-
-            // Hide popover when mouse leaves
-            popoverTriggerEl.addEventListener("mouseleave", function () {
-                popover.hide();
-            });
-
-            // Close popover when clicking outside
-            document.addEventListener("click", function (event) {
-                if (!popoverTriggerEl.contains(event.target)) {
-                    popover.hide();
-                }
-            });
+            new bootstrap.Popover(popoverTriggerEl, popoverOptions);
         });
     });
 </script>
 
 <style>
     .bed-container {
-        gap: 15px;
+        gap: 12px;
         justify-content: center;
     }
 
     .bed {
-        width: 90px;
-        height: 90px;
+        width: 100px;
+        height: 100px;
         display: flex;
+        flex-direction: column;
         align-items: center;
         justify-content: center;
         font-weight: bold;
-        border-radius: 10px;
+        border-radius: 12px;
         cursor: pointer;
-        transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-        font-size: 18px;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
     }
 
     .bed:hover {
-        transform: scale(1.1);
-        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    }
+
+    .bed-number {
+        font-size: 14px;
+        margin-bottom: 5px;
+        z-index: 2;
+    }
+
+    .bed-status {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 16px;
+        z-index: 2;
     }
 
     .available {
-        background-color: #28a745; /* Green */
+        background-color: #e8f5e9; /* Light green background */
+        color: #2e7d32;
+        border: 2px solid #a5d6a7;
+    }
+
+    .available-status {
+        background-color: #4caf50;
         color: white;
-        border: 2px solid #28a745;
     }
 
     .occupied {
-        background-color: #3989ad; /* Soft Yellow */
-        color:white;
-        border: 2px solid #3989ad;
+        background-color: #ffebee; /* Light red background */
+        color: #c62828;
+        border: 2px solid #ef9a9a;
     }
 
-    .card-header {
-        font-size: 18px;
+    .occupied-status {
+        background-color: #f44336;
+        color: white;
+    }
+
+    .patient-info {
+        font-size: 14px;
+    }
+
+    .popover {
+        max-width: 300px;
+    }
+
+    .popover-header {
+        background-color: #f8f9fa;
+        font-weight: bold;
+    }
+
+    .card {
+        transition: transform 0.3s ease;
+    }
+
+    .card:hover {
+        transform: translateY(-3px);
     }
 
     .badge {
         font-size: 14px;
-        padding: 8px;
+        padding: 8px 12px;
+        border-radius: 50px;
     }
 </style>
 

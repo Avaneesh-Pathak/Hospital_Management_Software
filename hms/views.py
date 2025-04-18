@@ -44,11 +44,11 @@ from django.views.generic import ListView, CreateView, UpdateView,DeleteView
 # Import Models and Forms
 from .models import (
     CustomUser, Patient, Doctor, Appointment, Billing, EmergencyCase, OPD, IPD, Expense, Employee, Room, PatientReport, Prescription,
-    License, Asset, Maintenance, AccountingRecord, Daybook, Balance, PatientTransfer, NICUVitals, NICUMedicationRecord, Medicine, Diluent,Vial,FluidRequirement
+    License, Asset, Maintenance, AccountingRecord, Daybook, Balance, PatientTransfer, NICUVitals, NICUMedicationRecord, Medicine, Diluent,Vial,FluidRequirement,MedicineVial
 )
 from .forms import (
     PatientRegistrationForm, ExpenseForm, BillingForm, OPDForm, DoctorForm, EmployeeForm, RoomForm, EmergencyCaseForm, ProfileUpdateForm, PatientReportForm,
-    PrescriptionForm, LicenseForm, AssetForm, MaintenanceForm, BalanceUpdateForm, DaybookEntryForm, NICUVitalsForm, NICUMedicationRecordForm, MedicineForm, DiluentForm,VialForm,NICUFluidForm,IPDForm
+    PrescriptionForm, LicenseForm, AssetForm, MaintenanceForm, BalanceUpdateForm, DaybookEntryForm, NICUVitalsForm, NICUMedicationRecordForm, MedicineForm, DiluentForm,VialForm,NICUFluidForm,IPDForm,MedicineVialFormSet
 )
 
 # Logger Setup
@@ -1637,18 +1637,132 @@ class BalanceUpdateView(LoginRequiredMixin, View):
         return render(request, self.template_name, {'form': form})
 
 # NICU Vitals Views
+# @login_required
+# def add_nicu_vitals(request, ipd_id):
+#     ipd = get_object_or_404(IPD, id=ipd_id)
+#     today = localdate()
+
+#     # Fetch existing vitals for today
+#     existing_vitals = NICUVitals.objects.filter(ipd=ipd, date=today)
+#     existing_vitals_dict = {f"{vital.time.strftime('%H:%M')}": vital for vital in existing_vitals}
+# def add_nicu_vitals(request, ipd_id):
+#     ipd = get_object_or_404(IPD, id=ipd_id)
+#     now = localtime()
+#     today = now.date()
+
+#     # Check if today's 06:00 AM record exists
+#     six_am = datetime.strptime("06:00", "%H:%M").time()
+#     six_am_vital_exists = NICUVitals.objects.filter(ipd=ipd, date=today, time=six_am).exists()
+
+#     # Decide which date to show/edit
+#     chart_date = today
+#     if six_am_vital_exists:
+#         chart_date = today + timedelta(days=1)
+
+#     existing_vitals = NICUVitals.objects.filter(ipd=ipd, date=chart_date)
+#     existing_vitals_dict = {f"{v.time.strftime('%H:%M')}": v for v in existing_vitals}
+
+#     TIME_SLOTS = [
+#         ("08:00", "08 AM"),
+#         # ("09:00", "09 AM"),
+#         ("10:00", "10 AM"),
+#         ("12:00", "12 PM"),
+#         ("14:00", "2 PM"),
+#         ("16:00", "4 PM"),
+#         ("18:00", "6 PM"),
+#         ("20:00", "8 PM"),
+#         ("22:00", "10 PM"),
+#         ("23:59", "12 AM"),
+#         ("02:00", "2 AM"),
+#         ("04:00", "4 AM"),
+#         ("06:00", "6 AM"),
+#     ]
+#     URINE_CHOICES = [('', ''), ('nil', 'Nil'), ('ml', 'ML')]
+#     numeric_fields = ['temperature (°F)', 'respiratory_rate(b/min)', 'pulse_rate(b/min)', 'cft(sec)', 'spo2 %', 'oxygen (lit./min)', 'iv_fluids(ml)', 'by_nasogastric (ml)', 'oral(ml) Katori & Spoon', 'ift(ML)']
+#     boolean_fields = ['seizure', 'retraction', 'breastfeeding', 'stool', 'vomiting']
+#     dropdown_fields = ['skin_color', 'urine']  # Adding skin_color dropdown field
+
+#     SKIN_COLOR_CHOICES = [
+#         ('', ''),
+#         ('pink', 'Pink (Normal)'),
+#         ('pallor', 'Pallor (Pale)'),
+#         ('jaundiced', 'Jaundiced (Yellowish)'),
+#         ('cyanotic', 'Cyanotic (Bluish)'),
+#         ('mottled', 'Mottled (Blotchy)'),
+#         ('erythematous', 'Erythematous (Red/Flushed)'),
+#         ('grayish', 'Grayish'),
+#         ('dusky', 'Dusky (Bluish-Gray)'),
+#     ]
+
+#     if request.method == "POST":
+#         for time, label in TIME_SLOTS:
+#             time_obj = datetime.strptime(time, "%H:%M").time()  # Convert string to time object
+#             # Get or create a NICUVitals entry for this time slot
+#             vitals, created = NICUVitals.objects.get_or_create(ipd=ipd, date=today, time=time_obj)
+
+#             # Handle Urine Output
+#             urine_value = request.POST.get(f"urine_{time}", "").strip()
+#             ml_value = request.POST.get(f"urine_ml_{time.replace(':', '')}", "").strip()
+
+#             if urine_value:
+#                 vitals.urine = urine_value
+#                 if urine_value == "ml" and ml_value:
+#                     vitals.urine_value = float(ml_value)
+#                 else:
+#                     vitals.urine_value = None
+#             else:
+#                 # Preserve existing urine value if no new value is provided
+#                 if not created:
+#                     existing_vital = existing_vitals_dict.get(time)
+#                     if existing_vital:
+#                         vitals.urine = existing_vital.urine
+#                         vitals.urine_value = existing_vital.urine_value
+
+#             # Debugging: Print urine values for each time slot
+#             print(f"Time: {time}, Urine: {vitals.urine}, Urine Value: {vitals.urine_value}")
+
+#             # Update fields safely from request.POST
+#             for field in numeric_fields:
+#                 field_name = f"{field}_{time}"
+#                 value = request.POST.get(field_name, "").strip()  # Get value, handle missing values
+#                 print("value",value)
+#                 if value:  # If value is not empty
+#                     setattr(vitals, field, float(value))
+#                 else:
+#                     setattr(vitals, field, None)  # Default to NULL
+
+#             for field in boolean_fields:
+#                 field_name = f"{field}_{time}"
+#                 setattr(vitals, field, request.POST.get(field_name) == "on")  # Checkbox handling
+
+#             # Update dropdown fields
+#             for field in dropdown_fields:
+#                 field_name = f"{field}_{time}"
+#                 setattr(vitals, field, request.POST.get(field_name, ""))
+
+#             vitals.save()
+
+#         messages.success(request, "NICU Vitals recorded successfully.")
+#         return redirect('view_nicu_vitals', ipd_id=ipd.id)
+
+#     return render(request, 'hms/vitals/add_vitals.html', {
+#         'ipd': ipd,
+#         'existing_vitals': existing_vitals,
+#         'existing_vitals_dict': existing_vitals_dict,  # Pass existing data
+#         'time_slots': TIME_SLOTS,
+#         'numeric_fields': numeric_fields,
+#         'boolean_fields': boolean_fields,
+#         'dropdown_fields': dropdown_fields,  # Passing dropdown fields
+#         'skin_color_choices': SKIN_COLOR_CHOICES,  # Passing choices for template
+#         'urine_choices': URINE_CHOICES,  # Fixed variable name
+#     })
 @login_required
 def add_nicu_vitals(request, ipd_id):
     ipd = get_object_or_404(IPD, id=ipd_id)
     today = localdate()
 
-    # Fetch existing vitals for today
-    existing_vitals = NICUVitals.objects.filter(ipd=ipd, date=today)
-    existing_vitals_dict = {f"{vital.time.strftime('%H:%M')}": vital for vital in existing_vitals}
-
     TIME_SLOTS = [
         ("08:00", "08 AM"),
-        # ("09:00", "09 AM"),
         ("10:00", "10 AM"),
         ("12:00", "12 PM"),
         ("14:00", "2 PM"),
@@ -1661,8 +1775,13 @@ def add_nicu_vitals(request, ipd_id):
         ("04:00", "4 AM"),
         ("06:00", "6 AM"),
     ]
+    
+    # Fetch existing vitals for today
+    existing_vitals = NICUVitals.objects.filter(ipd=ipd, date=today)
+    existing_vitals_dict = {f"{vital.time.strftime('%H:%M')}": vital for vital in existing_vitals}
+
     URINE_CHOICES = [('', ''), ('nil', 'Nil'), ('ml', 'ML')]
-    numeric_fields = ['temperature (°F)', 'respiratory_rate(b/min)', 'pulse_rate(b/min)', 'cft(sec)', 'spo2 %', 'oxygen (lit./min)', 'iv_fluids(ml)', 'by_nasogastric (ml)', 'oral(ml) Katori & Spoon', 'ift(ML)']
+    numeric_fields = ['temperature', 'respiratory_rate', 'pulse_rate', 'cft', 'spo2', 'oxygen', 'iv_fluids', 'by_nasogastric', 'oral', 'ift']
     boolean_fields = ['seizure', 'retraction', 'breastfeeding', 'stool', 'vomiting']
     dropdown_fields = ['skin_color', 'urine']  # Adding skin_color dropdown field
 
@@ -1941,10 +2060,11 @@ def manage_medicine_diluent(request):
     medicine_form = MedicineForm()
     diluent_form = DiluentForm()
     vial_form = VialForm()
-
+    
     medicines = Medicine.objects.all()
     diluents = Diluent.objects.all()
     vials = Vial.objects.all()
+    vial_formset = None  # Initialized only if needed
 
     if request.method == "POST":
         # Add Medicine
@@ -1956,7 +2076,25 @@ def manage_medicine_diluent(request):
                 return redirect('manage_medicine_diluent')
             else:
                 messages.error(request, "Failed to add medicine. Please check the form for errors.")
-        
+
+        # Add Vials to Existing Medicine
+        elif "add_vials_to_medicine" in request.POST:
+            selected_medicine_id = request.POST.get('selected_medicine')
+            if selected_medicine_id:
+                try:
+                    selected_medicine = Medicine.objects.get(id=selected_medicine_id)
+                    vial_formset = MedicineVialFormSet(request.POST, instance=selected_medicine)
+                    if vial_formset.is_valid():
+                        vial_formset.save()
+                        messages.success(request, "Vials added to medicine successfully!")
+                        return redirect('manage_medicine_diluent')
+                    else:
+                        messages.error(request, "Vial formset is invalid. Please check the fields.")
+                except Medicine.DoesNotExist:
+                    messages.error(request, "Selected medicine not found.")
+            else:
+                messages.error(request, "Please select a medicine to attach vials.")
+
         # Add Diluent
         elif "add_diluent" in request.POST:
             diluent_form = DiluentForm(request.POST)
@@ -1966,8 +2104,8 @@ def manage_medicine_diluent(request):
                 return redirect('manage_medicine_diluent')
             else:
                 messages.error(request, "Failed to add diluent. Please check the form for errors.")
-        
-        # Add Vial
+
+        # Add Vial (independent)
         elif "add_vial" in request.POST:
             vial_form = VialForm(request.POST)
             if vial_form.is_valid():
@@ -1981,12 +2119,61 @@ def manage_medicine_diluent(request):
         'medicine_form': medicine_form,
         'diluent_form': diluent_form,
         'vial_form': vial_form,
+        'vial_formset': vial_formset or MedicineVialFormSet(),
         'medicines': medicines,
         'diluents': diluents,
         'vials': vials,
     }
     return render(request, 'hms/medice_&_diluent/add_medicine_diluent.html', context)
 
+def get_vials_for_medicine(request):
+    medicine_id = request.GET.get('medicine_id')
+    vials = MedicineVial.objects.filter(medicine_id=medicine_id)
+
+    # Group vials by medicine and return a single medicine with all its vials
+    vial_data = [{
+        "id": vial.id,
+        "label": vial.medicine.name,
+        "strength_mg": vial.strength_mg,
+        "volume_ml": vial.volume_ml
+    } for vial in vials]
+    
+    # Assuming there is only one medicine selected, so returning it once with all vials
+    return JsonResponse({"vials": vial_data})
+
+def filter_medicines(request):
+    medicine_type = request.GET.get('type')
+    medicines = Medicine.objects.filter(medicine_type=medicine_type).distinct()
+
+    # Prepare medicines data (grouped)
+    medicine_data = [{"id": medicine.id, "name": medicine.name} for medicine in medicines]
+    
+    return JsonResponse({"medicines": medicine_data})
+
+def medicine_list_api(request):
+    medicine_type = request.GET.get('type')
+    medicines = Medicine.objects.all()
+    
+    if medicine_type:
+        medicines = medicines.filter(medicine_type=medicine_type)
+    
+    data = [{'id': m.id, 'name': m.name} for m in medicines]
+    return JsonResponse(data, safe=False)
+
+def medicine_detail_api(request, pk):
+    try:
+        medicine = Medicine.objects.get(pk=pk)
+        data = {
+            'id': medicine.id,
+            'name': medicine.name,
+            'medicine_type': medicine.medicine_type
+        }
+        return JsonResponse(data)
+    except Medicine.DoesNotExist:
+        return JsonResponse({'error': 'Medicine not found'}, status=404)
+    
+
+    
 def delete_medicine(request, pk):
     medicine = get_object_or_404(Medicine, pk=pk)
     medicine.delete()
