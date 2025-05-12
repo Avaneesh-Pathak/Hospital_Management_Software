@@ -22110,3 +22110,12 @@ INFO 2025-04-16 22:06:53,956 basehttp "GET /nicu/medication/add/16/ HTTP/1.1" 20
 INFO 2025-04-16 22:06:54,380 basehttp "GET /nicu/medication/add/16/ HTTP/1.1" 200 55095
 INFO 2025-04-16 22:06:54,823 basehttp "GET /nicu/medication/add/16/ HTTP/1.1" 200 55095
 INFO 2025-04-16 22:06:55,116 basehttp "GET /nicu/medication/add/16/ HTTP/1.1" 200 55095
+INFO 2025-05-12 13:24:14,969 autoreload Watching for file changes with StatReloader
+INFO 2025-05-12 13:24:18,659 basehttp "GET / HTTP/1.1" 302 0
+INFO 2025-05-12 13:24:18,710 basehttp "GET /login/?next=/ HTTP/1.1" 200 1389
+WARNING 2025-05-12 13:24:18,956 basehttp "GET /favicon.ico HTTP/1.1" 404 28959
+INFO 2025-05-12 13:24:27,895 basehttp "POST /login/?next=/ HTTP/1.1" 302 0
+INFO 2025-05-12 13:24:28,111 basehttp "GET / HTTP/1.1" 200 42911
+INFO 2025-05-12 13:25:09,952 basehttp "GET /ipd/ HTTP/1.1" 200 77806
+INFO 2025-05-12 13:25:10,292 basehttp "GET /get-ipd-data/ HTTP/1.1" 200 1199
+INFO 2025-05-12 13:25:14,253 basehttp "GET /nicu/medications/16/ HTTP/1.1" 200 39105
