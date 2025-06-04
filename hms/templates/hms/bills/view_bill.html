@@ -1,0 +1,453 @@
+{% extends 'hms/base.html' %}
+{% load humanize %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-10 col-xl-8">
+            <!-- Bill Header Card -->
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center border-bottom">
+                    <div>
+                        <h2 class="h4 mb-0 text-gray-800">
+                            <i class="fas fa-file-invoice text-primary mr-2"></i>
+                            Bill #{{ bill.bill_number }}
+                        </h2>
+                        <p class="mb-0 text-muted small mt-2">
+                            {% if bill.bill_type == 'OPD' %}
+                            <span class="badge bg-primary-soft text-primary rounded-pill px-3 py-1">Outpatient Bill</span>
+                            {% else %}
+                            <span class="badge bg-info-soft text-info rounded-pill px-3 py-1">Inpatient Bill</span>
+                            {% endif %}
+                            <span class="mx-2">|</span>
+                            <i class="far fa-calendar-alt mr-1"></i> {{ bill.generated_date|date:"d M Y, h:i A" }}
+                        </p>
+                    </div>
+                    <div>
+                        <a href="{% url 'view_bill_pdf' bill.bill_number %}" class="btn btn-sm btn-outline-danger">
+                            <i class="fas fa-file-pdf mr-2"></i>Download PDF
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="card-body">
+                    <div class="row">
+                        <!-- Patient Information -->
+                        <div class="col-md-6">
+                            <div class="d-flex mb-3">
+                                <div class="flex-shrink-0">
+                                    <div class="bg-light rounded-circle p-3 text-center" style="width: 50px; height: 50px;">
+                                        <i class="fas fa-user-circle text-primary fa-lg"></i>
+                                    </div>
+                                </div>
+                                <div class="flex-grow-1 ms-3">
+                                    <h6 class="text-uppercase text-muted small mb-1">Patient Information</h6>
+                                    <h5 class="mb-1 font-weight-bold">{{ bill.patient.user.full_name }}</h5>
+                                    <p class="small text-muted mb-0">
+                                        <i class="fas fa-id-card mr-1"></i> ID: {{ bill.patient.patient_code }}
+                                        {% if bill.patient.user.phone %}
+                                        <span class="mx-2">|</span>
+                                        <i class="fas fa-phone mr-1"></i> {{ bill.patient.user.phone }}
+                                        {% endif %}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Billing Information -->
+                        <div class="col-md-6">
+                            <div class="d-flex mb-3">
+                                <div class="flex-shrink-0">
+                                    <div class="bg-light rounded-circle p-3 text-center" style="width: 50px; height: 50px;">
+                                        <i class="fas fa-calendar-check text-primary fa-lg"></i>
+                                    </div>
+                                </div>
+                                <div class="flex-grow-1 ms-3">
+                                    <h6 class="text-uppercase text-muted small mb-1">Billing Information</h6>
+                                    <h5 class="mb-1 font-weight-bold">{{ bill.generated_date|date:"d M Y" }}</h5>
+                                    <p class="small text-muted mb-0">
+                                        <i class="far fa-clock mr-1"></i> {{ bill.generated_date|time }}
+                                        <span class="mx-2">|</span>
+                                        <i class="fas fa-history mr-1"></i> {{ bill.generated_date|timesince }} ago
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    {% if bill.notes %}
+                    <div class="alert alert-light mt-3 border-start border-primary border-3">
+                        <h6 class="text-uppercase text-muted small mb-2">
+                            <i class="fas fa-sticky-note mr-1"></i> Additional Notes
+                        </h6>
+                        <p class="mb-0">{{ bill.notes }}</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Bill Items Section -->
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="fas fa-list-ul text-primary mr-2"></i>
+                        Bill Items
+                    </h5>
+                    <span class="badge bg-light text-dark rounded-pill px-3 py-1">
+                        {{ bill.billingitem_set.count }} items
+                    </span>
+                </div>
+                
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="thead-light">
+                                <tr>
+                                    <th width="5%" class="ps-4">#</th>
+                                    <th>Description</th>
+                                    <th class="text-center">Qty</th>
+                                    <th class="text-end">Unit Price</th>
+                                    <th class="text-center">Discount</th>
+                                    <th class="text-center">Tax</th>
+                                    <th width="20%" class="text-end pe-4">Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in bill.billingitem_set.all %}
+                                <tr>
+                                    <td class="ps-4">{{ forloop.counter }}</td>
+                                    <td>{{ item.description }}</td>
+                                    <td class="text-center">{{ item.quantity }}</td>
+                                    <td class="text-end">₹{{ item.unit_price|intcomma }}</td>
+                                    <td class="text-center">{{ item.discount }}%</td>
+                                    <td class="text-center">{{ item.tax_rate }}%</td>
+                                    <td class="text-end pe-4">₹{{ item.amount|intcomma }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Charges Summary Section -->
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0">
+                        <i class="fas fa-file-invoice-dollar text-primary mr-2"></i>
+                        Charges Summary
+                        {% if bill.bill_type == 'IPD' %}
+                        <span class="badge bg-info-soft text-info rounded-pill ms-2">Inpatient</span>
+                        {% else %}
+                        <span class="badge bg-primary-soft text-primary rounded-pill ms-2">Outpatient</span>
+                        {% endif %}
+                    </h5>
+                </div>
+                
+                <div class="card-body p-0">
+                    {% if bill.bill_type == "OPD" %}
+                    <div class="table-responsive">
+                        <table class="table table-borderless mb-0">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th class="ps-4">#</th>
+                                    <th>Description</th>
+                                    <th class="text-center">Qty</th>
+                                    <th class="text-end">Unit Price</th>
+                                    <th class="text-center">Discount</th>
+                                    <th class="text-center">Tax</th>
+                                    <th class="text-end pe-4">Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% with counter=1 %}
+                                {% if bill.bill_type == "OPD" %}
+                                {% if bill.consultation_fee > 0 %}
+                                <tr>
+                                    <td class="ps-4">{{ counter }}</td>
+                                    <td>Consultation Fee</td>
+                                    <td class="text-center">1</td>
+                                    <td class="text-end">₹{{ bill.consultation_fee|intcomma }}</td>
+                                    <td class="text-center">0%</td>
+                                    <td class="text-center">0%</td>
+                                    <td class="text-end pe-4">₹{{ bill.consultation_fee|intcomma }}</td>
+                                </tr>
+                                {% with counter=counter|add:"1" %}{% endwith %}
+                                {% endif %}
+                                
+                                {% if bill.procedure_fee > 0 %}
+                                <tr>
+                                    <td class="ps-4">{{ counter }}</td>
+                                    <td>Procedure Fee</td>
+                                    <td class="text-center">1</td>
+                                    <td class="text-end">₹{{ bill.procedure_fee|intcomma }}</td>
+                                    <td class="text-center">0%</td>
+                                    <td class="text-center">0%</td>
+                                    <td class="text-end pe-4">₹{{ bill.procedure_fee|intcomma }}</td>
+                                </tr>
+                                {% with counter=counter|add:"1" %}{% endwith %}
+                                {% endif %}
+                                
+                                {% if bill.medication_fee > 0 %}
+                                <tr>
+                                    <td class="ps-4">{{ counter }}</td>
+                                    <td>Medication Fee</td>
+                                    <td class="text-center">1</td>
+                                    <td class="text-end">₹{{ bill.medication_fee|intcomma }}</td>
+                                    <td class="text-center">0%</td>
+                                    <td class="text-center">0%</td>
+                                    <td class="text-end pe-4">₹{{ bill.medication_fee|intcomma }}</td>
+                                </tr>
+                                {% with counter=counter|add:"1" %}{% endwith %}
+                                {% endif %}
+                                
+                                {% if bill.other_fee > 0 %}
+                                <tr>
+                                    <td class="ps-4">{{ counter }}</td>
+                                    <td>Other Fee</td>
+                                    <td class="text-center">1</td>
+                                    <td class="text-end">₹{{ bill.other_fee|intcomma }}</td>
+                                    <td class="text-center">0%</td>
+                                    <td class="text-center">0%</td>
+                                    <td class="text-end pe-4">₹{{ bill.other_fee|intcomma }}</td>
+                                </tr>
+                                {% with counter=counter|add:"1" %}{% endwith %}
+                                {% endif %}
+                                {% endif %}
+                                
+                                {% for item in bill.billingitem_set.all %}
+                                <tr>
+                                    <td class="ps-4">{{ forloop.counter|add:counter|add:"-1" }}</td>
+                                    <td>{{ item.description }}</td>
+                                    <td class="text-center">{{ item.quantity }}</td>
+                                    <td class="text-end">₹{{ item.unit_price|intcomma }}</td>
+                                    <td class="text-center">{{ item.discount }}%</td>
+                                    <td class="text-center">{{ item.tax_rate }}%</td>
+                                    <td class="text-end pe-4">₹{{ item.amount|intcomma }}</td>
+                                </tr>
+                                {% endfor %}
+                                {% endwith %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% endif %}
+                    
+                    {% if bill.bill_type == "IPD" %}
+                    <div class="table-responsive">
+                        <table class="table table-borderless mb-0">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th class="ps-4">#</th>
+                                    <th>Description</th>
+                                    <th class="text-center">Qty</th>
+                                    <th class="text-end">Unit Price</th>
+                                    <th class="text-center">Discount</th>
+                                    <th class="text-center">Tax</th>
+                                    <th class="text-end pe-4">Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% with counter=1 %}
+                                {% if bill.room_charges > 0 %}
+                                <tr>
+                                    <td class="ps-4">{{ counter }}</td>
+                                    <td>Room Charges</td>
+                                    <td class="text-center">1</td>
+                                    <td class="text-end">₹{{ bill.room_charges|intcomma }}</td>
+                                    <td class="text-center">0%</td>
+                                    <td class="text-center">0%</td>
+                                    <td class="text-end pe-4">₹{{ bill.room_charges|intcomma }}</td>
+                                </tr>
+                                {% with counter=counter|add:"1" %}{% endwith %}
+                                {% endif %}
+                                
+                                {% if bill.nursing_charges > 0 %}
+                                <tr>
+                                    <td class="ps-4">{{ counter }}</td>
+                                    <td>Nursing Charges</td>
+                                    <td class="text-center">1</td>
+                                    <td class="text-end">₹{{ bill.nursing_charges|intcomma }}</td>
+                                    <td class="text-center">0%</td>
+                                    <td class="text-center">0%</td>
+                                    <td class="text-end pe-4">₹{{ bill.nursing_charges|intcomma }}</td>
+                                </tr>
+                                {% with counter=counter|add:"1" %}{% endwith %}
+                                {% endif %}
+                                
+                                {% if bill.procedure_charges > 0 %}
+                                <tr>
+                                    <td class="ps-4">{{ counter }}</td>
+                                    <td>Procedure Charges</td>
+                                    <td class="text-center">1</td>
+                                    <td class="text-end">₹{{ bill.procedure_charges|intcomma }}</td>
+                                    <td class="text-center">0%</td>
+                                    <td class="text-center">0%</td>
+                                    <td class="text-end pe-4">₹{{ bill.procedure_charges|intcomma }}</td>
+                                </tr>
+                                {% with counter=counter|add:"1" %}{% endwith %}
+                                {% endif %}
+                                
+                                {% if bill.medication_charges > 0 %}
+                                <tr>
+                                    <td class="ps-4">{{ counter }}</td>
+                                    <td>Medication Charges</td>
+                                    <td class="text-center">1</td>
+                                    <td class="text-end">₹{{ bill.medication_charges|intcomma }}</td>
+                                    <td class="text-center">0%</td>
+                                    <td class="text-center">0%</td>
+                                    <td class="text-end pe-4">₹{{ bill.medication_charges|intcomma }}</td>
+                                </tr>
+                                {% with counter=counter|add:"1" %}{% endwith %}
+                                {% endif %}
+                                
+                                {% if bill.lab_charges > 0 %}
+                                <tr>
+                                    <td class="ps-4">{{ counter }}</td>
+                                    <td>Lab Charges</td>
+                                    <td class="text-center">1</td>
+                                    <td class="text-end">₹{{ bill.lab_charges|intcomma }}</td>
+                                    <td class="text-center">0%</td>
+                                    <td class="text-center">0%</td>
+                                    <td class="text-end pe-4">₹{{ bill.lab_charges|intcomma }}</td>
+                                </tr>
+                                {% with counter=counter|add:"1" %}{% endwith %}
+                                {% endif %}
+                                
+                                {% if bill.other_charges > 0 %}
+                                <tr>
+                                    <td class="ps-4">{{ counter }}</td>
+                                    <td>Other Charges</td>
+                                    <td class="text-center">1</td>
+                                    <td class="text-end">₹{{ bill.other_charges|intcomma }}</td>
+                                    <td class="text-center">0%</td>
+                                    <td class="text-center">0%</td>
+                                    <td class="text-end pe-4">₹{{ bill.other_charges|intcomma }}</td>
+                                </tr>
+                                {% with counter=counter|add:"1" %}{% endwith %}
+                                {% endif %}
+                                {% endwith %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Summary Totals -->
+                <div class="card-footer bg-light">
+                    <div class="row justify-content-end">
+                        <div class="col-md-6 col-lg-5">
+                            <div class="bg-white p-3 rounded border">
+                                <table class="table table-sm table-borderless mb-0">
+                                    <tbody>
+                                        <tr>
+                                            <td class="text-muted">Subtotal:</td>
+                                            <td class="text-end font-weight-bold">₹{{ bill.total_amount|intcomma }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-muted">Discount:</td>
+                                            <td class="text-end text-danger">- ₹{{ bill.discount_amount|intcomma }}</td>
+                                        </tr>
+                                        <tr class="border-top">
+                                            <td class="text-muted font-weight-bold">Total Amount:</td>
+                                            <td class="text-end font-weight-bold text-success h5">₹{{ bill.get_final_amount|intcomma }}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Payment Status -->
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0">
+                        <i class="fas fa-credit-card text-primary mr-2"></i>
+                        Payment Status
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="text-center py-3">
+                        <div class="d-inline-block px-4 py-3 rounded bg-light">
+                            <p class="mb-1 small text-muted">Current Status</p>
+                            <span class="badge {% if bill.status == 'paid' %}bg-success
+                                                 {% elif bill.status == 'partially_paid' %}bg-warning text-dark
+                                                 {% else %}bg-danger{% endif %} py-2 px-3 rounded-pill">
+                                {{ bill.get_status_display|upper }}
+                            </span>
+                            
+                            {% if bill.paid_amount > 0 %}
+                            <div class="mt-3">
+                                <div class="progress" style="height: 8px;">
+                                    <div class="progress-bar {% if bill.status == 'paid' %}bg-success{% else %}bg-primary{% endif %}" 
+                                         role="progressbar" 
+                                         style="width: {{ bill.paid_percentage }}%" 
+                                         aria-valuenow="{{ bill.paid_percentage }}" 
+                                         aria-valuemin="0" 
+                                         aria-valuemax="100">
+                                    </div>
+                                </div>
+                                <p class="mt-2 mb-0 small text-muted">
+                                    Paid: ₹{{ bill.paid_amount|intcomma }} of ₹{{ bill.get_final_amount|intcomma }}
+                                    ({{ bill.paid_percentage }}%)
+                                </p>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Action Buttons -->
+            <div class="d-flex justify-content-between mt-4">
+                <a href="{% url 'add_billing_item' bill.bill_number %}" class="btn btn-outline-primary px-4">
+                    <i class="fas fa-plus-circle mr-2"></i>Add Item
+                </a>
+                <div>
+                    <a href="{% url 'record_payment' bill.bill_number %}" class="btn btn-success px-4">
+                        <i class="fas fa-credit-card mr-2"></i>Record Payment
+                    </a>
+                    <button onclick="window.print()" class="btn btn-primary px-4 ml-2">
+                        <i class="fas fa-print mr-2"></i>Print Bill
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.bg-primary-soft {
+    background-color: rgba(13, 110, 253, 0.1);
+}
+.bg-info-soft {
+    background-color: rgba(13, 202, 240, 0.1);
+}
+.card {
+    border-radius: 0.5rem;
+    border: none;
+}
+.card-header {
+    border-bottom: 1px solid rgba(0,0,0,.05);
+}
+.table thead th {
+    border-top: none;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.5px;
+    color: #6c757d;
+}
+.table tbody td {
+    vertical-align: middle;
+}
+.progress {
+    border-radius: 4px;
+}
+.alert-light {
+    background-color: #f8f9fa;
+}
+</style>
+
+{% endblock %}

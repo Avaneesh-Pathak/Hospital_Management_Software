@@ -9,10 +9,10 @@ from django.db.models import Sum, Count
 from django.db.models.functions import TruncDate
 from .models import (
     Patient, Asset, License, Maintenance, Doctor, Appointment, 
-    AccountingRecord, EmergencyCase, IPD, OPD, Billing, CustomUser, 
+    AccountingRecord, EmergencyCase, IPD, OPD, BillingBase, CustomUser, 
     Room, Expense, Employee, PatientReport, Daybook, Balance, NICUVitals, 
-    NICUMedicationRecord, Medicine, Diluent, Vial, FluidRequirement,MedicineVial
-)
+    NICUMedicationRecord, Medicine, Diluent, Vial, FluidRequirement,MedicineVial,IPDBilling
+,OPDBilling,Payment)
 
 class CustomAdminSite(admin.AdminSite):
     site_header = "Hospital Management Dashboard"
@@ -31,7 +31,7 @@ class CustomAdminSite(admin.AdminSite):
         total_patients = Patient.objects.count()
         total_doctors = Doctor.objects.count()
         total_appointments = Appointment.objects.count()
-        total_revenue = Billing.objects.aggregate(total=Sum('total_amount'))['total'] or 0
+        total_revenue = BillingBase.objects.aggregate(total=Sum('total_amount'))['total'] or 0
         today = datetime.today()
         warning_period = today + timedelta(days=30)
         emergency_cases_today = EmergencyCase.objects.filter(admitted_on__date=today).count()
@@ -104,7 +104,11 @@ admin_site.register(Appointment)
 admin_site.register(EmergencyCase)
 admin_site.register(IPD)
 admin_site.register(OPD)
-admin_site.register(Billing)
+# admin_site.register(BillingBase)
+admin_site.register(Payment)
+admin_site.register(OPDBilling)
+# admin_site.register(Payment)
+admin_site.register(IPDBilling)
 admin_site.register(Room)
 admin_site.register(Asset)
 admin_site.register(License)

@@ -1,50 +1,69 @@
 {% extends 'hms/base.html' %}
 {% block content %}
+
 {% if messages %}
-        {% for message in messages %}
-            <p style="color: red;">{{ message }}</p>
-        {% endfor %}
-    {% endif %}
-<h2 class="text-2xl font-bold">Billing Details</h2>
-<a href="{% url 'add_expense' %}" class="mt-4 inline-block px-4 py-2 bg-green-600 text-white rounded">
+    {% for message in messages %}
+        <p class="text-red-500">{{ message }}</p>
+    {% endfor %}
+{% endif %}
+
+<h2 class="text-2xl font-bold mb-4">Billing Details</h2>
+
+<a href="{% url 'add_expense' %}" class="mb-4 inline-block px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">
     Add New Expense
 </a>
-<br>
-<table class="w-full bg-white shadow-md rounded-lg">
-    <tr class="bg-blue-500 text-white">
-        <th class="p-2">Patient Code</th>
-        <th class="p-2">Total Amount</th>
-        <th class="p-2">Paid Amount</th>
-        <th class="p-2">Pending Amount</th>
-        <th class="p-2">Actions</th>
-        <th class="p-2">Genrate Bills</th>
-    </tr>
-    {% for bill in bills %}
-    <tr class="border-b text-center">
-        <td class="p-2">{{ bill.patient.patient_code }}</td>
-        <td class="p-2">₹{{ bill.total_amount }}</td>
-        <td class="p-2">₹{{ bill.paid_amount }}</td>
-        <td class="p-2">₹{{ bill.pending_amount }}</td>  {# No need for add filter #}
-        <td class="p-2">
-            <a href="{% url 'pay_bill' bill.id %}" class="px-3 py-2 bg-green-600 text-white rounded">Pay Bill</a>
-        </td>
-        <td>
-            <a href="{% url 'generate_bill' bill.patient.patient_code %}" 
-               class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700">
-                Generate Bill
-            </a>
-        </td>
-        
-    </tr>
-    {% empty %}
-    <tr>
-        <td colspan="5" class="p-4 text-center">No bills available</td>
-    </tr>
-    {% endfor %}
+
+<table class="w-full bg-white shadow-md rounded-lg overflow-hidden">
+    <thead class="bg-blue-600 text-white">
+        <tr>
+            <th class="p-3">Patient Code</th>
+            <th class="p-3">Total Amount</th>
+            <th class="p-3">Paid Amount</th>
+            <th class="p-3">Pending Amount</th>
+            <th class="p-3">Status</th>
+            <th class="p-3">Actions</th>
+            <th class="p-3">Generate Bill</th>
+            <th class="p-3">Download PDF</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for bill in bills %}
+        <tr class="border-b text-center">
+            <td class="p-3">{{ bill.patient.patient_code }}</td>
+            <td class="p-3">₹{{ bill.total_amount }}</td>
+            <td class="p-3">₹{{ bill.paid_amount }}</td>
+            <td class="p-3">₹{{ bill.pending_amount }}</td>
+            <td class="p-3">
+                {% if bill.status == 'paid' %}
+                    <span class="text-green-600 font-semibold">PAID</span>
+                {% else %}
+                    <span class="text-red-600 font-semibold">PENDING</span>
+                {% endif %}
+            </td>
+            <td class="p-3">
+                <a href="{% url 'pay_bill' bill.id %}" class="px-3 py-2 bg-green-600 text-white rounded hover:bg-green-700">
+                    Pay Bill
+                </a>
+            </td>
+            <td class="p-3">
+                <a href="{% url 'generate_bill' bill.patient.patient_code %}" 
+                   class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700">
+                    Generate
+                </a>
+            </td>
+            <td class="p-3">
+                <a href="{% url 'download_bill_pdf' bill.patient.patient_code %}" 
+                   class="px-4 py-2 bg-gray-700 text-white rounded hover:bg-gray-900">
+                    PDF
+                </a>
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="8" class="p-4 text-center">No bills available</td>
+        </tr>
+        {% endfor %}
+    </tbody>
 </table>
-
-
-
-
 
 {% endblock %}

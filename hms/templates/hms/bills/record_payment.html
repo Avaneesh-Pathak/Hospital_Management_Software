@@ -1,0 +1,139 @@
+{% extends 'hms/base.html' %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row mb-4">
+        <div class="col">
+            <h2 class="text-primary"><i class="fas fa-money-bill-wave me-2"></i>Record Payment</h2>
+            <p class="text-muted">For Bill #{{ bill.bill_number }}</p>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card border-primary">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-file-invoice me-2"></i>Bill Summary</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong><i class="fas fa-user me-2"></i>Patient:</strong></p>
+                            <p><strong><i class="fas fa-indian-rupee-sign me-2"></i>Total Amount:</strong></p>
+                            <p><strong><i class="fas fa-check-circle me-2"></i>Paid Amount:</strong></p>
+                        </div>
+                        <div class="col-md-6">
+                            <p>{{ bill.patient.user.full_name }}</p>
+                            <p>₹{{ bill.total_amount }}</p>
+                            <p>₹{{ bill.paid_amount }}</p>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="alert alert-info">
+                        <h5 class="alert-heading"><i class="fas fa-exclamation-circle me-2"></i>Balance Due</h5>
+                        <h4 class="mb-0">₹{{ bill.balance_amount }}</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card border-success">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="fas fa-credit-card me-2"></i>Payment Details</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" class="needs-validation" novalidate>
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label for="id_amount" class="form-label">Amount (₹)</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-rupee-sign"></i></span>
+                                {{ form.amount }}
+                            </div>
+                            <small class="form-text text-muted">Maximum: ₹{{ bill.balance_amount }}</small>
+                            <div class="invalid-feedback">
+                                Please enter a valid amount.
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="id_payment_method" class="form-label">Payment Method</label>
+                            {{ form.payment_method }}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="id_transaction_id" class="form-label">Transaction ID</label>
+                            {{ form.transaction_id }}
+                            <small class="form-text text-muted">Leave blank for cash payments</small>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="id_notes" class="form-label">Notes</label>
+                            {{ form.notes }}
+                        </div>
+                        
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="{% url 'view_bill' bill.bill_number %}" class="btn btn-outline-secondary me-md-2">
+                                <i class="fas fa-times me-1"></i> Cancel
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-1"></i> Record Payment
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Client-side validation
+    const forms = document.querySelectorAll('.needs-validation');
+    Array.prototype.slice.call(forms).forEach(function(form) {
+        form.addEventListener('submit', function(event) {
+            if (!form.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            form.classList.add('was-validated');
+        }, false);
+    });
+
+    // Amount field validation
+    const amountField = document.getElementById('id_amount');
+    const maxAmount = {{ bill.balance_amount }};
+    
+    amountField.setAttribute('max', maxAmount);
+    amountField.classList.add('form-control');
+    
+    amountField.addEventListener('input', function() {
+        if (parseFloat(this.value) > maxAmount) {
+            this.value = maxAmount;
+        }
+    });
+
+    // Add Bootstrap classes to other form fields
+    document.getElementById('id_payment_method').classList.add('form-select');
+    document.getElementById('id_transaction_id').classList.add('form-control');
+    document.getElementById('id_notes').classList.add('form-control');
+});
+</script>
+
+<style>
+    .card {
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        transition: all 0.3s ease;
+    }
+    .card:hover {
+        box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+    }
+    .form-control:focus, .form-select:focus {
+        border-color: #86b7fe;
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+    }
+</style>
+{% endblock %}

@@ -11,6 +11,7 @@ from itertools import groupby
 from django.views import View
 from django.db.models import Q
 from operator import attrgetter
+from django.http import Http404
 from django.utils import timezone
 from collections import defaultdict
 from reportlab.pdfgen import canvas
@@ -43,11 +44,11 @@ from django.views.generic import ListView, CreateView, UpdateView,DeleteView
 
 # Import Models and Forms
 from .models import (
-    CustomUser, Patient, Doctor, Appointment, Billing, EmergencyCase, OPD, IPD, Expense, Employee, Room, PatientReport, Prescription,
+    CustomUser, Patient, Doctor, Appointment,BillingBase, OPDBilling, IPDBilling, BillingItem, Payment, Expense, EmergencyCase, OPD, IPD, Expense, Employee, Room, PatientReport, Prescription,
     License, Asset, Maintenance, AccountingRecord, Daybook, Balance, PatientTransfer, NICUVitals, NICUMedicationRecord, Medicine, Diluent,Vial,FluidRequirement,MedicineVial
 )
 from .forms import (
-    PatientRegistrationForm, ExpenseForm, BillingForm, OPDForm, DoctorForm, EmployeeForm, RoomForm, EmergencyCaseForm, ProfileUpdateForm, PatientReportForm,
+    PatientRegistrationForm, ExpenseForm, OPDBillingForm, IPDBillingForm, BillingItemForm, PaymentForm, ExpenseForm, OPDForm, DoctorForm, EmployeeForm, RoomForm, EmergencyCaseForm, ProfileUpdateForm, PatientReportForm,
     PrescriptionForm, LicenseForm, AssetForm, MaintenanceForm, BalanceUpdateForm, DaybookEntryForm, NICUVitalsForm, NICUMedicationRecordForm, MedicineForm, DiluentForm,VialForm,NICUFluidForm,IPDForm,MedicineVialFormSet
 )
 
@@ -171,7 +172,7 @@ def dashboard(request):
     total_patients = Patient.objects.count()
     total_doctors = Doctor.objects.count()
     total_appointments = Appointment.objects.count()
-    total_revenue = Billing.objects.aggregate(total=Sum('total_amount'))['total'] or 0
+    total_revenue = OPDBilling.objects.aggregate(total=Sum('total_amount'))['total'] or 0
     today = datetime.today()
     warning_period = today + timedelta(days=30)
     emergency_cases_today = EmergencyCase.objects.filter(admitted_on__date=today).count()
@@ -354,6 +355,7 @@ def register_patient(request):
                     date_of_birth=form.cleaned_data['date_of_birth'],
                     aadhar_number=form.cleaned_data['aadhar_number'],
                     blood_group=form.cleaned_data['blood_group'],
+                    weight=form.cleaned_data.get('weight'),  # ✅ Add this line
                     allergies=form.cleaned_data.get('allergies', ''),
                     medical_history=form.cleaned_data.get('medical_history', ''),
                     current_medications=form.cleaned_data.get('current_medications', ''),
@@ -522,156 +524,568 @@ def update_appointment_status(request):
 
     return redirect("appointments")
 
-# Billing Views
-@login_required
-def billing(request):
-    bills = Billing.objects.all()
+# @login_required
+# def billing(request):
+#     bills = Billing.objects.select_related('patient').all()
+#     return render(request, 'hms/bills/billing.html', {'bills': bills})
 
-    # Add pending_amount calculation for each bill
-    for bill in bills:
-        bill.pending_amount = bill.total_amount - bill.paid_amount
-    return render(request, 'hms/bills/billing.html', {'bills': bills})
 
-@login_required
-def generate_bill(request, patient_code):
-    patient = get_object_or_404(Patient, patient_code=patient_code)
+# @login_required
+# def generate_bill(request, patient_code):
+#     patient = get_object_or_404(Patient, patient_code=patient_code)
+#     billing, _ = Billing.objects.get_or_create(patient=patient)
+#     billing.update_total()
+#     return redirect('billing_detail', billing_id=billing.id)
 
-    # Fetch expenses and total amount
-    expenses = Expense.objects.filter(patient=patient)
-    total_amount = sum(expense.cost for expense in expenses)
 
-    # Create or update the bill
-    bill, created = Billing.objects.get_or_create(patient=patient)
-    bill.total_amount = total_amount
-    bill.status = "paid" if bill.paid_amount >= total_amount else "pending"
-    bill.save()
+# @login_required
+# def generate_bill_pdf(request, patient_code):
+#     patient = get_object_or_404(Patient, patient_code=patient_code)
+#     bill = get_object_or_404(Billing, patient=patient)
+#     expenses = Expense.objects.filter(patient=patient)
 
-    # Calculate pending amount
-    pending_amount = bill.total_amount - bill.paid_amount
+#     response = HttpResponse(content_type='application/pdf')
+#     response['Content-Disposition'] = f'attachment; filename="bill_{patient_code}.pdf"'
 
-    return render(request, 'hms/bills/generate_bill.html', {
-        'patient': patient,
-        'expenses': expenses,
-        'bill': bill,
-        'pending_amount': pending_amount
-    })
+#     p = canvas.Canvas(response)
+#     p.setFont("Helvetica-Bold", 16)
+#     p.drawString(200, 800, "Hospital Bill Receipt")
 
-@login_required
-def generate_bill_pdf(request, patient_code):
-    # Get the patient
-    patient = get_object_or_404(Patient, patient_code=patient_code)
+#     # Patient Info
+#     p.setFont("Helvetica", 12)
+#     p.drawString(50, 770, f"Patient Name: {patient.user.full_name or 'N/A'}")
+#     p.drawString(50, 750, f"Patient Code: {patient.patient_code or 'N/A'}")
+#     p.drawString(50, 730, f"Phone Number: {patient.contact_number or 'N/A'}")
+#     p.drawString(50, 710, f"Address: {patient.address or 'N/A'}")
+#     p.drawString(50, 690, f"Blood Group: {patient.blood_group or 'N/A'}")
 
-    # Get the related billing information
-    bill = get_object_or_404(Billing, patient=patient)
+#     # Expense Table Header
+#     y = 650
+#     p.setFont("Helvetica-Bold", 12)
+#     p.drawString(50, y, "Service/Item")
+#     p.drawString(300, y, "Cost (₹)")
+#     y -= 20
 
-    # Get the patient's expenses
-    expenses = Expense.objects.filter(patient=patient)
+#     p.setFont("Helvetica", 12)
+#     for expense in expenses:
+#         p.drawString(50, y, str(expense.category or "N/A"))
+#         p.drawString(300, y, f"₹{(expense.cost or 0):.2f}")
+#         y -= 20
 
-    # Create the response with PDF content
+#     # Summary
+#     y -= 30
+#     p.setFont("Helvetica-Bold", 12)
+#     total = bill.total_amount or 0
+#     paid = bill.paid_amount or 0
+#     pending = total - paid
+
+#     p.drawString(50, y, "Total Amount:")
+#     p.drawString(300, y, f"₹{total:.2f}")
+#     y -= 20
+
+#     p.drawString(50, y, "Paid Amount:")
+#     p.drawString(300, y, f"₹{paid:.2f}")
+#     y -= 20
+
+#     p.drawString(50, y, "Pending Amount:")
+#     p.drawString(300, y, f"₹{pending:.2f}")
+
+#     # Status
+#     y -= 30
+#     p.setFont("Helvetica-Bold", 14)
+#     p.setFillColorRGB(0, 1, 0) if bill.status == "paid" else p.setFillColorRGB(1, 0, 0)
+#     p.drawString(50, y, f"Status: {bill.status.upper()}")
+
+#     p.showPage()
+#     p.save()
+
+#     return response
+
+
+# @login_required
+# def add_expense(request):
+#     if request.method == "POST":
+#         form = ExpenseForm(request.POST)
+#         if form.is_valid():
+#             expense = form.save()
+
+#             billing, _ = Billing.objects.get_or_create(patient=expense.patient)
+#             total = Expense.objects.filter(patient=expense.patient).aggregate(models.Sum('cost'))['cost__sum'] or 0
+#             billing.total_cost = total
+#             billing.save()
+
+#             messages.success(request, "Expense added successfully!")
+#             return redirect('billing')
+#     else:
+#         form = ExpenseForm()
+
+#     return render(request, 'hms/expense/add_expense.html', {'form': form})
+
+
+
+# @login_required
+# def pay_bill(request, billing_id):
+#     billing = get_object_or_404(Billing, id=billing_id)
+#     pending_amount = (billing.total_amount or 0) - (billing.paid_amount or 0)
+
+#     if request.method == "POST":
+#         try:
+#             paid_amount = Decimal(request.POST.get('paid_amount', '0'))
+#         except:
+#             messages.error(request, "Invalid amount.")
+#             return redirect('billing')
+
+#         if paid_amount <= 0:
+#             messages.error(request, "Amount must be greater than zero.")
+#         else:
+#             billing.paid_amount = (billing.paid_amount or 0) + paid_amount
+
+#             if billing.paid_amount >= (billing.total_amount or 0):
+#                 billing.paid_amount = billing.total_amount
+#                 billing.status = 'paid'
+#             else:
+#                 billing.status = 'pending'
+
+#             billing.save()
+#             messages.success(request, f"₹{paid_amount:.2f} added to the bill!")
+#             return redirect('billing')
+
+#     return render(request, 'hms/bills/pay_bill.html', {
+#         'billing': billing,
+#         'pending_amount': f"{pending_amount:.2f}"
+#     })
+
+def generate_ipd_bill(request, ipd_id):
+    ipd_admission = get_object_or_404(IPD, id=ipd_id)
+    
+    # Create or get existing billing
+    bill, created = IPDBilling.objects.get_or_create(
+        ipd_admission=ipd_admission,
+        defaults={
+            'patient': ipd_admission.patient,
+            'due_date': timezone.now() + timezone.timedelta(days=7)
+        }
+    )
+    
+    # Add standard items if new bill
+    if created:
+        # Room charges
+        BillingItem.objects.create(
+            billing_type='ipd',
+            ipd_billing=bill,
+            description=f"Room Charges ({ipd_admission.room.room_type}) - Bed #{ipd_admission.bed_number}",
+            quantity=max(1, (timezone.now() - ipd_admission.admitted_on).days),
+            unit_price=ipd_admission.room.bed_price_per_day,
+        )
+        
+        # Nursing charges (example)
+        BillingItem.objects.create(
+            billing_type='ipd',
+            ipd_billing=bill,
+            description="Nursing Charges",
+            quantity=max(1, (timezone.now() - ipd_admission.admitted_on).days),
+            unit_price=Decimal('500.00'),  # Daily nursing charge
+        )
+    
+    return render(request, 'hms/bills/ipd_bill.html', {'bill': bill})
+
+def generate_opd_bill(request, opd_id):
+    opd_visit = get_object_or_404(OPD, id=opd_id)
+    
+    bill, created = OPDBilling.objects.get_or_create(
+        opd_visit=opd_visit,
+        defaults={
+            'patient': opd_visit.patient,
+            'due_date': timezone.now() + timezone.timedelta(days=7)
+        }
+    )
+    
+    if created:
+        # Consultation fee
+        BillingItem.objects.create(
+            billing_type='opd',
+            opd_billing=bill,
+            description=f"Consultation with Dr. {opd_visit.doctor.user.full_name}",
+            quantity=1,
+            unit_price=opd_visit.doctor.consultation_fee,
+        )
+    
+    return render(request, 'hms/bills/opd_bill.html', {'bill': bill})
+
+def view_bill_pdf(request, bill_number):
+    # Try to find bill in both OPD and IPD tables
+    bill = None
+    try:
+        bill = OPDBilling.objects.get(bill_number=bill_number)
+    except OPDBilling.DoesNotExist:
+        try:
+            bill = IPDBilling.objects.get(bill_number=bill_number)
+        except IPDBilling.DoesNotExist:
+            raise Http404("Bill not found")
+    
+    template_path = 'hms/bills/bill_pdf.html'
+    context = {'bill': bill}
+    
     response = HttpResponse(content_type='application/pdf')
-    response['Content-Disposition'] = f'attachment; filename="bill_{patient_code}.pdf"'
-
-    # Create the PDF object using ReportLab
-    p = canvas.Canvas(response)
-
-    # PDF Title
-    p.setFont("Helvetica-Bold", 16)
-    p.drawString(200, 800, "Hospital Bill Receipt")
-
-    # Patient Details (Handling None values)
-    p.setFont("Helvetica", 12)
-    p.drawString(50, 770, f"Patient Name: {patient.user.full_name or 'N/A'}")
-    p.drawString(50, 750, f"Patient Code: {patient.patient_code or 'N/A'}")
-    p.drawString(50, 730, f"Phone Number: {patient.contact_number or 'N/A'}")
-    p.drawString(50, 710, f"Address: {patient.address or 'N/A'}")
-    p.drawString(50, 690, f"Blood Group: {patient.blood_group or 'N/A'}")
-
-    # Table Header
-    y_position = 650
-    p.setFont("Helvetica-Bold", 12)
-    p.drawString(50, y_position, "Service/Item")
-    p.drawString(300, y_position, "Cost (₹)")
-
-    # Table Data (Handling None values)
-    p.setFont("Helvetica", 12)
-    y_position -= 20
-    for expense in expenses:
-        p.drawString(50, y_position, str(expense.category) if expense.category else "N/A")
-        p.drawString(300, y_position, f"₹{expense.cost:.2f}" if expense.cost else "₹0.00")
-        y_position -= 20  # Move to the next line
-
-    # Payment Summary
-    y_position -= 30
-    p.setFont("Helvetica-Bold", 12)
-    p.drawString(50, y_position, "Total Amount:")
-    p.drawString(300, y_position, f"₹{bill.total_amount:.2f}" if bill.total_amount else "₹0.00")
-
-    y_position -= 20
-    p.drawString(50, y_position, "Paid Amount:")
-    p.drawString(300, y_position, f"₹{bill.paid_amount:.2f}" if bill.paid_amount else "₹0.00")
-
-    y_position -= 20
-    pending_amount = bill.total_amount - bill.paid_amount if bill.total_amount and bill.paid_amount else 0.00
-    p.drawString(50, y_position, "Pending Amount:")
-    p.drawString(300, y_position, f"₹{pending_amount:.2f}")
-
-    # Status
-    y_position -= 30
-    p.setFont("Helvetica-Bold", 14)
-    p.setFillColorRGB(0, 1, 0) if bill.status == "paid" else p.setFillColorRGB(1, 0, 0)
-    p.drawString(50, y_position, f"Status: {bill.status.upper()}")
-
-    # Save the PDF
-    p.showPage()
-    p.save()
+    response['Content-Disposition'] = f'attachment; filename="{bill.bill_number}.pdf"'
+    
+    template = get_template(template_path)
+    html = template.render(context)
+    
+    # Create PDF
+    pisa_status = pisa.CreatePDF(html, dest=response)
+    if pisa_status.err:
+        return HttpResponse('Error generating PDF')
     
     return response
 
-@login_required
+def record_payment(request, bill_number):
+    bill = None
+    try:
+        bill = OPDBilling.objects.get(bill_number=bill_number)
+    except OPDBilling.DoesNotExist:
+        try:
+            bill = IPDBilling.objects.get(bill_number=bill_number)
+        except IPDBilling.DoesNotExist:
+            raise Http404("Bill not found")
+    
+    if request.method == 'POST':
+        form = PaymentForm(request.POST)
+        if form.is_valid():
+            payment = form.save(commit=False)
+            payment.billing = bill
+            payment.received_by = request.user
+            payment.save()
+            
+            messages.success(request, f"Payment of ₹{payment.amount} recorded successfully")
+            return redirect('view_bill', bill_number=bill.bill_number)
+    else:
+        form = PaymentForm()
+    
+    return render(request, 'hms/bills/record_payment.html', {
+        'bill': bill,
+        'form': form,
+        'balance': bill.balance_amount
+    })
+
+
+def bill_list(request):
+    opd_bills = list(OPDBilling.objects.select_related('patient__user'))
+    ipd_bills = list(IPDBilling.objects.select_related('patient__user'))
+
+    
+
+    # Merge and sort
+    bills = opd_bills + ipd_bills
+    bills.sort(key=lambda b: b.generated_date, reverse=True)
+
+    # Paginate
+    paginator = Paginator(bills, 10)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    return render(request, 'hms/bills/billing_list.html', {
+        'page_obj': page_obj,
+        'bills': page_obj.object_list,
+    })
+
+def create_opd_bill(request):
+    if request.method == 'POST':
+        form = OPDBillingForm(request.POST)
+        if form.is_valid():
+            bill = form.save(commit=False)
+            bill.patient = bill.opd_visit.patient
+            bill.save()
+            messages.success(request, 'OPD bill created successfully!')
+            return redirect('view_bill', bill_number=bill.bill_number)
+    else:
+        form = OPDBillingForm()
+    
+    return render(request, 'hms/bills/create_opd_bill.html', {'form': form})
+
+def create_ipd_bill(request):
+    if request.method == 'POST':
+        form = IPDBillingForm(request.POST)
+        if form.is_valid():
+            bill = form.save(commit=False)
+            # Get patient from the selected IPD admission
+            bill.patient = bill.ipd_admission.patient  
+            bill.save()
+            messages.success(request, 'IPD bill created successfully!')
+            return redirect('view_bill', bill_number=bill.bill_number)
+    else:
+        form = IPDBillingForm()
+
+    return render(request, 'hms/bills/create_ipd_bill.html', {'form': form})
+
+# def view_bill(request, bill_number=None, patient_id=None):
+def view_bill(request, bill_number=None, patient_id=None):
+    if bill_number:
+        # Show a single OPD or IPD bill
+        bill = None
+        bill_type = None
+        opd_bill = None
+        ipd_bill = None
+
+        try:
+            bill = OPDBilling.objects.select_related('patient__user').get(bill_number=bill_number)
+            opd_bill = bill
+            bill_type = 'OPD'
+        except OPDBilling.DoesNotExist:
+            try:
+                bill = IPDBilling.objects.select_related('patient__user').get(bill_number=bill_number)
+                ipd_bill = bill
+                bill_type = 'IPD'
+            except IPDBilling.DoesNotExist:
+                raise Http404("Bill not found")
+
+        return render(request, 'hms/bills/view_bill.html', {
+            'bill': bill,
+            'opd_bill': opd_bill,
+            'ipd_bill': ipd_bill,
+            'bill_type': bill_type
+        })
+
+    elif patient_id:
+        # Show all bills for a patient
+        patient = get_object_or_404(Patient, id=patient_id)
+        opd_bills = OPDBilling.objects.filter(patient=patient)
+        ipd_bills = IPDBilling.objects.filter(patient=patient)
+
+        return render(request, 'hms/bills/view_bill.html', {
+            'patient': patient,
+            'opd_bills': opd_bills,
+            'ipd_bills': ipd_bills,
+        })
+
+    else:
+        raise Http404("Invalid request")
+
+# def patient_billing_summary(request, patient_id):
+#     patient = get_object_or_404(Patient, id=patient_id)
+#     opd_bills = OPDBilling.objects.filter(patient=patient)
+#     ipd_bills = IPDBilling.objects.filter(patient=patient)
+
+#     return render(request, 'hms/bills/view_bill.html', {
+#         'patient': patient,
+#         'opd_bills': opd_bills,
+#         'ipd_bills': ipd_bills,
+#     })
+
+
+from django.http import HttpResponse, Http404
+from django.template.loader import get_template
+from xhtml2pdf import pisa
+from .models import OPDBilling, IPDBilling
+
+def view_bill_pdf(request, bill_number):
+    # Try to find the bill in both OPD and IPD tables
+    bill = None
+    bill_type = None
+
+    try:
+        bill = OPDBilling.objects.get(bill_number=bill_number)
+        bill_type = 'OPD'
+    except OPDBilling.DoesNotExist:
+        try:
+            bill = IPDBilling.objects.get(bill_number=bill_number)
+            bill_type = 'IPD'
+        except IPDBilling.DoesNotExist:
+            raise Http404("Bill not found")
+    
+    # Set item_offset based on static items in the template
+    item_offset = 4 if bill_type == 'OPD' else 6
+
+    # Additional context for rendering
+    context = {
+        'bill': bill,
+        'bill_type': bill_type,
+        'item_offset': item_offset,
+        'hospital_name': 'Nelson Hospital',
+        'hospital_address': '123 Nelson Street, Health City',
+        'hospital_phone': '+91-9876543210',
+        'hospital_email': 'contact@nelsonhospital.com',
+        'billing_contact': 'billing@nelsonhospital.com',
+    }
+
+    # Render HTML template
+    template_path = 'hms/bills/bill_pdf.html'
+    template = get_template(template_path)
+    html = template.render(context)
+
+    # Generate PDF
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="{bill.bill_number}.pdf"'
+
+    pisa_status = pisa.CreatePDF(html, dest=response)
+
+    if pisa_status.err:
+        return HttpResponse('Error generating PDF')
+
+    return response
+
+
+def add_billing_item(request, bill_number):
+    bill = None
+    billing_type = None
+    
+    try:
+        bill = OPDBilling.objects.get(bill_number=bill_number)
+        billing_type = 'opd'
+    except OPDBilling.DoesNotExist:
+        try:
+            bill = IPDBilling.objects.get(bill_number=bill_number)
+            billing_type = 'ipd'
+        except IPDBilling.DoesNotExist:
+            raise Http404("Bill not found")
+    
+    if request.method == 'POST':
+        form = BillingItemForm(request.POST)
+        if form.is_valid():
+            item = form.save(commit=False)
+            # Assign foreign key and billing_type based on parent bill
+            if billing_type == 'opd':
+                item.opd_billing = bill
+            else:
+                item.ipd_billing = bill
+            
+            # billing_type set automatically in BillingItem.save()
+            item.save()
+            
+            messages.success(request, 'Billing item added successfully!')
+            return redirect('view_bill', bill_number=bill.bill_number)
+    else:
+        form = BillingItemForm()
+    
+    return render(request, 'hms/bills/add_billing_item.html', {
+        'form': form,
+        'bill': bill,
+        'billing_type': billing_type,
+    })
+
+def record_payment(request, bill_number):
+    # Find bill
+    try:
+        bill = OPDBilling.objects.get(bill_number=bill_number)
+    except OPDBilling.DoesNotExist:
+        try:
+            bill = IPDBilling.objects.get(bill_number=bill_number)
+        except IPDBilling.DoesNotExist:
+            raise Http404("Bill not found")
+
+    if request.method == 'POST':
+        form = PaymentForm(request.POST, max_amount=bill.balance_amount)
+        if form.is_valid():
+            payment = form.save(commit=False)
+            payment.billing = bill
+            payment.received_by = request.user
+            payment.save()
+
+            messages.success(request, f"Payment of ₹{payment.amount} recorded successfully!")
+            return redirect('view_bill', bill_number=bill.bill_number)
+        else:
+            # For debugging, you can print errors here or pass them to template
+            print(form.errors)
+    else:
+        form = PaymentForm(max_amount=bill.balance_amount)
+
+    return render(request, 'hms/bills/record_payment.html', {
+        'bill': bill,
+        'form': form
+    })
+
+def expense_list(request):
+    expenses = Expense.objects.all().order_by('-created_at')
+    return render(request, 'hms/bills/expense_list.html', {'expenses': expenses})
+
 def add_expense(request):
-    if request.method == "POST":
+    if request.method == 'POST':
         form = ExpenseForm(request.POST)
         if form.is_valid():
             expense = form.save()
-            
-            # Update total amount in Billing
-            billing, created = Billing.objects.get_or_create(patient=expense.patient)
-            billing.update_total()
-            
-            messages.success(request, "Expense added successfully!")
-            return redirect('billing')
+            messages.success(request, 'Expense added successfully!')
+            return redirect('expense_list')
     else:
         form = ExpenseForm()
-
-    return render(request, 'hms/expense/add_expense.html', {'form': form})  
-
-@login_required
-def pay_bill(request, billing_id):
-    billing = get_object_or_404(Billing, id=billing_id)
     
-    # Calculate pending amount in Python, not in the template
-    pending_amount = billing.total_amount - billing.paid_amount
+    return render(request, 'hms/bills/add_expense.html', {'form': form})
 
-    if request.method == "POST":
-        paid_amount = Decimal(request.POST.get('paid_amount', 0))
-        
-        if paid_amount <= 0:
-            messages.error(request, "Amount must be greater than zero.")
-        else:
-            billing.paid_amount += paid_amount
-            
-            # Ensure that paid amount does not exceed total amount
-            if billing.paid_amount >= billing.total_amount:
-                billing.paid_amount = billing.total_amount
-                billing.status = 'paid'
-            else:
-                billing.status = 'pending'
-            
-            billing.save()
-            messages.success(request, f"₹{paid_amount} added to the bill!")
-            return redirect('billing')
+def edit_expense(request, pk):
+    expense = get_object_or_404(Expense, pk=pk)
+    if request.method == 'POST':
+        form = ExpenseForm(request.POST, instance=expense)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Expense updated successfully!')
+            return redirect('expense_list')
+    else:
+        form = ExpenseForm(instance=expense)
+    
+    return render(request, 'hms/bills/edit_expense.html', {'form': form})
 
-    return render(request, 'hms/bills/pay_bill.html', {'billing': billing, 'pending_amount': pending_amount})
+def delete_expense(request, pk):
+    expense = get_object_or_404(Expense, pk=pk)
+    if request.method == 'POST':
+        expense.delete()
+        messages.success(request, 'Expense deleted successfully!')
+        return redirect('expense_list')
+    
+    return render(request, 'hms/bills/delete_expense.html', {'expense': expense})
+
+def payment_list(request):
+    payments = Payment.objects.all().order_by('-payment_date')
+
+    # Add billing type manually
+    for payment in payments:
+        billing_model = payment.billing.__class__.__name__.replace('Billing', '').upper()  # OPD, IPD, etc.
+        payment.billing_type = billing_model
+
+    return render(request, 'hms/bills/payment_list.html', {'payments': payments})
+
+
+def payment_detail(request, pk):
+    payment = get_object_or_404(Payment, pk=pk)
+    return render(request, 'hms/bills/payment_detail.html', {'payment': payment})
+
+from django.core.files.storage import default_storage
+import qrcode
+from io import BytesIO
+import base64
+
+def payment_receipt(request, pk):
+    payment = get_object_or_404(Payment, pk=pk)
+
+    billing_model = payment.billing.__class__.__name__
+    billing_type = "OPD" if billing_model == "OPDBilling" else "IPD" if billing_model == "IPDBilling" else "Other"
+
+    # Generate QR code (optional: use payment ID, transaction ID, or bill link)
+    qr_data = f"Payment ID: {payment.id} | Bill No: {payment.billing.bill_number}"
+    qr = qrcode.make(qr_data)
+    buffer = BytesIO()
+    qr.save(buffer, format="PNG")
+    img_str = base64.b64encode(buffer.getvalue()).decode()
+    qr_image_url = f"data:image/png;base64,{img_str}"
+
+    context = {
+        'payment': payment,
+        'qr_image_url': qr_image_url,
+        'hospital_name': 'Nelson Health Connect',
+        'hospital_logo_url': '/static/images/hospital_logo.png',  # adjust path as needed
+    }
+
+    template_path = 'hms/bills/payment_receipt.html'
+    html = get_template(template_path).render(context)
+    
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="payment_receipt_{payment.id}.pdf"'
+
+    pisa_status = pisa.CreatePDF(html, dest=response)
+    if pisa_status.err:
+        return HttpResponse("Error generating PDF")
+    return response
+
+
+
 
 # Emergency Views
 @login_required
@@ -773,15 +1187,17 @@ def admit_emergency_patient(request, emergency_id):
 # IPD Views
 @login_required
 def ipd(request):
-    ipds = IPD.objects.all()
+    ipds = IPD.objects.all().order_by('-admitted_on')  # latest first
     room = Room.objects.all()
-    return render(request, 'hms/ipd/ipd.html', {'ipds': ipds,'room':room})
+    return render(request, 'hms/ipd/ipd.html', {'ipds': ipds, 'room': room})
+
 
 @login_required
 def add_ipd(request):
     available_rooms = Room.objects.filter(available_beds__gt=0)
 
     if request.method == "POST":
+        print("POST weight:", request.POST.get('weight'))
         room_id = request.POST.get("room")
         bed_number = request.POST.get("bed_number")
         patient_id = request.POST.get("patient")
@@ -802,6 +1218,7 @@ def add_ipd(request):
         room.update_availability()
 
         patient = get_object_or_404(Patient, id=patient_id)
+        print("patient",patient)
 
         ipd = IPD.objects.create(
             patient=patient,
@@ -1002,8 +1419,7 @@ def fetch_opd(request):
             "symptoms", 
             "prescription", 
             "visit_type", 
-            "payment_status", 
-            "payment_amount", 
+             
             "follow_up_date"
         )
 
@@ -1021,8 +1437,8 @@ def fetch_opd(request):
                 "symptoms": record["symptoms"] or "N/A",  # Handle null values
                 "prescription": record["prescription"] or "N/A",  # Handle null values
                 "visit_type": record["visit_type"],
-                "payment_status": record["payment_status"],
-                "payment_amount": float(record["payment_amount"]),  # Convert Decimal to float
+                # "payment_status": record["payment_status"],
+                # "payment_amount": float(record["payment_amount"]),  # Convert Decimal to float
                 "follow_up_date": record["follow_up_date"].strftime("%Y-%m-%d") if record["follow_up_date"] else "N/A"  # Format date
             })
 
@@ -1060,8 +1476,8 @@ def update_opd(request, opd_id):
         prescription = request.POST.get("prescription")
         follow_up_date = request.POST.get("follow_up_date")
         visit_type = request.POST.get("visit_type")
-        payment_status = request.POST.get("payment_status")
-        payment_amount = request.POST.get("payment_amount")
+        # payment_status = request.POST.get("payment_status")
+        # payment_amount = request.POST.get("payment_amount")
 
         opd.doctor = Doctor.objects.get(id=doctor_id)
         opd.diagnosis = diagnosis
@@ -1069,8 +1485,8 @@ def update_opd(request, opd_id):
         opd.prescription = prescription
         opd.follow_up_date = follow_up_date
         opd.visit_type = visit_type
-        opd.payment_status = payment_status
-        opd.payment_amount = payment_amount
+        # opd.payment_status = payment_status
+        # opd.payment_amount = payment_amount
         opd.save()
 
         messages.success(request, "OPD visit updated successfully!")

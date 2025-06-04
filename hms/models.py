@@ -2,10 +2,12 @@ import uuid
 import os
 import logging
 from decimal import Decimal
+from django.http import Http404
 from django.db import models
 from django.utils import timezone
 from django.utils.timezone import now
 from datetime import datetime, timedelta
+from decimal import Decimal, ROUND_HALF_UP
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.core.validators import MinLengthValidator
@@ -268,11 +270,14 @@ class EmergencyCase(models.Model):
 #Room Model
 class Room(models.Model):
     ROOM_TYPES = [
-        ('general', 'General Ward'),
-        ('semi-private', 'Semi-Private'),
-        ('private', 'Private'),
-        ('icu', 'ICU'),
-    ]
+    ('picu', 'PICU'),
+    ('private', 'Private'),
+    ('general', 'General Ward'),
+    ('nicu', 'NICU'),
+    ('icu', 'ICU'),
+    ('emergency', 'Emergency Ward'),
+    ('other', 'Other'),]
+
 
     room_number = models.CharField(max_length=10, unique=True)
     room_type = models.CharField(max_length=20, choices=ROOM_TYPES)
@@ -511,35 +516,39 @@ class OPD(models.Model):
         ('emergency', 'Emergency Visit'),
     ]
     visit_type = models.CharField(max_length=20, choices=VISIT_TYPE_CHOICES, default='new')  # Type of visit
-    PAYMENT_STATUS_CHOICES = [
-        ('paid', 'Paid'),
-        ('pending', 'Pending'),
-    ]
-    payment_status = models.CharField(max_length=20, choices=PAYMENT_STATUS_CHOICES, default='pending')  # Payment status
-    payment_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)  # Amount paid for the visit
+    # PAYMENT_STATUS_CHOICES = [
+    #     ('paid', 'Paid'),
+    #     ('pending', 'Pending'),
+    # ]
+    # payment_status = models.CharField(max_length=20, choices=PAYMENT_STATUS_CHOICES, default='pending')  # Payment status
+    # payment_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)  # Amount paid for the visit
 
-    def save(self, *args, **kwargs):
-        if isinstance(self.payment_amount, str):
-            try:
-                self.payment_amount = Decimal(self.payment_amount)
-            except ValueError:
-                self.payment_amount = Decimal(0)  # Set to 0 if conversion fails
+    # def save(self, *args, **kwargs):
+    #     if isinstance(self.payment_amount, str):
+    #         try:
+    #             self.payment_amount = Decimal(self.payment_amount)
+    #         except ValueError:
+    #             self.payment_amount = Decimal(0)  # Set to 0 if conversion fails
         
-        super().save(*args, **kwargs)
+    #     super().save(*args, **kwargs)
 
-        if self.payment_status == 'paid' and self.payment_amount > 0:
-            AccountingRecord.objects.create(
-                transaction_type='income',
-                source='opd',
-                amount=self.payment_amount,
-                description=f"OPD payment for {self.patient.user.full_name}",
-                patient=self.patient,
-            )
+    #     if self.payment_status == 'paid' and self.payment_amount > 0:
+    #         AccountingRecord.objects.create(
+    #             transaction_type='income',
+    #             source='opd',
+    #             amount=self.payment_amount,
+    #             description=f"OPD payment for {self.patient.user.full_name}",
+    #             patient=self.patient,
+    #         )
 
     def __str__(self):
-        
         return f"OPD Visit - {self.patient.user.full_name} ({self.visit_date.strftime('%Y-%m-%d')})"
 
+
+from django.contrib.auth import get_user_model
+from django.core.validators import MinValueValidator
+
+User = get_user_model()
 
 # Billing Model
 class Expense(models.Model):
@@ -567,29 +576,318 @@ class Expense(models.Model):
             description=f"{self.get_category_display()} expense for {self.patient.user.full_name}",
             patient=self.patient,
         )
+        billing, _ = BillingBase.objects.get_or_create(patient=self.patient)
+        billing.calculate_totals()
 
     def __str__(self):
         return f"{self.patient.patient_code} - {self.category} - ₹{self.cost}"
 
-class Billing(models.Model):
-    patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
-    total_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    paid_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    status = models.CharField(max_length=20, choices=[('paid', 'Paid'), ('pending', 'Pending')], default='pending')
-    generated_on = models.DateTimeField(auto_now_add=True)
+# class Billing(models.Model):
+#     STATUS_CHOICES = [
+#         ('paid', 'Paid'),
+#         ('partial', 'Partially Paid'),
+#         ('pending', 'Pending'),
+#     ]
 
-    def update_total(self):
-        """Automatically update total amount based on expenses."""
-        self.total_amount = Expense.objects.filter(patient=self.patient).aggregate(models.Sum('cost'))['cost__sum'] or 0
-        self.save()
+#     patient = models.OneToOneField(Patient, on_delete=models.CASCADE, related_name='billing')
+#     total_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+#     paid_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+#     pending_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0, editable=False)
+#     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+#     generated_on = models.DateTimeField(auto_now_add=True)
+#     last_updated = models.DateTimeField(auto_now=True)
+
+#     def calculate_totals(self):
+#         """Recalculate totals based on related expenses and payments."""
+#         expenses_total = Expense.objects.filter(patient=self.patient).aggregate(models.Sum('cost'))['cost__sum'] or Decimal(0)
+#         payments_total = Payment.objects.filter(billing=self).aggregate(models.Sum('amount'))['amount__sum'] or Decimal(0)
+
+#         self.total_amount = expenses_total
+#         self.paid_amount = payments_total
+#         self.pending_amount = expenses_total - payments_total
+
+#         if payments_total >= expenses_total:
+#             self.status = 'paid'
+#         elif payments_total == 0:
+#             self.status = 'pending'
+#         else:
+#             self.status = 'partial'
+
+#         self.save()
+    
+    
+
+#     def __str__(self):
+#         return f"Billing - {self.patient.patient_code} | Total: ₹{self.total_amount} | Paid: ₹{self.paid_amount} | Status: {self.get_status_display()}"
+
+# # class Payment(models.Model):
+# #     billing = models.ForeignKey(Billing, on_delete=models.CASCADE, related_name='payments')
+# #     amount = models.DecimalField(max_digits=10, decimal_places=2)
+# #     payment_mode = models.CharField(max_length=20, choices=[('cash', 'Cash'), ('card', 'Card'), ('upi', 'UPI'), ('other', 'Other')], default='cash')
+# #     payment_date = models.DateTimeField(default=timezone.now)
+# #     notes = models.TextField(null=True, blank=True)
+
+# #     def save(self, *args, **kwargs):
+# #         super().save(*args, **kwargs)
+# #         self.billing.calculate_totals()
+
+# #     def __str__(self):
+# #         return f"Payment ₹{self.amount} on {self.payment_date.strftime('%Y-%m-%d')} via {self.payment_mode.title()}"
+
+
+# new model of billing and payment
+class BillingBase(models.Model):
+    """Abstract base model for common billing fields"""
+    BILL_STATUS_CHOICES = [
+        ('draft', 'Draft'),
+        ('generated', 'Generated'),
+        ('paid', 'Paid'),
+        ('partially_paid', 'Partially Paid'),
+        ('cancelled', 'Cancelled'),
+    ]
+    
+    bill_number = models.CharField(max_length=20, unique=True, editable=False)
+    patient = models.ForeignKey("Patient", on_delete=models.PROTECT)
+    generated_date = models.DateTimeField(auto_now_add=True)
+    due_date = models.DateTimeField()
+    status = models.CharField(max_length=20, choices=BILL_STATUS_CHOICES, default='draft')
+    subtotal = models.DecimalField(max_digits=12, decimal_places=2, default=0.00)
+    tax_amount = models.DecimalField(max_digits=12, decimal_places=2, default=0.00)
+    discount_amount = models.DecimalField(max_digits=12, decimal_places=2, default=0.00)
+    total_amount = models.DecimalField(max_digits=12, decimal_places=2, default=0.00)
+    paid_amount = models.DecimalField(max_digits=12, decimal_places=2, default=0.00)
+    balance_amount = models.DecimalField(max_digits=12, decimal_places=2, default=0.00)
+    notes = models.TextField(blank=True, null=True)
+    
+    class Meta:
+        abstract = True
+    
+    def calculate_totals(self):
+        """Calculate all financial fields"""
+        self.subtotal = Decimal(self.calculate_subtotal())
+        self.tax_amount = Decimal(self.calculate_tax())
+        self.discount_amount = Decimal(self.discount_amount)
+        self.paid_amount = Decimal(self.paid_amount)
+
+        self.total_amount = self.subtotal + self.tax_amount - self.discount_amount
+        self.balance_amount = self.total_amount - self.paid_amount
+
+        # Update status based on payment
+        if self.paid_amount <= Decimal('0.00'):
+            self.status = 'generated'
+        elif self.paid_amount >= self.total_amount:
+            self.status = 'paid'
+        else:
+            self.status = 'partially_paid'
+    @property
+    def get_final_amount(self):
+        return self.subtotal + self.tax_amount - self.discount_amount
+    
+    def calculate_subtotal(self):
+        """To be implemented by child classes"""
+        return Decimal('0.00')
+    
+    def calculate_tax(self):
+        """Default tax calculation (5%) - can be overridden"""
+        return self.subtotal * Decimal('0.05')
+    @property
+    def billing_type(self):
+        # Return the billing type based on the model class
+        if isinstance(self, OPDBilling):
+            return 'OPD'
+        elif isinstance(self, IPDBilling):
+            return 'IPD'
+        else:
+            return 'Other'
+        
+    def save(self, *args, **kwargs):
+        if not self.bill_number:
+            # Generate bill number specific to model type:
+            date_part = timezone.now().strftime('%Y%m%d')
+            # Use model-specific prefix
+            prefix = ''
+            if isinstance(self, OPDBilling):
+                prefix = 'OPD'
+            elif isinstance(self, IPDBilling):
+                prefix = 'IPD'
+            else:
+                prefix = 'BILL'
+
+            # Get last bill number for this model only
+            last_bill = self.__class__.objects.filter(bill_number__startswith=prefix).order_by('-id').first()
+            seq_num = (last_bill.id + 1) if last_bill else 1
+            self.bill_number = f"{prefix}-{date_part}-{seq_num:04d}"
+        
+        if not self.due_date:
+            self.due_date = timezone.now() + timezone.timedelta(days=7)
+        
+        self.calculate_totals()
+        super().save(*args, **kwargs)
+
+class OPDBilling(BillingBase):
+    """Billing model for Outpatient Department"""
+    opd_visit = models.ForeignKey("OPD", on_delete=models.PROTECT)
+    consultation_fee = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    procedure_fee = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    medication_fee = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    other_fee = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    is_paid = models.BooleanField(default=False)
+    def calculate_subtotal(self):
+        return (
+            self.consultation_fee + 
+            self.procedure_fee + 
+            self.medication_fee + 
+            self.other_fee
+        )
+    @property
+    def calculated_paid_amount(self):
+        # Automatically calculate the paid amount as subtotal
+        return self.calculate_subtotal()
+    
+    @property
+    def bill_type(self):
+        return 'OPD'
+    
+    def save(self, *args, **kwargs):
+        # Auto-populate fees from OPD visit if not set
+        
+        if not self.consultation_fee and hasattr(self.opd_visit, 'doctor'):
+            self.consultation_fee = self.opd_visit.doctor.consultation_fee or Decimal('0.00')
+        # Automatically mark bill as paid if it's marked for payment
+        if self.is_paid:
+            self.paid_amount = self.calculate_subtotal()
+
+        super().save(*args, **kwargs)
+
+        # Create accounting record if paid and not already recorded
+        if self.is_paid and self.paid_amount > 0:
+            # from AccountingRecord.models import AccountingRecord  # avoid circular import
+            AccountingRecord.objects.get_or_create(
+                transaction_type='income',
+                source='opd',
+                amount=self.paid_amount,
+                description=f"OPD payment for {self.opd_visit.patient.user.full_name}",
+                patient=self.opd_visit.patient,
+                billing_reference=self  # optional, if you have such a field
+            )
+
+class IPDBilling(BillingBase):
+    """Billing model for Inpatient Department"""
+    ipd_admission = models.ForeignKey("IPD", on_delete=models.PROTECT)
+    room_charges = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    nursing_charges = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    procedure_charges = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    medication_charges = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    lab_charges = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    other_charges = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    
+    def calculate_subtotal(self):
+        return (
+            self.room_charges +
+            self.nursing_charges +
+            self.procedure_charges +
+            self.medication_charges +
+            self.lab_charges +
+            self.other_charges
+        )
+    @property
+    def bill_type(self):
+        return 'IPD'
+    
+    def save(self, *args, **kwargs):
+        # Calculate room charges based on IPD stay duration
+        if not self.room_charges and self.ipd_admission:
+            self.room_charges = self.ipd_admission.calculate_total_cost()
+        super().save(*args, **kwargs)
+
+class BillingItem(models.Model):
+    """Line items for detailed billing"""
+    BILLING_TYPE_CHOICES = [
+        ('opd', 'OPD'),
+        ('ipd', 'IPD'),
+    ]
+    
+    billing_type = models.CharField(max_length=10, choices=BILLING_TYPE_CHOICES)
+    opd_billing = models.ForeignKey(OPDBilling, on_delete=models.CASCADE, null=True, blank=True)
+    ipd_billing = models.ForeignKey(IPDBilling, on_delete=models.CASCADE, null=True, blank=True)
+    description = models.CharField(max_length=255)
+    quantity = models.PositiveIntegerField(default=1)
+    unit_price = models.DecimalField(max_digits=10, decimal_places=2)
+    discount = models.DecimalField(max_digits=5, decimal_places=2, default=0.00)
+    tax_rate = models.DecimalField(max_digits=5, decimal_places=2, default=0.00)  # 5% default tax
+    amount = models.DecimalField(max_digits=10, decimal_places=2, editable=False)
+    
+    def save(self, *args, **kwargs):
+        subtotal = self.unit_price * self.quantity
+
+        discount_amount = subtotal * (self.discount / Decimal('100'))
+        discounted_total = subtotal - discount_amount
+
+        tax_amount = discounted_total * (self.tax_rate / Decimal('100'))
+        final_amount = discounted_total + tax_amount
+
+        # Round to 2 decimal places
+        self.amount = final_amount.quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
+
+        super().save(*args, **kwargs)
+
+        # Update parent billing totals
+        if self.opd_billing:
+            self.opd_billing.calculate_totals()
+            self.billing_type = 'opd'
+            self.opd_billing.save()
+        elif self.ipd_billing:
+            self.ipd_billing.calculate_totals()
+            self.billing_type = 'ipd'
+            self.ipd_billing.save()
 
     def __str__(self):
-        return f"Billing for {self.patient.patient_code} - ₹{self.total_amount} (Paid: ₹{self.paid_amount})"
+        return f"{self.description} - {self.amount}"
 
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.models import ContentType
 
+class Payment(models.Model):
+    """Payment records for billing"""
+    PAYMENT_METHOD_CHOICES = [
+        ('cash', 'Cash'),
+        ('card', 'Credit/Debit Card'),
+        ('insurance', 'Insurance'),
+        ('bank_transfer', 'Bank Transfer'),
+        ('upi', 'UPI'),
+        ('cheque', 'Cheque'),
+    ]
+    
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, null=True)
+    object_id = models.PositiveIntegerField( null=True)
+    billing = GenericForeignKey('content_type', 'object_id')
+    amount = models.DecimalField(max_digits=12, decimal_places=2, validators=[MinValueValidator(0.01)])
+    payment_date = models.DateTimeField(auto_now_add=True)
+    payment_method = models.CharField(max_length=20, choices=PAYMENT_METHOD_CHOICES, null=True)
+    transaction_id = models.CharField(max_length=100, blank=True, null=True)
+    received_by = models.ForeignKey(User, on_delete=models.PROTECT, null=True)
+    notes = models.TextField(blank=True, null=True)
 
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
 
+        # Update billing payment fields
+        all_payments = Payment.objects.filter(
+            content_type=self.content_type,
+            object_id=self.object_id
+        )
+        self.billing.paid_amount = sum(p.amount for p in all_payments)
+        self.billing.calculate_totals()
+        self.billing.save()
 
+        AccountingRecord.objects.create(
+            transaction_type='income',
+            source=self.billing._meta.model_name.lower(),
+            amount=self.amount,
+            description=f"Payment for bill {self.billing.bill_number}",
+            patient=self.billing.patient,
+            
+        )
 
 class Employee(models.Model):
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)

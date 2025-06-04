@@ -53,6 +53,8 @@ INSTALLED_APPS = [
     'crispy_forms',
     'crispy_bootstrap5', 
     'mathfilters',
+    'widget_tweaks',
+    'django.contrib.humanize',
 ]
 
 MIDDLEWARE = [
@@ -101,7 +103,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'hospital',   # Your database name
         'USER': 'postgres',   # Your PostgreSQL username
-        'PASSWORD': 'anuj@saumya',  # Your PostgreSQL password
+        'PASSWORD': '19Piyush95@245132',  # Your PostgreSQL password
         'HOST': 'localhost',  # PostgreSQL runs locally
         'PORT': '5432',       # Default PostgreSQL port
     }

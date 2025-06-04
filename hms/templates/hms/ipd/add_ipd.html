@@ -35,10 +35,10 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <!-- Room Selection -->
             <div class="space-y-2">
-                <label for="room-select" class="block text-sm font-medium text-gray-700">Select Room</label>
+                <label for="room-select" class="block text-sm font-medium text-gray-700">Select Ward</label>
                 <div class="relative">
                     <select name="room" id="room-select" class="block w-full px-4 py-3 pr-8 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white appearance-none" required>
-                        <option value="">Select a room...</option>
+                        <option value="">Select a ward...</option>
                         {% for room in rooms %}
                         <option value="{{ room.id }}">{{ room.room_number }} ({{ room.get_room_type_display }})</option>
                         {% endfor %}
