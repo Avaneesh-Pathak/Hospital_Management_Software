@@ -5,7 +5,7 @@ from .views import (
     signup, upload_patient_report, add_prescription, get_available_beds, fetch_patients, fetch_opd, fetch_appointments,
     user_login, get_ipd_data, book_appointment, update_appointment_status, appointment_success, available_doctors,
     profile_view, patient_profile, user_logout, add_emergency_case, admit_emergency_patient, patient_detail,
-    doctor_detail, generate_bill, add_expense, generate_bill_pdf, add_opd, update_opd, admit_patient, add_doctor,
+    doctor_detail,  add_opd, update_opd, admit_patient, add_doctor,
     add_employee, add_room, employee_list, edit_employee, delete_employee, view_ipd_report,
     update_ipd_room,DaybookListView,DaybookCreateView,BalanceUpdateView,NICUMedicationRecordListView,NICUMedicationRecordCreateView,
     NICUMedicationRecordUpdateView,delete_nicu_medication,NICUFluidAddView,NICUFluidUpdateView,NICUFluidDeleteView,
@@ -76,11 +76,32 @@ urlpatterns = [
     path('emergency/admit/<int:emergency_id>/', admit_emergency_patient, name='admit_emergency_patient'),
 
     # Billing
-    path('billing/', views.billing, name='billing'),
-    path('billing/pay/<int:billing_id>/', views.pay_bill, name='pay_bill'),
-    path('billing/generate/<str:patient_code>/', generate_bill, name='generate_bill'),
-    path('billing/pdf/<str:patient_code>/', generate_bill_pdf, name='download_bill_pdf'),
-    path('billing/add-expense/', add_expense, name='add_expense'),
+    # path('billing/', views.billing, name='billing'),
+    # path('billing/pay/<int:billing_id>/', views.pay_bill, name='pay_bill'),
+    # path('billing/generate/<str:patient_code>/', generate_bill, name='generate_bill'),
+    # path('billing/pdf/<str:patient_code>/', generate_bill_pdf, name='download_bill_pdf'),
+    # path('billing/add-expense/', add_expense, name='add_expense'),
+    # Billing URLs
+    path('bills/', views.bill_list, name='bill_list'),
+    path('bills/opd/create/', views.create_opd_bill, name='create_opd_bill'),
+    path('bills/ipd/create/', views.create_ipd_bill, name='create_ipd_bill'),
+    path('bills/<str:bill_number>/', views.view_bill, name='view_bill'),
+    #  path('billing/patient/<int:patient_id>/', patient_billing_summary, name='patient_billing_summary'),
+    path('bills/<str:bill_number>/pdf/', views.view_bill_pdf, name='view_bill_pdf'),
+    path('bills/<str:bill_number>/add-item/', views.add_billing_item, name='add_billing_item'),
+    path('bills/<str:bill_number>/pay/', views.record_payment, name='record_payment'),
+    
+    # Expense URLs
+    path('expenses/', views.expense_list, name='expense_list'),
+    path('expenses/add/', views.add_expense, name='add_expense'),
+    path('expenses/<int:pk>/edit/', views.edit_expense, name='edit_expense'),
+    path('expenses/<int:pk>/delete/', views.delete_expense, name='delete_expense'),
+    
+    # Payment URLs
+    path('payments/', views.payment_list, name='payment_list'),
+    path('payments/<int:pk>/', views.payment_detail, name='payment_detail'),
+    path('payments/<int:pk>/receipt/', views.payment_receipt, name='payment_receipt'),
+    
 
     # Rooms and Beds
     path('add-room/', add_room, name='add_room'),

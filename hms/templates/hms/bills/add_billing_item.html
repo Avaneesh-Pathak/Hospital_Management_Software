@@ -1,0 +1,219 @@
+{% extends 'hms/base.html' %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-lg border-0">
+                <div class="card-header bg-primary text-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h3 class="mb-0">
+                            <i class="fas fa-plus-circle mr-2"></i>
+                            Add Billing Item to Bill #{{ bill.bill_number }}
+                        </h3>
+                        {% if form.errors %}
+  <div class="alert alert-danger">
+    <ul>
+      {% for field in form %}
+        {% for error in field.errors %}
+          <li><strong>{{ field.label }}:</strong> {{ error }}</li>
+        {% endfor %}
+      {% endfor %}
+      {% for error in form.non_field_errors %}
+        <li>{{ error }}</li>
+      {% endfor %}
+    </ul>
+  </div>
+{% endif %}
+
+                        <a href="{% url 'view_bill' bill.bill_number %}" class="btn btn-light btn-sm">
+                            <i class="fas fa-arrow-left mr-1"></i> Back to Bill
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="card-body">
+                    <form method="post" id="billing-item-form">
+                        {% csrf_token %}
+                        
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <div class="card bg-light mb-3">
+                                    <div class="card-body">
+                                        <h6 class="card-title text-muted">Bill Information</h6>
+                                        <div class="d-flex mb-2">
+                                            <span class="text-muted mr-3" style="min-width: 100px;">Patient:</span>
+                                            <span class="font-weight-bold">{{ bill.patient.user.full_name }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card bg-light mb-3">
+                                    <div class="card-body">
+                                        <h6 class="card-title text-muted">Current Bill Total</h6>
+                                        <h4 class="text-success">₹{{ bill.total_amount|floatformat:2 }}</h4>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <h5 class="mb-4 text-primary">
+                            <i class="fas fa-receipt mr-2"></i>
+                            Item Details
+                        </h5>
+                        
+                        {{ form.description|as_crispy_field }}
+                        
+                        <div class="row">
+                            <div class="col-md-4">
+                                {{ form.quantity|as_crispy_field }}
+                            </div>
+                            <div class="col-md-4">
+                                {{ form.unit_price|as_crispy_field }}
+                            </div>
+                            <div class="col-md-4">
+                                {{ form.discount|as_crispy_field }}
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                {{ form.tax_rate|as_crispy_field }}
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label">Amount*</label>
+                                    <input type="text" class="form-control" id="amount-display" value="0.00" readonly>
+                                    <small class="form-text text-muted">Calculated automatically</small>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="card mt-4 mb-4 border-primary">
+                            <div class="card-header bg-primary-soft">
+                                <h6 class="mb-0 text-primary">
+                                    <i class="fas fa-calculator mr-2"></i>
+                                    Calculation Breakdown
+                                </h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <table class="table table-sm table-borderless">
+                                            <tr>
+                                                <td>Subtotal:</td>
+                                                <td class="text-end" id="subtotal-display">₹0.00</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Discount (<span id="discount-percent">0</span>%):</td>
+                                                <td class="text-end text-danger" id="discount-display">-₹0.00</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Tax (<span id="tax-percent">5</span>%):</td>
+                                                <td class="text-end" id="tax-display">₹0.00</td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="text-right">
+                                            <h5 class="mb-1">Total Amount:</h5>
+                                            <h3 class="text-success" id="total-display">₹0.00</h3>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex justify-content-end mt-4">
+                            <button type="reset" class="btn btn-secondary mr-3">
+                                <i class="fas fa-undo mr-2"></i> Reset
+                            </button>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save mr-2"></i> Add Item
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Get form elements
+    const quantityInput = document.getElementById('id_quantity');
+    const unitPriceInput = document.getElementById('id_unit_price');
+    const discountInput = document.getElementById('id_discount');
+    const taxRateInput = document.getElementById('id_tax_rate');
+    
+    // Add event listeners
+    [quantityInput, unitPriceInput, discountInput, taxRateInput].forEach(input => {
+        input.addEventListener('input', calculateAmounts);
+    });
+    
+    // Initial calculation
+    calculateAmounts();
+    
+    function calculateAmounts() {
+        // Get values
+        const quantity = parseFloat(quantityInput.value) || 0;
+        const unitPrice = parseFloat(unitPriceInput.value) || 0;
+        const discount = parseFloat(discountInput.value) || 0;
+        const taxRate = parseFloat(taxRateInput.value) || 5;
+        
+        // Calculate subtotal
+        const subtotal = quantity * unitPrice;
+        
+        // Calculate discount amount
+        const discountAmount = subtotal * (discount / 100);
+        
+        // Calculate taxable amount
+        const taxableAmount = subtotal - discountAmount;
+        
+        // Calculate tax
+        const taxAmount = taxableAmount * (taxRate / 100);
+        
+        // Calculate total
+        const totalAmount = taxableAmount + taxAmount;
+        
+        // Update displays
+        document.getElementById('subtotal-display').textContent = '₹' + subtotal.toFixed(2);
+        document.getElementById('discount-percent').textContent = discount;
+        document.getElementById('discount-display').textContent = '-₹' + discountAmount.toFixed(2);
+        document.getElementById('tax-percent').textContent = taxRate;
+        document.getElementById('tax-display').textContent = '₹' + taxAmount.toFixed(2);
+        document.getElementById('total-display').textContent = '₹' + totalAmount.toFixed(2);
+        document.getElementById('amount-display').value = totalAmount.toFixed(2);
+        
+        // Add animation to highlight changes
+        animateValueChange('total-display');
+    }
+    
+    function animateValueChange(elementId) {
+        const element = document.getElementById(elementId);
+        element.classList.add('animate__animated', 'animate__pulse');
+        setTimeout(() => {
+            element.classList.remove('animate__animated', 'animate__pulse');
+        }, 500);
+    }
+});
+</script>
+
+<style>
+.bg-primary-soft {
+    background-color: rgba(13, 110, 253, 0.1);
+}
+.card {
+    border-radius: 0.5rem;
+}
+.form-control:read-only {
+    background-color: #f8f9fa;
+}
+.animate__animated {
+    --animate-duration: 0.5s;
+}
+</style>
+{% endblock %}

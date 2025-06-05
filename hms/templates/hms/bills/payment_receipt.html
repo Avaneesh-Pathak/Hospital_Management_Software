@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Payment Receipt</title>
+    <style>
+        body {
+            font-family: 'DejaVu Sans', sans-serif;
+            font-size: 14px;
+            margin: 40px;
+            color: #000;
+        }
+        .print-btn {
+            margin-bottom: 20px;
+            text-align: right;
+        }
+        .print-btn button {
+            padding: 6px 12px;
+            font-size: 13px;
+        }
+        @media print {
+            .print-btn {
+                display: none;
+            }
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .logo {
+            width: 60px;
+            height: auto;
+        }
+        .header h2 {
+            margin: 5px 0 0 0;
+            font-size: 22px;
+        }
+        .info-table, .summary-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 25px;
+        }
+        .info-table td,
+        .summary-table th, .summary-table td {
+            padding: 8px 10px;
+            border: 1px solid #333;
+        }
+        .summary-table th {
+            background-color: #f0f0f0;
+            text-align: left;
+        }
+        .thank-you {
+            margin-top: 40px;
+            text-align: center;
+            font-style: italic;
+        }
+        .qr-container {
+            text-align: center;
+            margin-top: 30px;
+        }
+        .qr-container img {
+            width: 120px;
+            height: auto;
+        }
+    </style>
+</head>
+<body>
+
+<div class="print-btn">
+    <button onclick="window.print()">🖨️ Print Receipt</button>
+</div>
+
+<div class="header">
+    <img src="{{ hospital_logo_url }}" class="logo" alt="Hospital Logo">
+    <h2>{{ hospital_name|default:"Your Hospital Name" }}</h2>
+    <p>Payment Receipt - ID: {{ payment.id }}</p>
+</div>
+
+<table class="info-table">
+    <tr>
+        <td><strong>Patient Name</strong></td>
+        <td>
+            {{ payment.billing.patient.user.full_name|default:payment.billing.patient.user.get_full_name|default:"N/A" }}
+        </td>
+    </tr>
+    <tr>
+        <td><strong>Bill Number</strong></td>
+        <td>{{ payment.billing.bill_number }}</td>
+    </tr>
+    <tr>
+        <td><strong>Payment Method</strong></td>
+        <td>{{ payment.get_payment_method_display|default:"N/A" }}</td>
+    </tr>
+    <tr>
+        <td><strong>Transaction ID</strong></td>
+        <td>{{ payment.transaction_id|default:"N/A" }}</td>
+    </tr>
+    <tr>
+        <td><strong>Received By</strong></td>
+        <td>{{ payment.received_by.get_full_name|default:payment.received_by.username }}</td>
+    </tr>
+    <tr>
+        <td><strong>Payment Date</strong></td>
+        <td>{{ payment.payment_date|date:"d M Y, h:i A" }}</td>
+    </tr>
+</table>
+
+<table class="summary-table">
+    <tr>
+        <th>Total Amount</th>
+        <td>&#8377;{{ payment.billing.total_amount }}</td>
+    </tr>
+    <tr>
+        <th>Paid Amount</th>
+        <td>&#8377;{{ payment.amount }}</td>
+    </tr>
+    <tr>
+        <th>Balance Remaining</th>
+        <td>&#8377;{{ payment.billing.balance_amount }}</td>
+    </tr>
+</table>
+
+{% if payment.notes %}
+<p><strong>Notes:</strong> {{ payment.notes }}</p>
+{% endif %}
+
+<div class="qr-container">
+    <p>Scan this QR for payment verification:</p>
+    <img src="{{ qr_image_url }}" alt="QR Code">
+</div>
+
+<div class="thank-you">
+    <p>Thank you for your payment.</p>
+</div>
+
+</body>
+</html>

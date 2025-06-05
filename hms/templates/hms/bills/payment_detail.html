@@ -1,0 +1,184 @@
+{% extends 'hms/base.html' %}
+{% load humanize %}
+
+{% block content %}
+<div id="printable-area" class="container py-4">
+    <div class="card border-0 shadow-lg">
+        <div class="card-header bg-gradient-primary text-white py-3">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h4 class="mb-0">
+                        <i class="bi bi-credit-card-fill me-2"></i>Payment Details
+                    </h4>
+                    <small class="opacity-75">Transaction ID: {{ payment.id }}</small>
+                </div>
+                <div>
+                    <span class="badge bg-white text-primary fs-6 py-2 px-3 rounded-pill">
+                        {{ payment.get_payment_method_display }}
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="detail-card mb-4 p-3 bg-light rounded">
+                        <h6 class="text-uppercase text-muted mb-3">Bill Information</h6>
+                        <div class="d-flex justify-content-between border-bottom py-2">
+                            <span class="fw-semibold">Bill Number:</span>
+                            <span class="text-primary">{{ payment.billing.bill_number }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between border-bottom py-2">
+                            <span class="fw-semibold">Billing Type:</span>
+                            <span>
+                                {% if payment.billing.billing_type == 'OPD' %}
+                                <span class="badge bg-primary bg-opacity-10 text-primary">OPD</span>
+                                {% elif payment.billing.billing_type == 'IPD' %}
+                                <span class="badge bg-success bg-opacity-10 text-success">IPD</span>
+                                {% else %}
+                                <span class="badge bg-secondary bg-opacity-10 text-secondary">Other</span>
+                                {% endif %}
+                            </span>
+                        </div>
+                        <div class="d-flex justify-content-between border-bottom py-2">
+                            <span class="fw-semibold">Total Amount:</span>
+                            <span class="text-dark">₹{{ payment.billing.total_amount|intcomma }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="detail-card mb-4 p-3 bg-light rounded">
+                        <h6 class="text-uppercase text-muted mb-3">Patient Information</h6>
+                        <div class="d-flex justify-content-between border-bottom py-2">
+                            <span class="fw-semibold">Patient Name:</span>
+                            <span>{{ payment.billing.patient.user.full_name }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between border-bottom py-2">
+                            <span class="fw-semibold">Patient ID:</span>
+                            <span>{{ payment.billing.patient.patient_code }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between py-2">
+                            <span class="fw-semibold">Contact:</span>
+                            <span>{{ payment.billing.patient.user.contact_number|default:"N/A" }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="detail-card mb-4 p-3 bg-light rounded">
+                        <h6 class="text-uppercase text-muted mb-3">Payment Details</h6>
+                        <div class="d-flex justify-content-between border-bottom py-2">
+                            <span class="fw-semibold">Amount Paid:</span>
+                            <span class="text-success fw-bold">₹{{ payment.amount|intcomma }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between border-bottom py-2">
+                            <span class="fw-semibold">Balance Due:</span>
+                            <span class="text-danger">₹{{ payment.billing.balance_amount|intcomma }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between border-bottom py-2">
+                            <span class="fw-semibold">Transaction ID:</span>
+                            <span class="text-muted">{{ payment.transaction_id|default:"N/A" }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between py-2">
+                            <span class="fw-semibold">Payment Date:</span>
+                            <span>{{ payment.payment_date|date:"d M Y, h:i A" }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="detail-card mb-4 p-3 bg-light rounded">
+                        <h6 class="text-uppercase text-muted mb-3">Processed By</h6>
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="avatar bg-primary text-white rounded-circle me-3">
+                                {{ payment.received_by.username|slice:":1"|upper }}
+                            </div>
+                            <div>
+                                <h6 class="mb-0">{{ payment.received_by.get_full_name|default:payment.received_by.username }}</h6>
+                                <small class="text-muted">{{ payment.received_by.groups.first|default:"Staff" }}</small>
+                            </div>
+                        </div>
+                        {% if payment.notes %}
+                        <div class="notes-box p-3 bg-white rounded">
+                            <h6 class="text-uppercase text-muted mb-2">Notes</h6>
+                            <p class="mb-0">{{ payment.notes }}</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="d-flex justify-content-between mt-4">
+    <a href="{% url 'payment_list' %}" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left me-2"></i> Back to Payments
+    </a>
+    <div>
+        <a href="{% url 'payment_receipt' payment.pk %}" class="btn btn-primary me-2">
+            <i class="bi bi-download me-2"></i> Download Receipt
+        </a>
+        <button onclick="printDiv('printable-area')" class="btn btn-success">
+            <i class="bi bi-printer me-2"></i> Print
+        </button>
+    </div>
+</div>
+
+
+
+<style>
+    .card-header {
+        border-radius: 0.5rem 0.5rem 0 0 !important;
+    }
+
+    .detail-card {
+        height: 100%;
+    }
+
+    .avatar {
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+    }
+
+    .notes-box {
+        border-left: 3px solid var(--bs-primary);
+    }
+
+    .bg-gradient-primary {
+        background: linear-gradient(135deg, #3a7bd5 0%, #00d2ff 100%);
+    }
+
+    .border-bottom {
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05) !important;
+    }
+</style>
+<script>
+    function printDiv(divId) {
+        const content = document.getElementById(divId).innerHTML;
+        const mywindow = window.open('', 'Print', 'height=600,width=800');
+
+        mywindow.document.write('<html><head><title>Print</title>');
+        // Optionally include CSS for styles in print window:
+        mywindow.document.write('<link rel="stylesheet" href="/static/css/bootstrap.min.css" />');
+        mywindow.document.write('</head><body>');
+        mywindow.document.write(content);
+        mywindow.document.write('</body></html>');
+
+        mywindow.document.close();
+        mywindow.focus();
+
+        setTimeout(() => {
+            mywindow.print();
+            mywindow.close();
+        }, 300);
+    }
+</script>
+{% endblock %}

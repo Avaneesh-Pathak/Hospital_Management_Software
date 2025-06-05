@@ -333,7 +333,7 @@
         <div class="bg-white p-6 rounded-lg shadow-md">
             <div class="flex justify-between items-center mb-6">
                 <h2 class="text-xl font-bold text-gray-800">Recent Transactions</h2>
-                <a href="{% url 'billing' %}" class="text-sm text-blue-600 hover:underline">View All</a>
+                <a href="{% url 'bill_list' %}" class="text-sm text-blue-600 hover:underline">View All</a>
             </div>
             <div class="space-y-4">
                 {% for billing in recent_billings|slice:":5" %}

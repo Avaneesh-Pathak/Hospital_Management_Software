@@ -1,0 +1,233 @@
+{% extends 'hms/base.html' %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+<div class="container-fluid py-5" style="background-color: #f8fafc;">
+    <div class="row justify-content-center">
+        <div class="col-xl-8 col-lg-10">
+            <!-- Card with glossy shadow and subtle border -->
+            <div class="card border-0 shadow-lg" style="border-radius: 12px; border-top: 4px solid #4361ee;">
+                <div class="card-header bg-white py-4" style="border-radius: 12px 12px 0 0;">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h2 class="h4 mb-0 text-gray-900 font-weight-bold">
+                                <i class="fas fa-file-invoice text-primary mr-2"></i>
+                                Outpatient Department Billing
+                            </h2>
+                            <p class="mb-0 text-muted small">Generate new bill for OPD services</p>
+                        </div>
+                        <a href="{% url 'bill_list' %}" class="btn btn-sm btn-outline-primary">
+                            <i class="fas fa-chevron-left mr-1"></i> Bill Registry
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="card-body px-5 py-4">
+                    <form method="post" id="opd-billing-form" class="needs-validation" novalidate>
+                        {% csrf_token %}
+                        
+                        <!-- Patient Summary Panel -->
+                        <div class="alert alert-light border" style="border-radius: 10px; background-color: #f8f9fa;">
+                            <div class="row">
+                                <div class="col-md-6 border-right">
+                                    <h6 class="text-uppercase text-primary mb-3">
+                                        <i class="fas fa-user-circle mr-2"></i>Patient Details
+                                    </h6>
+                                    <div class="d-flex mb-2">
+                                        <span class="text-muted mr-3" style="min-width: 120px;">Patient:</span>
+                                        <span class="font-weight-bold">{{ form.opd_visit }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Fee Breakdown Section -->
+                        <div class="mt-5">
+                            <h5 class="mb-4 text-primary d-flex align-items-center">
+                                <span class="bg-primary-soft rounded-circle p-2 mr-3">
+                                    <i class="fas fa-receipt text-primary"></i>
+                                </span>
+                                Service Fee Configuration
+                            </h5>
+                            
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="font-weight-bold text-dark">Consultation Fee</label>
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text bg-light">₹</span>
+                                            </div>
+                                            {{ form.consultation_fee }}
+                                        </div>
+                                        <small class="form-text text-muted">Standard doctor consultation charge</small>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="font-weight-bold text-dark">Procedure Fee</label>
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text bg-light">₹</span>
+                                            </div>
+                                            {{ form.procedure_fee }}
+                                        </div>
+                                        <small class="form-text text-muted">Any additional procedures performed</small>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="row mt-3">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="font-weight-bold text-dark">Medication Fee</label>
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text bg-light">₹</span>
+                                            </div>
+                                            {{ form.medication_fee }}
+                                        </div>
+                                        <small class="form-text text-muted">Prescribed medications cost</small>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="font-weight-bold text-dark">Other Charges</label>
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text bg-light">₹</span>
+                                            </div>
+                                            {{ form.other_fee }}
+                                        </div>
+                                        <small class="form-text text-muted">Miscellaneous charges</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Calculation Panel -->
+                        <div class="row mt-4">
+                            <div class="col-md-6">
+                                <button type="button" class="btn btn-primary-soft btn-block py-2" 
+                                        onclick="calculateFees()">
+                                    <i class="fas fa-calculator mr-2"></i>
+                                    Calculate Total
+                                </button>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card border-0 bg-primary-soft" style="border-radius: 10px;">
+                                    <div class="card-body py-3">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <h6 class="mb-0 text-primary font-weight-bold">
+                                                <i class="fas fa-file-invoice-dollar mr-2"></i>
+                                                Bill Subtotal
+                                            </h6>
+                                            <h4 class="mb-0 text-success font-weight-bold" id="subtotal-display">
+                                                ₹0.00
+                                            </h4>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Form Actions -->
+                        <div class="d-flex justify-content-between mt-5 pt-4 border-top">
+                            <button type="reset" class="btn btn-light px-4 py-2" style="border-radius: 8px;">
+                                <i class="fas fa-eraser mr-2"></i>
+                                Clear Form
+                            </button>
+                            <button type="submit" class="btn btn-primary px-4 py-2" style="border-radius: 8px;">
+                                <i class="fas fa-paper-plane mr-2"></i>
+                                Generate Bill
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Help Text -->
+            <div class="text-center mt-4 text-muted small">
+                <p class="mb-0">All charges are subject to hospital billing policies</p>
+                <p>Generated bills will appear in patient's records immediately</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function calculateFees() {
+    const consultation = parseFloat(document.getElementById('id_consultation_fee').value) || 0;
+    const procedure = parseFloat(document.getElementById('id_procedure_fee').value) || 0;
+    const medication = parseFloat(document.getElementById('id_medication_fee').value) || 0;
+    const other = parseFloat(document.getElementById('id_other_fee').value) || 0;
+    
+    const subtotal = consultation + procedure + medication + other;
+    
+    // Animation effect
+    const subtotalDisplay = document.getElementById('subtotal-display');
+    subtotalDisplay.classList.remove('text-success');
+    subtotalDisplay.classList.add('text-primary');
+    
+    setTimeout(() => {
+        subtotalDisplay.textContent = '₹' + subtotal.toFixed(2);
+        subtotalDisplay.classList.remove('text-primary');
+        subtotalDisplay.classList.add('text-success');
+        
+        // Add bounce animation
+        subtotalDisplay.classList.add('animate__animated', 'animate__bounceIn');
+        setTimeout(() => {
+            subtotalDisplay.classList.remove('animate__animated', 'animate__bounceIn');
+        }, 1000);
+    }, 300);
+}
+</script>
+
+<style>
+/* Custom color palette */
+:root {
+    --primary-soft: rgba(67, 97, 238, 0.1);
+}
+
+.bg-primary-soft {
+    background-color: var(--primary-soft);
+}
+
+.btn-primary-soft {
+    background-color: var(--primary-soft);
+    color: #4361ee;
+    border: 1px solid rgba(67, 97, 238, 0.3);
+}
+
+.btn-primary-soft:hover {
+    background-color: rgba(67, 97, 238, 0.2);
+}
+
+/* Enhanced form controls */
+.form-control {
+    border-radius: 8px;
+    border: 1px solid #e0e6ed;
+    padding: 10px 15px;
+    transition: all 0.3s;
+}
+
+.form-control:focus {
+    border-color: #4361ee;
+    box-shadow: 0 0 0 0.2rem rgba(67, 97, 238, 0.25);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .card-body {
+        padding: 1.5rem;
+    }
+    
+    .border-right {
+        border-right: none !important;
+        border-bottom: 1px solid #dee2e6;
+        padding-bottom: 1rem;
+        margin-bottom: 1rem;
+    }
+}
+</style>
+{% endblock %}

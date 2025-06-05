@@ -2,7 +2,7 @@ from django import forms
 from django.utils import timezone
 from django.forms import inlineformset_factory
 from django.core.exceptions import ValidationError
-from .models import CustomUser,NICUVitals, Patient,Billing,Expense,OPD,Room, Doctor, Employee,EmergencyCase,PatientReport,Prescription,License,Asset,Maintenance,Daybook,NICUMedicationRecord,Medicine, Diluent,Vial,FluidRequirement,IPD,MedicineVial
+from .models import CustomUser,NICUVitals, Patient,OPDBilling, IPDBilling, BillingItem, Payment, Expense,OPD,Room, Doctor, Employee,EmergencyCase,PatientReport,Prescription,License,Asset,Maintenance,Daybook,NICUMedicationRecord,Medicine, Diluent,Vial,FluidRequirement,IPD,MedicineVial
 
 class ProfileUpdateForm(forms.ModelForm):
     class Meta:
@@ -56,15 +56,15 @@ class PatientReportForm(forms.ModelForm):
         }
 
         
-class BillingForm(forms.ModelForm):
-    class Meta:
-        model = Billing
-        fields = ['paid_amount']
+# class BillingForm(forms.ModelForm):
+#     class Meta:
+#         model = Billing
+#         fields = ['paid_amount']
 
-class ExpenseForm(forms.ModelForm):
-    class Meta:
-        model = Expense
-        fields = ['patient', 'category', 'description', 'cost']
+# class ExpenseForm(forms.ModelForm):
+#     class Meta:
+#         model = Expense
+        # fields = ['patient', 'category', 'description', 'cost']
 
 class IPDForm(forms.ModelForm):
     class Meta:
@@ -104,7 +104,7 @@ class OPDForm(forms.ModelForm):
         model = OPD
         fields = [
             'patient', 'doctor', 'diagnosis', 'symptoms', 'prescription', 
-            'follow_up_date', 'visit_type', 'payment_status', 'payment_amount'
+            'follow_up_date', 'visit_type',
         ]
         widgets = {
             'patient': forms.Select(attrs={'class': 'w-full p-2 border border-gray-300 rounded-md'}),
@@ -114,8 +114,6 @@ class OPDForm(forms.ModelForm):
             'prescription': forms.Textarea(attrs={'class': 'w-full p-2 border border-gray-300 rounded-md', 'rows': 3}),
             'follow_up_date': forms.DateInput(attrs={'type': 'date', 'class': 'w-full p-2 border border-gray-300 rounded-md'}),
             'visit_type': forms.Select(attrs={'class': 'w-full p-2 border border-gray-300 rounded-md'}),
-            'payment_status': forms.Select(attrs={'class': 'w-full p-2 border border-gray-300 rounded-md'}),
-            'payment_amount': forms.NumberInput(attrs={'class': 'w-full p-2 border border-gray-300 rounded-md'}),
         }
 
     def clean_follow_up_date(self):
@@ -323,7 +321,6 @@ class BalanceUpdateForm(forms.Form):
 
 
 
-
 class NICUVitalsForm(forms.ModelForm):
     class Meta:
         model = NICUVitals
@@ -489,3 +486,56 @@ class NICUFluidForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["medicine"].queryset = Medicine.objects.filter(medicine_type="fluid")
+
+
+
+
+
+
+class OPDBillingForm(forms.ModelForm):
+    class Meta:
+        model = OPDBilling
+        fields = ['opd_visit', 'consultation_fee', 'procedure_fee', 'medication_fee', 'other_fee']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for name, field in self.fields.items():
+            field.widget.attrs.update({'class': 'form-control fee-input' if 'fee' in name else 'form-control'})
+
+
+class IPDBillingForm(forms.ModelForm):
+    class Meta:
+        model = IPDBilling
+        fields = ['ipd_admission', 'nursing_charges', 'procedure_charges', 'medication_charges', 'lab_charges', 'other_charges']
+
+    room_charges = forms.DecimalField(required=False, widget=forms.HiddenInput())
+
+class BillingItemForm(forms.ModelForm):
+    class Meta:
+        model = BillingItem
+        fields = [ 'opd_billing', 'ipd_billing', 'description', 'quantity', 'unit_price', 'discount', 'tax_rate']
+    
+
+class PaymentForm(forms.ModelForm):
+    def __init__(self, *args, max_amount=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        if max_amount is not None:
+            self.fields['amount'].widget.attrs['max'] = str(max_amount)
+            self.fields['amount'].widget.attrs['placeholder'] = f'Max: ₹{max_amount}'
+
+    class Meta:
+        model = Payment
+        # ✅ EXCLUDE 'received_by' since it's set in the view
+        fields = ['amount', 'payment_method', 'transaction_id', 'notes']
+
+
+class ExpenseForm(forms.ModelForm):
+    class Meta:
+        model = Expense
+        fields = ['patient', 'category', 'description', 'cost']
+        widgets = {
+            'patient': forms.Select(attrs={'class': 'form-control'}),
+            'category': forms.Select(attrs={'class': 'form-control'}),
+            'description': forms.TextInput(attrs={'class': 'form-control'}),
+            'cost': forms.NumberInput(attrs={'class': 'form-control'}),
+        }

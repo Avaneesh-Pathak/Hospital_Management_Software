@@ -1,0 +1,162 @@
+{% extends 'hms/base.html' %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 mb-0 text-gray-800">Billing Management</h1>
+        <div>
+            <a href="{% url 'create_opd_bill' %}" class="btn btn-primary mr-2">
+                <i class="fas fa-file-medical mr-2"></i>Create OPD Bill
+            </a>
+            <a href="{% url 'create_ipd_bill' %}" class="btn btn-primary">
+                <i class="fas fa-procedures mr-2"></i>Create IPD Bill
+            </a>
+        </div>
+    </div>
+
+    <div class="card shadow mb-4">
+        <div class="card-header py-3 d-flex justify-content-between align-items-center">
+            <h6 class="m-0 font-weight-bold text-primary">Recent Bills</h6>
+            <div class="dropdown no-arrow">
+                <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink" 
+                   data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
+                </a>
+                <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" 
+                     aria-labelledby="dropdownMenuLink">
+                    <a class="dropdown-item" href="#">Export to Excel</a>
+                    <a class="dropdown-item" href="#">Print Report</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="card-body">
+            <div class="mb-3">
+                <input type="text" id="billSearchInput" class="form-control" placeholder="Search by bill number or patient name">
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover" width="100%" cellspacing="0">
+                    <thead class="thead-light">
+                        <tr>
+                            <th>Bill No.</th>
+                            <th>Patient</th>
+                            <th>Type</th>
+                            <th>Date</th>
+                            <th class="text-right">Total</th>
+                            <th class="text-right">Paid</th>
+                            <th>Status</th>
+                            <th class="text-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for bill in bills %}
+                        <tr>
+                            <td class="font-weight-bold">#{{ bill.bill_number }}</td>
+                            <td>{{ bill.patient.user.full_name }}</td>
+                            <td>{{ bill.bill_type|upper }}</td>
+                            <td>{{ bill.generated_date|date:"d M Y" }}</td>
+                            <td class="text-right">₹{{ bill.total_amount|floatformat:2 }}</td>
+                            <td class="text-right">₹{{ bill.paid_amount|floatformat:2 }}</td>
+                            <td>
+                                <span class="badge 
+                                    {% if bill.status == 'paid' %}bg-success
+                                    {% elif bill.status == 'partially_paid' %}bg-warning
+                                    {% elif bill.status == 'cancelled' %}bg-danger
+                                    {% else %}bg-info{% endif %}">
+                                    {{ bill.get_status_display }}
+                                </span>
+                            </td>
+                            <td class="text-center">
+                                <div class="btn-group" role="group">
+                                    <a href="{% url 'view_bill' bill.bill_number %}" 
+                                       class="btn btn-sm btn-outline-primary" title="View Details">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <a href="{% url 'record_payment' bill.bill_number %}" 
+                                       class="btn btn-sm btn-outline-success" title="Record Payment">
+                                        <i class="fas fa-rupee-sign"></i>
+                                    </a>
+                                    <a href="#" class="btn btn-sm btn-outline-secondary" title="Print">
+                                        <i class="fas fa-print"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="8" class="text-center py-4">
+                                <i class="fas fa-file-invoice fa-2x text-gray-400 mb-2"></i>
+                                <p class="text-muted">No bills found</p>
+                                <a href="{% url 'create_opd_bill' %}" class="btn btn-primary mt-2">
+                                    Create Your First Bill
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        {% if page_obj.has_other_pages %}
+        <div class="card-footer">
+            <div class="row">
+                <div class="col-md-6">
+                    <p class="text-muted small">Showing <strong>{{ page_obj.paginator.count }}</strong> bills</p>
+                </div>
+                <div class="col-md-6">
+                    <nav aria-label="Page navigation" class="float-right">
+                        <ul class="pagination">
+                            {% if page_obj.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a>
+                            </li>
+                            {% else %}
+                            <li class="page-item disabled">
+                                <a class="page-link" href="#">Previous</a>
+                            </li>
+                            {% endif %}
+
+                            {% for num in page_obj.paginator.page_range %}
+                            <li class="page-item {% if page_obj.number == num %}active{% endif %}">
+                                <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                            </li>
+                            {% endfor %}
+
+                            {% if page_obj.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a>
+                            </li>
+                            {% else %}
+                            <li class="page-item disabled">
+                                <a class="page-link" href="#">Next</a>
+                            </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+document.getElementById('billSearchInput').addEventListener('keyup', function () {
+    const search = this.value.toLowerCase();
+    const rows = document.querySelectorAll("table tbody tr");
+
+    rows.forEach(row => {
+        const billNo = row.querySelector('td:nth-child(1)')?.textContent.toLowerCase();
+        const patient = row.querySelector('td:nth-child(2)')?.textContent.toLowerCase();
+
+        if (billNo.includes(search) || patient.includes(search)) {
+            row.style.display = '';
+        } else {
+            row.style.display = 'none';
+        }
+    });
+});
+</script>
+{% endblock %}

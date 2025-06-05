@@ -298,11 +298,18 @@
                 <span class="text-xs font-semibold uppercase text-gray-400 tracking-wider">Financial</span>
             </li>
             <li>
-                <a href="{% url 'billing' %}" class="flex items-center p-3 text-sm font-medium rounded-lg transition-all duration-200 hover:bg-gray-800 hover:text-white group">
+                <a href="{% url 'bill_list' %}" class="flex items-center p-3 text-sm font-medium rounded-lg transition-all duration-200 hover:bg-gray-800 hover:text-white group">
                     <i class="fas fa-money-bill-wave w-5 text-center text-gray-400 group-hover:text-green-400"></i>
                     <span class="ml-3">Billing</span>
                 </a>
             </li>
+            <li>
+                <a href="{% url 'payment_list' %}" class="flex items-center p-3 text-sm font-medium rounded-lg transition-all duration-200 hover:bg-gray-800 hover:text-white group">
+                    <i class="fas fa-credit-card w-5 text-center text-gray-400 group-hover:text-yellow-400"></i>
+                    <span class="ml-3">View All Payments</span>
+                </a>
+            </li>
+
             <li>
                 <a href="{% url 'accounting_summary' %}" class="flex items-center p-3 text-sm font-medium rounded-lg transition-all duration-200 hover:bg-gray-800 hover:text-white group">
                     <i class="fas fa-calculator w-5 text-center text-gray-400 group-hover:text-blue-400"></i>

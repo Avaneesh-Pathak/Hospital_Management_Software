@@ -1,0 +1,676 @@
+{% load humanize %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Invoice #{{ bill.bill_number }} - {{ hospital_name|default:'Healthcare System' }}</title>
+    <style>
+        @font-face {
+            font-family: 'DejaVuSans';
+            src: url('file:///C:/Windows/Fonts/DejaVuSans.ttf');
+        }
+
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            color: #333;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: #fff;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            border: 1px solid #e0e0e0;
+            padding: 30px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.05);
+            position: relative;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #005b96;
+            position: relative;
+        }
+        
+        .hospital-name {
+            font-size: 28px;
+            font-weight: 700;
+            color: #005b96;
+            margin-bottom: 5px;
+            letter-spacing: 0.5px;
+        }
+        
+        .hospital-subtitle {
+            font-size: 14px;
+            color: #666;
+            font-weight: 400;
+            margin-bottom: 10px;
+        }
+        
+        .hospital-address {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 15px;
+            line-height: 1.4;
+        }
+        
+        .hospital-contact {
+            font-size: 12px;
+            color: #444;
+            margin-bottom: 5px;
+        }
+        
+        .bill-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #005b96;
+            margin-top: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .bill-info-container {
+            display: flex;
+            justify-content: space-between;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+        
+        .info-section {
+            flex: 1;
+            min-width: 250px;
+            margin: 0 10px 20px;
+        }
+        
+        .info-section-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #005b96;
+            margin-bottom: 10px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .info-row {
+            display: flex;
+            margin-bottom: 8px;
+        }
+        
+        .info-label {
+            font-size: 11px;
+            color: #666;
+            width: 120px;
+            flex-shrink: 0;
+        }
+        
+        .info-value {
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .paid {
+            background-color: #28a745;
+            color: white;
+        }
+        
+        .unpaid {
+            background-color: #dc3545;
+            color: white;
+        }
+        
+        .partial {
+            background-color: #ffc107;
+            color: #212529;
+        }
+        
+        .bill-details-section {
+            margin: 40px 0;
+        }
+        
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #005b96;
+            margin-bottom: 15px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .bill-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 12px;
+        }
+        
+        .bill-table thead th {
+            background-color: #005b96;
+            color: white;
+            padding: 12px 10px;
+            text-align: left;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .bill-table tbody td {
+            padding: 12px 10px;
+            border-bottom: 1px solid #eee;
+            vertical-align: top;
+        }
+        
+        .bill-table tbody tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        
+        .bill-table tbody tr:hover {
+            background-color: #f1f7fd;
+        }
+        
+        .text-right {
+            text-align: right;
+        }
+        
+        .text-center {
+            text-align: center;
+        }
+        
+        .summary-section {
+            float: right;
+            width: 300px;
+            margin-top: 20px;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            padding: 20px;
+            background-color: #f8fafc;
+        }
+        
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 12px;
+        }
+        
+        .summary-total {
+            border-top: 1px solid #ddd;
+            padding-top: 10px;
+            margin-top: 10px;
+            font-weight: 600;
+            font-size: 13px;
+        }
+        
+        .summary-due {
+            color: #dc3545;
+            font-weight: 600;
+        }
+        
+        .signature-area {
+            margin-top: 60px;
+            display: flex;
+            justify-content: space-between;
+            padding-top: 30px;
+            border-top: 1px solid #eee;
+        }
+        
+        .signature-box {
+            width: 250px;
+            text-align: center;
+        }
+        
+        .signature-line {
+            height: 1px;
+            background-color: #333;
+            margin: 15px auto;
+            width: 80%;
+        }
+        
+        .signature-label {
+            font-size: 11px;
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        .footer {
+            margin-top: 50px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            font-size: 10px;
+            color: #666;
+            text-align: center;
+            line-height: 1.5;
+        }
+        
+        .footer-note {
+            font-style: italic;
+            margin-top: 10px;
+        }
+        
+        .watermark {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-30deg);
+            opacity: 0.06;
+            font-size: 100px;
+            font-weight: 700;
+            color: #005b96;
+            pointer-events: none;
+            z-index: -1;
+            white-space: nowrap;
+        }
+        
+        .hospital-logo {
+            max-height: 80px;
+            margin-bottom: 15px;
+        }
+        
+        .barcode {
+            text-align: center;
+            margin-top: 10px;
+            font-family: 'Libre Barcode 39', cursive;
+            font-size: 24px;
+            letter-spacing: 2px;
+        }
+        
+        .page-break {
+            page-break-after: always;
+        }
+        
+        @media print {
+            body {
+                padding: 0;
+                background: none;
+            }
+            
+            .container {
+                border: none;
+                box-shadow: none;
+                padding: 15px;
+            }
+            
+            .no-print {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="watermark">{{ hospital_name|default:'HOSPITAL' }}</div>
+        
+        <!-- Header Section -->
+        <div class="header">
+            {% if hospital_logo %}
+            <img src="{{ hospital_logo }}" alt="Hospital Logo" class="hospital-logo">
+            {% endif %}
+            <div class="hospital-name">{{ hospital_name|default:'HEALTHCARE MANAGEMENT SYSTEM' }}</div>
+            <div class="hospital-subtitle">Quality Healthcare Services</div>
+            <div class="hospital-address">
+                {{ hospital_address|default:'123 Medical Drive, Healthcare City' }}<br>
+                {{ hospital_city|default:'City' }}, {{ hospital_state|default:'State' }} {{ hospital_zip|default:'ZIP' }}, {{ hospital_country|default:'Country' }}
+            </div>
+            <div class="hospital-contact">
+                Phone: {{ hospital_phone|default:'+1 (555) 123-4567' }} | 
+                Email: {{ hospital_email|default:'info@hospital.com' }} | 
+                Website: {{ hospital_website|default:'www.hospital.com' }}
+            </div>
+            <div class="bill-title">Tax Invoice</div>
+            <div class="barcode">*{{ bill.bill_number }}*</div>
+        </div>
+        
+        <!-- Bill Information Sections -->
+        <div class="bill-info-container">
+            <!-- Patient Information -->
+            <div class="info-section">
+                <div class="info-section-title">Patient Details</div>
+                <div class="info-row">
+                    <div class="info-label">Patient Name:</div>
+                    <div class="info-value">{{ bill.patient.user.full_name }}</div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">Patient ID:</div>
+                    <div class="info-value">{{ bill.patient.patient_code }}</div>
+                </div>
+                {% if bill.patient.user.phone %}
+                <div class="info-row">
+                    <div class="info-label">Phone:</div>
+                    <div class="info-value">{{ bill.patient.user.phone }}</div>
+                </div>
+                {% endif %}
+                {% if bill.patient.user.address %}
+                <div class="info-row">
+                    <div class="info-label">Address:</div>
+                    <div class="info-value">{{ bill.patient.user.address }}</div>
+                </div>
+                {% endif %}
+                {% if bill.patient.insurance_provider %}
+                <div class="info-row">
+                    <div class="info-label">Insurance:</div>
+                    <div class="info-value">{{ bill.patient.insurance_provider }} ({{ bill.patient.insurance_number }})</div>
+                </div>
+                {% endif %}
+            </div>
+            
+            <!-- Billing Information -->
+            <div class="info-section">
+                <div class="info-section-title">Billing Information</div>
+                <div class="info-row">
+                    <div class="info-label">Invoice Number:</div>
+                    <div class="info-value">{{ bill.bill_number }}</div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">Invoice Date:</div>
+                    <div class="info-value">{{ bill.generated_date|date:"F d, Y" }}</div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">Time:</div>
+                    <div class="info-value">{{ bill.generated_date|time:"H:i" }}</div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">Service Type:</div>
+                    <div class="info-value">
+                        {% if bill.bill_type == 'OPD' %}
+                        Outpatient Department
+                        {% else %}
+                        Inpatient Department
+                        {% endif %}
+                    </div>
+                </div>
+                {% if bill.admission %}
+                <div class="info-row">
+                    <div class="info-label">Admission Date:</div>
+                    <div class="info-value">{{ bill.admission.admission_date|date:"F d, Y" }}</div>
+                </div>
+                {% endif %}
+            </div>
+            
+            <!-- Payment Information -->
+            <div class="info-section">
+                <div class="info-section-title">Payment Information</div>
+                <div class="info-row">
+                    <div class="info-label">Status:</div>
+                    <div class="info-value">
+                        <span class="status-badge {% if bill.status == 'paid' %}paid{% elif bill.status == 'partially_paid' %}partial{% else %}unpaid{% endif %}">
+                            {{ bill.get_status_display|upper }}
+                        </span>
+                    </div>
+                </div>
+                {% if bill.paid_amount > 0 %}
+                <div class="info-row">
+                    <div class="info-label">Amount Paid:</div>
+                    <div class="info-value">Rs.{{ bill.paid_amount|intcomma }}</div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">Payment Date:</div>
+                    <div class="info-value">{{ bill.payment_date|date:"F d, Y"|default:"-" }}</div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">Payment Method:</div>
+                    <div class="info-value">{{ bill.payment_method|default:"-"|title }}</div>
+                </div>
+                {% endif %}
+                <div class="info-row">
+                    <div class="info-label">Total Amount:</div>
+                    <div class="info-value">Rs.{{ bill.get_final_amount|intcomma }}</div>
+                </div>
+                {% if bill.get_balance_due > 0 %}
+                <div class="info-row">
+                    <div class="info-label">Balance Due:</div>
+                    <div class="info-value">Rs.{{ bill.get_balance_due|intcomma }}</div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Bill Details Section -->
+        <div class="bill-details-section">
+            <div class="section-title">Itemized Charges</div>
+            <table class="bill-table">
+                <thead>
+                    <tr>
+                        <th width="5%">#</th>
+                        <th width="35%">Description</th>
+                        <th width="10%" class="text-center">Qty</th>
+                        <th width="15%" class="text-right">Unit Price (Rs.)</th>
+                        <th width="10%" class="text-center">Discount</th>
+                        <th width="10%" class="text-center">Tax</th>
+                        <th width="15%" class="text-right">Amount (Rs.)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if bill.bill_type == "OPD" %}
+                        {% if bill.consultation_fee > 0 %}
+                        <tr>
+                            <td>1</td>
+                            <td>Consultation Fee</td>
+                            <td class="text-center">1</td>
+                            <td class="text-right">{{ bill.consultation_fee|intcomma }}</td>
+                            <td class="text-center">0%</td>
+                            <td class="text-center">0%</td>
+                            <td class="text-right">{{ bill.consultation_fee|intcomma }}</td>
+                        </tr>
+                        {% endif %}
+                        
+                        {% if bill.procedure_fee > 0 %}
+                        <tr>
+                            <td>2</td>
+                            <td>Procedure Fee</td>
+                            <td class="text-center">1</td>
+                            <td class="text-right">{{ bill.procedure_fee|intcomma }}</td>
+                            <td class="text-center">0%</td>
+                            <td class="text-center">0%</td>
+                            <td class="text-right">{{ bill.procedure_fee|intcomma }}</td>
+                        </tr>
+                        {% endif %}
+                        
+                        {% if bill.medication_fee > 0 %}
+                        <tr>
+                            <td>3</td>
+                            <td>Medication Fee</td>
+                            <td class="text-center">1</td>
+                            <td class="text-right">{{ bill.medication_fee|intcomma }}</td>
+                            <td class="text-center">0%</td>
+                            <td class="text-center">0%</td>
+                            <td class="text-right">{{ bill.medication_fee|intcomma }}</td>
+                        </tr>
+                        {% endif %}
+                        
+                        {% if bill.other_fee > 0 %}
+                        <tr>
+                            <td>4</td>
+                            <td>Other Services</td>
+                            <td class="text-center">1</td>
+                            <td class="text-right">{{ bill.other_fee|intcomma }}</td>
+                            <td class="text-center">0%</td>
+                            <td class="text-center">0%</td>
+                            <td class="text-right">{{ bill.other_fee|intcomma }}</td>
+                        </tr>
+                        {% endif %}
+                    {% endif %}
+                    
+                    {% if bill.bill_type == "IPD" %}
+                        {% if bill.room_charges > 0 %}
+                        <tr>
+                            <td>1</td>
+                            <td>Room Charges ({{ bill.admission.ward.name|default:"Ward" }})</td>
+                            <td class="text-center">{{ bill.admission.duration|default:1 }}</td>
+                            <td class="text-right">{{ bill.room_charges|intcomma }}</td>
+                            <td class="text-center">0%</td>
+                            <td class="text-center">0%</td>
+                            <td class="text-right">{{ bill.room_charges|intcomma }}</td>
+                        </tr>
+                        {% endif %}
+                        
+                        {% if bill.nursing_charges > 0 %}
+                        <tr>
+                            <td>2</td>
+                            <td>Nursing Care Charges</td>
+                            <td class="text-center">{{ bill.admission.duration|default:1 }}</td>
+                            <td class="text-right">{{ bill.nursing_charges|intcomma }}</td>
+                            <td class="text-center">0%</td>
+                            <td class="text-center">0%</td>
+                            <td class="text-right">{{ bill.nursing_charges|intcomma }}</td>
+                        </tr>
+                        {% endif %}
+                        
+                        {% if bill.procedure_charges > 0 %}
+                        <tr>
+                            <td>3</td>
+                            <td>Medical Procedures</td>
+                            <td class="text-center">1</td>
+                            <td class="text-right">{{ bill.procedure_charges|intcomma }}</td>
+                            <td class="text-center">0%</td>
+                            <td class="text-center">0%</td>
+                            <td class="text-right">{{ bill.procedure_charges|intcomma }}</td>
+                        </tr>
+                        {% endif %}
+                        
+                        {% if bill.medication_charges > 0 %}
+                        <tr>
+                            <td>4</td>
+                            <td>Medication Charges</td>
+                            <td class="text-center">1</td>
+                            <td class="text-right">{{ bill.medication_charges|intcomma }}</td>
+                            <td class="text-center">0%</td>
+                            <td class="text-center">0%</td>
+                            <td class="text-right">{{ bill.medication_charges|intcomma }}</td>
+                        </tr>
+                        {% endif %}
+                        
+                        {% if bill.lab_charges > 0 %}
+                        <tr>
+                            <td>5</td>
+                            <td>Laboratory Tests</td>
+                            <td class="text-center">1</td>
+                            <td class="text-right">{{ bill.lab_charges|intcomma }}</td>
+                            <td class="text-center">0%</td>
+                            <td class="text-center">0%</td>
+                            <td class="text-right">{{ bill.lab_charges|intcomma }}</td>
+                        </tr>
+                        {% endif %}
+                        
+                        {% if bill.other_charges > 0 %}
+                        <tr>
+                            <td>6</td>
+                            <td>Other Hospital Services</td>
+                            <td class="text-center">1</td>
+                            <td class="text-right">{{ bill.other_charges|intcomma }}</td>
+                            <td class="text-center">0%</td>
+                            <td class="text-center">0%</td>
+                            <td class="text-right">{{ bill.other_charges|intcomma }}</td>
+                        </tr>
+                        {% endif %}
+                    {% endif %}
+                    
+                    {% for item in bill.billingitem_set.all %}
+                    <tr>
+                        <td>{{ forloop.counter|add:item_offset }}</td>
+                        <td>{{ item.description }}</td>
+                        <td class="text-center">{{ item.quantity }}</td>
+                        <td class="text-right">{{ item.unit_price|intcomma }}</td>
+                        <td class="text-center">{{ item.discount }}%</td>
+                        <td class="text-center">{{ item.tax_rate }}%</td>
+                        <td class="text-right">{{ item.amount|intcomma }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            
+            <!-- Payment Summary -->
+            <div class="summary-section">
+                <div class="section-title">Payment Summary</div>
+                <div class="summary-row">
+                    <span>Subtotal:</span>
+                    <span>Rs.{{ bill.total_amount|intcomma }}</span>
+                </div>
+                <div class="summary-row">
+                    <span>Discount:</span>
+                    <span>- Rs.{{ bill.discount_amount|intcomma }}</span>
+                </div>
+                {% if bill.tax_amount > 0 %}
+                <div class="summary-row">
+                    <span>Tax ({{ bill.tax_rate|default:0 }}%):</span>
+                    <span>+ Rs.{{ bill.tax_amount|intcomma }}</span>
+                </div>
+                {% endif %}
+                <div class="summary-row summary-total">
+                    <span>Total Amount:</span>
+                    <span>Rs.{{ bill.get_final_amount|intcomma }}</span>
+                </div>
+                {% if bill.paid_amount > 0 %}
+                <div class="summary-row">
+                    <span>Amount Paid:</span>
+                    <span>Rs.{{ bill.paid_amount|intcomma }}</span>
+                </div>
+                <div class="summary-row summary-total {% if bill.get_balance_due > 0 %}summary-due{% endif %}">
+                    <span>Balance Due:</span>
+                    <span>Rs.{{ bill.get_balance_due|intcomma }}</span>
+                </div>
+                {% endif %}
+            </div>
+            <div style="clear: both;"></div>
+        </div>
+        
+        <!-- Terms and Notes -->
+        <div style="margin-top: 20px; font-size: 11px; color: #666;">
+            <div style="font-weight: 600; margin-bottom: 5px;">Payment Terms:</div>
+            <div style="margin-bottom: 15px;">
+                Payment is due within {{ payment_terms|default:"15" }} days of invoice date. Please make checks payable to {{ hospital_name|default:"Hospital Name" }}. 
+                For electronic payments, use the bank details provided below.
+            </div>
+            
+            <div style="display: flex; justify-content: space-between; flex-wrap: wrap;">
+                <div style="width: 48%; margin-bottom: 15px;">
+                    <div style="font-weight: 600; margin-bottom: 5px;">Bank Details:</div>
+                    <div>Bank Name: {{ bank_name|default:"National Bank" }}</div>
+                    <div>Account Name: {{ account_name|default:"Hospital Account" }}</div>
+                    <div>Account Number: {{ account_number|default:"123456789" }}</div>
+                    <div>IFSC Code: {{ ifsc_code|default:"IFSC000123" }}</div>
+                </div>
+                <div style="width: 48%; margin-bottom: 15px;">
+                    <div style="font-weight: 600; margin-bottom: 5px;">Tax Information:</div>
+                    <div>GSTIN: {{ gst_number|default:"22AAAAA0000A1Z5" }}</div>
+                    <div>PAN: {{ pan_number|default:"AAAAA1234A" }}</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Signature Area -->
+        <div class="signature-area">
+            <div class="signature-box">
+                <div class="signature-line"></div>
+                <div class="signature-label">Patient/Authorized Representative</div>
+            </div>
+            <div class="signature-box">
+                <div class="signature-line"></div>
+                <div class="signature-label">Authorized Hospital Signatory</div>
+            </div>
+        </div>
+        
+        <!-- Footer -->
+        <div class="footer">
+            <div>{{ hospital_name|default:"Healthcare Management System" }} | License No: {{ hospital_license|default:"MH-123-456" }}</div>
+            <div>For billing inquiries, please contact: {{ billing_contact|default:"billing@hospital.com" }} | Phone: {{ billing_phone|default:"+1 (555) 987-6543" }}</div>
+            <div class="footer-note">
+                This is a computer generated invoice and does not require a physical signature. 
+                Please retain this document for your records.
+            </div>
+        </div>
+    </div>
+</body>
+</html>
