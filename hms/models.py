@@ -278,11 +278,6 @@ class Room(models.Model):
     ('icu', 'ICU'),
     ('emergency', 'Emergency Ward'),
     ('other', 'Other'),]
-<<<<<<< HEAD
-=======
-
->>>>>>> 8def213117a19109122b0ebb92dbd88ac1082f45
-
     room_number = models.CharField(max_length=10, unique=True)
     room_type = models.CharField(max_length=20, choices=ROOM_TYPES)
     is_available = models.BooleanField(default=True)
@@ -520,30 +515,6 @@ class OPD(models.Model):
         ('emergency', 'Emergency Visit'),
     ]
     visit_type = models.CharField(max_length=20, choices=VISIT_TYPE_CHOICES, default='new')  # Type of visit
-    # PAYMENT_STATUS_CHOICES = [
-    #     ('paid', 'Paid'),
-    #     ('pending', 'Pending'),
-    # ]
-    # payment_status = models.CharField(max_length=20, choices=PAYMENT_STATUS_CHOICES, default='pending')  # Payment status
-    # payment_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)  # Amount paid for the visit
-
-    # def save(self, *args, **kwargs):
-    #     if isinstance(self.payment_amount, str):
-    #         try:
-    #             self.payment_amount = Decimal(self.payment_amount)
-    #         except ValueError:
-    #             self.payment_amount = Decimal(0)  # Set to 0 if conversion fails
-        
-    #     super().save(*args, **kwargs)
-
-    #     if self.payment_status == 'paid' and self.payment_amount > 0:
-    #         AccountingRecord.objects.create(
-    #             transaction_type='income',
-    #             source='opd',
-    #             amount=self.payment_amount,
-    #             description=f"OPD payment for {self.patient.user.full_name}",
-    #             patient=self.patient,
-    #         )
 
     def __str__(self):
         return f"OPD Visit - {self.patient.user.full_name} ({self.visit_date.strftime('%Y-%m-%d')})"
@@ -585,59 +556,6 @@ class Expense(models.Model):
 
     def __str__(self):
         return f"{self.patient.patient_code} - {self.category} - ₹{self.cost}"
-
-# class Billing(models.Model):
-#     STATUS_CHOICES = [
-#         ('paid', 'Paid'),
-#         ('partial', 'Partially Paid'),
-#         ('pending', 'Pending'),
-#     ]
-
-#     patient = models.OneToOneField(Patient, on_delete=models.CASCADE, related_name='billing')
-#     total_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-#     paid_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-#     pending_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0, editable=False)
-#     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
-#     generated_on = models.DateTimeField(auto_now_add=True)
-#     last_updated = models.DateTimeField(auto_now=True)
-
-#     def calculate_totals(self):
-#         """Recalculate totals based on related expenses and payments."""
-#         expenses_total = Expense.objects.filter(patient=self.patient).aggregate(models.Sum('cost'))['cost__sum'] or Decimal(0)
-#         payments_total = Payment.objects.filter(billing=self).aggregate(models.Sum('amount'))['amount__sum'] or Decimal(0)
-
-#         self.total_amount = expenses_total
-#         self.paid_amount = payments_total
-#         self.pending_amount = expenses_total - payments_total
-
-#         if payments_total >= expenses_total:
-#             self.status = 'paid'
-#         elif payments_total == 0:
-#             self.status = 'pending'
-#         else:
-#             self.status = 'partial'
-
-#         self.save()
-    
-    
-
-#     def __str__(self):
-#         return f"Billing - {self.patient.patient_code} | Total: ₹{self.total_amount} | Paid: ₹{self.paid_amount} | Status: {self.get_status_display()}"
-
-# # class Payment(models.Model):
-# #     billing = models.ForeignKey(Billing, on_delete=models.CASCADE, related_name='payments')
-# #     amount = models.DecimalField(max_digits=10, decimal_places=2)
-# #     payment_mode = models.CharField(max_length=20, choices=[('cash', 'Cash'), ('card', 'Card'), ('upi', 'UPI'), ('other', 'Other')], default='cash')
-# #     payment_date = models.DateTimeField(default=timezone.now)
-# #     notes = models.TextField(null=True, blank=True)
-
-# #     def save(self, *args, **kwargs):
-# #         super().save(*args, **kwargs)
-# #         self.billing.calculate_totals()
-
-# #     def __str__(self):
-# #         return f"Payment ₹{self.amount} on {self.payment_date.strftime('%Y-%m-%d')} via {self.payment_mode.title()}"
-
 
 # new model of billing and payment
 class BillingBase(models.Model):
@@ -1206,12 +1124,6 @@ class NICUMedicationRecord(models.Model):
         try:
             
             print("🚀 Starting save method")
-            # Make sure 'medicine_vial' is set
-            # if self.medicine_vial is None and self.medicine.medicine_type == 'injection' and self.route == "IV":
-            #     raise ValidationError("Please select a medicine vial for IV injections.")
-                # Make sure the 'medicine_vial' field is properly set
-            # if not self.medicine_vial:
-            #     self.medicine_vial = self.cleaned_data.get('medicine_vial', None)
             self.clean()
             print("✅ Cleaned successfully")
             print(f"medicine_vial value before saving: {self.medicine_vial}")
@@ -1445,20 +1357,3 @@ class FluidRequirement(models.Model):
         return f"{patient_name} - Day {self.day_after_birth}"
 
 
-# FluidRequirement.objects.bulk_create([
-#     # For preterm neonates birth weight ≤1500g
-#     FluidRequirement(birth_weight_category="≤1500g", day_after_birth=1, fluid_ml_per_kg_per_day=80),
-#     FluidRequirement(birth_weight_category="≤1500g", day_after_birth=2, fluid_ml_per_kg_per_day=90),
-#     FluidRequirement(birth_weight_category="≤1500g", day_after_birth=3, fluid_ml_per_kg_per_day=100),
-#     FluidRequirement(birth_weight_category="≤1500g", day_after_birth=4, fluid_ml_per_kg_per_day=120),
-#     FluidRequirement(birth_weight_category="≤1500g", day_after_birth=5, fluid_ml_per_kg_per_day=140),
-#     FluidRequirement(birth_weight_category="≤1500g", day_after_birth=6, fluid_ml_per_kg_per_day=150),
-    
-#     # For term/preterm neonates birth weight >1500g
-#     FluidRequirement(birth_weight_category=">1500g", day_after_birth=1, fluid_ml_per_kg_per_day=60),
-#     FluidRequirement(birth_weight_category=">1500g", day_after_birth=2, fluid_ml_per_kg_per_day=80),
-#     FluidRequirement(birth_weight_category=">1500g", day_after_birth=3, fluid_ml_per_kg_per_day=100),
-#     FluidRequirement(birth_weight_category=">1500g", day_after_birth=4, fluid_ml_per_kg_per_day=120),
-#     FluidRequirement(birth_weight_category=">1500g", day_after_birth=5, fluid_ml_per_kg_per_day=140),
-#     FluidRequirement(birth_weight_category=">1500g", day_after_birth=6, fluid_ml_per_kg_per_day=160),
-# ])

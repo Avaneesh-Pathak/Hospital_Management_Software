@@ -1,8 +1,11 @@
 # Import Statements
 import io
 import csv
+import base64
+import qrcode
 import datetime
 import logging
+from io import BytesIO
 from datetime import date
 from xhtml2pdf import pisa
 from decimal import Decimal
@@ -36,6 +39,7 @@ from django.utils.dateparse import parse_time
 from django.template.loader import get_template
 from django.db.models.functions import TruncDate
 from django.core.exceptions import ObjectDoesNotExist
+from django.core.files.storage import default_storage
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
@@ -44,13 +48,23 @@ from django.views.generic import ListView, CreateView, UpdateView,DeleteView
 
 # Import Models and Forms
 from .models import (
-    CustomUser, Patient, Doctor, Appointment,BillingBase, OPDBilling, IPDBilling, BillingItem, Payment, Expense, EmergencyCase, OPD, IPD, Expense, Employee, Room, PatientReport, Prescription,
-    License, Asset, Maintenance, AccountingRecord, Daybook, Balance, PatientTransfer, NICUVitals, NICUMedicationRecord, Medicine, Diluent,Vial,FluidRequirement,MedicineVial
+    CustomUser, Patient, Doctor, Appointment,
+    BillingBase, OPDBilling, IPDBilling, BillingItem, Payment, Expense,
+    EmergencyCase, OPD, IPD, Employee, Room, PatientReport, Prescription,
+    License, Asset, Maintenance, AccountingRecord, Daybook, Balance,
+    PatientTransfer, NICUVitals, NICUMedicationRecord, Medicine, Diluent,
+    Vial, FluidRequirement, MedicineVial
 )
+
 from .forms import (
-    PatientRegistrationForm, ExpenseForm, OPDBillingForm, IPDBillingForm, BillingItemForm, PaymentForm, ExpenseForm, OPDForm, DoctorForm, EmployeeForm, RoomForm, EmergencyCaseForm, ProfileUpdateForm, PatientReportForm,
-    PrescriptionForm, LicenseForm, AssetForm, MaintenanceForm, BalanceUpdateForm, DaybookEntryForm, NICUVitalsForm, NICUMedicationRecordForm, MedicineForm, DiluentForm,VialForm,NICUFluidForm,IPDForm,MedicineVialFormSet
+    PatientRegistrationForm, ExpenseForm, OPDBillingForm, IPDBillingForm,
+    BillingItemForm, PaymentForm, OPDForm, DoctorForm, EmployeeForm,
+    RoomForm, EmergencyCaseForm, ProfileUpdateForm, PatientReportForm,
+    PrescriptionForm, LicenseForm, AssetForm, MaintenanceForm,
+    BalanceUpdateForm, DaybookEntryForm, NICUVitalsForm, NICUMedicationRecordForm,
+    MedicineForm, DiluentForm, VialForm, NICUFluidForm, IPDForm, MedicineVialFormSet
 )
+
 
 # Logger Setup
 logger = logging.getLogger(__name__)
@@ -188,11 +202,6 @@ def dashboard(request):
         .annotate(count=Count('id'))
         .order_by('date')
     )
-
-    # Prepare data for Chart.js
-    # daily_patient_labels = [entry['date'].strftime('%Y-%m-%d') for entry in patient_trend]
-    # daily_patient_data = [entry['count'] for entry in patient_trend]
-    # Create complete date range
     date_counts = {entry['date']: entry['count'] for entry in patient_trend}
     labels = []
     data = []
@@ -209,8 +218,6 @@ def dashboard(request):
     available_rooms_count = Room.objects.filter(is_available=True).count()  # Fixed
     booked_rooms = total_rooms - available_rooms_count  # Fixed
 
-    # Count rooms by type and available rooms by type
-    # In your dashboard_view function
     room_type_data = {}
     room_type_counts = Room.objects.values('room_type').annotate(total=Count('id'))
     available_rooms = Room.objects.filter(is_available=True).values('room_type').annotate(available=Count('id'))
@@ -228,9 +235,6 @@ def dashboard(request):
     expiring_licenses = License.objects.filter(expiry_date__lte=warning_period, expiry_date__gte=today)
     expiring_assets = Asset.objects.filter(warranty_expiry__lte=warning_period, warranty_expiry__gte=today)
     due_maintenance = Maintenance.objects.filter(next_due_date__lte=warning_period, next_due_date__gte=today)
-
-    # billing section
-    # Add this in your dashboard view
     recent_opd_bills = OPDBilling.objects.select_related('patient__user').order_by('-generated_date')[:5]
     recent_ipd_bills = IPDBilling.objects.select_related('patient__user').order_by('-generated_date')[:5]
 
@@ -302,7 +306,7 @@ def patient_profile(request, patient_code):
     opd_records = OPD.objects.filter(patient=patient)
     ipd_record = IPD.objects.filter(patient=patient, discharge_date__isnull=True).first()
     expenses = Expense.objects.filter(patient=patient)
-    billing = Billing.objects.filter(patient=patient).first()
+    billing = BillingBase.objects.filter(patient=patient).first()
     reports = PatientReport.objects.filter(patient=patient)
 
     context = {
@@ -368,11 +372,7 @@ def register_patient(request):
                     date_of_birth=form.cleaned_data['date_of_birth'],
                     aadhar_number=form.cleaned_data['aadhar_number'],
                     blood_group=form.cleaned_data['blood_group'],
-<<<<<<< HEAD
-                    weight=form.cleaned_data.get('weight'),
-=======
                     weight=form.cleaned_data.get('weight'),  # ✅ Add this line
->>>>>>> 8def213117a19109122b0ebb92dbd88ac1082f45
                     allergies=form.cleaned_data.get('allergies', ''),
                     medical_history=form.cleaned_data.get('medical_history', ''),
                     current_medications=form.cleaned_data.get('current_medications', ''),
@@ -542,6 +542,7 @@ def update_appointment_status(request):
     return redirect("appointments")
 
 
+@login_required
 def generate_ipd_bill(request, ipd_id):
     ipd_admission = get_object_or_404(IPD, id=ipd_id)
     
@@ -575,7 +576,7 @@ def generate_ipd_bill(request, ipd_id):
         )
     
     return render(request, 'hms/bills/ipd_bill.html', {'bill': bill})
-
+@login_required
 def generate_opd_bill(request, opd_id):
     opd_visit = get_object_or_404(OPD, id=opd_id)
     
@@ -599,6 +600,8 @@ def generate_opd_bill(request, opd_id):
     
     return render(request, 'hms/bills/opd_bill.html', {'bill': bill})
 
+
+@login_required
 def view_bill_pdf(request, bill_number):
     # Try to find bill in both OPD and IPD tables
     bill = None
@@ -626,6 +629,8 @@ def view_bill_pdf(request, bill_number):
     
     return response
 
+
+@login_required
 def record_payment(request, bill_number):
     bill = None
     try:
@@ -655,7 +660,7 @@ def record_payment(request, bill_number):
         'balance': bill.balance_amount
     })
 
-
+@login_required
 def bill_list(request):
     opd_bills = list(OPDBilling.objects.select_related('patient__user'))
     ipd_bills = list(IPDBilling.objects.select_related('patient__user'))
@@ -676,6 +681,7 @@ def bill_list(request):
         'bills': page_obj.object_list,
     })
 
+@login_required
 def create_opd_bill(request):
     if request.method == 'POST':
         form = OPDBillingForm(request.POST)
@@ -689,7 +695,7 @@ def create_opd_bill(request):
         form = OPDBillingForm()
     
     return render(request, 'hms/bills/create_opd_bill.html', {'form': form})
-
+@login_required
 def create_ipd_bill(request):
     if request.method == 'POST':
         form = IPDBillingForm(request.POST)
@@ -710,6 +716,8 @@ def create_ipd_bill(request):
     return render(request, 'hms/bills/create_ipd_bill.html', {'form': form})
 
 # def view_bill(request, bill_number=None, patient_id=None):
+
+@login_required
 def view_bill(request, bill_number=None, patient_id=None):
     if bill_number:
         # Show a single OPD or IPD bill
@@ -751,18 +759,6 @@ def view_bill(request, bill_number=None, patient_id=None):
 
     else:
         raise Http404("Invalid request")
-
-# def patient_billing_summary(request, patient_id):
-#     patient = get_object_or_404(Patient, id=patient_id)
-#     opd_bills = OPDBilling.objects.filter(patient=patient)
-#     ipd_bills = IPDBilling.objects.filter(patient=patient)
-
-#     return render(request, 'hms/bills/view_bill.html', {
-#         'patient': patient,
-#         'opd_bills': opd_bills,
-#         'ipd_bills': ipd_bills,
-#     })
-
 
 from django.http import HttpResponse, Http404
 from django.template.loader import get_template
@@ -922,7 +918,7 @@ def delete_expense(request, pk):
         return redirect('expense_list')
     
     return render(request, 'hms/bills/delete_expense.html', {'expense': expense})
-
+@login_required
 def payment_list(request):
     payments = Payment.objects.all().order_by('-payment_date')
 
@@ -933,16 +929,14 @@ def payment_list(request):
 
     return render(request, 'hms/bills/payment_list.html', {'payments': payments})
 
-
+@login_required
 def payment_detail(request, pk):
     payment = get_object_or_404(Payment, pk=pk)
     return render(request, 'hms/bills/payment_detail.html', {'payment': payment})
 
-from django.core.files.storage import default_storage
-import qrcode
-from io import BytesIO
-import base64
 
+
+@login_required
 def payment_receipt(request, pk):
     payment = get_object_or_404(Payment, pk=pk)
 
@@ -1078,11 +1072,7 @@ def admit_emergency_patient(request, emergency_id):
 # IPD Views
 @login_required
 def ipd(request):
-<<<<<<< HEAD
     ipds = IPD.objects.all().order_by('-admitted_on')
-=======
-    ipds = IPD.objects.all().order_by('-admitted_on')  # latest first
->>>>>>> 8def213117a19109122b0ebb92dbd88ac1082f45
     room = Room.objects.all()
     return render(request, 'hms/ipd/ipd.html', {'ipds': ipds, 'room': room})
 
@@ -1673,131 +1663,97 @@ def delete_maintenance(request, id):
     maintenance.delete()
     return redirect('maintenance_list')
 
-# Accounting Views
 @login_required
 def accounting_summary(request):
-    # Default to today's date if no date range is provided
+    # Default dates
     today = timezone.now().date()
     start_date = request.GET.get('start_date', today)
     end_date = request.GET.get('end_date', today)
 
-    # Convert date strings to date objects
+    # Convert to date objects if strings
     if isinstance(start_date, str):
         start_date = datetime.strptime(start_date, "%Y-%m-%d").date()
     if isinstance(end_date, str):
         end_date = datetime.strptime(end_date, "%Y-%m-%d").date()
 
-    # Ensure end_date is not before start_date
     if end_date < start_date:
         messages.error(request, "End date cannot be before start date.")
         return redirect('accounting_summary')
 
-    # ----------------------------
-    # Income Calculations
-    # ----------------------------
+    # Income calculations:
 
-    # Income from OPD
-    opd_income = OPD.objects.filter(
-        visit_date__date__range=(start_date, end_date),
-        payment_status='paid'
-    ).aggregate(total_income=Sum('payment_amount'))['total_income'] or 0
-
-    # Income from IPD (Room charges)
-    ipd_income = IPD.objects.filter(
-        admitted_on__date__range=(start_date, end_date)
-    ).aggregate(total_income=Sum('total_cost'))['total_income'] or 0
-
-    # Income from Billing (Expenses paid by patients)
-    billing_income = Billing.objects.filter(
-        generated_on__date__range=(start_date, end_date),
+    opd_income = OPDBilling.objects.filter(
+        generated_date__date__range=(start_date, end_date),
         status='paid'
     ).aggregate(total_income=Sum('paid_amount'))['total_income'] or 0
 
-    # Total Income
-    total_income = opd_income + ipd_income + billing_income
+    ipd_income = IPDBilling.objects.filter(
+        generated_date__date__range=(start_date, end_date),
+        status='paid'
+    ).aggregate(total_income=Sum('paid_amount'))['total_income'] or 0
 
-    # ----------------------------
-    # Expense Calculations
-    # ----------------------------
+    # You can remove the IPD income from IPD admissions unless you want it separately.
 
-    # Expenses from Daybook
+    billing_income = opd_income + ipd_income
+
+    # Expenses calculations:
+
     daybook_expenses = Daybook.objects.filter(
         date__range=(start_date, end_date)
     ).aggregate(total_expenses=Sum('amount'))['total_expenses'] or 0
 
-    # Salary Expenses
     salary_expenses = AccountingRecord.objects.filter(
         transaction_type='expense',
         source='salary',
         date__date__range=(start_date, end_date)
     ).aggregate(total_expenses=Sum('amount'))['total_expenses'] or 0
 
-    # Other Expenses (from AccountingRecord)
     other_expenses = AccountingRecord.objects.filter(
         transaction_type='expense',
         date__date__range=(start_date, end_date)
     ).exclude(source='salary').aggregate(total_expenses=Sum('amount'))['total_expenses'] or 0
 
-    # Total Expenses
     total_expenses = daybook_expenses + salary_expenses + other_expenses
 
-    # ----------------------------
-    # Net Profit/Loss
-    # ----------------------------
-    net_profit = total_income - total_expenses
+    net_profit = billing_income - total_expenses
 
-    # ----------------------------
-    # Calculate Daily Net Profit
-    # ----------------------------
+    # Daily profit calculation
     daily_profit = []
     date_labels = []
     current_date = start_date
     while current_date <= end_date:
-        # Calculate daily income
-        daily_income = (
-            (OPD.objects.filter(visit_date__date=current_date, payment_status='paid')
-            .aggregate(total=Sum('payment_amount'))['total'] or 0) +
-            (IPD.objects.filter(admitted_on__date=current_date)
-            .aggregate(total=Sum('total_cost'))['total'] or 0) +
-            (Billing.objects.filter(generated_on__date=current_date, status='paid')
-            .aggregate(total=Sum('paid_amount'))['total'] or 0)
-        )
+        opd_total = OPDBilling.objects.filter(generated_date__date=current_date, is_paid='True').aggregate(total=Sum('total_amount'))['total'] or 0
+        ipd_total = IPDBilling.objects.filter(generated_date__date=current_date).aggregate(total=Sum('total_amount'))['total'] or 0
+        # billing_total = BillingBase.objects.filter(generated_on__date=current_date, status='paid').aggregate(total=Sum('paid_amount'))['total'] or 0
+        daily_income = opd_total + ipd_total 
 
+        daybook_total = Daybook.objects.filter(date=current_date).aggregate(total=Sum('amount'))['total'] or 0
+        accounting_total = AccountingRecord.objects.filter(transaction_type='expense', date=current_date).aggregate(total=Sum('amount'))['total'] or 0
+        daily_expenses = daybook_total + accounting_total
 
-        # Calculate daily expenses
-        daily_expenses = (
-            (Daybook.objects.filter(date=current_date).aggregate(total=Sum('amount'))['total'] or 0) +
-            (AccountingRecord.objects.filter(transaction_type='expense', date=current_date)
-            .aggregate(total=Sum('amount'))['total'] or 0)
-        )
-
-
-        # Calculate daily net profit
         daily_net_profit = float(daily_income - daily_expenses)
         daily_profit.append(daily_net_profit)
-        date_labels.append(current_date.strftime("%Y-%m-%d"))  # Format date as string
+        date_labels.append(current_date.strftime("%Y-%m-%d"))
         current_date += timedelta(days=1)
 
-    # ----------------------------
-    # Prepare Context
-    # ----------------------------
+
     context = {
         'start_date': start_date.strftime("%Y-%m-%d"),
         'end_date': end_date.strftime("%Y-%m-%d"),
         'opd_income': opd_income,
         'ipd_income': ipd_income,
         'billing_income': billing_income,
-        'total_income': total_income,
+        'total_income': billing_income,
         'daybook_expenses': daybook_expenses,
         'salary_expenses': salary_expenses,
         'other_expenses': other_expenses,
         'total_expenses': total_expenses,
         'net_profit': net_profit,
-        'daily_profit': daily_profit,  # Pass daily net profit data
-        'date_labels': date_labels,   # Pass date labels
+        'daily_profit': daily_profit,
+        'date_labels': date_labels,
     }
-
     return render(request, 'hms/accounting_summary.html', context)
+
 
 # Daybook Views
 class DaybookCreateView(LoginRequiredMixin, View):
