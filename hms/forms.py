@@ -506,12 +506,15 @@ class OPDBillingForm(forms.ModelForm):
 class IPDBillingForm(forms.ModelForm):
     class Meta:
         model = IPDBilling
-        fields = ['ipd_admission', 'room_charges', 'nursing_charges', 'procedure_charges', 'medication_charges', 'lab_charges', 'other_charges']
+        fields = ['ipd_admission', 'nursing_charges', 'procedure_charges', 'medication_charges', 'lab_charges', 'other_charges']
+
+    room_charges = forms.DecimalField(required=False, widget=forms.HiddenInput())
 
 class BillingItemForm(forms.ModelForm):
     class Meta:
         model = BillingItem
         fields = [ 'opd_billing', 'ipd_billing', 'description', 'quantity', 'unit_price', 'discount', 'tax_rate']
+    
 
 class PaymentForm(forms.ModelForm):
     def __init__(self, *args, max_amount=None, **kwargs):

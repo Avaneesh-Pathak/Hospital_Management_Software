@@ -40812,3 +40812,151 @@ INFO 2025-06-04 22:37:00,424 basehttp "GET /payments/ HTTP/1.1" 200 34910
 INFO 2025-06-04 22:37:00,871 basehttp "GET /payments/ HTTP/1.1" 200 34910
 INFO 2025-06-04 22:37:23,922 basehttp "GET /bills/ HTTP/1.1" 200 33957
 INFO 2025-06-04 22:37:27,269 basehttp "GET /bills/ipd/create/ HTTP/1.1" 200 38635
+INFO 2025-06-05 10:52:08,128 autoreload Watching for file changes with StatReloader
+INFO 2025-06-05 10:52:15,247 basehttp "GET / HTTP/1.1" 200 43308
+WARNING 2025-06-05 10:52:18,279 basehttp "GET /favicon.ico HTTP/1.1" 404 31444
+INFO 2025-06-05 10:52:47,676 basehttp "GET /bills/ HTTP/1.1" 200 33957
+INFO 2025-06-05 10:52:53,833 basehttp "GET /bills/BILL-20250604-0001/ HTTP/1.1" 200 44605
+INFO 2025-06-05 10:53:02,753 basehttp "GET /bills/BILL-20250604-0001/pay/ HTTP/1.1" 200 33888
+INFO 2025-06-05 10:53:11,807 basehttp "GET /payments/ HTTP/1.1" 200 34910
+INFO 2025-06-05 10:53:15,450 basehttp "GET /payments/12/ HTTP/1.1" 200 34449
+INFO 2025-06-05 10:54:14,520 basehttp "GET /payments/12/ HTTP/1.1" 200 34448
+INFO 2025-06-05 10:54:15,054 basehttp "GET /payments/12/ HTTP/1.1" 200 34448
+INFO 2025-06-05 10:54:20,960 basehttp "GET /payments/12/ HTTP/1.1" 200 34448
+INFO 2025-06-05 10:54:21,514 basehttp "GET /payments/12/ HTTP/1.1" 200 34468
+INFO 2025-06-05 10:54:22,054 basehttp "GET /payments/12/ HTTP/1.1" 200 34468
+INFO 2025-06-05 10:54:50,088 basehttp "GET /bills/ipd/create/ HTTP/1.1" 200 38635
+INFO 2025-06-05 10:58:58,208 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-06-05 10:58:59,738 autoreload Watching for file changes with StatReloader
+INFO 2025-06-05 10:59:10,390 autoreload D:\Hospital_Management\hospital_management\hms\forms.py changed, reloading.
+INFO 2025-06-05 10:59:11,782 autoreload Watching for file changes with StatReloader
+INFO 2025-06-05 10:59:21,825 basehttp "GET /bills/ipd/create/ HTTP/1.1" 200 38540
+INFO 2025-06-05 10:59:53,769 autoreload D:\Hospital_Management\hospital_management\hms\forms.py changed, reloading.
+INFO 2025-06-05 10:59:54,917 autoreload Watching for file changes with StatReloader
+INFO 2025-06-05 11:00:00,032 autoreload D:\Hospital_Management\hospital_management\hms\forms.py changed, reloading.
+INFO 2025-06-05 11:00:01,065 autoreload Watching for file changes with StatReloader
+INFO 2025-06-05 11:00:04,076 autoreload D:\Hospital_Management\hospital_management\hms\forms.py changed, reloading.
+INFO 2025-06-05 11:00:05,182 autoreload Watching for file changes with StatReloader
+INFO 2025-06-05 11:00:07,561 basehttp "GET /bills/ipd/create/ HTTP/1.1" 200 38602
+INFO 2025-06-05 11:00:08,657 basehttp "GET /bills/ipd/create/ HTTP/1.1" 200 38602
+INFO 2025-06-05 11:00:09,301 basehttp "GET /bills/ipd/create/ HTTP/1.1" 200 38602
+INFO 2025-06-05 11:00:19,877 basehttp "POST /bills/ipd/create/ HTTP/1.1" 302 0
+INFO 2025-06-05 11:00:20,012 basehttp "GET /bills/IPD-20250605-0001/ HTTP/1.1" 200 42515
+INFO 2025-06-05 11:04:04,230 basehttp "GET /bills/IPD-20250605-0001/ HTTP/1.1" 200 44553
+INFO 2025-06-05 11:04:04,444 basehttp "GET /bills/IPD-20250605-0001/ HTTP/1.1" 200 44553
+INFO 2025-06-05 11:05:45,910 basehttp "GET /bills/IPD-20250605-0001/ HTTP/1.1" 200 44553
+INFO 2025-06-05 11:05:46,609 basehttp "GET /bills/IPD-20250605-0001/ HTTP/1.1" 200 44553
+INFO 2025-06-05 11:05:46,967 basehttp "GET /bills/IPD-20250605-0001/ HTTP/1.1" 200 44553
+INFO 2025-06-05 11:05:47,225 basehttp "GET /bills/IPD-20250605-0001/ HTTP/1.1" 200 44553
+INFO 2025-06-05 11:05:51,270 basehttp "GET /bills/IPD-20250605-0001/add-item/ HTTP/1.1" 200 39941
+INFO 2025-06-05 11:05:59,537 basehttp "POST /bills/IPD-20250605-0001/add-item/ HTTP/1.1" 302 0
+INFO 2025-06-05 11:05:59,764 basehttp "GET /bills/IPD-20250605-0001/ HTTP/1.1" 200 45463
+INFO 2025-06-05 11:10:26,228 basehttp "GET /bills/IPD-20250605-0001/ HTTP/1.1" 200 48312
+INFO 2025-06-05 11:10:26,719 basehttp "GET /bills/IPD-20250605-0001/ HTTP/1.1" 200 48312
+INFO 2025-06-05 11:11:52,674 basehttp "GET /bills/IPD-20250605-0001/ HTTP/1.1" 200 46854
+INFO 2025-06-05 11:11:52,986 basehttp "GET /bills/IPD-20250605-0001/ HTTP/1.1" 200 46854
+INFO 2025-06-05 11:12:01,680 basehttp "GET /bills/IPD-20250605-0001/add-item/ HTTP/1.1" 200 39941
+INFO 2025-06-05 11:12:03,659 basehttp "GET /bills/ipd/create/ HTTP/1.1" 200 38602
+INFO 2025-06-05 11:12:05,541 basehttp "GET /bills/ HTTP/1.1" 200 35633
+INFO 2025-06-05 11:12:12,759 basehttp "GET / HTTP/1.1" 200 43714
+INFO 2025-06-05 11:13:59,632 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-06-05 11:14:01,645 autoreload Watching for file changes with StatReloader
+INFO 2025-06-05 11:14:06,275 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-06-05 11:14:07,565 autoreload Watching for file changes with StatReloader
+INFO 2025-06-05 11:14:13,993 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-06-05 11:14:15,110 autoreload Watching for file changes with StatReloader
+INFO 2025-06-05 11:14:18,283 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-06-05 11:14:19,566 autoreload Watching for file changes with StatReloader
+INFO 2025-06-05 11:14:23,549 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-06-05 11:14:24,624 autoreload Watching for file changes with StatReloader
+INFO 2025-06-05 11:14:31,068 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-06-05 11:14:32,063 autoreload Watching for file changes with StatReloader
+INFO 2025-06-05 11:14:40,483 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-06-05 11:14:41,790 autoreload Watching for file changes with StatReloader
+ERROR 2025-06-05 11:14:56,215 log Internal Server Error: /
+Traceback (most recent call last):
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\contrib\auth\decorators.py", line 60, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\hms\views.py", line 234, in dashboard
+    recent_opd_bills = OPDBilling.objects.select_related('patient__user').order_by('-created_at')[:5]
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\db\models\query.py", line 1701, in order_by
+    obj.query.add_ordering(*field_names)
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\db\models\sql\query.py", line 2249, in add_ordering
+    self.names_to_path(item.split(LOOKUP_SEP), self.model._meta)
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\db\models\sql\query.py", line 1768, in names_to_path
+    raise FieldError(
+django.core.exceptions.FieldError: Cannot resolve keyword 'created_at' into field. Choices are: balance_amount, bill_number, billingitem, consultation_fee, discount_amount, due_date, generated_date, id, is_paid, medication_fee, notes, opd_visit, opd_visit_id, other_fee, paid_amount, patient, patient_id, procedure_fee, status, subtotal, tax_amount, total_amount
+ERROR 2025-06-05 11:14:56,223 basehttp "GET / HTTP/1.1" 500 113002
+INFO 2025-06-05 11:15:22,950 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-06-05 11:15:24,479 autoreload Watching for file changes with StatReloader
+ERROR 2025-06-05 11:15:27,112 log Internal Server Error: /
+Traceback (most recent call last):
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\contrib\auth\decorators.py", line 60, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\hms\views.py", line 238, in dashboard
+    recent_billings = sorted(
+                      ^^^^^^^
+  File "D:\Hospital_Management\hospital_management\hms\views.py", line 240, in <lambda>
+    key=lambda b: b.created_at,
+                  ^^^^^^^^^^^^
+AttributeError: 'OPDBilling' object has no attribute 'created_at'
+ERROR 2025-06-05 11:15:27,120 basehttp "GET / HTTP/1.1" 500 100341
+INFO 2025-06-05 11:15:35,309 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-06-05 11:15:36,608 autoreload Watching for file changes with StatReloader
+INFO 2025-06-05 11:15:39,145 basehttp "GET / HTTP/1.1" 200 47362
+INFO 2025-06-05 11:15:56,414 basehttp "GET /bills/ HTTP/1.1" 200 35633
+INFO 2025-06-05 11:15:59,176 basehttp "GET /bills/IPD-20250605-0001/pay/ HTTP/1.1" 200 33895
+INFO 2025-06-05 11:16:05,559 basehttp "GET /bills/OPD-20250604-0001/pay/ HTTP/1.1" 200 33877
+INFO 2025-06-05 11:16:12,723 basehttp "POST /bills/OPD-20250604-0001/pay/ HTTP/1.1" 302 0
+INFO 2025-06-05 11:16:12,834 basehttp "GET /bills/OPD-20250604-0001/ HTTP/1.1" 200 46622
+INFO 2025-06-05 11:17:12,196 basehttp "GET /bills/OPD-20250604-0001/ HTTP/1.1" 200 46047
+INFO 2025-06-05 11:17:17,997 basehttp "GET /bills/OPD-20250604-0001/pay/ HTTP/1.1" 200 33869
+INFO 2025-06-05 11:17:19,219 basehttp "GET /bills/ HTTP/1.1" 200 35670
+INFO 2025-06-05 11:17:22,731 basehttp "GET /bills/BILL-20250604-0001/ HTTP/1.1" 200 48688
+INFO 2025-06-05 11:18:51,818 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-06-05 11:18:53,080 autoreload Watching for file changes with StatReloader
+INFO 2025-06-05 11:18:55,404 basehttp "GET /bills/IPD-20250605-0001/pay/ HTTP/1.1" 200 33895
+ERROR 2025-06-05 11:19:02,949 log Internal Server Error: /bills/IPD-20250605-0001/pay/
+Traceback (most recent call last):
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\hms\views.py", line 1002, in record_payment
+    return redirect('payment_receipt', bill_number=bill.bill_number)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\shortcuts.py", line 49, in redirect
+    return redirect_class(resolve_url(to, *args, **kwargs))
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\shortcuts.py", line 180, in resolve_url
+    return reverse(to, args=args, kwargs=kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\urls\base.py", line 88, in reverse
+    return resolver._reverse_with_prefix(view, prefix, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\urls\resolvers.py", line 831, in _reverse_with_prefix
+    raise NoReverseMatch(msg)
+django.urls.exceptions.NoReverseMatch: Reverse for 'payment_receipt' with keyword arguments '{'bill_number': 'IPD-20250605-0001'}' not found. 1 pattern(s) tried: ['payments/(?P<pk>[0-9]+)/receipt/\\Z']
+ERROR 2025-06-05 11:19:02,955 basehttp "POST /bills/IPD-20250605-0001/pay/ HTTP/1.1" 500 108552
+INFO 2025-06-05 11:20:20,899 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-06-05 11:20:22,211 autoreload Watching for file changes with StatReloader
+INFO 2025-06-05 11:20:26,724 basehttp "POST /bills/IPD-20250605-0001/pay/ HTTP/1.1" 302 0
+INFO 2025-06-05 11:20:27,089 basehttp "GET /payments/15/receipt/ HTTP/1.1" 200 12008
+INFO 2025-06-05 11:20:28,881 basehttp "GET /bills/IPD-20250605-0001/pay/ HTTP/1.1" 200 33898

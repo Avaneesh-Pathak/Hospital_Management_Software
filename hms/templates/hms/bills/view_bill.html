@@ -114,7 +114,14 @@
                             </thead>
                             <tbody>
                                 {% for item in bill.billingitem_set.all %}
-                                <tr>
+                                <tr
+                                    class="item-row"
+                                    data-qty="{{ item.quantity }}" 
+                                    data-price="{{ item.unit_price }}" 
+                                    data-discount="{{ item.discount }}" 
+                                    data-tax="{{ item.tax_rate }}" 
+                                    data-amount="{{ item.amount }}">
+
                                     <td class="ps-4">{{ forloop.counter }}</td>
                                     <td>{{ item.description }}</td>
                                     <td class="text-center">{{ item.quantity }}</td>
@@ -163,7 +170,9 @@
                                 {% with counter=1 %}
                                 {% if bill.bill_type == "OPD" %}
                                 {% if bill.consultation_fee > 0 %}
-                                <tr>
+                                <tr data-qty="1" data-price="{{ bill.consultation_fee }}" 
+                                    data-discount="0" data-tax="0" 
+                                    data-amount="{{ bill.consultation_fee }}">
                                     <td class="ps-4">{{ counter }}</td>
                                     <td>Consultation Fee</td>
                                     <td class="text-center">1</td>
@@ -176,7 +185,9 @@
                                 {% endif %}
                                 
                                 {% if bill.procedure_fee > 0 %}
-                                <tr>
+                                <tr data-qty="1" data-price="{{ bill.procedure_fee }}" 
+                                    data-discount="0" data-tax="0" 
+                                    data-amount="{{ bill.procedure_fee }}">
                                     <td class="ps-4">{{ counter }}</td>
                                     <td>Procedure Fee</td>
                                     <td class="text-center">1</td>
@@ -189,7 +200,10 @@
                                 {% endif %}
                                 
                                 {% if bill.medication_fee > 0 %}
-                                <tr>
+                                <tr 
+                                    data-qty="1" data-price="{{ bill.medication_fee }}" 
+                                    data-discount="0" data-tax="0" 
+                                    data-amount="{{ bill.medication_fee }}">
                                     <td class="ps-4">{{ counter }}</td>
                                     <td>Medication Fee</td>
                                     <td class="text-center">1</td>
@@ -202,7 +216,10 @@
                                 {% endif %}
                                 
                                 {% if bill.other_fee > 0 %}
-                                <tr>
+                                <tr 
+                                    data-qty="1" data-price="{{ bill.other_fee }}" 
+                                    data-discount="0" data-tax="0" 
+                                    data-amount="{{ bill.other_fee }}">
                                     <td class="ps-4">{{ counter }}</td>
                                     <td>Other Fee</td>
                                     <td class="text-center">1</td>
@@ -215,17 +232,7 @@
                                 {% endif %}
                                 {% endif %}
                                 
-                                {% for item in bill.billingitem_set.all %}
-                                <tr>
-                                    <td class="ps-4">{{ forloop.counter|add:counter|add:"-1" }}</td>
-                                    <td>{{ item.description }}</td>
-                                    <td class="text-center">{{ item.quantity }}</td>
-                                    <td class="text-end">₹{{ item.unit_price|intcomma }}</td>
-                                    <td class="text-center">{{ item.discount }}%</td>
-                                    <td class="text-center">{{ item.tax_rate }}%</td>
-                                    <td class="text-end pe-4">₹{{ item.amount|intcomma }}</td>
-                                </tr>
-                                {% endfor %}
+                                
                                 {% endwith %}
                             </tbody>
                         </table>
@@ -249,7 +256,10 @@
                             <tbody>
                                 {% with counter=1 %}
                                 {% if bill.room_charges > 0 %}
-                                <tr>
+                                <tr 
+                                    data-qty="1" data-price="{{ bill.room_charges }}" 
+                                    data-discount="0" data-tax="0" 
+                                    data-amount="{{ bill.room_charges }}">
                                     <td class="ps-4">{{ counter }}</td>
                                     <td>Room Charges</td>
                                     <td class="text-center">1</td>
@@ -262,7 +272,10 @@
                                 {% endif %}
                                 
                                 {% if bill.nursing_charges > 0 %}
-                                <tr>
+                                <tr 
+                                    data-qty="1" data-price="{{ bill.nursing_charges }}" 
+                                    data-discount="0" data-tax="0" 
+                                    data-amount="{{ bill.nursing_charges }}">
                                     <td class="ps-4">{{ counter }}</td>
                                     <td>Nursing Charges</td>
                                     <td class="text-center">1</td>
@@ -275,7 +288,10 @@
                                 {% endif %}
                                 
                                 {% if bill.procedure_charges > 0 %}
-                                <tr>
+                                <tr 
+                                    data-qty="1" data-price="{{ bill.procedure_charges }}" 
+                                    data-discount="0" data-tax="0" 
+                                    data-amount="{{ bill.procedure_charges }}">
                                     <td class="ps-4">{{ counter }}</td>
                                     <td>Procedure Charges</td>
                                     <td class="text-center">1</td>
@@ -288,7 +304,10 @@
                                 {% endif %}
                                 
                                 {% if bill.medication_charges > 0 %}
-                                <tr>
+                                <tr 
+                                    data-qty="1" data-price="{{ bill.medication_charges }}" 
+                                    data-discount="0" data-tax="0" 
+                                    data-amount="{{ bill.medication_charges }}">
                                     <td class="ps-4">{{ counter }}</td>
                                     <td>Medication Charges</td>
                                     <td class="text-center">1</td>
@@ -301,7 +320,10 @@
                                 {% endif %}
                                 
                                 {% if bill.lab_charges > 0 %}
-                                <tr>
+                                <tr 
+                                    data-qty="1" data-price="{{ bill.lab_charges }}" 
+                                    data-discount="0" data-tax="0" 
+                                    data-amount="{{ bill.lab_charges }}">
                                     <td class="ps-4">{{ counter }}</td>
                                     <td>Lab Charges</td>
                                     <td class="text-center">1</td>
@@ -314,7 +336,10 @@
                                 {% endif %}
                                 
                                 {% if bill.other_charges > 0 %}
-                                <tr>
+                                <tr 
+                                    data-qty="1" data-price="{{ bill.other_charges }}" 
+                                    data-discount="0" data-tax="0" 
+                                    data-amount="{{ bill.other_charges }}">
                                     <td class="ps-4">{{ counter }}</td>
                                     <td>Other Charges</td>
                                     <td class="text-center">1</td>
@@ -331,34 +356,40 @@
                     </div>
                     {% endif %}
                 </div>
-                
-                <!-- Summary Totals -->
-                <div class="card-footer bg-light">
-                    <div class="row justify-content-end">
-                        <div class="col-md-6 col-lg-5">
-                            <div class="bg-white p-3 rounded border">
-                                <table class="table table-sm table-borderless mb-0">
-                                    <tbody>
-                                        <tr>
-                                            <td class="text-muted">Subtotal:</td>
-                                            <td class="text-end font-weight-bold">₹{{ bill.total_amount|intcomma }}</td>
-                                        </tr>
-                                        <tr>
-                                            <td class="text-muted">Discount:</td>
-                                            <td class="text-end text-danger">- ₹{{ bill.discount_amount|intcomma }}</td>
-                                        </tr>
-                                        <tr class="border-top">
-                                            <td class="text-muted font-weight-bold">Total Amount:</td>
-                                            <td class="text-end font-weight-bold text-success h5">₹{{ bill.get_final_amount|intcomma }}</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <!-- Summary Card -->
+<div class="card-footer bg-light mt-4">
+    <div class="row justify-content-end">
+        <div class="col-md-6 col-lg-5">
+            <div class="bg-white p-3 rounded border">
+                <table class="table table-sm table-borderless mb-0">
+                    <tbody>
+                        <tr>
+                            <td class="text-muted">Subtotal:</td>
+                            <td class="text-end font-weight-bold">₹<span id="total-amount">0.00</span></td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted">Discount:</td>
+                            <td class="text-end text-danger">- ₹<span id="total-discount">0.00</span></td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted">Tax:</td>
+                            <td class="text-end text-primary">+ ₹<span id="total-tax">0.00</span></td>
+                        </tr>
+                        <tr class="border-top">
+                            <td class="text-muted font-weight-bold">Final Amount:</td>
+                            <td class="text-end font-weight-bold text-success h5">₹<span id="final-amount">0.00</span></td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
-            
+        </div>
+    </div>
+</div>
+                
+            </div>
+            <div class="card shadow-sm border-0 mb-4 mt-4">
+    
+
             <!-- Payment Status -->
             <div class="card shadow-sm border-0 mb-4">
                 <div class="card-header bg-white py-3">
@@ -449,5 +480,65 @@
     background-color: #f8f9fa;
 }
 </style>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const rows = document.querySelectorAll('tr[data-amount]');
+    let totalAmount = 0;
+    let totalDiscount = 0;
+    let totalTax = 0;
 
+    rows.forEach(row => {
+        const qty = parseFloat(row.dataset.qty || 0);
+        const price = parseFloat(row.dataset.price || 0);
+        const discountRate = parseFloat(row.dataset.discount || 0);
+        const taxRate = parseFloat(row.dataset.tax || 0);
+        
+        const rawAmount = qty * price;
+        const discount = rawAmount * (discountRate / 100);
+        const taxableAmount = rawAmount - discount;
+        const tax = taxableAmount * (taxRate / 100);
+        const finalItemAmount = taxableAmount + tax;
+
+        totalAmount += rawAmount;
+        totalDiscount += discount;
+        totalTax += tax;
+    });
+
+    const finalAmount = totalAmount - totalDiscount + totalTax;
+
+    document.getElementById("total-amount").textContent = totalAmount.toFixed(2);
+    document.getElementById("total-discount").textContent = totalDiscount.toFixed(2);
+    document.getElementById("total-tax").textContent = totalTax.toFixed(2);
+    document.getElementById("final-amount").textContent = finalAmount.toFixed(2);
+});
+</script>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const rows = document.querySelectorAll("tr[data-qty]");
+    let total = 0, discount = 0, tax = 0;
+
+    rows.forEach(row => {
+        const qty = parseFloat(row.dataset.qty || 0);
+        const price = parseFloat(row.dataset.price || 0);
+        const dis = parseFloat(row.dataset.discount || 0);
+        const tx = parseFloat(row.dataset.tax || 0);
+
+        const amt = qty * price;
+        const disAmt = amt * dis / 100;
+        const taxable = amt - disAmt;
+        const taxAmt = taxable * tx / 100;
+
+        total += amt;
+        discount += disAmt;
+        tax += taxAmt;
+    });
+
+    const final = total - discount + tax;
+
+    document.getElementById("total-amount").textContent = total.toFixed(2);
+    document.getElementById("total-discount").textContent = discount.toFixed(2);
+    document.getElementById("total-tax").textContent = tax.toFixed(2);
+    document.getElementById("final-amount").textContent = final.toFixed(2);
+});
+</script>
 {% endblock %}

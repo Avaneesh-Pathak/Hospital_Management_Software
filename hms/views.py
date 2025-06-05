@@ -166,6 +166,7 @@ def search(request):
     return render(request, 'hms/search_results.html', {'results': results, 'query': query})
 
 import json
+from itertools import chain 
 # Dashboard Views
 @login_required
 def dashboard(request):
@@ -228,6 +229,17 @@ def dashboard(request):
     expiring_assets = Asset.objects.filter(warranty_expiry__lte=warning_period, warranty_expiry__gte=today)
     due_maintenance = Maintenance.objects.filter(next_due_date__lte=warning_period, next_due_date__gte=today)
 
+    # billing section
+    # Add this in your dashboard view
+    recent_opd_bills = OPDBilling.objects.select_related('patient__user').order_by('-generated_date')[:5]
+    recent_ipd_bills = IPDBilling.objects.select_related('patient__user').order_by('-generated_date')[:5]
+
+    # Combine and sort by created_at
+    recent_billings = sorted(
+        chain(recent_opd_bills, recent_ipd_bills),
+        key=lambda b: b.generated_date,
+        reverse=True
+    )[:5]
     context = {
         'now': now(),
         'total_patients': total_patients,
@@ -245,6 +257,7 @@ def dashboard(request):
         'expiring_licenses': expiring_licenses,
         'expiring_assets': expiring_assets,
         'due_maintenance': due_maintenance,
+        'recent_billings': recent_billings,
     }
 
     return render(request, 'hms/dashboard.html', context)
@@ -808,8 +821,12 @@ def create_ipd_bill(request):
         form = IPDBillingForm(request.POST)
         if form.is_valid():
             bill = form.save(commit=False)
-            # Get patient from the selected IPD admission
-            bill.patient = bill.ipd_admission.patient  
+            bill.patient = bill.ipd_admission.patient
+
+            # Auto-fetch room charges from IPD
+            if not bill.room_charges:
+                bill.room_charges = bill.ipd_admission.calculate_total_cost()
+
             bill.save()
             messages.success(request, 'IPD bill created successfully!')
             return redirect('view_bill', bill_number=bill.bill_number)
@@ -982,7 +999,7 @@ def record_payment(request, bill_number):
             payment.save()
 
             messages.success(request, f"Payment of ₹{payment.amount} recorded successfully!")
-            return redirect('view_bill', bill_number=bill.bill_number)
+            return redirect('payment_receipt', pk=payment.id)
         else:
             # For debugging, you can print errors here or pass them to template
             print(form.errors)
