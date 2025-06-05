@@ -267,12 +267,15 @@ class EmergencyCase(models.Model):
 
 #Room Model
 class Room(models.Model):
+
     ROOM_TYPES = [
-        ('general', 'General Ward'),
-        ('semi-private', 'Semi-Private'),
-        ('private', 'Private'),
-        ('icu', 'ICU'),
-    ]
+    ('picu', 'PICU'),
+    ('private', 'Private'),
+    ('general', 'General Ward'),
+    ('nicu', 'NICU'),
+    ('icu', 'ICU'),
+    ('emergency', 'Emergency Ward'),
+    ('other', 'Other'),]
 
     room_number = models.CharField(max_length=10, unique=True)
     room_type = models.CharField(max_length=20, choices=ROOM_TYPES)

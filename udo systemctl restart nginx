@@ -1,0 +1,7 @@
+May 12 08:22:48 srv820736 systemd[1]: Started gunicorn.service - gunicorn daemon for Hospital Management Software.
+May 12 08:22:48 srv820736 gunicorn[26668]: [2025-05-12 08:22:48 +0000] [26668] [INFO] Starting gunicorn 23.0.0
+May 12 08:22:48 srv820736 gunicorn[26668]: [2025-05-12 08:22:48 +0000] [26668] [INFO] Listening at: unix:/root/hospital_project/Hospital_Management_Software/hospital_management.sock (26668)
+May 12 08:22:48 srv820736 gunicorn[26668]: [2025-05-12 08:22:48 +0000] [26668] [INFO] Using worker: sync
+May 12 08:22:48 srv820736 gunicorn[26669]: [2025-05-12 08:22:48 +0000] [26669] [INFO] Booting worker with pid: 26669
+May 12 08:22:48 srv820736 gunicorn[26670]: [2025-05-12 08:22:48 +0000] [26670] [INFO] Booting worker with pid: 26670
+May 12 08:22:48 srv820736 gunicorn[26671]: [2025-05-12 08:22:48 +0000] [26671] [INFO] Booting worker with pid: 26671

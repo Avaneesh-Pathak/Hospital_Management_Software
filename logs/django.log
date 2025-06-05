@@ -22119,3 +22119,19 @@ INFO 2025-05-12 13:24:28,111 basehttp "GET / HTTP/1.1" 200 42911
 INFO 2025-05-12 13:25:09,952 basehttp "GET /ipd/ HTTP/1.1" 200 77806
 INFO 2025-05-12 13:25:10,292 basehttp "GET /get-ipd-data/ HTTP/1.1" 200 1199
 INFO 2025-05-12 13:25:14,253 basehttp "GET /nicu/medications/16/ HTTP/1.1" 200 39105
+INFO 2025-05-12 13:44:09,157 autoreload Watching for file changes with StatReloader
+INFO 2025-05-12 13:44:30,106 basehttp code 400, message Bad request version ('Xü#\x12¥\x88ÉØ')
+ERROR 2025-05-12 13:44:30,107 basehttp You're accessing the development server over HTTPS, but it only supports HTTP.
+INFO 2025-05-12 13:44:30,228 basehttp code 400, message Bad request version ('\x01D\x19Ò\x7fÔ\x89b\x02z[ö\x11&ç·.¸z\x97äåÉ\x0f\x19\x99\x8e\x80')
+ERROR 2025-05-12 13:44:30,228 basehttp You're accessing the development server over HTTPS, but it only supports HTTP.
+INFO 2025-05-12 13:44:32,528 basehttp "GET / HTTP/1.1" 302 0
+INFO 2025-05-12 13:44:32,721 basehttp "GET /login/?next=/ HTTP/1.1" 200 1389
+WARNING 2025-05-12 13:44:32,873 basehttp "GET /favicon.ico HTTP/1.1" 404 28962
+INFO 2025-05-12 13:44:41,052 basehttp "POST /login/?next=/ HTTP/1.1" 302 0
+INFO 2025-05-12 13:44:41,248 basehttp "GET / HTTP/1.1" 200 41367
+WARNING 2025-05-12 13:45:01,197 basehttp "GET /favicon.ico HTTP/1.1" 404 28962
+WARNING 2025-05-12 22:19:03,448 log Forbidden (CSRF cookie not set.): /
+WARNING 2025-05-16 17:14:28,938 log Forbidden (CSRF cookie not set.): /
+WARNING 2025-05-25 02:29:43,692 log Forbidden (CSRF cookie not set.): /
+WARNING 2025-05-27 20:04:59,441 log Forbidden (CSRF cookie not set.): /
+WARNING 2025-06-04 09:34:14,610 log Forbidden (CSRF cookie not set.): /
