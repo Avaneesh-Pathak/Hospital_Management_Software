@@ -31,7 +31,7 @@ SECRET_KEY = "django-insecure-%o3#m#(0v_6#&naw*sor0%u#jjsdr=owzqrbopl@46as4-aii8
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = ["*","69.62.80.210"]
 
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 CRISPY_TEMPLATE_PACK = "bootstrap5"
@@ -145,8 +145,11 @@ USE_TZ = True  # ✅ Keep this True to use timezone-aware datetimes
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
 # Ensure STATIC settings too:
+# Static files (CSS, JavaScript, images)
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]  # For custom static files in the project
+STATIC_ROOT = os.path.join(BASE_DIR, 'static_root')  # Where static files will be collected by collectstatic
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'  # For serving static files efficiently
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
