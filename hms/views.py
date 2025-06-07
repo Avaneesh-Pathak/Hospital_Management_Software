@@ -2470,6 +2470,11 @@ class NICUMedicationRecordListView(ListView):
         context["ipd_id"] = ipd_id  # For the "Add Medication" button
         context['fluid_data'] = FluidRequirement.objects.filter(ipd_admission=ipd_id)
 
+        # Detect user role
+        user = self.request.user
+        context["is_doctor"] = user.groups.filter(name="Doctor").exists()
+        context["is_nurse"] = user.groups.filter(name="Nurse").exists()
+
 
         return context
 

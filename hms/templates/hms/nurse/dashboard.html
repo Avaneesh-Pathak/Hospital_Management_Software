@@ -4,73 +4,105 @@
 {% block content %}
 <div class="nurse-dashboard">
     <!-- Header Section -->
-    <div class="dashboard-header">
-        <h1>Nursing Dashboard</h1>
-        <div class="header-info">
-            <span class="welcome-message">Welcome, Nurse {{ nurse.user.get_full_name }}</span>
-            <span class="current-time">{{ current_time|time }}</span>
+    <header class="dashboard-header">
+        <div class="header-content">
+            <h1 class="dashboard-title">
+                <i class="fas fa-user-nurse"></i> Nursing Dashboard
+            </h1>
+            <div class="header-info">
+                <span class="welcome-message">Welcome, <strong>Nurse {{ nurse.user.get_full_name }}</strong></span>
+                <span class="current-time">
+                    <i class="far fa-clock"></i> {{ current_time|time }}
+                </span>
+            </div>
         </div>
-    </div>
-
-    
+        
+        {% comment %} <!-- Quick Actions -->
+        <div class="quick-actions">
+            <a href="{% url 'record_vitals' %}" class="action-btn">
+                <i class="fas fa-heartbeat"></i>
+                <span>Record Vitals</span>
+            </a>
+            <a href="{% url 'medication_admin' %}" class="action-btn">
+                <i class="fas fa-pills"></i>
+                <span>Administer Meds</span>
+            </a>
+            <a href="{% url 'patient_search' %}" class="action-btn">
+                <i class="fas fa-search"></i>
+                <span>Patient Search</span>
+            </a>
+            <a href="{% url 'emergency' %}" class="action-btn">
+                <i class="fas fa-ambulance"></i>
+                <span>Emergency</span>
+            </a>
+        </div> {% endcomment %}
+    </header>
 
     <!-- Main Content -->
-    <div class="dashboard-content">
+    <main class="dashboard-content">
         <!-- Left Column -->
         <div class="dashboard-column">
             <!-- Assigned IPD Patients -->
-            <div class="dashboard-widget">
+            <section class="dashboard-widget">
                 <div class="widget-header">
                     <h3><i class="fas fa-procedures"></i> My Assigned Patients</h3>
-                    <a href="{% url 'ipd' %}" class="view-all">View All</a>
+                    <a href="{% url 'ipd' %}" class="view-all">View All <i class="fas fa-chevron-right"></i></a>
                 </div>
                 <div class="widget-content">
                     {% if assigned_ipd_patients %}
-                    <table class="patient-table">
-                        <thead>
-                            <tr>
-                                <th>Patient</th>
-                                <th>Room/Bed</th>
-                                <th>Admitted</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for patient in assigned_ipd_patients %}
-                            <tr>
-                                <td>
-                                    <a href="{% url 'patient_detail' patient.patient.id %}">
-                                        {{ patient.patient.user.full_name }}
-                                    </a>
-                                </td>
-                                <td>
-                                    {% if patient.room %}
-                                    {{ patient.room.room_number }}/{{ patient.bed_number }}
-                                    {% else %}
-                                    Not assigned
-                                    {% endif %}
-                                </td>
-                                <td>{{ patient.admitted_on|timesince }} ago</td>
-                                <td>
-                                    <span class="status-badge">
-                                        Active
-                                    </span>
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+                    <div class="table-responsive">
+                        <table class="patient-table">
+                            <thead>
+                                <tr>
+                                    <th>Patient</th>
+                                    <th>Room/Bed</th>
+                                    <th>Admitted</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for patient in assigned_ipd_patients %}
+                                <tr>
+                                    <td>
+                                        <a href="{% url 'patient_detail' patient.patient.id %}" class="patient-link">
+                                            <i class="fas fa-user-injured"></i> 
+                                            {{ patient.patient.user.full_name }}
+                                        </a>
+                                    </td>
+                                    <td>
+                                        {% if patient.room %}
+                                        <span class="badge room-badge">
+                                            <i class="fas fa-door-open"></i> {{ patient.room.room_number }}/{{ patient.bed_number }}
+                                        </span>
+                                        {% else %}
+                                        <span class="badge warning-badge">Not assigned</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ patient.admitted_on|timesince }} ago</td>
+                                    <td>
+                                        <span class="status-badge active-badge">
+                                            <i class="fas fa-circle"></i> Active
+                                        </span>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
                     {% else %}
-                    <p class="no-data">No assigned patients currently</p>
+                    <div class="no-data-message">
+                        <i class="fas fa-user-slash"></i>
+                        <p>No assigned patients currently</p>
+                    </div>
                     {% endif %}
                 </div>
-            </div>
+            </section>
 
             <!-- Pending Medications -->
-            <div class="dashboard-widget">
+            <section class="dashboard-widget">
                 <div class="widget-header">
                     <h3><i class="fas fa-prescription-bottle-alt"></i> Pending Medications</h3>
-                    <a href="#" class="view-all">View All</a>
+                    <a href="#" class="view-all">View All <i class="fas fa-chevron-right"></i></a>
                 </div>
                 <div class="widget-content">
                     {% if pending_medications %}
@@ -83,41 +115,45 @@
                                     <span class="dosage">{{ med.dosage }}</span>
                                 </div>
                                 <div class="medication-patient">
-                                    For <a href="{% url 'patient_detail' med.ipd.patient.id %}">
+                                    <i class="fas fa-user-injured"></i> 
+                                    For <a href="{% url 'patient_detail' med.ipd.patient.id %}" class="patient-link">
                                         {{ med.ipd.patient.user.full_name }}
                                     </a>
                                 </div>
                             </div>
                             <div class="medication-time">
-                                {{ med.timing|time }}
+                                <i class="far fa-clock"></i> {{ med.timing|time }}
                                 {% if med.timing <= current_time %}
-                                <span class="badge overdue">OVERDUE</span>
+                                <span class="badge overdue-badge">OVERDUE</span>
                                 {% else %}
-                                <span class="badge">Due</span>
+                                <span class="badge due-badge">Due</span>
                                 {% endif %}
                             </div>
                             <div class="medication-actions">
-                                <a href="{% url 'administer_med' med.id %}" class="btn btn-sm btn-primary">
-                                    Administer
+                                <a href="{% url 'administer_med' med.id %}" class="btn btn-primary btn-sm">
+                                    <i class="fas fa-syringe"></i> Administer
                                 </a>
                             </div>
                         </li>
                         {% endfor %}
                     </ul>
                     {% else %}
-                    <p class="no-data">No pending medications in next hour</p>
+                    <div class="no-data-message">
+                        <i class="fas fa-check-circle"></i>
+                        <p>No pending medications in next hour</p>
+                    </div>
                     {% endif %}
                 </div>
-            </div>
+            </section>
         </div>
 
         <!-- Right Column -->
         <div class="dashboard-column">
             <!-- Emergency Cases -->
-            <div class="dashboard-widget emergency-widget">
+            <section class="dashboard-widget emergency-widget">
                 <div class="widget-header">
                     <h3><i class="fas fa-ambulance"></i> Emergency Cases</h3>
-                    <a href="{% url 'emergency' %}" class="view-all">View All</a>
+                    <a href="{% url 'emergency' %}" class="view-all">View All <i class="fas fa-chevron-right"></i></a>
                 </div>
                 <div class="widget-content">
                     {% if emergency_cases %}
@@ -126,8 +162,8 @@
                         <li class="emergency-item priority-{{ case.severity }}">
                             <div class="emergency-info">
                                 <div class="emergency-patient">
-                                    <a href="{% url 'patient_detail' case.patient.id %}">
-                                        {{ case.patient.user.full_name }}
+                                    <a href="{% url 'patient_detail' case.patient.id %}" class="patient-link">
+                                        <i class="fas fa-user-injured"></i> {{ case.patient.user.full_name }}
                                     </a>
                                     <span class="emergency-type">{{ case.get_emergency_type_display }}</span>
                                 </div>
@@ -136,27 +172,30 @@
                                 </div>
                             </div>
                             <div class="emergency-time">
-                                {{ case.admitted_on|timesince }} ago
+                                <i class="far fa-clock"></i> {{ case.admitted_on|timesince }} ago
                             </div>
                             <div class="emergency-actions">
-                                <a href="{% url 'triage_emergency' case.id %}" class="btn btn-sm btn-danger">
-                                    Triage
+                                <a href="{% url 'triage_emergency' case.id %}" class="btn btn-danger btn-sm">
+                                    <i class="fas fa-first-aid"></i> Triage
                                 </a>
                             </div>
                         </li>
                         {% endfor %}
                     </ul>
                     {% else %}
-                    <p class="no-data">No pending emergency cases</p>
+                    <div class="no-data-message">
+                        <i class="fas fa-thumbs-up"></i>
+                        <p>No pending emergency cases</p>
+                    </div>
                     {% endif %}
                 </div>
-            </div>
+            </section>
 
             <!-- Critical Vitals -->
-            <div class="dashboard-widget">
+            <section class="dashboard-widget">
                 <div class="widget-header">
                     <h3><i class="fas fa-heartbeat"></i> Critical Vitals</h3>
-                    <a href="#" class="view-all">View All</a>
+                    <a href="#" class="view-all">View All <i class="fas fa-chevron-right"></i></a>
                 </div>
                 <div class="widget-content">
                     {% if critical_vitals %}
@@ -164,85 +203,100 @@
                         {% for vital in critical_vitals %}
                         <li class="vital-item">
                             <div class="vital-patient">
-                                <a href="{% url 'patient_detail' vital.ipd.patient.id %}">
-                                    {{ vital.ipd.patient.user.full_name }}
+                                <a href="{% url 'patient_detail' vital.ipd.patient.id %}" class="patient-link">
+                                    <i class="fas fa-user-injured"></i> {{ vital.ipd.patient.user.full_name }}
                                 </a>
                             </div>
                             <div class="vital-stats">
-                                <span class="stat">
+                                <span class="stat temperature">
                                     <i class="fas fa-temperature-high"></i> {{ vital.temperature|default:"--" }}°C
                                 </span>
-                                <span class="stat">
+                                <span class="stat pulse">
                                     <i class="fas fa-heart"></i> {{ vital.pulse_rate|default:"--" }} BPM
                                 </span>
-                                <span class="stat">
+                                <span class="stat respiratory">
                                     <i class="fas fa-lungs"></i> {{ vital.respiratory_rate|default:"--" }}
+                                </span>
+                                <span class="stat bp">
+                                    <i class="fas fa-tachometer-alt"></i> {{ vital.blood_pressure|default:"--" }}
                                 </span>
                             </div>
                             <div class="vital-time">
-                                {{ vital.date }} {{ vital.time|time }}
+                                <i class="far fa-clock"></i> {{ vital.time|time }}
                             </div>
                             <div class="vital-actions">
-                                <a href="{% url 'record_vitals' vital.ipd.patient.id %}" class="btn btn-sm btn-warning">
-                                    Recheck
+                                <a href="{% url 'record_vitals' vital.ipd.patient.id %}" class="btn btn-warning btn-sm">
+                                    <i class="fas fa-redo"></i> Recheck
                                 </a>
                             </div>
                         </li>
                         {% endfor %}
                     </ul>
                     {% else %}
-                    <p class="no-data">No critical vitals in last 4 hours</p>
+                    <div class="no-data-message">
+                        <i class="fas fa-heart"></i>
+                        <p>No critical vitals in last 4 hours</p>
+                    </div>
                     {% endif %}
                 </div>
-            </div>
+            </section>
         </div>
-    </div>
+    </main>
 
     <!-- Bottom Row -->
     <div class="dashboard-bottom">
         <!-- Recent OPD Visits -->
-        <div class="dashboard-widget">
+        <section class="dashboard-widget">
             <div class="widget-header">
                 <h3><i class="fas fa-stethoscope"></i> Recent OPD Visits</h3>
-                <a href="{% url 'opd' %}" class="view-all">View All</a>
+                <a href="{% url 'opd' %}" class="view-all">View All <i class="fas fa-chevron-right"></i></a>
             </div>
             <div class="widget-content">
                 {% if recent_opd_visits %}
-                <table class="opd-table">
-                    <thead>
-                        <tr>
-                            <th>Patient</th>
-                            <th>Doctor</th>
-                            <th>Diagnosis</th>
-                            <th>Time</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for visit in recent_opd_visits %}
-                        <tr>
-                            <td>
-                                <a href="{% url 'patient_detail' visit.patient.id %}">
-                                    {{ visit.patient.user.full_name }}
-                                </a>
-                            </td>
-                            <td>Dr. {{ visit.doctor.user.full_name }}</td>
-                            <td>{{ visit.diagnosis|truncatechars:40 }}</td>
-                            <td>{{ visit.visit_date|timesince }} ago</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+                <div class="table-responsive">
+                    <table class="opd-table">
+                        <thead>
+                            <tr>
+                                <th>Patient</th>
+                                <th>Doctor</th>
+                                <th>Diagnosis</th>
+                                <th>Time</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for visit in recent_opd_visits %}
+                            <tr>
+                                <td>
+                                    <a href="{% url 'patient_detail' visit.patient.id %}" class="patient-link">
+                                        <i class="fas fa-user-injured"></i> {{ visit.patient.user.full_name }}
+                                    </a>
+                                </td>
+                                <td>
+                                    <i class="fas fa-user-md"></i> Dr. {{ visit.doctor.user.full_name }}
+                                </td>
+                                <td>{{ visit.diagnosis|truncatechars:40 }}</td>
+                                <td>
+                                    <i class="far fa-clock"></i> {{ visit.visit_date|timesince }} ago
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
                 {% else %}
-                <p class="no-data">No recent OPD visits</p>
+                <div class="no-data-message">
+                    <i class="fas fa-clipboard-list"></i>
+                    <p>No recent OPD visits</p>
+                </div>
                 {% endif %}
             </div>
-        </div>
+        </section>
 
         <!-- Recent Activities -->
-        <div class="dashboard-widget">
+        <section class="dashboard-widget">
             <div class="widget-header">
                 <h3><i class="fas fa-clipboard-list"></i> My Recent Activities</h3>
-                <a href="#" class="view-all">View All</a>
+                <a href="#" class="view-all">View All <i class="fas fa-chevron-right"></i></a>
             </div>
             <div class="widget-content">
                 {% if recent_activities %}
@@ -256,42 +310,107 @@
                             <div class="activity-description">
                                 {{ activity.description }}
                             </div>
-                            <div class="activity-time">
-                                {{ activity.timestamp|timesince }} ago
+                            <div class="activity-meta">
+                                <span class="activity-time">
+                                    <i class="far fa-clock"></i> {{ activity.timestamp|timesince }} ago
+                                </span>
+                                {% if activity.patient %}
+                                <span class="activity-patient">
+                                    <i class="fas fa-user-injured"></i> 
+                                    <a href="{% url 'patient_detail' activity.patient.id %}">{{ activity.patient.user.full_name }}</a>
+                                </span>
+                                {% endif %}
                             </div>
                         </div>
                     </li>
                     {% endfor %}
                 </ul>
                 {% else %}
-                <p class="no-data">No recent activities</p>
+                <div class="no-data-message">
+                    <i class="fas fa-history"></i>
+                    <p>No recent activities</p>
+                </div>
                 {% endif %}
             </div>
-        </div>
+        </section>
     </div>
 </div>
+
 <style>
-    /* Nurse Dashboard Styles */
+/* =============== Base Styles =============== */
+:root {
+    --primary-color: #3498db;
+    --secondary-color: #2980b9;
+    --success-color: #2ecc71;
+    --danger-color: #e74c3c;
+    --warning-color: #f39c12;
+    --info-color: #1abc9c;
+    --light-color: #ecf0f1;
+    --dark-color: #2c3e50;
+    --gray-color: #95a5a6;
+    --white-color: #ffffff;
+    --emergency-high: #e74c3c;
+    --emergency-medium: #f39c12;
+    --emergency-low: #2ecc71;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Roboto', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+    color: #333;
+    background-color: #f5f7fa;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+i {
+    margin-right: 5px;
+}
+
+/* =============== Dashboard Layout =============== */
 .nurse-dashboard {
     padding: 20px;
     max-width: 1400px;
     margin: 0 auto;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
+/* Header Styles */
 .dashboard-header {
+    margin-bottom: 25px;
+    background: var(--white-color);
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    padding: 20px;
+}
+
+.header-content {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 25px;
-    padding-bottom: 15px;
-    border-bottom: 1px solid #e0e0e0;
+    margin-bottom: 20px;
 }
 
-.dashboard-header h1 {
-    color: #2c3e50;
+.dashboard-title {
+    color: var(--dark-color);
     font-weight: 600;
     margin: 0;
+    font-size: 1.8rem;
+    display: flex;
+    align-items: center;
+}
+
+.dashboard-title i {
+    color: var(--primary-color);
+    margin-right: 15px;
 }
 
 .header-info {
@@ -301,56 +420,63 @@
 .welcome-message {
     display: block;
     font-size: 1.1rem;
-    color: #5d6778;
+    color: var(--dark-color);
     font-weight: 500;
 }
 
 .current-time {
     font-size: 0.9rem;
-    color: #7f8c8d;
-    background: #f8f9fa;
-    padding: 3px 8px;
-    border-radius: 12px;
+    color: var(--gray-color);
+    background: var(--light-color);
+    padding: 5px 12px;
+    border-radius: 20px;
+    display: inline-flex;
+    align-items: center;
+}
+
+.current-time i {
+    margin-right: 5px;
 }
 
 /* Quick Actions */
 .quick-actions {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
     gap: 15px;
-    margin-bottom: 25px;
 }
 
 .action-btn {
-    background: white;
+    background: var(--white-color);
     border-radius: 8px;
     padding: 15px;
     text-align: center;
-    text-decoration: none;
-    color: #2c3e50;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    color: var(--dark-color);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
     transition: all 0.3s ease;
     display: flex;
     flex-direction: column;
     align-items: center;
+    border: 1px solid #e0e0e0;
 }
 
 .action-btn:hover {
     transform: translateY(-3px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    border-color: var(--primary-color);
 }
 
 .action-btn i {
     font-size: 1.8rem;
     margin-bottom: 10px;
-    color: #3498db;
+    color: var(--primary-color);
 }
 
 .action-btn span {
     font-weight: 500;
+    font-size: 0.9rem;
 }
 
-/* Dashboard Content Layout */
+/* Main Content Layout */
 .dashboard-content {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -372,54 +498,85 @@
 
 /* Widget Styles */
 .dashboard-widget {
-    background: white;
+    background: var(--white-color);
     border-radius: 10px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
 }
 
 .emergency-widget {
-    border-top: 3px solid #e74c3c;
+    border-top: 3px solid var(--danger-color);
 }
 
 .widget-header {
     padding: 15px 20px;
-    border-bottom: 1px solid #ecf0f1;
+    border-bottom: 1px solid #eee;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    background: #f9f9f9;
 }
 
 .widget-header h3 {
     margin: 0;
     font-size: 1.1rem;
-    color: #2c3e50;
+    color: var(--dark-color);
     display: flex;
     align-items: center;
+    font-weight: 600;
 }
 
 .widget-header h3 i {
     margin-right: 10px;
-    color: #3498db;
+    color: var(--primary-color);
 }
 
 .view-all {
     font-size: 0.8rem;
-    color: #3498db;
-    text-decoration: none;
+    color: var(--primary-color);
+    display: flex;
+    align-items: center;
+    transition: color 0.2s;
+}
+
+.view-all:hover {
+    color: var(--secondary-color);
+}
+
+.view-all i {
+    margin-left: 5px;
+    font-size: 0.7rem;
 }
 
 .widget-content {
     padding: 15px 20px;
 }
 
-.no-data {
-    color: #95a5a6;
+/* No Data Message */
+.no-data-message {
+    color: var(--gray-color);
     text-align: center;
-    padding: 20px;
-    font-style: italic;
+    padding: 30px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.no-data-message i {
+    font-size: 2rem;
+    margin-bottom: 10px;
+    color: #ddd;
+}
+
+.no-data-message p {
+    margin: 0;
 }
 
 /* Tables */
+.table-responsive {
+    overflow-x: auto;
+}
+
 .patient-table, .opd-table {
     width: 100%;
     border-collapse: collapse;
@@ -428,31 +585,90 @@
 
 .patient-table th, .opd-table th {
     text-align: left;
-    padding: 10px;
-    background: #f8f9fa;
-    font-size: 0.8rem;
+    padding: 12px 10px;
+    background: #f5f7fa;
+    font-size: 0.75rem;
     text-transform: uppercase;
-    color: #7f8c8d;
+    color: var(--gray-color);
+    font-weight: 600;
+    letter-spacing: 0.5px;
 }
 
 .patient-table td, .opd-table td {
     padding: 12px 10px;
-    border-bottom: 1px solid #ecf0f1;
+    border-bottom: 1px solid #eee;
+    vertical-align: middle;
 }
 
 .patient-table tr:last-child td, .opd-table tr:last-child td {
     border-bottom: none;
 }
 
-/* Status Badges */
-.status-badge {
+/* Patient Links */
+.patient-link {
+    color: var(--dark-color);
+    display: flex;
+    align-items: center;
+    transition: color 0.2s;
+}
+
+.patient-link:hover {
+    color: var(--primary-color);
+}
+
+.patient-link i {
+    margin-right: 8px;
+    color: var(--primary-color);
+    font-size: 0.9rem;
+}
+
+/* Badges */
+.badge {
     display: inline-block;
-    padding: 3px 8px;
+    padding: 4px 8px;
     border-radius: 12px;
     font-size: 0.7rem;
     font-weight: 600;
+    line-height: 1;
+}
+
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 8px 4px 6px;
+    border-radius: 12px;
+    font-size: 0.7rem;
+    font-weight: 600;
+}
+
+.active-badge {
     background: #e8f5e9;
-    color: #27ae60;
+    color: var(--success-color);
+}
+
+.active-badge i {
+    font-size: 0.5rem;
+    margin-right: 5px;
+}
+
+.room-badge {
+    background: #e3f2fd;
+    color: var(--primary-color);
+}
+
+.warning-badge {
+    background: #fff3e0;
+    color: var(--warning-color);
+}
+
+.due-badge {
+    background: #e3f2fd;
+    color: var(--primary-color);
+}
+
+.overdue-badge {
+    background: #ffebee;
+    color: var(--danger-color);
 }
 
 /* Lists */
@@ -462,17 +678,16 @@
     margin: 0;
 }
 
-.medication-item, .emergency-item, .vital-item, .activity-item {
+/* Medication List */
+.medication-item {
     padding: 12px 0;
-    border-bottom: 1px solid #ecf0f1;
+    border-bottom: 1px solid #eee;
     display: flex;
     align-items: center;
+    transition: background 0.2s;
 }
 
-.medication-item:last-child, 
-.emergency-item:last-child, 
-.vital-item:last-child, 
-.activity-item:last-child {
+.medication-item:last-child {
     border-bottom: none;
 }
 
@@ -480,7 +695,6 @@
     background-color: #fff8e1;
 }
 
-/* Medication List */
 .medication-info {
     flex: 1;
     margin-right: 15px;
@@ -488,111 +702,186 @@
 
 .medication-name {
     margin-bottom: 5px;
+    display: flex;
+    align-items: center;
 }
 
 .medication-name strong {
-    color: #2c3e50;
+    color: var(--dark-color);
+    font-size: 0.95rem;
 }
 
 .dosage {
     font-size: 0.8rem;
-    color: #7f8c8d;
+    color: var(--gray-color);
     margin-left: 8px;
+    background: #f5f5f5;
+    padding: 2px 6px;
+    border-radius: 4px;
 }
 
-.medication-patient a {
+.medication-patient {
     font-size: 0.8rem;
-    color: #3498db;
-    text-decoration: none;
+    color: var(--gray-color);
+    display: flex;
+    align-items: center;
+}
+
+.medication-patient i {
+    margin-right: 5px;
+    font-size: 0.8rem;
 }
 
 .medication-time {
     margin-right: 15px;
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     font-weight: 500;
-    color: #2c3e50;
+    color: var(--dark-color);
     min-width: 80px;
     text-align: right;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
 }
 
-.badge {
-    display: inline-block;
-    padding: 2px 6px;
-    border-radius: 10px;
-    font-size: 0.7rem;
-    background: #e3f2fd;
-    color: #3498db;
-    margin-left: 5px;
-}
-
-.badge.overdue {
-    background: #ffebee;
-    color: #e74c3c;
+.medication-time i {
+    margin-right: 5px;
 }
 
 /* Emergency List */
+.emergency-list {
+    border-radius: 8px;
+    overflow: hidden;
+}
+
 .emergency-item {
     padding: 12px 15px;
     margin: 0 -15px;
+    transition: background 0.2s;
+    display: flex;
+    align-items: center;
+}
+
+.emergency-item:hover {
+    background: rgba(0, 0, 0, 0.02);
 }
 
 .emergency-item.priority-1 {
-    background-color: #ffebee;
-    border-left: 3px solid #e74c3c;
+    background-color: rgba(231, 76, 60, 0.08);
+    border-left: 3px solid var(--emergency-high);
 }
 
 .emergency-item.priority-2 {
-    background-color: #fff3e0;
-    border-left: 3px solid #f39c12;
+    background-color: rgba(243, 156, 18, 0.08);
+    border-left: 3px solid var(--emergency-medium);
 }
 
 .emergency-item.priority-3 {
-    background-color: #e8f5e9;
-    border-left: 3px solid #2ecc71;
+    background-color: rgba(46, 204, 113, 0.08);
+    border-left: 3px solid var(--emergency-low);
 }
 
 .emergency-info {
     flex: 1;
+    margin-right: 15px;
+}
+
+.emergency-patient {
+    display: flex;
+    align-items: center;
+    margin-bottom: 3px;
 }
 
 .emergency-patient a {
     font-weight: 600;
-    color: #2c3e50;
-    text-decoration: none;
+    color: var(--dark-color);
+    display: flex;
+    align-items: center;
+}
+
+.emergency-patient i {
+    margin-right: 8px;
+    font-size: 0.9rem;
 }
 
 .emergency-type {
     font-size: 0.7rem;
     background: #f1f1f1;
-    padding: 2px 6px;
+    padding: 2px 8px;
     border-radius: 10px;
     margin-left: 8px;
+    font-weight: 500;
 }
 
 .emergency-description {
     font-size: 0.8rem;
-    color: #7f8c8d;
+    color: var(--gray-color);
     margin-top: 3px;
+    line-height: 1.4;
 }
 
 .emergency-time {
     font-size: 0.8rem;
-    color: #95a5a6;
+    color: var(--gray-color);
     margin-right: 15px;
+    min-width: 80px;
+    text-align: right;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.emergency-time i {
+    margin-right: 5px;
 }
 
 /* Vitals List */
+.vitals-list {
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.vital-item {
+    padding: 12px 0;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    align-items: center;
+}
+
+.vital-item:last-child {
+    border-bottom: none;
+}
+
+.vital-patient {
+    flex: 1;
+    margin-right: 15px;
+}
+
+.vital-patient a {
+    display: flex;
+    align-items: center;
+}
+
+.vital-patient i {
+    margin-right: 8px;
+    font-size: 0.9rem;
+}
+
 .vital-stats {
     display: flex;
-    gap: 15px;
+    flex-wrap: wrap;
+    gap: 10px;
     margin-right: 15px;
 }
 
 .vital-stats .stat {
     font-size: 0.8rem;
-    color: #7f8c8d;
+    color: var(--gray-color);
     display: flex;
     align-items: center;
+    background: #f5f5f5;
+    padding: 4px 8px;
+    border-radius: 4px;
 }
 
 .vital-stats .stat i {
@@ -600,24 +889,59 @@
     font-size: 0.9rem;
 }
 
+.vital-stats .stat.temperature {
+    color: #e74c3c;
+}
+
+.vital-stats .stat.pulse {
+    color: #3498db;
+}
+
+.vital-stats .stat.respiratory {
+    color: #2ecc71;
+}
+
+.vital-stats .stat.bp {
+    color: #9b59b6;
+}
+
 .vital-time {
     font-size: 0.8rem;
-    color: #95a5a6;
+    color: var(--gray-color);
     margin-right: 15px;
-    min-width: 100px;
+    min-width: 80px;
     text-align: right;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.vital-time i {
+    margin-right: 5px;
 }
 
 /* Activity Log */
+.activity-log {
+    border-radius: 8px;
+    overflow: hidden;
+}
+
 .activity-item {
+    padding: 12px 0;
+    border-bottom: 1px solid #eee;
     display: flex;
     align-items: flex-start;
 }
 
+.activity-item:last-child {
+    border-bottom: none;
+}
+
 .activity-icon {
-    margin-right: 12px;
-    color: #3498db;
+    margin-right: 15px;
+    color: var(--primary-color);
     font-size: 1.1rem;
+    margin-top: 2px;
 }
 
 .activity-details {
@@ -626,56 +950,134 @@
 
 .activity-description {
     font-size: 0.9rem;
-    color: #2c3e50;
+    color: var(--dark-color);
+    margin-bottom: 3px;
+}
+
+.activity-meta {
+    display: flex;
+    align-items: center;
+    font-size: 0.75rem;
+    color: var(--gray-color);
 }
 
 .activity-time {
-    font-size: 0.7rem;
-    color: #95a5a6;
-    margin-top: 3px;
+    display: flex;
+    align-items: center;
+    margin-right: 15px;
+}
+
+.activity-time i {
+    margin-right: 5px;
+}
+
+.activity-patient {
+    display: flex;
+    align-items: center;
+}
+
+.activity-patient a {
+    color: var(--primary-color);
+    margin-left: 5px;
 }
 
 /* Buttons */
 .btn {
-    padding: 5px 12px;
+    padding: 6px 12px;
     border-radius: 4px;
     font-size: 0.8rem;
+    font-weight: 500;
     text-decoration: none;
     border: none;
     cursor: pointer;
-    transition: background 0.2s;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .btn-sm {
-    padding: 3px 8px;
+    padding: 5px 10px;
     font-size: 0.75rem;
 }
 
 .btn-primary {
-    background: #3498db;
-    color: white;
+    background: var(--primary-color);
+    color: var(--white-color);
 }
 
 .btn-primary:hover {
-    background: #2980b9;
+    background: var(--secondary-color);
+    transform: translateY(-1px);
 }
 
 .btn-danger {
-    background: #e74c3c;
-    color: white;
+    background: var(--danger-color);
+    color: var(--white-color);
 }
 
 .btn-danger:hover {
     background: #c0392b;
+    transform: translateY(-1px);
 }
 
 .btn-warning {
-    background: #f39c12;
-    color: white;
+    background: var(--warning-color);
+    color: var(--white-color);
 }
 
 .btn-warning:hover {
-    background: #d35400;
+    background: #e67e22;
+    transform: translateY(-1px);
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+    .dashboard-content, .dashboard-bottom {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .header-content {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .header-info {
+        text-align: left;
+        margin-top: 10px;
+    }
+    
+    .quick-actions {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .vital-stats {
+        flex-direction: column;
+        gap: 5px;
+    }
+}
+
+@media (max-width: 480px) {
+    .quick-actions {
+        grid-template-columns: 1fr;
+    }
+    
+    .medication-item, .emergency-item, .vital-item {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .medication-time, .emergency-time, .vital-time {
+        margin-top: 5px;
+        align-self: flex-start;
+    }
+    
+    .medication-actions, .emergency-actions, .vital-actions {
+        margin-top: 10px;
+        align-self: flex-end;
+    }
 }
 </style>
 {% endblock %}
