@@ -1,0 +1,178 @@
+{% extends 'hms/base.html' %}
+
+{% block content %}
+<body style="margin:0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
+Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif; background: #f7f9fc; color:#2c3e50;">
+
+  <div style="max-width: 1200px; margin: 2rem auto; padding: 1rem;">
+
+    <h1 style="font-weight: 700; font-size: 2.5rem; margin-bottom: 1rem;">Welcome Dr. {{ doctor.user.full_name }}</h1>
+
+    <!-- Summary Cards -->
+    <div style="display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 2rem;">
+      <div class="card summary" style="flex:1; min-width: 220px; background:#3498db; color:#fff; border-radius:10px; padding:1.5rem; box-shadow:0 4px 8px rgba(52,152,219,0.3);">
+        <h3>Active IPD Patients</h3>
+        <p class="counter" id="ipdCount" style="font-size: 2.5rem; font-weight: 700;">{{ ipd_patients.count }}</p>
+      </div>
+      <div class="card summary" style="flex:1; min-width: 220px; background:#2ecc71; color:#fff; border-radius:10px; padding:1.5rem; box-shadow:0 4px 8px rgba(46,204,113,0.3);">
+        <h3>Today's Appointments</h3>
+        <p class="counter" id="apptCount" style="font-size: 2.5rem; font-weight: 700;">{{ todays_appointments.count }}</p>
+      </div>
+      <div class="card summary" style="flex:1; min-width: 220px; background:#e67e22; color:#fff; border-radius:10px; padding:1.5rem; box-shadow:0 4px 8px rgba(230,126,34,0.3);">
+        <h3>Recent Vitals</h3>
+        <p class="counter" id="vitalsCount" style="font-size: 2.5rem; font-weight: 700;">{{ recent_vitals.count }}</p>
+      </div>
+      <div class="card summary" style="flex:1; min-width: 220px; background:#e74c3c; color:#fff; border-radius:10px; padding:1.5rem; box-shadow:0 4px 8px rgba(231,76,60,0.3);">
+        <h3>Emergency Cases</h3>
+        <p class="counter" id="emergencyCount" style="font-size: 2.5rem; font-weight: 700;">{{ emergency_cases.count }}</p>
+      </div>
+    </div>
+
+    <!-- Charts Row -->
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 3rem;">
+      <div style="background: white; padding: 1rem 1.5rem; border-radius: 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.1);">
+        <h2 style="color:#34495e;">Appointments This Week</h2>
+        <canvas id="appointmentsChart" style="width:100%; height:300px;"></canvas>
+      </div>
+      <div style="background: white; padding: 1rem 1.5rem; border-radius: 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.1);">
+        <h2 style="color:#34495e;">Active Medications Overview</h2>
+        <canvas id="medicationsChart" style="width:100%; height:300px;"></canvas>
+      </div>
+    </div>
+
+    <!-- Tables Row -->
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+
+      <!-- IPD Patients Table -->
+      <section style="background: white; padding: 1rem 1.5rem; border-radius: 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); overflow-x:auto;">
+        <h2 style="color:#34495e;">Active IPD Patients</h2>
+        {% if ipd_patients %}
+        <table style="width:100%; border-collapse: collapse;">
+          <thead>
+            <tr style="background: #3498db; color: white;">
+              <th style="padding: 0.75rem; text-align: left;">Patient</th>
+              <th style="padding: 0.75rem; text-align: left;">Bed</th>
+              <th style="padding: 0.75rem; text-align: left;">Admission Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for ipd in ipd_patients %}
+            <tr style="border-bottom: 1px solid #ddd;">
+              <td style="padding: 0.5rem;">{{ ipd.patient.user.get_full_name }}</td>
+              <td style="padding: 0.5rem;">{{ ipd.bed_number }}</td>
+              <td style="padding: 0.5rem;">{{ ipd.admission_date|date:"d M Y" }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        {% else %}
+          <p>No active IPD patients.</p>
+        {% endif %}
+      </section>
+
+      <!-- Emergency Cases Table -->
+      <section style="background: white; padding: 1rem 1.5rem; border-radius: 10px; box-shadow: 0 2px 6px rgba(231, 76, 60, 0.1); border-left: 4px solid #e74c3c; overflow-x:auto;">
+        <h2 style="color:#e74c3c;">Emergency Cases</h2>
+        {% if emergency_cases %}
+        <table style="width:100%; border-collapse: collapse;">
+          <thead>
+            <tr style="background: #e74c3c; color: white;">
+              <th style="padding: 0.75rem; text-align: left;">Patient</th>
+              <th style="padding: 0.75rem; text-align: left;">Emergency Type</th>
+              <th style="padding: 0.75rem; text-align: left;">Reported At</th>
+              <th style="padding: 0.75rem; text-align: left;">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for case in emergency_cases %}
+            <tr style="border-bottom: 1px solid #f9d6d5;">
+              <td style="padding: 0.5rem;">{{ case.patient.user.get_full_name }}</td>
+              <td style="padding: 0.5rem;">{{ case.emergency_type }}</td>
+              <td style="padding: 0.5rem;">{{ case.created_at|date:"d M Y H:i" }}</td>
+              <td style="padding: 0.5rem;">{{ case.status }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        {% else %}
+          <p>No pending emergency cases.</p>
+        {% endif %}
+      </section>
+
+    </div>
+
+  </div>
+
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+
+  <style>
+    /* Add smooth hover effect on table rows */
+    table tbody tr:hover {
+      background-color: #f0f8ff;
+      transition: background-color 0.3s ease;
+    }
+
+    /* Summary cards counter animation */
+    .counter {
+      animation: pulse 1.2s ease-in-out forwards;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(0.8); opacity: 0.5; }
+      50% { transform: scale(1.1); opacity: 1; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+  </style>
+<script>
+  const apptLabels = {{ appointment_chart_labels|safe }};
+  const apptData = {{ appointment_chart_counts|safe }};
+  const medsLabels = {{ med_chart_labels|safe }};
+  const medsData = {{ med_chart_counts|safe }};
+
+  new Chart(document.getElementById('appointmentsChart'), {
+    type: 'bar',
+    data: {
+      labels: apptLabels,
+      datasets: [{
+        label: 'Appointments',
+        data: apptData,
+        backgroundColor: 'rgba(52,152,219,0.7)',
+        borderRadius: 5
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { display: false }
+      },
+      scales: {
+        y: { beginAtZero: true }
+      }
+    }
+  });
+
+  new Chart(document.getElementById('medicationsChart'), {
+    type: 'doughnut',
+    data: {
+      labels: medsLabels,
+      datasets: [{
+        label: 'Medications',
+        data: medsData,
+        backgroundColor: ['#e67e22', '#3498db', '#2ecc71', '#9b59b6', '#f1c40f'],
+        hoverOffset: 20
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { position: 'bottom' }
+      }
+    }
+  });
+</script>
+
+</body>
+{% endblock %}

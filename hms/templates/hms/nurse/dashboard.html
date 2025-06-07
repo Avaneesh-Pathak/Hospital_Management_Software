@@ -1,0 +1,681 @@
+{% extends 'hms/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="nurse-dashboard">
+    <!-- Header Section -->
+    <div class="dashboard-header">
+        <h1>Nursing Dashboard</h1>
+        <div class="header-info">
+            <span class="welcome-message">Welcome, Nurse {{ nurse.user.get_full_name }}</span>
+            <span class="current-time">{{ current_time|time }}</span>
+        </div>
+    </div>
+
+    
+
+    <!-- Main Content -->
+    <div class="dashboard-content">
+        <!-- Left Column -->
+        <div class="dashboard-column">
+            <!-- Assigned IPD Patients -->
+            <div class="dashboard-widget">
+                <div class="widget-header">
+                    <h3><i class="fas fa-procedures"></i> My Assigned Patients</h3>
+                    <a href="{% url 'ipd' %}" class="view-all">View All</a>
+                </div>
+                <div class="widget-content">
+                    {% if assigned_ipd_patients %}
+                    <table class="patient-table">
+                        <thead>
+                            <tr>
+                                <th>Patient</th>
+                                <th>Room/Bed</th>
+                                <th>Admitted</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for patient in assigned_ipd_patients %}
+                            <tr>
+                                <td>
+                                    <a href="{% url 'patient_detail' patient.patient.id %}">
+                                        {{ patient.patient.user.full_name }}
+                                    </a>
+                                </td>
+                                <td>
+                                    {% if patient.room %}
+                                    {{ patient.room.room_number }}/{{ patient.bed_number }}
+                                    {% else %}
+                                    Not assigned
+                                    {% endif %}
+                                </td>
+                                <td>{{ patient.admitted_on|timesince }} ago</td>
+                                <td>
+                                    <span class="status-badge">
+                                        Active
+                                    </span>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    {% else %}
+                    <p class="no-data">No assigned patients currently</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Pending Medications -->
+            <div class="dashboard-widget">
+                <div class="widget-header">
+                    <h3><i class="fas fa-prescription-bottle-alt"></i> Pending Medications</h3>
+                    <a href="#" class="view-all">View All</a>
+                </div>
+                <div class="widget-content">
+                    {% if pending_medications %}
+                    <ul class="medication-list">
+                        {% for med in pending_medications %}
+                        <li class="medication-item {% if med.timing <= current_time %}due-now{% endif %}">
+                            <div class="medication-info">
+                                <div class="medication-name">
+                                    <strong>{{ med.medication }}</strong>
+                                    <span class="dosage">{{ med.dosage }}</span>
+                                </div>
+                                <div class="medication-patient">
+                                    For <a href="{% url 'patient_detail' med.ipd.patient.id %}">
+                                        {{ med.ipd.patient.user.full_name }}
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="medication-time">
+                                {{ med.timing|time }}
+                                {% if med.timing <= current_time %}
+                                <span class="badge overdue">OVERDUE</span>
+                                {% else %}
+                                <span class="badge">Due</span>
+                                {% endif %}
+                            </div>
+                            <div class="medication-actions">
+                                <a href="{% url 'administer_med' med.id %}" class="btn btn-sm btn-primary">
+                                    Administer
+                                </a>
+                            </div>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                    {% else %}
+                    <p class="no-data">No pending medications in next hour</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column -->
+        <div class="dashboard-column">
+            <!-- Emergency Cases -->
+            <div class="dashboard-widget emergency-widget">
+                <div class="widget-header">
+                    <h3><i class="fas fa-ambulance"></i> Emergency Cases</h3>
+                    <a href="{% url 'emergency' %}" class="view-all">View All</a>
+                </div>
+                <div class="widget-content">
+                    {% if emergency_cases %}
+                    <ul class="emergency-list">
+                        {% for case in emergency_cases %}
+                        <li class="emergency-item priority-{{ case.severity }}">
+                            <div class="emergency-info">
+                                <div class="emergency-patient">
+                                    <a href="{% url 'patient_detail' case.patient.id %}">
+                                        {{ case.patient.user.full_name }}
+                                    </a>
+                                    <span class="emergency-type">{{ case.get_emergency_type_display }}</span>
+                                </div>
+                                <div class="emergency-description">
+                                    {{ case.case_description|truncatechars:60 }}
+                                </div>
+                            </div>
+                            <div class="emergency-time">
+                                {{ case.admitted_on|timesince }} ago
+                            </div>
+                            <div class="emergency-actions">
+                                <a href="{% url 'triage_emergency' case.id %}" class="btn btn-sm btn-danger">
+                                    Triage
+                                </a>
+                            </div>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                    {% else %}
+                    <p class="no-data">No pending emergency cases</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Critical Vitals -->
+            <div class="dashboard-widget">
+                <div class="widget-header">
+                    <h3><i class="fas fa-heartbeat"></i> Critical Vitals</h3>
+                    <a href="#" class="view-all">View All</a>
+                </div>
+                <div class="widget-content">
+                    {% if critical_vitals %}
+                    <ul class="vitals-list">
+                        {% for vital in critical_vitals %}
+                        <li class="vital-item">
+                            <div class="vital-patient">
+                                <a href="{% url 'patient_detail' vital.ipd.patient.id %}">
+                                    {{ vital.ipd.patient.user.full_name }}
+                                </a>
+                            </div>
+                            <div class="vital-stats">
+                                <span class="stat">
+                                    <i class="fas fa-temperature-high"></i> {{ vital.temperature|default:"--" }}°C
+                                </span>
+                                <span class="stat">
+                                    <i class="fas fa-heart"></i> {{ vital.pulse_rate|default:"--" }} BPM
+                                </span>
+                                <span class="stat">
+                                    <i class="fas fa-lungs"></i> {{ vital.respiratory_rate|default:"--" }}
+                                </span>
+                            </div>
+                            <div class="vital-time">
+                                {{ vital.date }} {{ vital.time|time }}
+                            </div>
+                            <div class="vital-actions">
+                                <a href="{% url 'record_vitals' vital.ipd.patient.id %}" class="btn btn-sm btn-warning">
+                                    Recheck
+                                </a>
+                            </div>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                    {% else %}
+                    <p class="no-data">No critical vitals in last 4 hours</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom Row -->
+    <div class="dashboard-bottom">
+        <!-- Recent OPD Visits -->
+        <div class="dashboard-widget">
+            <div class="widget-header">
+                <h3><i class="fas fa-stethoscope"></i> Recent OPD Visits</h3>
+                <a href="{% url 'opd' %}" class="view-all">View All</a>
+            </div>
+            <div class="widget-content">
+                {% if recent_opd_visits %}
+                <table class="opd-table">
+                    <thead>
+                        <tr>
+                            <th>Patient</th>
+                            <th>Doctor</th>
+                            <th>Diagnosis</th>
+                            <th>Time</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for visit in recent_opd_visits %}
+                        <tr>
+                            <td>
+                                <a href="{% url 'patient_detail' visit.patient.id %}">
+                                    {{ visit.patient.user.full_name }}
+                                </a>
+                            </td>
+                            <td>Dr. {{ visit.doctor.user.full_name }}</td>
+                            <td>{{ visit.diagnosis|truncatechars:40 }}</td>
+                            <td>{{ visit.visit_date|timesince }} ago</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <p class="no-data">No recent OPD visits</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Recent Activities -->
+        <div class="dashboard-widget">
+            <div class="widget-header">
+                <h3><i class="fas fa-clipboard-list"></i> My Recent Activities</h3>
+                <a href="#" class="view-all">View All</a>
+            </div>
+            <div class="widget-content">
+                {% if recent_activities %}
+                <ul class="activity-log">
+                    {% for activity in recent_activities %}
+                    <li class="activity-item">
+                        <div class="activity-icon">
+                            <i class="fas fa-{{ activity.get_activity_icon }}"></i>
+                        </div>
+                        <div class="activity-details">
+                            <div class="activity-description">
+                                {{ activity.description }}
+                            </div>
+                            <div class="activity-time">
+                                {{ activity.timestamp|timesince }} ago
+                            </div>
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <p class="no-data">No recent activities</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+<style>
+    /* Nurse Dashboard Styles */
+.nurse-dashboard {
+    padding: 20px;
+    max-width: 1400px;
+    margin: 0 auto;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.dashboard-header h1 {
+    color: #2c3e50;
+    font-weight: 600;
+    margin: 0;
+}
+
+.header-info {
+    text-align: right;
+}
+
+.welcome-message {
+    display: block;
+    font-size: 1.1rem;
+    color: #5d6778;
+    font-weight: 500;
+}
+
+.current-time {
+    font-size: 0.9rem;
+    color: #7f8c8d;
+    background: #f8f9fa;
+    padding: 3px 8px;
+    border-radius: 12px;
+}
+
+/* Quick Actions */
+.quick-actions {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    margin-bottom: 25px;
+}
+
+.action-btn {
+    background: white;
+    border-radius: 8px;
+    padding: 15px;
+    text-align: center;
+    text-decoration: none;
+    color: #2c3e50;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.action-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.action-btn i {
+    font-size: 1.8rem;
+    margin-bottom: 10px;
+    color: #3498db;
+}
+
+.action-btn span {
+    font-weight: 500;
+}
+
+/* Dashboard Content Layout */
+.dashboard-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.dashboard-column {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.dashboard-bottom {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+/* Widget Styles */
+.dashboard-widget {
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.emergency-widget {
+    border-top: 3px solid #e74c3c;
+}
+
+.widget-header {
+    padding: 15px 20px;
+    border-bottom: 1px solid #ecf0f1;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.widget-header h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    color: #2c3e50;
+    display: flex;
+    align-items: center;
+}
+
+.widget-header h3 i {
+    margin-right: 10px;
+    color: #3498db;
+}
+
+.view-all {
+    font-size: 0.8rem;
+    color: #3498db;
+    text-decoration: none;
+}
+
+.widget-content {
+    padding: 15px 20px;
+}
+
+.no-data {
+    color: #95a5a6;
+    text-align: center;
+    padding: 20px;
+    font-style: italic;
+}
+
+/* Tables */
+.patient-table, .opd-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+}
+
+.patient-table th, .opd-table th {
+    text-align: left;
+    padding: 10px;
+    background: #f8f9fa;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    color: #7f8c8d;
+}
+
+.patient-table td, .opd-table td {
+    padding: 12px 10px;
+    border-bottom: 1px solid #ecf0f1;
+}
+
+.patient-table tr:last-child td, .opd-table tr:last-child td {
+    border-bottom: none;
+}
+
+/* Status Badges */
+.status-badge {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    background: #e8f5e9;
+    color: #27ae60;
+}
+
+/* Lists */
+.medication-list, .emergency-list, .vitals-list, .activity-log {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.medication-item, .emergency-item, .vital-item, .activity-item {
+    padding: 12px 0;
+    border-bottom: 1px solid #ecf0f1;
+    display: flex;
+    align-items: center;
+}
+
+.medication-item:last-child, 
+.emergency-item:last-child, 
+.vital-item:last-child, 
+.activity-item:last-child {
+    border-bottom: none;
+}
+
+.medication-item.due-now {
+    background-color: #fff8e1;
+}
+
+/* Medication List */
+.medication-info {
+    flex: 1;
+    margin-right: 15px;
+}
+
+.medication-name {
+    margin-bottom: 5px;
+}
+
+.medication-name strong {
+    color: #2c3e50;
+}
+
+.dosage {
+    font-size: 0.8rem;
+    color: #7f8c8d;
+    margin-left: 8px;
+}
+
+.medication-patient a {
+    font-size: 0.8rem;
+    color: #3498db;
+    text-decoration: none;
+}
+
+.medication-time {
+    margin-right: 15px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #2c3e50;
+    min-width: 80px;
+    text-align: right;
+}
+
+.badge {
+    display: inline-block;
+    padding: 2px 6px;
+    border-radius: 10px;
+    font-size: 0.7rem;
+    background: #e3f2fd;
+    color: #3498db;
+    margin-left: 5px;
+}
+
+.badge.overdue {
+    background: #ffebee;
+    color: #e74c3c;
+}
+
+/* Emergency List */
+.emergency-item {
+    padding: 12px 15px;
+    margin: 0 -15px;
+}
+
+.emergency-item.priority-1 {
+    background-color: #ffebee;
+    border-left: 3px solid #e74c3c;
+}
+
+.emergency-item.priority-2 {
+    background-color: #fff3e0;
+    border-left: 3px solid #f39c12;
+}
+
+.emergency-item.priority-3 {
+    background-color: #e8f5e9;
+    border-left: 3px solid #2ecc71;
+}
+
+.emergency-info {
+    flex: 1;
+}
+
+.emergency-patient a {
+    font-weight: 600;
+    color: #2c3e50;
+    text-decoration: none;
+}
+
+.emergency-type {
+    font-size: 0.7rem;
+    background: #f1f1f1;
+    padding: 2px 6px;
+    border-radius: 10px;
+    margin-left: 8px;
+}
+
+.emergency-description {
+    font-size: 0.8rem;
+    color: #7f8c8d;
+    margin-top: 3px;
+}
+
+.emergency-time {
+    font-size: 0.8rem;
+    color: #95a5a6;
+    margin-right: 15px;
+}
+
+/* Vitals List */
+.vital-stats {
+    display: flex;
+    gap: 15px;
+    margin-right: 15px;
+}
+
+.vital-stats .stat {
+    font-size: 0.8rem;
+    color: #7f8c8d;
+    display: flex;
+    align-items: center;
+}
+
+.vital-stats .stat i {
+    margin-right: 5px;
+    font-size: 0.9rem;
+}
+
+.vital-time {
+    font-size: 0.8rem;
+    color: #95a5a6;
+    margin-right: 15px;
+    min-width: 100px;
+    text-align: right;
+}
+
+/* Activity Log */
+.activity-item {
+    display: flex;
+    align-items: flex-start;
+}
+
+.activity-icon {
+    margin-right: 12px;
+    color: #3498db;
+    font-size: 1.1rem;
+}
+
+.activity-details {
+    flex: 1;
+}
+
+.activity-description {
+    font-size: 0.9rem;
+    color: #2c3e50;
+}
+
+.activity-time {
+    font-size: 0.7rem;
+    color: #95a5a6;
+    margin-top: 3px;
+}
+
+/* Buttons */
+.btn {
+    padding: 5px 12px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.btn-sm {
+    padding: 3px 8px;
+    font-size: 0.75rem;
+}
+
+.btn-primary {
+    background: #3498db;
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #2980b9;
+}
+
+.btn-danger {
+    background: #e74c3c;
+    color: white;
+}
+
+.btn-danger:hover {
+    background: #c0392b;
+}
+
+.btn-warning {
+    background: #f39c12;
+    color: white;
+}
+
+.btn-warning:hover {
+    background: #d35400;
+}
+</style>
+{% endblock %}

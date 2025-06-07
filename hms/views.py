@@ -34,6 +34,7 @@ from django.utils.timezone import localdate
 from django.core.paginator import Paginator
 from django.contrib.auth.models import User
 from django.utils.timezone import localtime
+from django.contrib.auth.models import Group
 from django.urls import reverse_lazy, reverse
 from django.utils.dateparse import parse_time
 from django.template.loader import get_template
@@ -44,6 +45,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
 from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.views.generic import ListView, CreateView, UpdateView,DeleteView
 
 # Import Models and Forms
@@ -53,7 +55,7 @@ from .models import (
     EmergencyCase, OPD, IPD, Employee, Room, PatientReport, Prescription,
     License, Asset, Maintenance, AccountingRecord, Daybook, Balance,
     PatientTransfer, NICUVitals, NICUMedicationRecord, Medicine, Diluent,
-    Vial, FluidRequirement, MedicineVial
+    Vial, FluidRequirement, MedicineVial,Nurse, Staff
 )
 
 from .forms import (
@@ -70,47 +72,349 @@ from .forms import (
 logger = logging.getLogger(__name__)
 
 # Authentication Views
+# Role-Group mapping for consistency and reuse
+ROLE_GROUP_MAP = {
+    'admin': 'Admin',
+    'doctor': 'Doctor',
+    'nurse': 'Nurse',
+    'staff': 'Staff',
+    'patient': 'Patient',
+}
+
 def signup(request):
     if request.method == "POST":
-        full_name = request.POST['full_name']
-        username = request.POST['username']
-        email = request.POST['email']
-        password = request.POST['password']
-        confirm_password = request.POST['confirm_password']
+        full_name = request.POST.get('full_name', '').strip()
+        username = request.POST.get('username', '').strip()
+        email = request.POST.get('email', '').strip()
+        password = request.POST.get('password', '')
+        confirm_password = request.POST.get('confirm_password', '')
+        role = request.POST.get('role', '').lower()
 
-        if password == confirm_password:
-            if User.objects.filter(username=username).exists():
-                messages.error(request, "Username already taken!")
-            elif User.objects.filter(email=email).exists():
-                messages.error(request, "Email already registered!")
-            else:
-                user = User.objects.create_user(username=username, email=email, password=password)
-                user.first_name = full_name
-                user.save()
-                messages.success(request, "Account created successfully! You can now log in.")
-                return redirect('login')
-        else:
+        # Basic validation
+        if not all([full_name, username, email, password, confirm_password]):
+            messages.error(request, "Please fill in all required fields.")
+            return render(request, 'hms/auth/signup.html')
+
+        if password != confirm_password:
             messages.error(request, "Passwords do not match!")
+            return render(request, 'hms/auth/signup.html')
+
+        if CustomUser.objects.filter(username=username).exists():
+            messages.error(request, "Username already taken!")
+            return render(request, 'hms/auth/signup.html')
+
+        if CustomUser.objects.filter(email=email).exists():
+            messages.error(request, "Email already registered!")
+            return render(request, 'hms/auth/signup.html')
+
+        # Create user and set password properly
+        user = CustomUser(username=username, email=email, full_name=full_name, role=role if role in ROLE_GROUP_MAP else 'staff')
+        user.set_password(password)
+        user.save()
+
+        # Add user to group and create related profile models
+        if role in ROLE_GROUP_MAP:
+            group_name = ROLE_GROUP_MAP[role]
+            group, _ = Group.objects.get_or_create(name=group_name)
+            user.groups.add(group)
+
+            # Create role-specific profiles
+            if role == 'doctor':
+                Doctor.objects.create(user=user)
+            elif role == 'nurse':
+                Nurse.objects.create(user=user)
+            elif role == 'staff':
+                Staff.objects.create(user=user)
+
+        messages.success(request, "Account created successfully! Please log in.")
+        return redirect('login')
 
     return render(request, 'hms/auth/signup.html')
 
+
 def user_login(request):
     if request.method == "POST":
-        username = request.POST['username']
-        password = request.POST['password']
-        user = authenticate(request, username=username, password=password)
+        username = request.POST.get('username', '').strip()
+        password = request.POST.get('password', '')
 
+        user = authenticate(request, username=username, password=password)
         if user is not None:
             login(request, user)
-            return redirect('dashboard')  # Redirect to dashboard after login
-        else:
-            messages.error(request, "Invalid username or password!")
+
+            # Role-based redirection
+            if user.is_superuser or user.role == 'admin':
+                return redirect('dashboard')
+            elif user.groups.filter(name='Doctor').exists():
+                return redirect('doctor_dashboard')
+            elif user.groups.filter(name='Nurse').exists():
+                return redirect('nurse_dashboard')
+            elif user.groups.filter(name='Staff').exists():
+                return redirect('staff_dashboard')
+            elif user.groups.filter(name='Patient').exists():
+                return redirect('patient_dashboard')
+            else:
+                return redirect('hms/dashboard.html')
+
+        messages.error(request, "Invalid username or password!")
 
     return render(request, 'hms/auth/login.html')
 
+@login_required
 def user_logout(request):
     logout(request)
     return redirect('login')
+
+@login_required
+def redirect_after_login(request):
+    user = request.user
+    if user.is_superuser or user.role == 'admin':
+        return redirect('dashboard')
+    elif user.groups.filter(name='Doctor').exists():
+        return redirect('doctor_dashboard')
+    elif user.groups.filter(name='Nurse').exists():
+        return redirect('nurse_dashboard')
+    elif user.groups.filter(name='Staff').exists():
+        return redirect('staff_dashboard')
+    elif user.groups.filter(name='Patient').exists():
+        return redirect('patient_dashboard')
+    else:
+        return redirect('hms/dashboard.html')
+    
+
+# Decorator factory for group-based access control
+def group_required(*group_names):
+    def in_groups(user):
+        return user.is_authenticated and (user.is_superuser or bool(user.groups.filter(name__in=group_names)))
+    return user_passes_test(in_groups)
+
+# Example role-based views using the decorator:
+from django.utils import timezone
+from datetime import timedelta
+from collections import Counter
+from django.db.models.functions import TruncDate
+from django.db.models import Count
+@login_required
+@group_required('Doctor')
+def doctor_dashboard(request):
+    doctor = request.user.doctor
+
+    # IPD
+    ipd_patients = IPD.objects.filter(patient__assigned_doctor=doctor, discharge_date__isnull=True)
+
+    # Appointments Today
+    todays_appointments = Appointment.objects.filter(doctor=doctor, date=date.today()).order_by('time')
+
+    # Last 7 days appointment stats
+    seven_days_ago = timezone.now().date() - timedelta(days=6)
+    appointments_last_7_days = (
+        Appointment.objects.filter(doctor=doctor, date__gte=seven_days_ago)
+        .annotate(day=TruncDate('date'))
+        .values('day')
+        .annotate(count=Count('id'))
+        .order_by('day')
+    )
+
+    # Prepare labels and counts for Chart.js
+    appointment_chart_labels = []
+    appointment_chart_counts = []
+    for i in range(7):
+        day = seven_days_ago + timedelta(days=i)
+        appointment_chart_labels.append(day.strftime('%a'))  # Mon, Tue, etc.
+        count = next((item['count'] for item in appointments_last_7_days if item['day'] == day), 0)
+        appointment_chart_counts.append(count)
+
+    # Vitals
+    recent_vitals = NICUVitals.objects.filter(ipd__patient__assigned_doctor=doctor).order_by('-date', '-time')[:5]
+
+    # Medications
+    active_medications = NICUMedicationRecord.objects.filter(patient__assigned_doctor=doctor).order_by('-timestamp')[:10]
+
+    # Group medication types for chart
+    med_types = [med.medicine.medicine_type if med.medicine else 'Unknown' for med in active_medications]
+    med_counter = Counter(med_types)
+    med_chart_labels = list(med_counter.keys())
+    med_chart_counts = list(med_counter.values())
+
+    # Emergency
+    emergency_cases = EmergencyCase.objects.filter(patient__assigned_doctor=doctor, status='Pending')
+
+    context = {
+        'doctor': doctor,
+        'ipd_patients': ipd_patients,
+        'todays_appointments': todays_appointments,
+        'recent_vitals': recent_vitals,
+        'active_medications': active_medications,
+        'emergency_cases': emergency_cases,
+        'appointment_chart_labels': appointment_chart_labels,
+        'appointment_chart_counts': appointment_chart_counts,
+        'med_chart_labels': med_chart_labels,
+        'med_chart_counts': med_chart_counts,
+    }
+
+    return render(request, 'doctors/dashboard.html', context)
+
+
+@login_required
+@group_required('Nurse')
+def nurse_dashboard(request):
+    nurse = request.user.nurse_profile
+    
+    # Get assigned patients (IPD)
+    assigned_ipd_patients = IPD.objects.filter(
+        patient__assigned_doctor__isnull=False,
+        discharge_date__isnull=True
+    ).select_related('patient', 'room').order_by('-admitted_on')[:5]
+    
+    # Get recent OPD visits
+    recent_opd_visits = OPD.objects.select_related(
+        'patient', 'doctor'
+    ).order_by('-visit_date')[:5]
+    
+    # Get emergency cases
+    emergency_cases = EmergencyCase.objects.filter(
+        status='Pending'
+    ).select_related('patient').order_by('-admitted_on')[:5]
+    
+    # Get vitals needing attention (last 4 hours)
+    four_hours_ago = timezone.now() - timedelta(hours=4)
+    critical_vitals = NICUVitals.objects.filter(
+        date__gte=four_hours_ago.date(),
+        time__gte=four_hours_ago.time()
+    ).select_related('ipd', 'ipd__patient').order_by('-date', '-time')[:5]
+    
+    # Get pending medications
+    now = timezone.now()
+    one_hour_from_now = now + timedelta(hours=1)
+    pending_medications = Prescription.objects.filter(
+        timing__gte=now,
+        timing__lte=one_hour_from_now,
+        # administered=False
+    ).select_related('ipd', 'ipd__patient').order_by('timing')[:10]
+    
+    
+    context = {
+        'nurse': nurse,
+        'assigned_ipd_patients': assigned_ipd_patients,
+        'recent_opd_visits': recent_opd_visits,
+        'emergency_cases': emergency_cases,
+        'critical_vitals': critical_vitals,
+        'pending_medications': pending_medications,
+        # 'recent_activities': recent_activities,
+        'current_time': now,
+    }
+    
+    return render(request, 'hms/nurse/dashboard.html', context)
+
+@login_required
+@group_required('Staff')
+def staff_dashboard(request):
+    total_patients = Patient.objects.count()
+    total_doctors = Doctor.objects.count()
+    total_appointments = Appointment.objects.count()
+    total_revenue = OPDBilling.objects.aggregate(total=Sum('total_amount'))['total'] or 0
+    today = datetime.today()
+    warning_period = today + timedelta(days=30)
+    emergency_cases_today = EmergencyCase.objects.filter(admitted_on__date=today).count()
+    upcoming_appointments = Appointment.objects.filter(date__gte=now()).order_by('date')
+    
+    # Get patient registration trend for the last 7 days
+    last_week = today - timedelta(days=6)
+    patient_trend = (
+        Patient.objects.filter(created_at__date__gte=last_week)
+        .annotate(date=TruncDate('created_at'))
+        .values('date')
+        .annotate(count=Count('id'))
+        .order_by('date')
+    )
+    date_counts = {entry['date']: entry['count'] for entry in patient_trend}
+    labels = []
+    data = []
+    days = 7
+    end_date = timezone.now().date()
+    start_date = end_date - timedelta(days=days-1)
+
+    for day in range(days):
+        current_date = start_date + timedelta(days=day)
+        labels.append(current_date.strftime('%Y-%m-%d'))
+        data.append(date_counts.get(current_date, 0))
+    # Room Statistics
+    total_rooms = Room.objects.count()
+    available_rooms_count = Room.objects.filter(is_available=True).count()  # Fixed
+    booked_rooms = total_rooms - available_rooms_count  # Fixed
+
+    room_type_data = {}
+    room_type_counts = Room.objects.values('room_type').annotate(total=Count('id'))
+    available_rooms = Room.objects.filter(is_available=True).values('room_type').annotate(available=Count('id'))
+
+    for room in room_type_counts:
+        total = room['total']
+        available = next((r['available'] for r in available_rooms if r['room_type'] == room['room_type']), 0)
+        percentage = (available / total) * 100 if total > 0 else 0
+        room_type_data[room['room_type']] = {
+                'total': total,
+                'available': available,
+                'percentage': round(percentage)
+            }
+
+    expiring_licenses = License.objects.filter(expiry_date__lte=warning_period, expiry_date__gte=today)
+    expiring_assets = Asset.objects.filter(warranty_expiry__lte=warning_period, warranty_expiry__gte=today)
+    due_maintenance = Maintenance.objects.filter(next_due_date__lte=warning_period, next_due_date__gte=today)
+    recent_opd_bills = OPDBilling.objects.select_related('patient__user').order_by('-generated_date')[:5]
+    recent_ipd_bills = IPDBilling.objects.select_related('patient__user').order_by('-generated_date')[:5]
+
+    # Combine and sort by created_at
+    recent_billings = sorted(
+        chain(recent_opd_bills, recent_ipd_bills),
+        key=lambda b: b.generated_date,
+        reverse=True
+    )[:5]
+    context = {
+        'now': now(),
+        'total_patients': total_patients,
+        'total_doctors': total_doctors,
+        'total_appointments': total_appointments,
+        'total_revenue': total_revenue,
+        'emergency_cases_today': emergency_cases_today,
+        'upcoming_appointments': upcoming_appointments,
+        'daily_patient_labels':  json.dumps(labels),
+        'daily_patient_data':  json.dumps(data),
+        'total_rooms': total_rooms,
+        'available_rooms_count': available_rooms_count,  # Fixed
+        'booked_rooms': booked_rooms,  # Fixed
+        'room_type_data': room_type_data,  # Dictionary of room counts & available rooms by type
+        'expiring_licenses': expiring_licenses,
+        'expiring_assets': expiring_assets,
+        'due_maintenance': due_maintenance,
+        'recent_billings': recent_billings,
+    }
+
+    return render(request, 'hms/employee/dashboard.html',context)
+
+def patient_stats_api_staff(request):
+    days = int(request.GET.get('days', 7))
+    today = timezone.now().date()
+    start_date = today - timedelta(days=days-1)
+
+    data = (
+        Patient.objects.filter(created_at__date__gte=start_date)
+        .annotate(day=TruncDate('created_at'))
+        .values('day')
+        .annotate(count=Count('id'))
+        .order_by('day')
+    )
+
+    labels = [d['day'].strftime('%Y-%m-%d') for d in data]
+    counts = [d['count'] for d in data]
+
+    return JsonResponse({'labels': labels, 'data': counts})
+
+
+@login_required
+@group_required('Admin')
+def admin_dashboard(request):
+    return render(request, 'hms/dashboard.html')
+
+
 
 # Profile Views
 @login_required
@@ -300,13 +604,29 @@ def patient_detail(request, patient_code):
     logger.info(f"Patient found: {patient.user.full_name}")
     return render(request, 'hms/patient/patient_detail.html', {'patient': patient})
 
+
+
 @login_required
 def patient_profile(request, patient_code):
     patient = get_object_or_404(Patient, patient_code=patient_code)
+
     opd_records = OPD.objects.filter(patient=patient)
     ipd_record = IPD.objects.filter(patient=patient, discharge_date__isnull=True).first()
     expenses = Expense.objects.filter(patient=patient)
-    billing = BillingBase.objects.filter(patient=patient).first()
+
+    # ✅ Fetch bills from OPD and IPD billing tables
+    opd_bills = OPDBilling.objects.filter(patient=patient)
+    ipd_bills = IPDBilling.objects.filter(patient=patient)
+
+    # Combine and sort bills (optional)
+    all_bills = sorted(
+        chain(opd_bills, ipd_bills),
+        key=lambda bill: bill.generated_date,
+        reverse=True
+    )
+    
+    latest_bill = all_bills[0] if all_bills else None
+
     reports = PatientReport.objects.filter(patient=patient)
 
     context = {
@@ -314,10 +634,11 @@ def patient_profile(request, patient_code):
         'opd_records': opd_records,
         'ipd_record': ipd_record,
         'expenses': expenses,
-        'billing': billing,
+        'billing': latest_bill,  # Or use `all_bills` if you want a list
         'reports': reports,
-        'profile_picture': patient.profile_picture.url if patient.profile_picture else None  # Ensuring profile picture is included
+        'profile_picture': patient.profile_picture.url if patient.profile_picture else None
     }
+
     return render(request, 'hms/patient/patient_profile.html', context)
 
 @login_required
@@ -417,15 +738,26 @@ def fetch_patients(request):
 # Doctor Views
 @login_required
 def doctors(request):
-    doctors = Doctor.objects.all()
+    user = request.user
+    if user.groups.filter(name='admin').exists():
+        doctors = Doctor.objects.all()
+    elif user.groups.filter(name='doctor').exists():
+        doctors = Doctor.objects.filter(user=user)
+    else:
+        doctors = []  # or raise 403
     return render(request, 'hms/doctor/doctors.html', {'doctors': doctors})
 
 @login_required
 def doctor_detail(request, doctor_id):
     doctor = get_object_or_404(Doctor, id=doctor_id)
+
+    if request.user.groups.filter(name='doctor').exists() and doctor.user != request.user:
+        return HttpResponseForbidden("You are not authorized to view this doctor's profile.")
+    
     return render(request, 'hms/doctor/doctor_detail.html', {'doctor': doctor})
 
 @login_required
+@user_passes_test(lambda u: u.groups.filter(name='admin').exists())
 def add_doctor(request):
     if request.method == 'POST':
         form = DoctorForm(request.POST)
@@ -439,6 +771,9 @@ def add_doctor(request):
 @login_required
 def update_doctor(request, doctor_id):
     doctor = get_object_or_404(Doctor, id=doctor_id)
+    if request.user.groups.filter(name='doctor').exists() and doctor.user != request.user:
+        return HttpResponseForbidden("You cannot edit another doctor's profile.")
+                                     
     if request.method == 'POST':
         form = DoctorForm(request.POST, instance=doctor)
         if form.is_valid():
@@ -448,6 +783,21 @@ def update_doctor(request, doctor_id):
     else:
         form = DoctorForm(instance=doctor)
     return render(request, 'hms/doctor/update_doctor.html', {'form': form, 'doctor': doctor})
+
+@login_required
+@user_passes_test(lambda u: u.groups.filter(name='Doctor').exists())
+def doctor_dashboard(request):
+    doctor = request.user.doctor  # ✅ Use related_name="doctor"
+    patients = Patient.objects.filter(assigned_doctor=doctor)
+    today = timezone.now().date()
+    appointments_today = Appointment.objects.filter(doctor=doctor, date=today)
+
+    return render(request, 'hms/doctor/doctor_dashboard.html', {
+        'doctor': doctor,
+        'patients': patients,
+        'appointments_today': appointments_today
+    })
+
 
 # Appointment Views
 def appointments_update(request):

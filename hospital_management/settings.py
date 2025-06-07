@@ -164,7 +164,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 AUTH_USER_MODEL = 'hms.CustomUser'
 
 LOGIN_URL = '/login/'  # Your login page
-LOGIN_REDIRECT_URL = '/dashboard/'  # Redirect after login
+LOGIN_REDIRECT_URL = '/redirect-after-login/'  # Redirect after login
  # Redirect after login (change as needed)
 LOGOUT_REDIRECT_URL = '/login/'  # Redirect after logout
 

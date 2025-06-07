@@ -24,24 +24,31 @@ class CustomUser(AbstractUser):
         ('female', 'Female'),
         ('other', 'Other'),
     )
+
+    ROLE_CHOICES = (
+        ('admin', 'Admin'),
+        ('doctor', 'Doctor'),
+        ('nurse', 'Nurse'),
+        ('staff', 'Staff'),
+    )
+
     full_name = models.CharField(max_length=255, blank=True, null=True)
     contact_number = models.CharField(max_length=15, blank=True, null=True)
     address = models.TextField(blank=True, null=True)
     gender = models.CharField(max_length=10, choices=GENDER_CHOICES, blank=True, null=True)
+    role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='staff')
 
     groups = models.ManyToManyField(Group, related_name="customuser_groups", blank=True)
     user_permissions = models.ManyToManyField(Permission, related_name="customuser_permissions", blank=True)
 
     def save(self, *args, **kwargs):
-        # Fetch the existing user object if it exists
         if self.pk:
             existing_user = CustomUser.objects.filter(pk=self.pk).first()
             if existing_user and existing_user.password != self.password:
-                self.set_password(self.password)  # Hash only if password changed
-        else:
-            if self.password and not self.password.startswith('pbkdf2_'):  # Prevent double hashing
                 self.set_password(self.password)
-
+        else:
+            if self.password and not self.password.startswith('pbkdf2_'):
+                self.set_password(self.password)
         super().save(*args, **kwargs)
 
     def __str__(self):
@@ -77,7 +84,7 @@ class Patient(models.Model):
     blood_group = models.CharField(max_length=3, blank=True, null=True, choices=BLOOD_GROUP_CHOICES)
     weight = models.DecimalField(max_digits=6, decimal_places=2,blank=True,null=True)
     email = models.EmailField(unique=True, blank=True, null=True)
-
+    assigned_doctor = models.ForeignKey('Doctor', on_delete=models.SET_NULL, null=True, blank=True, related_name='patients')
     # Medical Information
     allergies = models.TextField(blank=True, null=True)  # Known allergies
     medical_history = models.TextField(blank=True, null=True)  # Past medical history
@@ -182,6 +189,20 @@ class Doctor(models.Model):
         return f"Dr. {self.user.full_name} - {self.specialization}"
 
 
+class Nurse(models.Model):
+    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name='nurse_profile')
+    department = models.CharField(max_length=255, blank=True, null=True)
+
+    def __str__(self):
+        return self.user.full_name
+
+class Staff(models.Model):
+    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name='staff_profile')
+    role_description = models.TextField(blank=True, null=True)
+
+    def __str__(self):
+        return self.user.full_name
+    
 # Appointment Model
 
 class Appointment(models.Model):

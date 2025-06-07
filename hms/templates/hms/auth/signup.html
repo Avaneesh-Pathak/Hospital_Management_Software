@@ -1,135 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Signup</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: #f4f7fc;
+        }
 
-<style>
-    body {
-        font-family: 'Arial', sans-serif;
-        background: #f4f7fc;
-    }
+        .auth-container {
+            max-width: 400px;
+            margin: 60px auto;
+            padding: 30px;
+            background: #ffffff;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            text-align: center;
+        }
 
-    .auth-container {
-        max-width: 400px;
-        margin: 60px auto;
-        padding: 30px;
-        background: #ffffff;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-        border-radius: 10px;
-        text-align: center;
-    }
+        .auth-container h2 {
+            margin-bottom: 20px;
+            color: #2c3e50;
+            font-size: 24px;
+            font-weight: bold;
+        }
 
-    .auth-container h2 {
-        margin-bottom: 20px;
-        color: #2c3e50;
-        font-size: 24px;
-        font-weight: bold;
-    }
+        .input-group {
+            position: relative;
+            margin-bottom: 15px;
+        }
 
-    .input-group {
-        position: relative;
-        margin-bottom: 15px;
-    }
+        .input-group input,
+        .input-group select {
+            width: 100%;
+            padding: 12px;
+            padding-left: 40px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            outline: none;
+            font-size: 16px;
+            transition: 0.3s;
+        }
 
-    .input-group input {
-        width: 100%;
-        padding: 12px;
-        padding-left: 40px;
-        border: 1px solid #ddd;
-        border-radius: 5px;
-        outline: none;
-        font-size: 16px;
-        transition: 0.3s;
-    }
+        .input-group input:focus,
+        .input-group select:focus {
+            border-color: #3498db;
+            box-shadow: 0 0 5px rgba(52, 152, 219, 0.5);
+        }
 
-    .input-group input:focus {
-        border-color: #3498db;
-        box-shadow: 0 0 5px rgba(52, 152, 219, 0.5);
-    }
+        .input-group i {
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 18px;
+            color: #888;
+        }
 
-    .input-group i {
-        position: absolute;
-        left: 10px;
-        top: 50%;
-        transform: translateY(-50%);
-        font-size: 18px;
-        color: #888;
-    }
+        .btn-signup {
+            width: 100%;
+            padding: 12px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
 
-    .btn-signup {
-        width: 100%;
-        padding: 12px;
-        background: #3498db;
-        color: white;
-        border: none;
-        border-radius: 5px;
-        font-size: 18px;
-        font-weight: bold;
-        cursor: pointer;
-        transition: 0.3s;
-    }
+        .btn-signup:hover {
+            background: #2980b9;
+        }
 
-    .btn-signup:hover {
-        background: #2980b9;
-    }
+        .auth-container a {
+            display: block;
+            margin-top: 10px;
+            color: #3498db;
+            font-size: 14px;
+            text-decoration: none;
+        }
 
-    .auth-container a {
-        display: block;
-        margin-top: 10px;
-        color: #3498db;
-        font-size: 14px;
-        text-decoration: none;
-    }
+        .auth-container a:hover {
+            text-decoration: underline;
+        }
 
-    .auth-container a:hover {
-        text-decoration: underline;
-    }
+        .error-message {
+            color: red;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-container">
+        <h2>Create Your Account</h2>
+        {% if messages %}
+            {% for message in messages %}
+                <p class="error-message">{{ message }}</p>
+            {% endfor %}
+        {% endif %}
+        <form method="POST">
+            {% csrf_token %}
 
-    .error-message {
-        color: red;
-        font-size: 14px;
-        margin-bottom: 10px;
-    }
+            <div class="input-group">
+                <i class="fas fa-user"></i>
+                <input type="text" name="full_name" placeholder="Full Name" required>
+            </div>
 
-</style>
+            <div class="input-group">
+                <i class="fas fa-user-circle"></i>
+                <input type="text" name="username" placeholder="Username" required>
+            </div>
 
-<div class="auth-container">
-    <h2>Create Your Account</h2>
-    {% if messages %}
-        {% for message in messages %}
-            <p class="error-message">{{ message }}</p>
-        {% endfor %}
-    {% endif %}
-    <form method="POST">
-        {% csrf_token %}
-        
-        <div class="input-group">
-            <i class="fas fa-user"></i>
-            <input type="text" name="full_name" placeholder="Full Name" required>
-        </div>
+            <div class="input-group">
+                <i class="fas fa-envelope"></i>
+                <input type="email" name="email" placeholder="Email" required>
+            </div>
 
-        <div class="input-group">
-            <i class="fas fa-user-circle"></i>
-            <input type="text" name="username" placeholder="Username" required>
-        </div>
+            <div class="input-group">
+                <i class="fas fa-lock"></i>
+                <input type="password" name="password" placeholder="Password" required>
+            </div>
 
-        <div class="input-group">
-            <i class="fas fa-envelope"></i>
-            <input type="email" name="email" placeholder="Email" required>
-        </div>
+            <div class="input-group">
+                <i class="fas fa-lock"></i>
+                <input type="password" name="confirm_password" placeholder="Confirm Password" required>
+            </div>
 
-        <div class="input-group">
-            <i class="fas fa-lock"></i>
-            <input type="password" name="password" placeholder="Password" required>
-        </div>
+            <div class="input-group">
+                <i class="fas fa-users-cog"></i>
+                <select name="role" required>
+                    <option value="">Select Role</option>
+                    <option value="doctor">Doctor</option>
+                    <option value="nurse">Nurse</option>
+                    <option value="staff">Staff</option>
+                    <option value="admin">Admin</option>
+                </select>
+            </div>
 
-        <div class="input-group">
-            <i class="fas fa-lock"></i>
-            <input type="password" name="confirm_password" placeholder="Confirm Password" required>
-        </div>
+            <button type="submit" class="btn-signup">Sign Up</button>
+        </form>
+        <a href="{% url 'login' %}">Already have an account? Login</a>
+    </div>
 
-        <button type="submit" class="btn-signup">Sign Up</button>
-    </form>
-    <a href="{% url 'login' %}">Already have an account? Login</a>
-</div>
-
-<!-- FontAwesome Icons (For Better UI) -->
-<script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
-
-
+    <!-- FontAwesome Icons (For Better UI) -->
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+</body>
+</html>
