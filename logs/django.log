@@ -50956,3 +50956,1245 @@ Traceback (most recent call last):
 django.urls.exceptions.NoReverseMatch: Reverse for 'record_vitals' not found. 'record_vitals' is not a valid view function or pattern name.
 ERROR 2025-06-07 22:10:45,082 basehttp "GET /nurse/dashboard/ HTTP/1.1" 500 196442
 INFO 2025-06-07 22:10:56,678 basehttp "GET /nurse/dashboard/ HTTP/1.1" 200 43651
+INFO 2025-06-08 13:06:36,143 autoreload Watching for file changes with StatReloader
+INFO 2025-06-08 13:06:40,113 basehttp "GET / HTTP/1.1" 200 41692
+WARNING 2025-06-08 13:06:40,853 basehttp "GET /favicon.ico HTTP/1.1" 404 34079
+INFO 2025-06-08 13:08:11,273 basehttp "GET / HTTP/1.1" 200 41602
+INFO 2025-06-08 13:08:42,455 basehttp "GET /search/?q=Avaneesh HTTP/1.1" 200 28637
+INFO 2025-06-08 13:08:50,462 basehttp "GET /api/patient-stats/?days=30 HTTP/1.1" 200 39
+INFO 2025-06-08 13:08:52,581 basehttp "GET /api/patient-stats/?days=7 HTTP/1.1" 200 26
+INFO 2025-06-08 13:08:56,334 basehttp "GET / HTTP/1.1" 200 41696
+INFO 2025-06-08 13:08:58,244 basehttp "GET /api/patient-stats/?days=7 HTTP/1.1" 200 26
+INFO 2025-06-08 13:09:03,592 basehttp "GET /api/patient-stats/?days=30 HTTP/1.1" 200 39
+INFO 2025-06-08 13:09:24,733 basehttp "GET /logout/ HTTP/1.1" 302 0
+INFO 2025-06-08 13:09:24,739 basehttp "GET /login/ HTTP/1.1" 200 1389
+INFO 2025-06-08 13:09:34,672 basehttp "POST /login/ HTTP/1.1" 302 0
+INFO 2025-06-08 13:09:34,801 basehttp "GET /staff/dashboard/ HTTP/1.1" 200 46449
+INFO 2025-06-08 13:09:56,612 basehttp "GET /logout/ HTTP/1.1" 302 0
+INFO 2025-06-08 13:09:56,619 basehttp "GET /login/ HTTP/1.1" 200 1389
+INFO 2025-06-08 13:10:03,685 basehttp "POST /login/ HTTP/1.1" 302 0
+INFO 2025-06-08 13:10:03,864 basehttp "GET /doctor/dashboard/ HTTP/1.1" 200 27492
+INFO 2025-06-08 13:10:12,017 basehttp "GET /logout/ HTTP/1.1" 302 0
+INFO 2025-06-08 13:10:12,024 basehttp "GET /login/ HTTP/1.1" 200 1389
+INFO 2025-06-08 13:10:17,122 basehttp "POST /login/ HTTP/1.1" 302 0
+INFO 2025-06-08 13:10:17,259 basehttp "GET /dashboard/ HTTP/1.1" 200 47623
+INFO 2025-06-08 13:10:18,009 basehttp "GET / HTTP/1.1" 200 47623
+INFO 2025-06-08 13:10:20,119 basehttp "GET /admin/ HTTP/1.1" 200 24104
+INFO 2025-06-08 13:10:22,773 basehttp "GET /admin/hms/customuser/ HTTP/1.1" 200 36038
+INFO 2025-06-08 13:10:22,799 basehttp "GET /static/admin/img/search.svg HTTP/1.1" 304 0
+INFO 2025-06-08 13:10:22,799 basehttp "GET /static/admin/img/icon-no.svg HTTP/1.1" 304 0
+INFO 2025-06-08 13:10:22,840 basehttp "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-06-08 13:10:22,876 basehttp "GET /static/admin/img/sorting-icons.svg HTTP/1.1" 304 0
+INFO 2025-06-08 13:10:38,201 basehttp "POST /admin/hms/customuser/ HTTP/1.1" 200 19319
+INFO 2025-06-08 13:10:42,595 basehttp "GET /admin/hms/payment/13/change/ HTTP/1.1" 200 29114
+INFO 2025-06-08 13:10:42,676 basehttp "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-06-08 13:10:45,850 basehttp "GET /admin/hms/payment/13/delete/ HTTP/1.1" 200 19290
+INFO 2025-06-08 13:10:47,481 basehttp "POST /admin/hms/payment/13/delete/ HTTP/1.1" 302 0
+INFO 2025-06-08 13:10:47,698 basehttp "GET /admin/hms/payment/ HTTP/1.1" 200 21372
+INFO 2025-06-08 13:10:47,782 basehttp "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-06-08 13:10:52,395 basehttp "POST /admin/hms/payment/ HTTP/1.1" 200 19713
+INFO 2025-06-08 13:10:53,523 basehttp "POST /admin/hms/payment/ HTTP/1.1" 302 0
+INFO 2025-06-08 13:10:53,619 basehttp "GET /admin/hms/payment/ HTTP/1.1" 200 19463
+INFO 2025-06-08 13:10:53,695 basehttp "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-06-08 13:10:55,095 basehttp "GET /admin/hms/payment/ HTTP/1.1" 200 19325
+INFO 2025-06-08 13:10:58,909 basehttp "GET /admin/hms/customuser/ HTTP/1.1" 200 36038
+INFO 2025-06-08 13:10:59,095 basehttp "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-06-08 13:11:11,699 basehttp "POST /admin/hms/customuser/ HTTP/1.1" 302 0
+INFO 2025-06-08 13:11:11,936 basehttp "GET /admin/hms/customuser/ HTTP/1.1" 200 36163
+INFO 2025-06-08 13:11:12,015 basehttp "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-06-08 13:11:12,224 basehttp "GET /static/admin/img/icon-alert.svg HTTP/1.1" 200 504
+INFO 2025-06-08 13:12:03,768 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-06-08 13:12:04,723 autoreload Watching for file changes with StatReloader
+INFO 2025-06-08 13:12:18,931 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-06-08 13:12:19,836 autoreload Watching for file changes with StatReloader
+INFO 2025-06-08 13:12:22,484 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-06-08 13:12:23,238 autoreload Watching for file changes with StatReloader
+INFO 2025-06-08 13:12:26,851 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-06-08 13:12:27,639 autoreload Watching for file changes with StatReloader
+INFO 2025-06-08 13:12:32,317 basehttp "GET /logout/ HTTP/1.1" 302 0
+INFO 2025-06-08 13:12:32,325 basehttp "GET /login/ HTTP/1.1" 200 1389
+INFO 2025-06-08 13:12:40,432 basehttp "POST /login/ HTTP/1.1" 302 0
+INFO 2025-06-08 13:12:40,674 basehttp "GET /nurse/dashboard/ HTTP/1.1" 200 43647
+INFO 2025-06-08 13:12:50,277 basehttp "GET /ipd/ HTTP/1.1" 200 50818
+INFO 2025-06-08 13:12:50,525 basehttp "GET /get-ipd-data/ HTTP/1.1" 200 472
+INFO 2025-06-08 13:12:52,338 basehttp "GET /ipd/ HTTP/1.1" 200 50818
+INFO 2025-06-08 13:12:52,603 basehttp "GET /get-ipd-data/ HTTP/1.1" 200 472
+INFO 2025-06-08 13:12:59,070 basehttp "GET /emergency/ HTTP/1.1" 200 28329
+INFO 2025-06-08 13:13:29,502 basehttp "GET /ipd/ HTTP/1.1" 200 50818
+INFO 2025-06-08 13:13:29,886 basehttp "GET /get-ipd-data/ HTTP/1.1" 200 472
+INFO 2025-06-08 13:13:34,661 basehttp "GET /nicu/medications/22/ HTTP/1.1" 200 35589
+INFO 2025-06-08 13:13:44,843 basehttp "GET /logout/ HTTP/1.1" 302 0
+INFO 2025-06-08 13:13:44,848 basehttp "GET /login/ HTTP/1.1" 200 1389
+INFO 2025-06-08 13:13:54,627 basehttp "POST /login/ HTTP/1.1" 302 0
+INFO 2025-06-08 13:13:54,750 basehttp "GET /doctor/dashboard/ HTTP/1.1" 200 27492
+INFO 2025-06-08 13:13:56,904 basehttp "GET /ipd/ HTTP/1.1" 200 51659
+INFO 2025-06-08 13:13:57,090 basehttp "GET /get-ipd-data/ HTTP/1.1" 200 472
+INFO 2025-06-08 13:13:59,790 basehttp "GET /nicu/medications/22/ HTTP/1.1" 200 34913
+INFO 2025-06-08 14:18:48,523 basehttp "GET /logout/ HTTP/1.1" 302 0
+INFO 2025-06-08 14:18:48,531 basehttp "GET /login/ HTTP/1.1" 200 1389
+INFO 2025-06-08 14:18:56,078 basehttp "POST /login/ HTTP/1.1" 302 0
+INFO 2025-06-08 14:18:56,340 basehttp "GET /dashboard/ HTTP/1.1" 200 47623
+INFO 2025-06-08 14:19:06,557 basehttp "GET /admin/auth/ HTTP/1.1" 200 6172
+INFO 2025-06-08 14:19:08,839 basehttp "GET /admin/ HTTP/1.1" 200 25376
+INFO 2025-06-08 14:19:10,828 basehttp "GET /admin/hms/ HTTP/1.1" 200 20907
+INFO 2025-06-08 14:19:12,949 basehttp "GET /admin/ HTTP/1.1" 200 25376
+INFO 2025-06-08 14:19:31,539 basehttp "GET /bills/ HTTP/1.1" 200 35978
+INFO 2025-06-08 14:19:34,027 basehttp "GET /appointments/ HTTP/1.1" 200 33053
+INFO 2025-06-08 14:19:34,242 basehttp "GET /api/appointments/ HTTP/1.1" 200 796
+INFO 2025-06-08 14:26:21,639 basehttp "GET /logout/ HTTP/1.1" 302 0
+INFO 2025-06-08 14:26:21,645 basehttp "GET /login/ HTTP/1.1" 200 1389
+INFO 2025-06-08 14:26:23,480 basehttp "GET /signup/ HTTP/1.1" 200 4241
+INFO 2025-06-08 14:26:49,802 basehttp "POST /signup/ HTTP/1.1" 302 0
+INFO 2025-06-08 14:26:49,806 basehttp "GET /login/ HTTP/1.1" 200 1496
+INFO 2025-06-08 14:26:59,551 basehttp "POST /login/ HTTP/1.1" 302 0
+INFO 2025-06-08 14:26:59,641 basehttp "GET /doctor/dashboard/ HTTP/1.1" 200 27481
+INFO 2025-06-08 14:27:13,481 basehttp "GET /ipd/ HTTP/1.1" 200 51657
+INFO 2025-06-08 14:27:13,867 basehttp "GET /get-ipd-data/ HTTP/1.1" 200 472
+INFO 2025-06-08 14:27:16,682 basehttp "GET /nicu/medications/22/ HTTP/1.1" 200 34911
+INFO 2025-06-08 14:27:30,755 basehttp "GET /logout/ HTTP/1.1" 302 0
+INFO 2025-06-08 14:27:30,760 basehttp "GET /login/ HTTP/1.1" 200 1389
+INFO 2025-06-08 14:27:32,891 basehttp "GET /signup/ HTTP/1.1" 200 4241
+INFO 2025-06-08 14:28:05,320 basehttp "POST /signup/ HTTP/1.1" 200 4347
+INFO 2025-06-08 14:28:09,123 basehttp "GET /signup/ HTTP/1.1" 200 4241
+INFO 2025-06-08 14:28:23,488 basehttp "POST /signup/ HTTP/1.1" 302 0
+INFO 2025-06-08 14:28:23,492 basehttp "GET /login/ HTTP/1.1" 200 1496
+INFO 2025-06-08 14:28:35,613 basehttp "POST /login/ HTTP/1.1" 200 1481
+INFO 2025-06-08 14:28:44,788 basehttp "POST /login/ HTTP/1.1" 302 0
+INFO 2025-06-08 14:28:44,961 basehttp "GET /nurse/dashboard/ HTTP/1.1" 200 43647
+INFO 2025-06-08 14:28:54,205 basehttp "GET /ipd/ HTTP/1.1" 200 50818
+INFO 2025-06-08 14:28:54,531 basehttp "GET /get-ipd-data/ HTTP/1.1" 200 472
+INFO 2025-06-08 14:28:57,117 basehttp "GET /nicu/medications/22/ HTTP/1.1" 200 35589
+INFO 2025-06-08 14:29:15,922 basehttp "GET / HTTP/1.1" 302 0
+INFO 2025-06-08 14:29:15,931 basehttp "GET /login/?next=/ HTTP/1.1" 200 1389
+INFO 2025-06-08 14:29:24,560 basehttp - Broken pipe from ('127.0.0.1', 55752)
+INFO 2025-06-08 14:29:25,247 basehttp "POST /login/?next=/ HTTP/1.1" 302 0
+INFO 2025-06-08 14:29:25,348 basehttp "GET /doctor/dashboard/ HTTP/1.1" 200 27481
+INFO 2025-06-08 14:29:28,299 basehttp "GET /ipd/ HTTP/1.1" 200 51657
+INFO 2025-06-08 14:29:28,579 basehttp "GET /get-ipd-data/ HTTP/1.1" 200 472
+INFO 2025-06-08 14:29:30,942 basehttp "GET /nicu/medications/22/ HTTP/1.1" 200 34911
+INFO 2025-06-08 14:30:23,391 basehttp "GET /ipd/22/fluid/add/ HTTP/1.1" 200 26638
+INFO 2025-06-08 14:30:29,474 basehttp "POST /ipd/22/fluid/add/ HTTP/1.1" 302 0
+INFO 2025-06-08 14:30:29,614 basehttp "GET /nicu/medications/22/ HTTP/1.1" 200 35994
+INFO 2025-06-08 14:31:20,235 basehttp "GET /doctor/dashboard/ HTTP/1.1" 200 27481
+INFO 2025-06-08 14:31:47,768 basehttp "GET /doctor/dashboard/ HTTP/1.1" 200 27481
+INFO 2025-06-08 14:31:54,633 basehttp "GET /nurse/dashboard/ HTTP/1.1" 200 43647
+INFO 2025-06-08 14:32:16,958 basehttp "GET /ipd/ HTTP/1.1" 200 51657
+INFO 2025-06-08 14:32:17,209 basehttp "GET /get-ipd-data/ HTTP/1.1" 200 472
+INFO 2025-06-08 14:32:20,427 basehttp "GET /nicu/medications/22/ HTTP/1.1" 200 35994
+INFO 2025-06-08 14:33:32,521 basehttp "GET /medicine-diluent/ HTTP/1.1" 200 117319
+INFO 2025-06-08 14:45:16,665 basehttp "GET /logout/ HTTP/1.1" 302 0
+INFO 2025-06-08 14:45:16,670 basehttp "GET /login/ HTTP/1.1" 200 1389
+INFO 2025-06-08 14:45:25,503 basehttp "POST /login/ HTTP/1.1" 302 0
+INFO 2025-06-08 14:45:25,730 basehttp "GET /staff/dashboard/ HTTP/1.1" 200 46443
+INFO 2025-06-08 14:45:49,294 basehttp "GET /logout/ HTTP/1.1" 302 0
+INFO 2025-06-08 14:45:49,299 basehttp "GET /login/ HTTP/1.1" 200 1389
+INFO 2025-06-08 14:45:56,478 basehttp "POST /login/ HTTP/1.1" 302 0
+INFO 2025-06-08 14:45:56,566 basehttp "GET /doctor/dashboard/ HTTP/1.1" 200 27481
+INFO 2025-06-08 14:46:14,413 basehttp "GET /logout/ HTTP/1.1" 302 0
+INFO 2025-06-08 14:46:14,418 basehttp "GET /login/ HTTP/1.1" 200 1389
+INFO 2025-06-08 14:54:10,751 basehttp "GET /login/ HTTP/1.1" 200 1389
+INFO 2025-06-08 14:54:17,728 basehttp "POST /login/ HTTP/1.1" 302 0
+INFO 2025-06-08 14:54:17,953 basehttp "GET /dashboard/ HTTP/1.1" 200 47623
+ERROR 2025-06-08 14:54:51,806 log Internal Server Error: /dashboard/
+Traceback (most recent call last):
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\hms\views.py", line 571, in dashboard
+    return render(request, 'hms/dashboard.html', context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\template\loader.py", line 62, in render_to_string
+    return template.render(context, request)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\template\backends\django.py", line 107, in render
+    return self.template.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\template\base.py", line 171, in render
+    return self._render(context)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\template\base.py", line 163, in _render
+    return self.nodelist.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\template\base.py", line 1016, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\template\base.py", line 977, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\template\loader_tags.py", line 159, in render
+    return compiled_parent._render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\template\base.py", line 163, in _render
+    return self.nodelist.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\template\base.py", line 1016, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\template\base.py", line 977, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\template\defaulttags.py", line 327, in render
+    return nodelist.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\template\base.py", line 1016, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\template\base.py", line 977, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\template\defaulttags.py", line 480, in render
+    url = reverse(view_name, args=args, kwargs=kwargs, current_app=current_app)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\urls\base.py", line 98, in reverse
+    resolved_url = resolver._reverse_with_prefix(view, prefix, *args, **kwargs)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\urls\resolvers.py", line 831, in _reverse_with_prefix
+    raise NoReverseMatch(msg)
+django.urls.exceptions.NoReverseMatch: Reverse for 'admin' not found. 'admin' is not a valid view function or pattern name.
+INFO 2025-06-08 14:54:51,825 basehttp - Broken pipe from ('127.0.0.1', 56717)
+ERROR 2025-06-08 14:54:51,982 log Internal Server Error: /dashboard/
+Traceback (most recent call last):
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\hms\views.py", line 571, in dashboard
+    return render(request, 'hms/dashboard.html', context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\template\loader.py", line 62, in render_to_string
+    return template.render(context, request)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\template\backends\django.py", line 107, in render
+    return self.template.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\template\base.py", line 171, in render
+    return self._render(context)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\template\base.py", line 163, in _render
+    return self.nodelist.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\template\base.py", line 1016, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\template\base.py", line 977, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\template\loader_tags.py", line 159, in render
+    return compiled_parent._render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\template\base.py", line 163, in _render
+    return self.nodelist.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\template\base.py", line 1016, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\template\base.py", line 977, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\template\defaulttags.py", line 327, in render
+    return nodelist.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\template\base.py", line 1016, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\template\base.py", line 977, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\template\defaulttags.py", line 480, in render
+    url = reverse(view_name, args=args, kwargs=kwargs, current_app=current_app)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\urls\base.py", line 98, in reverse
+    resolved_url = resolver._reverse_with_prefix(view, prefix, *args, **kwargs)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\urls\resolvers.py", line 831, in _reverse_with_prefix
+    raise NoReverseMatch(msg)
+django.urls.exceptions.NoReverseMatch: Reverse for 'admin' not found. 'admin' is not a valid view function or pattern name.
+ERROR 2025-06-08 14:54:51,987 basehttp "GET /dashboard/ HTTP/1.1" 500 208502
+ERROR 2025-06-08 14:55:02,588 log Internal Server Error: /dashboard/
+Traceback (most recent call last):
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\hms\views.py", line 571, in dashboard
+    return render(request, 'hms/dashboard.html', context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\template\loader.py", line 62, in render_to_string
+    return template.render(context, request)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\template\backends\django.py", line 107, in render
+    return self.template.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\template\base.py", line 171, in render
+    return self._render(context)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\template\base.py", line 163, in _render
+    return self.nodelist.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\template\base.py", line 1016, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\template\base.py", line 977, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\template\loader_tags.py", line 159, in render
+    return compiled_parent._render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\template\base.py", line 163, in _render
+    return self.nodelist.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\template\base.py", line 1016, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\template\base.py", line 977, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\template\defaulttags.py", line 327, in render
+    return nodelist.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\template\base.py", line 1016, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\template\base.py", line 977, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\template\defaulttags.py", line 480, in render
+    url = reverse(view_name, args=args, kwargs=kwargs, current_app=current_app)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\urls\base.py", line 98, in reverse
+    resolved_url = resolver._reverse_with_prefix(view, prefix, *args, **kwargs)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\urls\resolvers.py", line 831, in _reverse_with_prefix
+    raise NoReverseMatch(msg)
+django.urls.exceptions.NoReverseMatch: Reverse for 'admin/' not found. 'admin/' is not a valid view function or pattern name.
+ERROR 2025-06-08 14:55:02,592 basehttp "GET /dashboard/ HTTP/1.1" 500 208508
+ERROR 2025-06-08 14:55:03,310 log Internal Server Error: /dashboard/
+Traceback (most recent call last):
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\hms\views.py", line 571, in dashboard
+    return render(request, 'hms/dashboard.html', context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\template\loader.py", line 62, in render_to_string
+    return template.render(context, request)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\template\backends\django.py", line 107, in render
+    return self.template.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\template\base.py", line 171, in render
+    return self._render(context)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\template\base.py", line 163, in _render
+    return self.nodelist.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\template\base.py", line 1016, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\template\base.py", line 977, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\template\loader_tags.py", line 159, in render
+    return compiled_parent._render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\template\base.py", line 163, in _render
+    return self.nodelist.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\template\base.py", line 1016, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\template\base.py", line 977, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\template\defaulttags.py", line 327, in render
+    return nodelist.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\template\base.py", line 1016, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\template\base.py", line 977, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\template\defaulttags.py", line 480, in render
+    url = reverse(view_name, args=args, kwargs=kwargs, current_app=current_app)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\urls\base.py", line 98, in reverse
+    resolved_url = resolver._reverse_with_prefix(view, prefix, *args, **kwargs)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\urls\resolvers.py", line 831, in _reverse_with_prefix
+    raise NoReverseMatch(msg)
+django.urls.exceptions.NoReverseMatch: Reverse for '/admin/' not found. '/admin/' is not a valid view function or pattern name.
+ERROR 2025-06-08 14:55:03,312 basehttp "GET /dashboard/ HTTP/1.1" 500 208533
+ERROR 2025-06-08 14:55:03,614 log Internal Server Error: /dashboard/
+Traceback (most recent call last):
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\hms\views.py", line 571, in dashboard
+    return render(request, 'hms/dashboard.html', context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\template\loader.py", line 62, in render_to_string
+    return template.render(context, request)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\template\backends\django.py", line 107, in render
+    return self.template.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\template\base.py", line 171, in render
+    return self._render(context)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\template\base.py", line 163, in _render
+    return self.nodelist.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\template\base.py", line 1016, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\template\base.py", line 977, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\template\loader_tags.py", line 159, in render
+    return compiled_parent._render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\template\base.py", line 163, in _render
+    return self.nodelist.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\template\base.py", line 1016, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\template\base.py", line 977, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\template\defaulttags.py", line 327, in render
+    return nodelist.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\template\base.py", line 1016, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\template\base.py", line 977, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\template\defaulttags.py", line 480, in render
+    url = reverse(view_name, args=args, kwargs=kwargs, current_app=current_app)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\urls\base.py", line 98, in reverse
+    resolved_url = resolver._reverse_with_prefix(view, prefix, *args, **kwargs)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\urls\resolvers.py", line 831, in _reverse_with_prefix
+    raise NoReverseMatch(msg)
+django.urls.exceptions.NoReverseMatch: Reverse for '/admin/' not found. '/admin/' is not a valid view function or pattern name.
+ERROR 2025-06-08 14:55:03,617 basehttp "GET /dashboard/ HTTP/1.1" 500 208533
+ERROR 2025-06-08 14:55:04,423 log Internal Server Error: /dashboard/
+Traceback (most recent call last):
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\hms\views.py", line 571, in dashboard
+    return render(request, 'hms/dashboard.html', context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\template\loader.py", line 62, in render_to_string
+    return template.render(context, request)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\template\backends\django.py", line 107, in render
+    return self.template.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\template\base.py", line 171, in render
+    return self._render(context)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\template\base.py", line 163, in _render
+    return self.nodelist.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\template\base.py", line 1016, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\template\base.py", line 977, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\template\loader_tags.py", line 159, in render
+    return compiled_parent._render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\template\base.py", line 163, in _render
+    return self.nodelist.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\template\base.py", line 1016, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\template\base.py", line 977, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\template\defaulttags.py", line 327, in render
+    return nodelist.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\template\base.py", line 1016, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\template\base.py", line 977, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\template\defaulttags.py", line 480, in render
+    url = reverse(view_name, args=args, kwargs=kwargs, current_app=current_app)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\urls\base.py", line 98, in reverse
+    resolved_url = resolver._reverse_with_prefix(view, prefix, *args, **kwargs)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\urls\resolvers.py", line 831, in _reverse_with_prefix
+    raise NoReverseMatch(msg)
+django.urls.exceptions.NoReverseMatch: Reverse for '/admin/' not found. '/admin/' is not a valid view function or pattern name.
+ERROR 2025-06-08 14:55:04,426 basehttp "GET /dashboard/ HTTP/1.1" 500 208533
+INFO 2025-06-08 14:55:53,081 basehttp "GET /dashboard/ HTTP/1.1" 200 47921
+INFO 2025-06-08 14:55:55,948 basehttp "GET /admin/login/? HTTP/1.1" 302 0
+INFO 2025-06-08 14:55:56,082 basehttp "GET /admin/ HTTP/1.1" 200 25376
+INFO 2025-06-08 14:56:37,118 basehttp "GET /logout/ HTTP/1.1" 302 0
+INFO 2025-06-08 14:56:37,126 basehttp "GET /login/ HTTP/1.1" 200 1389
+INFO 2025-06-08 14:56:53,778 basehttp - Broken pipe from ('127.0.0.1', 58966)
+INFO 2025-06-08 14:56:54,744 basehttp "POST /login/ HTTP/1.1" 302 0
+INFO 2025-06-08 14:56:54,924 basehttp "GET /doctor/dashboard/ HTTP/1.1" 200 27494
+INFO 2025-06-08 18:42:55,756 basehttp "GET /doctor/dashboard/ HTTP/1.1" 200 27494
+INFO 2025-06-08 19:36:17,892 basehttp "GET /doctor/dashboard/ HTTP/1.1" 200 27494
+INFO 2025-06-08 19:36:26,257 basehttp "GET /admin/ HTTP/1.1" 302 0
+INFO 2025-06-08 19:36:26,512 basehttp "GET /admin/login/?next=/admin/ HTTP/1.1" 200 3694
+INFO 2025-06-08 19:36:26,548 basehttp "GET /static/admin/css/login.css HTTP/1.1" 304 0
+INFO 2025-06-08 19:36:33,309 basehttp "POST /admin/login/?next=/admin/ HTTP/1.1" 302 0
+INFO 2025-06-08 19:36:33,404 basehttp "GET /admin/ HTTP/1.1" 200 25376
+INFO 2025-06-08 19:36:35,057 basehttp "GET /admin/hms/appointment/ HTTP/1.1" 200 21953
+INFO 2025-06-08 19:36:35,160 basehttp "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-06-08 19:36:37,352 basehttp "GET /admin/hms/appointment/add/ HTTP/1.1" 200 25656
+INFO 2025-06-08 19:36:37,436 basehttp "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-06-08 19:36:46,866 basehttp "GET /static/admin/img/calendar-icons.svg HTTP/1.1" 200 2455
+INFO 2025-06-08 19:37:00,114 basehttp "POST /admin/hms/appointment/add/ HTTP/1.1" 302 0
+INFO 2025-06-08 19:37:00,233 basehttp "GET /admin/hms/appointment/ HTTP/1.1" 200 22514
+INFO 2025-06-08 19:37:00,307 basehttp "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-06-08 19:37:02,238 basehttp "GET /doctor/dashboard/ HTTP/1.1" 302 0
+INFO 2025-06-08 19:37:02,246 basehttp "GET /login/?next=/doctor/dashboard/ HTTP/1.1" 200 1389
+INFO 2025-06-08 19:37:02,764 basehttp "GET /login/?next=/doctor/dashboard/ HTTP/1.1" 200 1389
+INFO 2025-06-08 19:37:09,713 basehttp "POST /login/?next=/doctor/dashboard/ HTTP/1.1" 302 0
+INFO 2025-06-08 19:37:09,858 basehttp "GET /doctor/dashboard/ HTTP/1.1" 200 27505
+INFO 2025-06-08 19:37:13,386 basehttp "GET /appointments/ HTTP/1.1" 200 28492
+INFO 2025-06-08 19:37:13,689 basehttp "GET /api/appointments/ HTTP/1.1" 200 957
+INFO 2025-06-08 19:37:18,079 basehttp "GET /appointments_update/ HTTP/1.1" 200 32206
+INFO 2025-06-08 19:37:22,316 basehttp "POST /update-appointment-status/ HTTP/1.1" 302 0
+INFO 2025-06-08 19:37:22,596 basehttp "GET /appointments/ HTTP/1.1" 200 28493
+INFO 2025-06-08 19:37:22,905 basehttp "GET /api/appointments/ HTTP/1.1" 200 959
+INFO 2025-06-08 19:37:24,504 basehttp "GET /doctor/dashboard/ HTTP/1.1" 200 27505
+INFO 2025-06-08 19:38:21,725 basehttp "GET /admin/hms/appointment/ HTTP/1.1" 302 0
+INFO 2025-06-08 19:38:21,825 basehttp "GET /admin/login/?next=/admin/hms/appointment/ HTTP/1.1" 200 3874
+INFO 2025-06-08 19:38:28,306 basehttp "POST /admin/login/?next=/admin/hms/appointment/ HTTP/1.1" 302 0
+INFO 2025-06-08 19:38:28,502 basehttp "GET /admin/hms/appointment/ HTTP/1.1" 200 22282
+INFO 2025-06-08 19:38:28,620 basehttp "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-06-08 19:38:30,606 basehttp "GET /admin/hms/appointment/7/change/ HTTP/1.1" 200 25990
+INFO 2025-06-08 19:38:30,681 basehttp "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-06-08 19:38:38,037 basehttp "POST /admin/hms/appointment/7/change/ HTTP/1.1" 302 0
+INFO 2025-06-08 19:38:38,180 basehttp "GET /admin/hms/appointment/ HTTP/1.1" 200 22522
+INFO 2025-06-08 19:38:38,277 basehttp "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-06-08 19:38:40,183 basehttp "GET /doctor/dashboard/ HTTP/1.1" 302 0
+INFO 2025-06-08 19:38:40,188 basehttp "GET /login/?next=/doctor/dashboard/ HTTP/1.1" 200 1389
+INFO 2025-06-08 19:38:40,779 basehttp "GET /login/?next=/doctor/dashboard/ HTTP/1.1" 200 1389
+INFO 2025-06-08 19:38:47,086 basehttp "POST /login/?next=/doctor/dashboard/ HTTP/1.1" 302 0
+INFO 2025-06-08 19:38:47,249 basehttp "GET /doctor/dashboard/ HTTP/1.1" 200 27505
+INFO 2025-06-08 19:38:49,212 basehttp "GET /doctor/dashboard/ HTTP/1.1" 200 27505
+INFO 2025-06-08 19:39:34,877 basehttp "GET /appointments/ HTTP/1.1" 200 28495
+INFO 2025-06-08 19:39:35,151 basehttp "GET /api/appointments/ HTTP/1.1" 200 959
+INFO 2025-06-08 19:39:40,023 basehttp "GET /doctor/dashboard/ HTTP/1.1" 200 27505
+INFO 2025-06-08 19:40:31,805 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-06-08 19:40:34,138 autoreload Watching for file changes with StatReloader
+INFO 2025-06-08 19:40:41,742 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-06-08 19:40:42,842 autoreload Watching for file changes with StatReloader
+INFO 2025-06-08 19:40:45,395 basehttp "GET /doctor/dashboard/ HTTP/1.1" 200 27505
+INFO 2025-06-08 19:40:46,137 basehttp "GET /doctor/dashboard/ HTTP/1.1" 200 27505
+INFO 2025-06-08 19:41:41,854 basehttp "GET /doctor/dashboard/ HTTP/1.1" 200 27505
+INFO 2025-06-08 19:41:42,470 basehttp "GET /doctor/dashboard/ HTTP/1.1" 200 27505
+INFO 2025-06-08 19:41:43,001 basehttp "GET /doctor/dashboard/ HTTP/1.1" 200 27505
+INFO 2025-06-08 19:41:44,239 basehttp "GET /doctor/dashboard/ HTTP/1.1" 200 27505
+INFO 2025-06-08 19:41:44,443 basehttp "GET /doctor/dashboard/ HTTP/1.1" 200 27505
+INFO 2025-06-08 19:41:44,691 basehttp "GET /doctor/dashboard/ HTTP/1.1" 200 27505
+INFO 2025-06-08 19:41:44,911 basehttp "GET /doctor/dashboard/ HTTP/1.1" 200 27505
+INFO 2025-06-08 19:41:45,550 basehttp "GET /doctor/dashboard/ HTTP/1.1" 200 27505
+INFO 2025-06-08 19:41:46,116 basehttp "GET /doctor/dashboard/ HTTP/1.1" 200 27505
+INFO 2025-06-08 19:41:46,934 basehttp "GET /doctor/dashboard/ HTTP/1.1" 200 27505
+INFO 2025-06-08 19:42:21,408 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-06-08 19:42:22,584 autoreload Watching for file changes with StatReloader
+INFO 2025-06-08 19:42:27,894 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-06-08 19:42:28,821 autoreload Watching for file changes with StatReloader
+INFO 2025-06-08 19:42:32,159 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-06-08 19:42:33,281 autoreload Watching for file changes with StatReloader
+INFO 2025-06-08 19:42:38,620 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-06-08 19:42:39,733 autoreload Watching for file changes with StatReloader
+INFO 2025-06-08 19:42:43,993 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-06-08 19:42:45,085 autoreload Watching for file changes with StatReloader
+INFO 2025-06-08 19:42:48,464 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-06-08 19:42:49,587 autoreload Watching for file changes with StatReloader
+INFO 2025-06-08 19:42:51,904 basehttp "GET /doctor/dashboard/ HTTP/1.1" 200 27505
+INFO 2025-06-08 19:42:57,536 basehttp "GET /doctor/dashboard/ HTTP/1.1" 200 27505
+INFO 2025-06-08 19:43:00,965 basehttp "GET /patients/ HTTP/1.1" 200 32044
+INFO 2025-06-08 19:43:01,242 basehttp "GET /api/fetch-patients/ HTTP/1.1" 200 2307
+INFO 2025-06-08 19:43:02,565 basehttp "GET /doctor/dashboard/ HTTP/1.1" 200 27505
+INFO 2025-06-08 19:43:54,993 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-06-08 19:43:56,154 autoreload Watching for file changes with StatReloader
+INFO 2025-06-08 19:43:58,786 basehttp "GET /doctor/dashboard/ HTTP/1.1" 200 27505
+INFO 2025-06-08 19:44:12,311 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-06-08 19:44:13,468 autoreload Watching for file changes with StatReloader
+INFO 2025-06-08 19:44:18,955 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-06-08 19:44:20,077 autoreload Watching for file changes with StatReloader
+INFO 2025-06-08 19:44:22,662 basehttp "GET /doctor/dashboard/ HTTP/1.1" 200 27505
+INFO 2025-06-08 19:44:41,196 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-06-08 19:44:42,538 autoreload Watching for file changes with StatReloader
+INFO 2025-06-08 19:44:44,782 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-06-08 19:44:45,706 autoreload Watching for file changes with StatReloader
+INFO 2025-06-08 19:44:47,945 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-06-08 19:44:49,142 autoreload Watching for file changes with StatReloader
+INFO 2025-06-08 19:44:51,408 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-06-08 19:44:52,569 autoreload Watching for file changes with StatReloader
+INFO 2025-06-08 19:44:55,201 basehttp "GET /doctor/dashboard/ HTTP/1.1" 200 27505
+ERROR 2025-06-08 19:45:23,704 log Internal Server Error: /doctor/dashboard/
+Traceback (most recent call last):
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\hms\views.py", line 806, in doctor_dashboard
+    return render(request, 'hms/doctor/doctor_dashboard.html', {
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\template\loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\template\loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: hms/doctor/doctor_dashboard.html
+ERROR 2025-06-08 19:45:23,708 basehttp "GET /doctor/dashboard/ HTTP/1.1" 500 112088
+INFO 2025-06-08 19:45:55,173 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-06-08 19:45:56,292 autoreload Watching for file changes with StatReloader
+ERROR 2025-06-08 19:45:58,647 log Internal Server Error: /doctor/dashboard/
+Traceback (most recent call last):
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\hms\views.py", line 265, in doctor_dashboard
+    return render(request, 'doctor/dashboard.html', context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\template\loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\template\loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: doctor/dashboard.html
+ERROR 2025-06-08 19:45:58,651 basehttp "GET /doctor/dashboard/ HTTP/1.1" 500 116179
+INFO 2025-06-08 19:46:18,153 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-06-08 19:46:19,328 autoreload Watching for file changes with StatReloader
+INFO 2025-06-08 19:46:22,537 basehttp "GET /doctor/dashboard/ HTTP/1.1" 200 27601
+INFO 2025-06-08 19:46:40,383 basehttp "GET /doctor/dashboard/ HTTP/1.1" 200 27583
+INFO 2025-06-08 20:26:15,417 basehttp "GET /admin/hms/appointment/5/change/ HTTP/1.1" 302 0
+INFO 2025-06-08 20:26:15,552 basehttp "GET /admin/login/?next=/admin/hms/appointment/5/change/ HTTP/1.1" 200 3746
+INFO 2025-06-08 20:26:23,321 basehttp "POST /admin/login/?next=/admin/hms/appointment/5/change/ HTTP/1.1" 302 0
+WARNING 2025-06-08 20:26:23,539 log Forbidden (CSRF token from POST incorrect.): /admin/login/
+WARNING 2025-06-08 20:26:23,542 basehttp "POST /admin/login/?next=/admin/hms/appointment/5/change/ HTTP/1.1" 403 2503
+INFO 2025-06-08 20:26:23,554 basehttp - Broken pipe from ('127.0.0.1', 55856)
+INFO 2025-06-08 20:26:26,574 basehttp "GET /admin/login/?next=/admin/hms/appointment/5/change/ HTTP/1.1" 302 0
+INFO 2025-06-08 20:26:26,699 basehttp "GET /admin/ HTTP/1.1" 200 26147
+INFO 2025-06-08 20:26:31,203 basehttp "GET /admin/hms/appointment/ HTTP/1.1" 200 22282
+INFO 2025-06-08 20:26:31,293 basehttp "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-06-08 20:26:32,852 basehttp "GET /admin/hms/appointment/5/change/ HTTP/1.1" 200 25990
+INFO 2025-06-08 20:26:32,946 basehttp "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-06-08 20:26:38,070 basehttp "POST /admin/hms/appointment/5/change/ HTTP/1.1" 302 0
+INFO 2025-06-08 20:26:38,223 basehttp "GET /admin/hms/appointment/ HTTP/1.1" 200 22522
+INFO 2025-06-08 20:26:38,304 basehttp "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-06-08 20:26:40,336 basehttp "GET /admin/hms/appointment/4/change/ HTTP/1.1" 200 25945
+INFO 2025-06-08 20:26:40,413 basehttp "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-06-08 20:26:47,946 basehttp "POST /admin/hms/appointment/4/change/ HTTP/1.1" 200 26116
+INFO 2025-06-08 20:26:48,027 basehttp "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-06-08 20:26:58,207 basehttp "POST /admin/hms/appointment/4/change/ HTTP/1.1" 302 0
+INFO 2025-06-08 20:26:58,368 basehttp "GET /admin/hms/appointment/ HTTP/1.1" 200 22504
+INFO 2025-06-08 20:26:58,458 basehttp "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+ERROR 2025-06-08 20:27:00,069 log Internal Server Error: /doctor/dashboard/
+Traceback (most recent call last):
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\hms\views.py", line 199, in doctor_dashboard
+    doctor = request.user.doctor
+             ^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\utils\functional.py", line 253, in inner
+    return func(_wrapped, *args)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\db\models\fields\related_descriptors.py", line 534, in __get__
+    raise self.RelatedObjectDoesNotExist(
+hms.models.CustomUser.doctor.RelatedObjectDoesNotExist: CustomUser has no doctor.
+ERROR 2025-06-08 20:27:00,077 basehttp "GET /doctor/dashboard/ HTTP/1.1" 500 103755
+ERROR 2025-06-08 20:27:01,041 log Internal Server Error: /doctor/dashboard/
+Traceback (most recent call last):
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\hms\views.py", line 199, in doctor_dashboard
+    doctor = request.user.doctor
+             ^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\utils\functional.py", line 253, in inner
+    return func(_wrapped, *args)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\db\models\fields\related_descriptors.py", line 534, in __get__
+    raise self.RelatedObjectDoesNotExist(
+hms.models.CustomUser.doctor.RelatedObjectDoesNotExist: CustomUser has no doctor.
+ERROR 2025-06-08 20:27:01,045 basehttp "GET /doctor/dashboard/ HTTP/1.1" 500 103755
+ERROR 2025-06-08 20:27:08,475 log Internal Server Error: /doctor/dashboard/
+Traceback (most recent call last):
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\hms\views.py", line 199, in doctor_dashboard
+    doctor = request.user.doctor
+             ^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\utils\functional.py", line 253, in inner
+    return func(_wrapped, *args)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\db\models\fields\related_descriptors.py", line 534, in __get__
+    raise self.RelatedObjectDoesNotExist(
+hms.models.CustomUser.doctor.RelatedObjectDoesNotExist: CustomUser has no doctor.
+ERROR 2025-06-08 20:27:08,479 basehttp "GET /doctor/dashboard/ HTTP/1.1" 500 103755
+INFO 2025-06-08 20:27:11,126 basehttp "GET / HTTP/1.1" 200 51997
+INFO 2025-06-08 20:27:14,768 basehttp "GET /logout/ HTTP/1.1" 302 0
+INFO 2025-06-08 20:27:14,774 basehttp "GET /login/ HTTP/1.1" 200 1389
+INFO 2025-06-08 20:27:23,657 basehttp "POST /login/ HTTP/1.1" 302 0
+WARNING 2025-06-08 20:27:23,751 basehttp "GET /login/hms/doctor/doctor_dashboard HTTP/1.1" 404 34145
+WARNING 2025-06-08 20:27:36,612 basehttp "GET /login/hms/doctor/doctor_dashboard HTTP/1.1" 404 34145
+WARNING 2025-06-08 20:27:37,088 basehttp "GET /login/hms/doctor/doctor_dashboard HTTP/1.1" 404 34145
+INFO 2025-06-08 20:27:37,195 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-06-08 20:27:38,476 autoreload Watching for file changes with StatReloader
+WARNING 2025-06-08 20:27:41,129 basehttp "GET /login/hms/doctor/doctor_dashboard HTTP/1.1" 404 34145
+INFO 2025-06-08 20:27:57,744 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-06-08 20:27:59,069 autoreload Watching for file changes with StatReloader
+WARNING 2025-06-08 20:28:01,223 basehttp "GET /login/hms/doctor/doctor_dashboard HTTP/1.1" 404 34145
+WARNING 2025-06-08 20:28:03,302 basehttp "GET /login/hms/doctor/doctor_dashboard HTTP/1.1" 404 34145
+WARNING 2025-06-08 20:28:19,821 basehttp "GET /login/hms/doctor/doctor_dashboard HTTP/1.1" 404 34145
+INFO 2025-06-08 20:28:19,898 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-06-08 20:28:21,211 autoreload Watching for file changes with StatReloader
+WARNING 2025-06-08 20:28:23,354 basehttp "GET /login/hms/doctor/doctor_dashboard HTTP/1.1" 404 34145
+INFO 2025-06-08 20:28:51,467 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-06-08 20:28:52,868 autoreload Watching for file changes with StatReloader
+WARNING 2025-06-08 20:28:55,080 basehttp "GET /login/hms/doctor/doctor_dashboard HTTP/1.1" 404 34145
+WARNING 2025-06-08 20:28:55,878 basehttp "GET /login/hms/doctor/doctor_dashboard HTTP/1.1" 404 34145
+WARNING 2025-06-08 20:28:56,657 basehttp "GET /login/hms/doctor/doctor_dashboard HTTP/1.1" 404 34145
+WARNING 2025-06-08 20:28:57,120 basehttp "GET /login/hms/doctor/doctor_dashboard HTTP/1.1" 404 34145
+WARNING 2025-06-08 20:28:57,320 basehttp "GET /login/hms/doctor/doctor_dashboard HTTP/1.1" 404 34145
+WARNING 2025-06-08 20:28:57,496 basehttp "GET /login/hms/doctor/doctor_dashboard HTTP/1.1" 404 34145
+WARNING 2025-06-08 20:28:57,723 basehttp "GET /login/hms/doctor/doctor_dashboard HTTP/1.1" 404 34145
+WARNING 2025-06-08 20:28:57,918 basehttp "GET /login/hms/doctor/doctor_dashboard HTTP/1.1" 404 34145
+WARNING 2025-06-08 20:28:58,176 basehttp "GET /login/hms/doctor/doctor_dashboard HTTP/1.1" 404 34145
+WARNING 2025-06-08 20:28:58,417 basehttp "GET /login/hms/doctor/doctor_dashboard HTTP/1.1" 404 34145
+WARNING 2025-06-08 20:28:58,616 basehttp "GET /login/hms/doctor/doctor_dashboard HTTP/1.1" 404 34145
+WARNING 2025-06-08 20:28:58,787 basehttp "GET /login/hms/doctor/doctor_dashboard HTTP/1.1" 404 34145
+WARNING 2025-06-08 20:28:58,971 basehttp "GET /login/hms/doctor/doctor_dashboard HTTP/1.1" 404 34145
+INFO 2025-06-08 20:29:10,888 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-06-08 20:29:12,326 autoreload Watching for file changes with StatReloader
+WARNING 2025-06-08 20:29:14,962 basehttp "GET /login/hms/doctor/doctor_dashboard HTTP/1.1" 404 34145
+INFO 2025-06-08 20:29:43,958 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-06-08 20:29:45,350 autoreload Watching for file changes with StatReloader
+WARNING 2025-06-08 20:30:00,269 basehttp "GET /login/hms/doctor/doctor_dashboard HTTP/1.1" 404 34145
+INFO 2025-06-08 20:30:09,763 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-06-08 20:30:10,950 autoreload Watching for file changes with StatReloader
+INFO 2025-06-08 20:30:22,841 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-06-08 20:30:23,923 autoreload Watching for file changes with StatReloader
+WARNING 2025-06-08 20:30:26,199 basehttp "GET /login/hms/doctor/doctor_dashboard HTTP/1.1" 404 34145
+INFO 2025-06-08 20:30:27,132 basehttp "GET /login/ HTTP/1.1" 200 1389
+INFO 2025-06-08 20:30:35,314 basehttp "POST /login/ HTTP/1.1" 302 0
+WARNING 2025-06-08 20:30:35,335 basehttp "GET /login/doctor/dashboard/ HTTP/1.1" 404 34115
+INFO 2025-06-08 20:31:24,286 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-06-08 20:31:25,497 autoreload Watching for file changes with StatReloader
+WARNING 2025-06-08 20:31:28,673 basehttp "GET /login/doctor/dashboard/ HTTP/1.1" 404 34115
+WARNING 2025-06-08 20:32:14,142 basehttp "GET /login/doctor/dashboard/ HTTP/1.1" 404 34115
+INFO 2025-06-08 20:32:14,500 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-06-08 20:32:15,764 autoreload Watching for file changes with StatReloader
+WARNING 2025-06-08 20:32:18,147 basehttp "GET /login/doctor/dashboard/ HTTP/1.1" 404 34115
+INFO 2025-06-08 20:33:15,166 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-06-08 20:33:16,385 autoreload Watching for file changes with StatReloader
+WARNING 2025-06-08 20:33:19,451 basehttp "GET /login/doctor/dashboard/ HTTP/1.1" 404 34115
+WARNING 2025-06-08 20:33:20,624 basehttp "GET /login/doctor/dashboard/ HTTP/1.1" 404 34115
+INFO 2025-06-08 20:33:26,280 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-06-08 20:33:27,643 autoreload Watching for file changes with StatReloader
+INFO 2025-06-08 20:36:29,235 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-06-08 20:36:30,418 autoreload Watching for file changes with StatReloader
+INFO 2025-06-08 20:37:11,044 autoreload D:\Hospital_Management\hospital_management\hms\urls.py changed, reloading.
+INFO 2025-06-08 20:37:12,329 autoreload Watching for file changes with StatReloader
+WARNING 2025-06-08 20:37:14,699 basehttp "GET /login/doctor/dashboard/ HTTP/1.1" 404 34115
+INFO 2025-06-08 20:39:01,556 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-06-08 20:39:02,765 autoreload Watching for file changes with StatReloader
+WARNING 2025-06-08 20:39:05,932 basehttp "GET /login/doctor/dashboard/ HTTP/1.1" 404 34115
+WARNING 2025-06-08 20:39:09,305 basehttp "GET /login/doctor/dashboard/ HTTP/1.1" 404 34115
+INFO 2025-06-08 20:39:37,575 autoreload Watching for file changes with StatReloader
+INFO 2025-06-08 20:39:41,047 basehttp "GET / HTTP/1.1" 200 46563
+ERROR 2025-06-08 20:40:10,703 log Internal Server Error: /doctor/dashboard/
+Traceback (most recent call last):
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\hms\views.py", line 265, in doctor_dashboard
+    return render(request, 'hms/doctor/doctor_dashboard', context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\template\loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\template\loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: hms/doctor/doctor_dashboard
+ERROR 2025-06-08 20:40:10,708 basehttp "GET /doctor/dashboard/ HTTP/1.1" 500 116153
+INFO 2025-06-08 20:40:26,350 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-06-08 20:40:40,127 autoreload Watching for file changes with StatReloader
+INFO 2025-06-08 20:40:43,960 basehttp "GET /doctor/dashboard/ HTTP/1.1" 200 27583
+INFO 2025-06-08 20:40:48,722 basehttp "GET /logout/ HTTP/1.1" 302 0
+INFO 2025-06-08 20:40:48,729 basehttp "GET /login/ HTTP/1.1" 200 1389
+INFO 2025-06-08 20:40:55,142 basehttp "POST /login/ HTTP/1.1" 302 0
+INFO 2025-06-08 20:40:55,274 basehttp "GET /doctor/dashboard/ HTTP/1.1" 200 27583
+INFO 2025-06-08 20:41:01,251 basehttp "GET /appointments/ HTTP/1.1" 200 28489
+INFO 2025-06-08 20:41:01,599 basehttp "GET /api/appointments/ HTTP/1.1" 200 957
+INFO 2025-06-08 20:41:06,632 basehttp "GET /api/appointments/ HTTP/1.1" 200 957
+INFO 2025-06-08 20:41:06,743 basehttp "GET /appointments/ HTTP/1.1" 200 28489
+INFO 2025-06-08 20:41:06,949 basehttp "GET /api/appointments/ HTTP/1.1" 200 957
+INFO 2025-06-08 20:41:11,954 basehttp "GET /api/appointments/ HTTP/1.1" 200 957
+INFO 2025-06-08 20:41:13,646 basehttp "GET /doctor/dashboard/ HTTP/1.1" 200 27583
+INFO 2025-06-08 20:41:22,973 basehttp "GET /admin/hms/appointment/5/change/ HTTP/1.1" 302 0
+INFO 2025-06-08 20:41:23,234 basehttp "GET /admin/login/?next=/admin/hms/appointment/5/change/ HTTP/1.1" 200 3746
+INFO 2025-06-08 20:41:28,723 basehttp "POST /admin/login/?next=/admin/hms/appointment/5/change/ HTTP/1.1" 302 0
+INFO 2025-06-08 20:41:28,940 basehttp "GET /admin/hms/appointment/5/change/ HTTP/1.1" 200 25990
+INFO 2025-06-08 20:41:29,030 basehttp "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-06-08 20:41:33,229 basehttp "POST /admin/hms/appointment/5/change/ HTTP/1.1" 302 0
+INFO 2025-06-08 20:41:33,407 basehttp "GET /admin/hms/appointment/ HTTP/1.1" 200 22512
+INFO 2025-06-08 20:41:33,505 basehttp "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-06-08 20:41:36,588 basehttp "GET /admin/hms/appointment/7/change/ HTTP/1.1" 200 25990
+INFO 2025-06-08 20:41:36,670 basehttp "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-06-08 20:41:40,521 basehttp "POST /admin/hms/appointment/7/change/ HTTP/1.1" 302 0
+INFO 2025-06-08 20:41:40,664 basehttp "GET /admin/hms/appointment/ HTTP/1.1" 200 22508
+INFO 2025-06-08 20:41:40,738 basehttp "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-06-08 20:41:45,882 basehttp "GET /admin/hms/appointment/3/change/ HTTP/1.1" 200 25972
+INFO 2025-06-08 20:41:46,071 basehttp "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-06-08 20:41:49,547 basehttp "POST /admin/hms/appointment/3/change/ HTTP/1.1" 302 0
+INFO 2025-06-08 20:41:49,710 basehttp "GET /admin/hms/appointment/ HTTP/1.1" 200 22504
+INFO 2025-06-08 20:41:49,797 basehttp "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+ERROR 2025-06-08 20:41:53,929 log Internal Server Error: /doctor/dashboard/
+Traceback (most recent call last):
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\hms\views.py", line 199, in doctor_dashboard
+    doctor = request.user.doctor
+             ^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\utils\functional.py", line 253, in inner
+    return func(_wrapped, *args)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\db\models\fields\related_descriptors.py", line 534, in __get__
+    raise self.RelatedObjectDoesNotExist(
+hms.models.CustomUser.doctor.RelatedObjectDoesNotExist: CustomUser has no doctor.
+ERROR 2025-06-08 20:41:53,936 basehttp "GET /doctor/dashboard/ HTTP/1.1" 500 103759
+ERROR 2025-06-08 20:41:54,191 log Internal Server Error: /doctor/dashboard/
+Traceback (most recent call last):
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\hms\views.py", line 199, in doctor_dashboard
+    doctor = request.user.doctor
+             ^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\utils\functional.py", line 253, in inner
+    return func(_wrapped, *args)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\db\models\fields\related_descriptors.py", line 534, in __get__
+    raise self.RelatedObjectDoesNotExist(
+hms.models.CustomUser.doctor.RelatedObjectDoesNotExist: CustomUser has no doctor.
+ERROR 2025-06-08 20:41:54,195 basehttp "GET /doctor/dashboard/ HTTP/1.1" 500 103759
+ERROR 2025-06-08 20:41:54,471 log Internal Server Error: /doctor/dashboard/
+Traceback (most recent call last):
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\hms\views.py", line 199, in doctor_dashboard
+    doctor = request.user.doctor
+             ^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\utils\functional.py", line 253, in inner
+    return func(_wrapped, *args)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\db\models\fields\related_descriptors.py", line 534, in __get__
+    raise self.RelatedObjectDoesNotExist(
+hms.models.CustomUser.doctor.RelatedObjectDoesNotExist: CustomUser has no doctor.
+ERROR 2025-06-08 20:41:54,475 basehttp "GET /doctor/dashboard/ HTTP/1.1" 500 103759
+ERROR 2025-06-08 20:41:54,765 log Internal Server Error: /doctor/dashboard/
+Traceback (most recent call last):
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\hms\views.py", line 199, in doctor_dashboard
+    doctor = request.user.doctor
+             ^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\utils\functional.py", line 253, in inner
+    return func(_wrapped, *args)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\db\models\fields\related_descriptors.py", line 534, in __get__
+    raise self.RelatedObjectDoesNotExist(
+hms.models.CustomUser.doctor.RelatedObjectDoesNotExist: CustomUser has no doctor.
+ERROR 2025-06-08 20:41:54,768 basehttp "GET /doctor/dashboard/ HTTP/1.1" 500 103759
+ERROR 2025-06-08 20:41:54,978 log Internal Server Error: /doctor/dashboard/
+Traceback (most recent call last):
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\hms\views.py", line 199, in doctor_dashboard
+    doctor = request.user.doctor
+             ^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\utils\functional.py", line 253, in inner
+    return func(_wrapped, *args)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\db\models\fields\related_descriptors.py", line 534, in __get__
+    raise self.RelatedObjectDoesNotExist(
+hms.models.CustomUser.doctor.RelatedObjectDoesNotExist: CustomUser has no doctor.
+ERROR 2025-06-08 20:41:54,982 basehttp "GET /doctor/dashboard/ HTTP/1.1" 500 103759
+INFO 2025-06-08 20:42:00,366 basehttp "GET / HTTP/1.1" 200 53405
+INFO 2025-06-08 20:42:04,865 basehttp "GET /logout/ HTTP/1.1" 302 0
+INFO 2025-06-08 20:42:04,873 basehttp "GET /login/ HTTP/1.1" 200 1389
+INFO 2025-06-08 20:42:12,257 basehttp "POST /login/ HTTP/1.1" 302 0
+INFO 2025-06-08 20:42:12,535 basehttp "GET /doctor/dashboard/ HTTP/1.1" 200 27583
+INFO 2025-06-08 20:47:42,073 autoreload D:\Hospital_Management\hospital_management\hms\models.py changed, reloading.
+INFO 2025-06-08 20:47:43,375 autoreload Watching for file changes with StatReloader
+INFO 2025-06-08 20:48:06,200 autoreload D:\Hospital_Management\hospital_management\hms\models.py changed, reloading.
+INFO 2025-06-08 20:48:07,287 autoreload Watching for file changes with StatReloader
+INFO 2025-06-08 20:48:10,369 autoreload D:\Hospital_Management\hospital_management\hms\models.py changed, reloading.
+INFO 2025-06-08 20:48:11,641 autoreload Watching for file changes with StatReloader
+INFO 2025-06-08 20:48:44,695 basehttp "GET /doctor/dashboard/ HTTP/1.1" 200 27583
+INFO 2025-06-08 20:48:50,898 basehttp "GET /doctor/dashboard/ HTTP/1.1" 200 27583
+INFO 2025-06-08 20:51:31,441 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-06-08 20:51:32,596 autoreload Watching for file changes with StatReloader
+INFO 2025-06-08 20:51:36,920 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-06-08 20:51:38,091 autoreload Watching for file changes with StatReloader
+INFO 2025-06-08 20:51:41,386 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-06-08 20:51:42,416 autoreload Watching for file changes with StatReloader
+INFO 2025-06-08 20:51:47,646 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-06-08 20:51:48,764 autoreload Watching for file changes with StatReloader
+INFO 2025-06-08 20:51:56,021 basehttp "GET /doctor/dashboard/ HTTP/1.1" 200 28393
+INFO 2025-06-08 20:52:17,921 basehttp "GET /doctor/dashboard/ HTTP/1.1" 200 28393
+INFO 2025-06-08 20:52:18,667 basehttp "GET /doctor/dashboard/ HTTP/1.1" 200 28408
+INFO 2025-06-08 20:52:38,252 basehttp "GET /doctor/dashboard/ HTTP/1.1" 200 28408
+INFO 2025-06-08 20:52:38,837 basehttp "GET /doctor/dashboard/ HTTP/1.1" 200 28425
+INFO 2025-06-08 20:52:39,500 basehttp "GET /doctor/dashboard/ HTTP/1.1" 200 28425
+INFO 2025-06-08 20:52:56,963 basehttp "GET /doctor/dashboard/ HTTP/1.1" 200 28425
+INFO 2025-06-08 20:52:57,610 basehttp "GET /doctor/dashboard/ HTTP/1.1" 200 28425
+INFO 2025-06-08 20:55:29,125 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-06-08 20:55:30,457 autoreload Watching for file changes with StatReloader
+INFO 2025-06-08 20:55:36,971 basehttp "GET /doctor/dashboard/ HTTP/1.1" 200 29345
+INFO 2025-06-08 20:55:50,534 basehttp "GET /doctor/dashboard/ HTTP/1.1" 200 29345
+INFO 2025-06-08 20:55:51,134 basehttp "GET /doctor/dashboard/ HTTP/1.1" 200 29367
+INFO 2025-06-08 20:55:51,689 basehttp "GET /doctor/dashboard/ HTTP/1.1" 200 29367
+INFO 2025-06-08 20:56:13,946 basehttp "GET /doctor/dashboard/ HTTP/1.1" 200 29565
+INFO 2025-06-08 20:56:14,577 basehttp "GET /doctor/dashboard/ HTTP/1.1" 200 29565
+INFO 2025-06-08 20:56:22,085 basehttp "GET /doctor/dashboard/ HTTP/1.1" 200 29565
+INFO 2025-06-08 20:56:22,694 basehttp "GET /doctor/dashboard/ HTTP/1.1" 200 29565
+INFO 2025-06-08 20:56:39,268 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-06-08 20:56:40,515 autoreload Watching for file changes with StatReloader
+INFO 2025-06-08 20:56:46,763 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-06-08 20:56:47,934 autoreload Watching for file changes with StatReloader
+INFO 2025-06-08 20:57:07,662 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-06-08 20:57:08,747 autoreload Watching for file changes with StatReloader
+INFO 2025-06-08 20:57:13,908 basehttp "GET /doctor/dashboard/ HTTP/1.1" 200 29565
+INFO 2025-06-08 20:57:29,789 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-06-08 20:57:30,848 autoreload Watching for file changes with StatReloader
+INFO 2025-06-08 20:57:35,215 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-06-08 20:57:36,200 autoreload Watching for file changes with StatReloader
+INFO 2025-06-08 20:58:20,661 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-06-08 20:58:21,596 autoreload Watching for file changes with StatReloader
+INFO 2025-06-08 20:58:24,268 basehttp "GET /doctor/dashboard/ HTTP/1.1" 200 29565
+INFO 2025-06-08 21:08:19,885 basehttp "GET /appointments_update/ HTTP/1.1" 200 32187
+INFO 2025-06-08 21:08:30,728 basehttp "POST /update-appointment-status/ HTTP/1.1" 302 0
+INFO 2025-06-08 21:08:30,922 basehttp "GET /appointments/ HTTP/1.1" 200 28487
+INFO 2025-06-08 21:08:31,348 basehttp "GET /api/appointments/ HTTP/1.1" 200 955
+INFO 2025-06-08 21:08:33,721 basehttp "GET /doctor/dashboard/ HTTP/1.1" 200 29565
+INFO 2025-06-08 21:08:51,064 basehttp "GET /appointments/ HTTP/1.1" 200 28487
+INFO 2025-06-08 21:08:51,372 basehttp "GET /api/appointments/ HTTP/1.1" 200 955
+INFO 2025-06-08 21:08:52,565 basehttp "GET /available-doctors/ HTTP/1.1" 200 25406
+INFO 2025-06-08 21:09:00,524 basehttp "GET /admin/hms/doctor/ HTTP/1.1" 302 0
+INFO 2025-06-08 21:09:00,778 basehttp "GET /admin/login/?next=/admin/hms/doctor/ HTTP/1.1" 200 3864
+INFO 2025-06-08 21:09:11,382 basehttp "POST /admin/login/?next=/admin/hms/doctor/ HTTP/1.1" 302 0
+INFO 2025-06-08 21:09:11,545 basehttp "GET /admin/hms/doctor/ HTTP/1.1" 200 21765
+INFO 2025-06-08 21:09:11,637 basehttp "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-06-08 21:09:16,029 basehttp "GET /admin/hms/doctor/4/change/ HTTP/1.1" 200 25809
+INFO 2025-06-08 21:09:16,109 basehttp "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-06-08 21:09:18,416 basehttp "GET /admin/hms/doctor/ HTTP/1.1" 200 21765
+INFO 2025-06-08 21:09:20,030 basehttp "GET /admin/hms/doctor/3/change/ HTTP/1.1" 200 25809
+INFO 2025-06-08 21:09:20,121 basehttp "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-06-08 21:09:23,986 basehttp "GET /admin/hms/doctor/ HTTP/1.1" 200 21765
+INFO 2025-06-08 21:09:30,058 basehttp "GET /admin/hms/customuser/ HTTP/1.1" 200 36972
+INFO 2025-06-08 21:09:30,093 basehttp "GET /static/admin/img/search.svg HTTP/1.1" 304 0
+INFO 2025-06-08 21:09:30,094 basehttp "GET /static/admin/img/icon-no.svg HTTP/1.1" 304 0
+INFO 2025-06-08 21:09:30,168 basehttp "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-06-08 21:09:30,198 basehttp "GET /static/admin/img/sorting-icons.svg HTTP/1.1" 304 0
+INFO 2025-06-08 21:09:33,443 basehttp "GET /admin/hms/customuser/31/change/ HTTP/1.1" 200 42614
+INFO 2025-06-08 21:09:33,482 basehttp "GET /static/admin/js/SelectFilter2.js HTTP/1.1" 304 0
+INFO 2025-06-08 21:09:33,482 basehttp "GET /static/admin/js/SelectBox.js HTTP/1.1" 304 0
+INFO 2025-06-08 21:09:33,649 basehttp "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-06-08 21:09:33,726 basehttp "GET /static/admin/img/selector-icons.svg HTTP/1.1" 304 0
+INFO 2025-06-08 21:09:48,708 basehttp "GET /admin/hms/customuser/ HTTP/1.1" 200 36972
+INFO 2025-06-08 21:09:51,434 basehttp "GET /admin/hms/doctor/ HTTP/1.1" 200 21765
+INFO 2025-06-08 21:09:51,511 basehttp "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-06-08 21:09:53,696 basehttp "GET /admin/hms/doctor/add/ HTTP/1.1" 200 25563
+INFO 2025-06-08 21:09:53,779 basehttp "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-06-08 21:09:54,759 basehttp "GET /admin/hms/doctor/ HTTP/1.1" 200 21765
+INFO 2025-06-08 21:09:59,916 basehttp "POST /admin/hms/doctor/ HTTP/1.1" 200 18805
+INFO 2025-06-08 21:10:04,838 basehttp "GET /admin/hms/opdbilling/12/change/ HTTP/1.1" 200 33983
+INFO 2025-06-08 21:10:04,923 basehttp "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-06-08 21:10:07,591 basehttp "GET /admin/hms/opdbilling/12/delete/ HTTP/1.1" 200 19459
+INFO 2025-06-08 21:10:09,483 basehttp "POST /admin/hms/opdbilling/12/delete/ HTTP/1.1" 302 0
+INFO 2025-06-08 21:10:09,590 basehttp "GET /admin/hms/opdbilling/ HTTP/1.1" 200 19527
+INFO 2025-06-08 21:10:09,797 basehttp "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-06-08 21:10:11,914 basehttp "GET /admin/hms/doctor/ HTTP/1.1" 200 21765
+INFO 2025-06-08 21:10:11,985 basehttp "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-06-08 21:10:13,724 basehttp "GET /admin/hms/doctor/add/ HTTP/1.1" 200 25563
+INFO 2025-06-08 21:10:13,794 basehttp "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-06-08 21:10:28,490 basehttp "POST /admin/hms/doctor/add/ HTTP/1.1" 200 25832
+INFO 2025-06-08 21:10:28,572 basehttp "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-06-08 21:10:33,083 basehttp "GET /admin/hms/doctor/add/ HTTP/1.1" 200 25563
+INFO 2025-06-08 21:10:34,287 basehttp "GET /admin/hms/doctor/ HTTP/1.1" 200 21765
+INFO 2025-06-08 21:10:38,847 basehttp "POST /admin/hms/doctor/ HTTP/1.1" 200 21356
+INFO 2025-06-08 21:10:40,919 basehttp "POST /admin/hms/doctor/ HTTP/1.1" 302 0
+INFO 2025-06-08 21:10:41,002 basehttp "GET /admin/hms/doctor/ HTTP/1.1" 200 19455
+INFO 2025-06-08 21:10:41,089 basehttp "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-06-08 21:10:43,095 basehttp "GET /admin/hms/doctor/add/ HTTP/1.1" 200 25563
+INFO 2025-06-08 21:10:43,190 basehttp "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-06-08 21:10:53,391 basehttp "POST /admin/hms/doctor/add/ HTTP/1.1" 302 0
+INFO 2025-06-08 21:10:53,495 basehttp "GET /admin/hms/doctor/ HTTP/1.1" 200 20848
+INFO 2025-06-08 21:10:53,705 basehttp "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-06-08 21:10:57,048 basehttp "GET /available-doctors/ HTTP/1.1" 200 28848
+INFO 2025-06-08 21:11:02,158 basehttp "GET /logout/ HTTP/1.1" 302 0
+INFO 2025-06-08 21:11:02,165 basehttp "GET /login/ HTTP/1.1" 200 1389
+INFO 2025-06-08 21:11:10,811 basehttp "POST /login/ HTTP/1.1" 302 0
+INFO 2025-06-08 21:11:11,014 basehttp "GET /doctor/dashboard/ HTTP/1.1" 200 29565
+INFO 2025-06-08 21:11:15,462 basehttp "GET /appointments/ HTTP/1.1" 200 24922
+INFO 2025-06-08 21:11:15,735 basehttp "GET /api/appointments/ HTTP/1.1" 200 20
+INFO 2025-06-08 21:11:21,178 basehttp "GET /api/appointments/ HTTP/1.1" 200 20
+INFO 2025-06-08 21:11:24,184 basehttp "GET /admin/hms/appointment/ HTTP/1.1" 302 0
+INFO 2025-06-08 21:11:24,297 basehttp "GET /admin/login/?next=/admin/hms/appointment/ HTTP/1.1" 200 3728
+INFO 2025-06-08 21:11:26,172 basehttp "GET /api/appointments/ HTTP/1.1" 200 20
+INFO 2025-06-08 21:11:29,969 basehttp "POST /admin/login/?next=/admin/hms/appointment/ HTTP/1.1" 302 0
+INFO 2025-06-08 21:11:30,075 basehttp "GET /admin/hms/appointment/ HTTP/1.1" 200 19353
+INFO 2025-06-08 21:11:30,182 basehttp "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-06-08 21:11:31,205 basehttp "GET /api/appointments/ HTTP/1.1" 200 20
+INFO 2025-06-08 21:11:33,556 basehttp "GET /admin/hms/appointment/add/ HTTP/1.1" 200 25458
+INFO 2025-06-08 21:11:33,775 basehttp "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-06-08 21:11:36,277 basehttp "GET /api/appointments/ HTTP/1.1" 200 20
+INFO 2025-06-08 21:11:41,189 basehttp "GET /api/appointments/ HTTP/1.1" 200 20
+INFO 2025-06-08 21:11:46,182 basehttp "GET /api/appointments/ HTTP/1.1" 200 20
+INFO 2025-06-08 21:11:47,172 basehttp "POST /admin/hms/appointment/add/ HTTP/1.1" 302 0
+INFO 2025-06-08 21:11:47,288 basehttp "GET /admin/hms/appointment/ HTTP/1.1" 200 20926
+INFO 2025-06-08 21:11:47,378 basehttp "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-06-08 21:11:50,749 basehttp "GET /api/appointments/ HTTP/1.1" 200 175
+INFO 2025-06-08 21:11:51,720 basehttp "GET /logout/ HTTP/1.1" 302 0
+INFO 2025-06-08 21:11:51,726 basehttp "GET /login/ HTTP/1.1" 200 1389
+INFO 2025-06-08 21:11:57,428 basehttp "POST /login/ HTTP/1.1" 302 0
+INFO 2025-06-08 21:11:57,733 basehttp "GET /doctor/dashboard/ HTTP/1.1" 200 29565
+INFO 2025-06-08 21:12:03,662 basehttp "GET /appointments/ HTTP/1.1" 200 25919
+INFO 2025-06-08 21:12:03,966 basehttp "GET /api/appointments/ HTTP/1.1" 200 175
+INFO 2025-06-08 21:12:09,198 basehttp "GET /api/appointments/ HTTP/1.1" 200 175
+INFO 2025-06-08 21:12:11,220 basehttp "GET /admin/hms/doctor/ HTTP/1.1" 302 0
+INFO 2025-06-08 21:12:11,301 basehttp "GET /admin/login/?next=/admin/hms/doctor/ HTTP/1.1" 200 3718
+INFO 2025-06-08 21:12:14,170 basehttp "GET /api/appointments/ HTTP/1.1" 200 175
+INFO 2025-06-08 21:12:19,200 basehttp "GET /api/appointments/ HTTP/1.1" 200 175
+INFO 2025-06-08 21:12:20,483 basehttp "POST /admin/login/?next=/admin/hms/doctor/ HTTP/1.1" 302 0
+INFO 2025-06-08 21:12:20,579 basehttp "GET /admin/hms/doctor/ HTTP/1.1" 200 20632
+INFO 2025-06-08 21:12:20,676 basehttp "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-06-08 21:12:23,398 basehttp "GET /admin/hms/doctor/add/ HTTP/1.1" 200 25563
+INFO 2025-06-08 21:12:23,463 basehttp "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-06-08 21:12:24,169 basehttp "GET /api/appointments/ HTTP/1.1" 200 175
+INFO 2025-06-08 21:12:29,167 basehttp "GET /api/appointments/ HTTP/1.1" 200 175
+INFO 2025-06-08 21:12:34,197 basehttp "GET /api/appointments/ HTTP/1.1" 200 175
+INFO 2025-06-08 21:12:34,743 basehttp "POST /admin/hms/doctor/add/ HTTP/1.1" 302 0
+INFO 2025-06-08 21:12:34,842 basehttp "GET /admin/hms/doctor/ HTTP/1.1" 200 21149
+INFO 2025-06-08 21:12:35,046 basehttp "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-06-08 21:12:38,955 basehttp "GET /admin/hms/doctor/7/change/ HTTP/1.1" 200 25859
+INFO 2025-06-08 21:12:39,020 basehttp "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-06-08 21:12:39,291 basehttp "GET /api/appointments/ HTTP/1.1" 200 175
+INFO 2025-06-08 21:12:44,282 basehttp "GET /api/appointments/ HTTP/1.1" 200 175
+INFO 2025-06-08 21:12:49,188 basehttp "GET /api/appointments/ HTTP/1.1" 200 175
+INFO 2025-06-08 21:12:50,862 basehttp "POST /admin/hms/doctor/7/change/ HTTP/1.1" 302 0
+INFO 2025-06-08 21:12:51,048 basehttp "GET /admin/hms/doctor/ HTTP/1.1" 200 21148
+INFO 2025-06-08 21:12:51,117 basehttp "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-06-08 21:12:53,064 basehttp "GET /admin/hms/doctor/6/change/ HTTP/1.1" 200 25858
+INFO 2025-06-08 21:12:53,136 basehttp "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-06-08 21:12:54,188 basehttp "GET /api/appointments/ HTTP/1.1" 200 175
+INFO 2025-06-08 21:12:55,400 basehttp "GET /admin/hms/doctor/ HTTP/1.1" 200 20931
+INFO 2025-06-08 21:12:57,471 basehttp "GET /admin/hms/appointment/ HTTP/1.1" 200 20694
+INFO 2025-06-08 21:12:57,543 basehttp "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-06-08 21:12:58,967 basehttp "GET /admin/hms/appointment/add/ HTTP/1.1" 200 25515
+INFO 2025-06-08 21:12:59,034 basehttp "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-06-08 21:12:59,217 basehttp "GET /api/appointments/ HTTP/1.1" 200 175
+INFO 2025-06-08 21:13:04,179 basehttp "GET /api/appointments/ HTTP/1.1" 200 175
+INFO 2025-06-08 21:13:11,582 basehttp "POST /admin/hms/appointment/add/ HTTP/1.1" 302 0
+INFO 2025-06-08 21:13:11,690 basehttp "GET /admin/hms/appointment/ HTTP/1.1" 200 21262
+INFO 2025-06-08 21:13:11,751 basehttp "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-06-08 21:13:12,652 basehttp "GET /api/appointments/ HTTP/1.1" 200 338
+INFO 2025-06-08 21:13:13,972 basehttp "GET /api/appointments/ HTTP/1.1" 200 338
+INFO 2025-06-08 21:13:14,511 basehttp "GET /logout/ HTTP/1.1" 302 0
+INFO 2025-06-08 21:13:14,515 basehttp "GET /login/ HTTP/1.1" 200 1389
+INFO 2025-06-08 21:13:22,921 basehttp "POST /login/ HTTP/1.1" 302 0
+INFO 2025-06-08 21:13:23,083 basehttp "GET /doctor/dashboard/ HTTP/1.1" 200 29565
+INFO 2025-06-08 21:13:26,177 basehttp "GET /appointments/ HTTP/1.1" 200 26442
+INFO 2025-06-08 21:13:26,460 basehttp "GET /api/appointments/ HTTP/1.1" 200 338
+INFO 2025-06-08 21:13:29,281 basehttp "GET /doctor/dashboard/ HTTP/1.1" 200 29565
+INFO 2025-06-08 21:15:13,848 basehttp "GET /appointments/ HTTP/1.1" 200 26442
+INFO 2025-06-08 21:15:14,269 basehttp "GET /api/appointments/ HTTP/1.1" 200 338
+INFO 2025-06-08 21:15:19,268 basehttp "GET /api/appointments/ HTTP/1.1" 200 338
+INFO 2025-06-08 21:15:21,123 basehttp "GET /medicine-diluent/ HTTP/1.1" 200 117637
+INFO 2025-06-08 21:15:28,829 basehttp "GET /admin/ HTTP/1.1" 302 0
+INFO 2025-06-08 21:15:28,915 basehttp "GET /admin/login/?next=/admin/ HTTP/1.1" 200 3696
+INFO 2025-06-08 21:15:35,665 basehttp "POST /admin/login/?next=/admin/ HTTP/1.1" 302 0
+INFO 2025-06-08 21:15:35,853 basehttp "GET /admin/ HTTP/1.1" 200 26157
+INFO 2025-06-08 21:15:41,488 basehttp "GET /medicine-diluent/ HTTP/1.1" 200 123073
+INFO 2025-06-08 21:15:44,508 basehttp "GET /dashboard/ HTTP/1.1" 200 49198
+INFO 2025-06-08 21:16:42,719 basehttp "GET /medicine-diluent/ HTTP/1.1" 200 123073

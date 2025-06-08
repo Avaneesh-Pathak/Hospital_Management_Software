@@ -51,6 +51,7 @@ Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif; background: #f7f9f
           <thead>
             <tr style="background: #3498db; color: white;">
               <th style="padding: 0.75rem; text-align: left;">Patient</th>
+              <th style="padding: 0.75rem; text-align: left;">Room</th>
               <th style="padding: 0.75rem; text-align: left;">Bed</th>
               <th style="padding: 0.75rem; text-align: left;">Admission Date</th>
             </tr>
@@ -58,9 +59,10 @@ Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif; background: #f7f9f
           <tbody>
             {% for ipd in ipd_patients %}
             <tr style="border-bottom: 1px solid #ddd;">
-              <td style="padding: 0.5rem;">{{ ipd.patient.user.get_full_name }}</td>
+              <td style="padding: 0.5rem;">{{ ipd.patient.user.full_name }}</td>
+              <td style="padding: 0.5rem;">{{ ipd.room }}</td>
               <td style="padding: 0.5rem;">{{ ipd.bed_number }}</td>
-              <td style="padding: 0.5rem;">{{ ipd.admission_date|date:"d M Y" }}</td>
+              <td style="padding: 0.5rem;">{{ ipd.admitted_on|date:"d M Y" }}</td>
             </tr>
             {% endfor %}
           </tbody>
@@ -86,9 +88,9 @@ Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif; background: #f7f9f
           <tbody>
             {% for case in emergency_cases %}
             <tr style="border-bottom: 1px solid #f9d6d5;">
-              <td style="padding: 0.5rem;">{{ case.patient.user.get_full_name }}</td>
+              <td style="padding: 0.5rem;">{{ case.patient.user.full_name }}</td>
               <td style="padding: 0.5rem;">{{ case.emergency_type }}</td>
-              <td style="padding: 0.5rem;">{{ case.created_at|date:"d M Y H:i" }}</td>
+              <td style="padding: 0.5rem;">{{ case.admitted_on|date:"d M Y H:i" }}</td>
               <td style="padding: 0.5rem;">{{ case.status }}</td>
             </tr>
             {% endfor %}

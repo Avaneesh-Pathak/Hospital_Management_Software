@@ -1021,16 +1021,15 @@ class Medicine(models.Model):
         ("tablet", "Tablet"),
         ("drop", "Drop"),
         ("suspension", "Suspension"),
-        ("fluid", "Fluid"), 
+        ("fluid", "Fluid"),
+        ("oral", "Oral"),
         ("other", "Other"),
     ]
 
     name = models.CharField(max_length=100)
     medicine_type = models.CharField(max_length=20, choices=MEDICINE_TYPE_CHOICES, default="other")
     is_liquid_injection = models.BooleanField(default=False, help_text="Only for injections: Check if this is a ready-to-use liquid injection")
-    # Standard dose is given in mg/kg/day (e.g., 5 mg/kg/day)
-    standard_dose_per_kg = models.FloatField(help_text="Standard dose per kg (mg/kg/day)", null=True)
-    # For liquids, the concentration tells how many mg per mL
+    standard_dose_per_kg = models.FloatField(help_text="Standard dose per kg (mg/kg/day)", null=True, blank=True)
     concentration_mg_per_ml = models.FloatField(help_text="Concentration of the medicine (mg/mL)", null=True, blank=True)
 
     def __str__(self):

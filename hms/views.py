@@ -172,7 +172,7 @@ def redirect_after_login(request):
     elif user.groups.filter(name='Doctor').exists():
         return redirect('doctor_dashboard')
     elif user.groups.filter(name='Nurse').exists():
-        return redirect('nurse_dashboard')
+        return redirect('hms/nurse/dashboard')
     elif user.groups.filter(name='Staff').exists():
         return redirect('staff_dashboard')
     elif user.groups.filter(name='Patient').exists():
@@ -197,15 +197,17 @@ from django.db.models import Count
 @group_required('Doctor')
 def doctor_dashboard(request):
     doctor = request.user.doctor
-
+    # print("Doctor:", doctor)  # Debugging line
     # IPD
-    ipd_patients = IPD.objects.filter(patient__assigned_doctor=doctor, discharge_date__isnull=True)
-
+    ipd_patients = IPD.objects.filter(discharge_date__isnull=True).select_related('patient', 'room')
     # Appointments Today
-    todays_appointments = Appointment.objects.filter(doctor=doctor, date=date.today()).order_by('time')
+    today = timezone.localdate()
+    print("Today's date:", today)  # Debugging line
+    todays_appointments = Appointment.objects.filter(doctor=doctor,date=today)
 
     # Last 7 days appointment stats
     seven_days_ago = timezone.now().date() - timedelta(days=6)
+
     appointments_last_7_days = (
         Appointment.objects.filter(doctor=doctor, date__gte=seven_days_ago)
         .annotate(day=TruncDate('date'))
@@ -236,7 +238,20 @@ def doctor_dashboard(request):
     med_chart_counts = list(med_counter.values())
 
     # Emergency
-    emergency_cases = EmergencyCase.objects.filter(patient__assigned_doctor=doctor, status='Pending')
+    emergency_cases = EmergencyCase.objects.filter(Q(status='Pending') | Q(status='Admitted')).order_by('-admitted_on')
+
+
+
+    print("Doctor:", doctor)
+    print("Today's Appointments:", todays_appointments)
+    print("IPD Patients:", ipd_patients)
+    print("Recent Vitals:", recent_vitals)
+    print("Active Medications:", active_medications)
+    print("Emergency Cases:", emergency_cases)
+    print("Appointment Chart Labels:", appointment_chart_labels)
+    print("Appointment Chart Counts:", appointment_chart_counts)
+    print("Medication Chart Labels:", med_chart_labels)
+    print("Medication Chart Counts:", med_chart_counts)
 
     context = {
         'doctor': doctor,
@@ -251,7 +266,7 @@ def doctor_dashboard(request):
         'med_chart_counts': med_chart_counts,
     }
 
-    return render(request, 'doctors/dashboard.html', context)
+    return render(request, 'hms/doctor/doctor_dashboard.html', context)
 
 
 @login_required
@@ -784,19 +799,19 @@ def update_doctor(request, doctor_id):
         form = DoctorForm(instance=doctor)
     return render(request, 'hms/doctor/update_doctor.html', {'form': form, 'doctor': doctor})
 
-@login_required
-@user_passes_test(lambda u: u.groups.filter(name='Doctor').exists())
-def doctor_dashboard(request):
-    doctor = request.user.doctor  # ✅ Use related_name="doctor"
-    patients = Patient.objects.filter(assigned_doctor=doctor)
-    today = timezone.now().date()
-    appointments_today = Appointment.objects.filter(doctor=doctor, date=today)
+# @login_required
+# @user_passes_test(lambda u: u.groups.filter(name='Doctor').exists())
+# def doctor_dashboard(request):
+#     doctor = request.user.doctor  # ✅ Use related_name="doctor"
+#     patients = Patient.objects.filter(assigned_doctor=doctor)
+#     today = timezone.now().date()
+#     appointments_today = Appointment.objects.filter(doctor=doctor, date=today)
 
-    return render(request, 'hms/doctor/doctor_dashboard.html', {
-        'doctor': doctor,
-        'patients': patients,
-        'appointments_today': appointments_today
-    })
+#     return render(request, 'hms/doctor/doctor_dashboard.html', {
+#         'doctor': doctor,
+#         'patients': patients,
+#         'appointments_today': appointments_today
+#     })
 
 
 # Appointment Views
