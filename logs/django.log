@@ -52198,3 +52198,548 @@ INFO 2025-06-08 21:15:35,853 basehttp "GET /admin/ HTTP/1.1" 200 26157
 INFO 2025-06-08 21:15:41,488 basehttp "GET /medicine-diluent/ HTTP/1.1" 200 123073
 INFO 2025-06-08 21:15:44,508 basehttp "GET /dashboard/ HTTP/1.1" 200 49198
 INFO 2025-06-08 21:16:42,719 basehttp "GET /medicine-diluent/ HTTP/1.1" 200 123073
+INFO 2025-06-08 21:17:58,079 autoreload Watching for file changes with StatReloader
+INFO 2025-06-08 21:18:30,444 basehttp "GET /logout/ HTTP/1.1" 302 0
+INFO 2025-06-08 21:18:30,461 basehttp "GET /login/ HTTP/1.1" 200 1389
+INFO 2025-06-08 21:18:37,269 basehttp "POST /login/ HTTP/1.1" 302 0
+INFO 2025-06-08 21:18:37,509 basehttp "GET /doctor/dashboard/ HTTP/1.1" 200 29565
+INFO 2025-06-08 21:21:06,915 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-06-08 21:21:07,733 autoreload Watching for file changes with StatReloader
+INFO 2025-06-08 21:22:17,768 basehttp "GET /doctor/dashboard/ HTTP/1.1" 200 29887
+INFO 2025-06-08 21:22:18,469 basehttp "GET /doctor/dashboard/ HTTP/1.1" 200 29887
+INFO 2025-06-08 21:22:55,770 basehttp "GET /doctor/dashboard/ HTTP/1.1" 200 29887
+INFO 2025-06-08 21:22:56,040 basehttp "GET /doctor/dashboard/ HTTP/1.1" 200 29887
+INFO 2025-06-08 21:22:56,364 basehttp "GET /doctor/dashboard/ HTTP/1.1" 200 29887
+INFO 2025-06-08 21:22:57,069 basehttp "GET /doctor/dashboard/ HTTP/1.1" 200 29887
+INFO 2025-06-08 21:22:57,202 basehttp "GET /doctor/dashboard/ HTTP/1.1" 200 29887
+INFO 2025-06-08 21:22:57,441 basehttp "GET /doctor/dashboard/ HTTP/1.1" 200 29887
+INFO 2025-06-08 21:22:57,585 basehttp "GET /doctor/dashboard/ HTTP/1.1" 200 29887
+INFO 2025-06-08 21:22:57,779 basehttp "GET /doctor/dashboard/ HTTP/1.1" 200 29887
+INFO 2025-06-08 21:22:57,938 basehttp "GET /doctor/dashboard/ HTTP/1.1" 200 29887
+INFO 2025-06-08 21:22:58,119 basehttp "GET /doctor/dashboard/ HTTP/1.1" 200 29887
+INFO 2025-06-08 21:23:27,554 basehttp "GET /doctor/dashboard/ HTTP/1.1" 200 29887
+INFO 2025-06-08 21:23:34,911 basehttp "GET /ipd/ HTTP/1.1" 200 51672
+INFO 2025-06-08 21:23:35,182 basehttp "GET /get-ipd-data/ HTTP/1.1" 200 472
+INFO 2025-06-08 21:23:37,626 basehttp "GET /nicu/medications/22/ HTTP/1.1" 200 36009
+INFO 2025-06-08 21:23:41,964 basehttp "GET /nicu/medications/21/ HTTP/1.1" 200 32349
+INFO 2025-06-08 21:23:45,266 basehttp "GET /doctor/dashboard/ HTTP/1.1" 200 29887
+INFO 2025-06-08 21:24:06,710 basehttp "GET /doctor/dashboard/ HTTP/1.1" 200 30353
+INFO 2025-06-08 21:24:07,401 basehttp "GET /doctor/dashboard/ HTTP/1.1" 200 30353
+INFO 2025-06-08 21:24:08,392 basehttp "GET /doctor/dashboard/ HTTP/1.1" 200 30353
+INFO 2025-06-08 21:24:52,980 basehttp "GET /doctor/dashboard/ HTTP/1.1" 200 29571
+INFO 2025-06-08 21:24:53,456 basehttp "GET /doctor/dashboard/ HTTP/1.1" 200 29571
+INFO 2025-06-08 21:26:49,721 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-06-08 21:26:50,628 autoreload Watching for file changes with StatReloader
+INFO 2025-06-08 21:26:57,447 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-06-08 21:26:58,322 autoreload Watching for file changes with StatReloader
+INFO 2025-06-08 21:27:09,475 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-06-08 21:27:10,289 autoreload Watching for file changes with StatReloader
+INFO 2025-06-08 21:27:45,369 basehttp "GET /doctor/dashboard/ HTTP/1.1" 200 30891
+INFO 2025-06-08 21:27:45,954 basehttp "GET /doctor/dashboard/ HTTP/1.1" 200 30891
+INFO 2025-06-08 21:28:02,826 basehttp "GET /doctor/dashboard/ HTTP/1.1" 200 30894
+INFO 2025-06-08 21:28:03,536 basehttp "GET /doctor/dashboard/ HTTP/1.1" 200 30894
+INFO 2025-06-08 21:28:57,675 basehttp "GET /doctor/dashboard/ HTTP/1.1" 200 30893
+INFO 2025-06-08 21:29:03,638 basehttp "GET /doctor/dashboard/ HTTP/1.1" 200 30893
+INFO 2025-06-08 21:29:04,183 basehttp "GET /doctor/dashboard/ HTTP/1.1" 200 30894
+INFO 2025-06-08 21:29:04,673 basehttp "GET /doctor/dashboard/ HTTP/1.1" 200 30894
+INFO 2025-06-08 21:29:15,801 basehttp "GET /doctor/dashboard/ HTTP/1.1" 200 30891
+INFO 2025-06-08 21:29:16,522 basehttp "GET /doctor/dashboard/ HTTP/1.1" 200 30891
+INFO 2025-06-08 21:33:29,240 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-06-08 21:33:30,258 autoreload Watching for file changes with StatReloader
+INFO 2025-06-08 21:33:39,221 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-06-08 21:33:40,055 autoreload Watching for file changes with StatReloader
+INFO 2025-06-08 21:33:58,181 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-06-08 21:33:59,022 autoreload Watching for file changes with StatReloader
+INFO 2025-06-08 21:34:01,769 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-06-08 21:34:02,570 autoreload Watching for file changes with StatReloader
+INFO 2025-06-08 21:34:20,590 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-06-08 21:34:21,534 autoreload Watching for file changes with StatReloader
+ERROR 2025-06-08 21:35:46,484 log Internal Server Error: /doctor/dashboard/
+Traceback (most recent call last):
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\hms\views.py", line 306, in doctor_dashboard
+    return render(request, 'hms/doctor/doctor_dashboard.html', context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\template\loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\template\loader.py", line 15, in get_template
+    return engine.get_template(template_name)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\template\backends\django.py", line 79, in get_template
+    return Template(self.engine.get_template(template_name), self)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\template\engine.py", line 177, in get_template
+    template, origin = self.find_template(template_name)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\template\engine.py", line 159, in find_template
+    template = loader.get_template(name, skip=skip)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\template\loaders\cached.py", line 57, in get_template
+    template = super().get_template(template_name, skip)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\template\loaders\base.py", line 28, in get_template
+    return Template(
+           ^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\template\base.py", line 154, in __init__
+    self.nodelist = self.compile_nodelist()
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\template\base.py", line 196, in compile_nodelist
+    nodelist = parser.parse()
+               ^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\template\base.py", line 518, in parse
+    raise self.error(token, e)
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\template\base.py", line 516, in parse
+    compiled_result = compile_func(self, token)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\template\loader_tags.py", line 299, in do_extends
+    nodelist = parser.parse()
+               ^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\template\base.py", line 518, in parse
+    raise self.error(token, e)
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\template\base.py", line 516, in parse
+    compiled_result = compile_func(self, token)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\template\loader_tags.py", line 234, in do_block
+    nodelist = parser.parse(("endblock",))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\template\base.py", line 489, in parse
+    raise self.error(token, e)
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\template\base.py", line 487, in parse
+    filter_expression = self.compile_filter(token.contents)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\template\base.py", line 609, in compile_filter
+    return FilterExpression(token, self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\template\base.py", line 710, in __init__
+    raise TemplateSyntaxError(
+django.template.exceptions.TemplateSyntaxError: Could not parse the remainder: ' if current_filter == 'all' else ''' from ''active-filter' if current_filter == 'all' else '''
+ERROR 2025-06-08 21:35:46,488 basehttp "GET /doctor/dashboard/ HTTP/1.1" 500 277003
+ERROR 2025-06-08 21:35:47,411 log Internal Server Error: /doctor/dashboard/
+Traceback (most recent call last):
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\hms\views.py", line 306, in doctor_dashboard
+    return render(request, 'hms/doctor/doctor_dashboard.html', context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\template\loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\template\loader.py", line 15, in get_template
+    return engine.get_template(template_name)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\template\backends\django.py", line 79, in get_template
+    return Template(self.engine.get_template(template_name), self)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\template\engine.py", line 177, in get_template
+    template, origin = self.find_template(template_name)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\template\engine.py", line 159, in find_template
+    template = loader.get_template(name, skip=skip)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\template\loaders\cached.py", line 57, in get_template
+    template = super().get_template(template_name, skip)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\template\loaders\base.py", line 28, in get_template
+    return Template(
+           ^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\template\base.py", line 154, in __init__
+    self.nodelist = self.compile_nodelist()
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\template\base.py", line 196, in compile_nodelist
+    nodelist = parser.parse()
+               ^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\template\base.py", line 518, in parse
+    raise self.error(token, e)
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\template\base.py", line 516, in parse
+    compiled_result = compile_func(self, token)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\template\loader_tags.py", line 299, in do_extends
+    nodelist = parser.parse()
+               ^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\template\base.py", line 518, in parse
+    raise self.error(token, e)
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\template\base.py", line 516, in parse
+    compiled_result = compile_func(self, token)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\template\loader_tags.py", line 234, in do_block
+    nodelist = parser.parse(("endblock",))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\template\base.py", line 489, in parse
+    raise self.error(token, e)
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\template\base.py", line 487, in parse
+    filter_expression = self.compile_filter(token.contents)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\template\base.py", line 609, in compile_filter
+    return FilterExpression(token, self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\template\base.py", line 710, in __init__
+    raise TemplateSyntaxError(
+django.template.exceptions.TemplateSyntaxError: Could not parse the remainder: ' if current_filter == 'all' else ''' from ''active-filter' if current_filter == 'all' else '''
+ERROR 2025-06-08 21:35:47,413 basehttp "GET /doctor/dashboard/ HTTP/1.1" 500 277003
+INFO 2025-06-08 21:35:59,990 basehttp "GET /doctor/dashboard/ HTTP/1.1" 200 42492
+INFO 2025-06-08 21:37:35,030 basehttp "GET /admin/ HTTP/1.1" 302 0
+INFO 2025-06-08 21:37:35,120 basehttp "GET /admin/login/?next=/admin/ HTTP/1.1" 200 3696
+INFO 2025-06-08 21:37:36,392 basehttp "GET /admin/login/?next=/admin/ HTTP/1.1" 200 3696
+INFO 2025-06-08 21:37:36,428 basehttp "GET /doctor/dashboard/ HTTP/1.1" 200 41105
+INFO 2025-06-08 21:37:36,892 basehttp "GET /admin/login/?next=/admin/ HTTP/1.1" 200 3696
+INFO 2025-06-08 21:37:36,979 basehttp "GET /doctor/dashboard/ HTTP/1.1" 200 41105
+INFO 2025-06-08 21:37:58,233 basehttp "GET /doctor/dashboard/ HTTP/1.1" 200 41908
+INFO 2025-06-08 21:38:05,645 basehttp "GET /doctor/dashboard/ HTTP/1.1" 200 41313
+INFO 2025-06-08 21:38:06,161 basehttp "GET /doctor/dashboard/ HTTP/1.1" 200 41313
+INFO 2025-06-08 21:38:34,234 basehttp "GET /doctor/dashboard/ HTTP/1.1" 200 42858
+INFO 2025-06-08 21:38:34,925 basehttp "GET /doctor/dashboard/ HTTP/1.1" 200 42858
+INFO 2025-06-08 21:38:35,893 basehttp "GET /doctor/dashboard/ HTTP/1.1" 200 42858
+INFO 2025-06-08 21:39:02,954 basehttp "GET /doctor/dashboard/ HTTP/1.1" 200 44038
+INFO 2025-06-08 21:39:03,664 basehttp "GET /doctor/dashboard/ HTTP/1.1" 200 44038
+INFO 2025-06-08 21:41:45,488 basehttp "GET /doctor/dashboard/ HTTP/1.1" 200 41061
+INFO 2025-06-08 21:41:46,258 basehttp "GET /doctor/dashboard/ HTTP/1.1" 200 41061
+INFO 2025-06-08 21:42:52,838 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-06-08 21:42:53,781 autoreload Watching for file changes with StatReloader
+INFO 2025-06-08 21:43:06,950 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-06-08 21:43:07,875 autoreload Watching for file changes with StatReloader
+INFO 2025-06-08 21:53:26,869 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-06-08 21:53:27,710 autoreload Watching for file changes with StatReloader
+INFO 2025-06-08 21:53:38,440 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-06-08 21:53:39,253 autoreload Watching for file changes with StatReloader
+INFO 2025-06-08 21:54:01,439 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-06-08 21:54:02,222 autoreload Watching for file changes with StatReloader
+INFO 2025-06-08 21:54:19,258 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-06-08 21:54:20,009 autoreload Watching for file changes with StatReloader
+INFO 2025-06-08 21:54:29,812 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-06-08 21:54:30,640 autoreload Watching for file changes with StatReloader
+ERROR 2025-06-08 21:55:20,432 log Internal Server Error: /doctor/dashboard/
+Traceback (most recent call last):
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\hms\views.py", line 212, in doctor_dashboard
+    Appointment.objects.filter(doctor=doctor, date__gte=start_date, date__lte=end_date)
+                                                        ^^^^^^^^^^
+UnboundLocalError: cannot access local variable 'start_date' where it is not associated with a value
+ERROR 2025-06-08 21:55:20,435 basehttp "GET /doctor/dashboard/ HTTP/1.1" 500 96624
+INFO 2025-06-08 21:57:04,886 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-06-08 21:57:05,818 autoreload Watching for file changes with StatReloader
+INFO 2025-06-08 21:57:07,528 basehttp "GET /doctor/dashboard/ HTTP/1.1" 200 41899
+INFO 2025-06-08 21:57:12,695 basehttp "GET /doctor/dashboard/?filter=30days HTTP/1.1" 200 42497
+INFO 2025-06-08 21:57:17,798 basehttp "GET /doctor/dashboard/?filter=today HTTP/1.1" 200 41743
+INFO 2025-06-08 21:57:23,380 basehttp "GET /doctor/dashboard/?filter=7days HTTP/1.1" 200 41899
+INFO 2025-06-08 21:59:50,666 basehttp "GET /doctor/dashboard/?filter=7days HTTP/1.1" 200 42313
+INFO 2025-06-08 22:00:39,800 basehttp "GET /doctor/dashboard/?filter=7days HTTP/1.1" 200 42313
+INFO 2025-06-08 22:00:40,614 basehttp "GET /doctor/dashboard/?filter=7days HTTP/1.1" 200 41672
+INFO 2025-06-08 22:00:41,334 basehttp "GET /doctor/dashboard/?filter=7days HTTP/1.1" 200 41672
+INFO 2025-06-08 22:01:15,275 basehttp "GET /doctor/dashboard/?filter=7days HTTP/1.1" 200 41872
+INFO 2025-06-08 22:01:15,945 basehttp "GET /doctor/dashboard/?filter=7days HTTP/1.1" 200 41872
+INFO 2025-06-08 22:01:18,978 basehttp "GET /doctor/dashboard/?filter=7days&appointment_filter=7days HTTP/1.1" 200 41872
+INFO 2025-06-08 22:01:23,312 basehttp "GET /doctor/dashboard/?filter=7days&appointment_filter=30days HTTP/1.1" 200 41872
+INFO 2025-06-08 22:02:04,452 basehttp "GET /doctor/dashboard/?filter=7days&appointment_filter=30days HTTP/1.1" 200 41899
+INFO 2025-06-08 22:02:09,159 basehttp "GET /doctor/dashboard/?filter=today&appointment_filter=30days HTTP/1.1" 200 41743
+INFO 2025-06-08 22:02:13,161 basehttp "GET /doctor/dashboard/?filter=30days&appointment_filter=30days HTTP/1.1" 200 42497
+INFO 2025-06-09 11:07:29,684 basehttp "GET /doctor/dashboard/?filter=30days&appointment_filter=30days HTTP/1.1" 200 42497
+INFO 2025-06-09 11:37:51,703 basehttp "GET /doctor/dashboard/?filter=30days&appointment_filter=30days HTTP/1.1" 200 42497
+INFO 2025-06-09 11:37:58,793 basehttp "GET /doctor/dashboard/?filter=30days&appointment_filter=30days HTTP/1.1" 200 42497
+INFO 2025-06-09 11:43:25,775 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-06-09 11:43:28,254 autoreload Watching for file changes with StatReloader
+INFO 2025-06-09 11:43:46,576 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-06-09 11:43:47,406 autoreload Watching for file changes with StatReloader
+INFO 2025-06-09 11:44:03,396 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-06-09 11:44:04,200 autoreload Watching for file changes with StatReloader
+ERROR 2025-06-09 11:44:20,923 log Internal Server Error: /doctor/dashboard/
+Traceback (most recent call last):
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\hms\views.py", line 310, in doctor_dashboard
+    opd_chart_labels = []
+                          
+UnboundLocalError: cannot access local variable 'appointment_chart_labels' where it is not associated with a value
+ERROR 2025-06-09 11:44:20,925 basehttp "GET /doctor/dashboard/?filter=30days&appointment_filter=30days HTTP/1.1" 500 99536
+ERROR 2025-06-09 11:44:22,928 log Internal Server Error: /doctor/dashboard/
+Traceback (most recent call last):
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\hms\views.py", line 310, in doctor_dashboard
+    opd_chart_labels = []
+                          
+UnboundLocalError: cannot access local variable 'appointment_chart_labels' where it is not associated with a value
+ERROR 2025-06-09 11:44:22,929 basehttp "GET /doctor/dashboard/?filter=30days&appointment_filter=30days HTTP/1.1" 500 99536
+INFO 2025-06-09 11:45:37,424 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-06-09 11:45:38,246 autoreload Watching for file changes with StatReloader
+INFO 2025-06-09 11:45:41,886 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-06-09 11:45:42,731 autoreload Watching for file changes with StatReloader
+INFO 2025-06-09 11:45:43,914 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-06-09 11:45:44,546 autoreload Watching for file changes with StatReloader
+INFO 2025-06-09 11:45:47,744 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-06-09 11:45:48,570 autoreload Watching for file changes with StatReloader
+ERROR 2025-06-09 11:45:50,029 log Internal Server Error: /doctor/dashboard/
+Traceback (most recent call last):
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\hms\views.py", line 254, in doctor_dashboard
+    count = next((item['count'] for item in appointments if item['day'] == day), 0)
+                                            ^^^^^^^^^^^^
+UnboundLocalError: cannot access local variable 'appointments' where it is not associated with a value
+ERROR 2025-06-09 11:45:50,031 basehttp "GET /doctor/dashboard/?filter=30days&appointment_filter=30days HTTP/1.1" 500 98691
+INFO 2025-06-09 11:46:38,978 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-06-09 11:46:39,999 autoreload Watching for file changes with StatReloader
+INFO 2025-06-09 11:46:42,028 basehttp "GET /doctor/dashboard/?filter=30days&appointment_filter=30days HTTP/1.1" 200 39978
+INFO 2025-06-09 11:46:46,617 basehttp "GET /doctor/dashboard/?filter=today&ajax=1 HTTP/1.1" 200 176
+INFO 2025-06-09 11:46:49,506 basehttp "GET /doctor/dashboard/?filter=7days&ajax=1 HTTP/1.1" 200 332
+INFO 2025-06-09 11:52:44,656 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-06-09 11:52:45,631 autoreload Watching for file changes with StatReloader
+INFO 2025-06-09 11:52:54,514 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-06-09 11:52:55,355 autoreload Watching for file changes with StatReloader
+INFO 2025-06-09 11:53:00,245 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-06-09 11:53:01,107 autoreload Watching for file changes with StatReloader
+INFO 2025-06-09 11:53:19,320 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-06-09 11:53:20,216 autoreload Watching for file changes with StatReloader
+INFO 2025-06-09 11:53:39,234 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-06-09 11:53:40,065 autoreload Watching for file changes with StatReloader
+INFO 2025-06-09 11:53:56,121 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-06-09 11:53:56,902 autoreload Watching for file changes with StatReloader
+INFO 2025-06-09 11:53:59,608 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-06-09 11:54:00,476 autoreload Watching for file changes with StatReloader
+INFO 2025-06-09 11:54:07,194 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-06-09 11:54:08,014 autoreload Watching for file changes with StatReloader
+INFO 2025-06-09 11:54:30,161 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-06-09 11:54:31,168 autoreload Watching for file changes with StatReloader
+INFO 2025-06-09 11:54:54,407 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-06-09 11:54:55,237 autoreload Watching for file changes with StatReloader
+INFO 2025-06-09 11:55:02,926 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-06-09 11:55:03,761 autoreload Watching for file changes with StatReloader
+INFO 2025-06-09 11:55:09,423 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-06-09 11:55:10,320 autoreload Watching for file changes with StatReloader
+INFO 2025-06-09 11:55:19,056 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-06-09 11:55:19,896 autoreload Watching for file changes with StatReloader
+INFO 2025-06-09 11:55:22,091 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-06-09 11:55:22,751 autoreload Watching for file changes with StatReloader
+INFO 2025-06-09 11:55:25,956 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-06-09 11:55:26,602 autoreload Watching for file changes with StatReloader
+INFO 2025-06-09 11:55:29,343 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-06-09 11:55:30,203 autoreload Watching for file changes with StatReloader
+INFO 2025-06-09 11:55:33,905 basehttp "GET /doctor/dashboard/?filter=30days&appointment_filter=30days HTTP/1.1" 200 43916
+INFO 2025-06-09 11:55:34,778 basehttp "GET /doctor/dashboard/?filter=30days&appointment_filter=30days HTTP/1.1" 200 43916
+INFO 2025-06-09 11:55:58,213 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-06-09 11:55:58,943 autoreload Watching for file changes with StatReloader
+INFO 2025-06-09 11:56:01,667 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-06-09 11:56:02,402 autoreload Watching for file changes with StatReloader
+INFO 2025-06-09 11:56:07,990 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-06-09 11:56:08,791 autoreload Watching for file changes with StatReloader
+INFO 2025-06-09 11:56:19,592 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-06-09 11:56:20,382 autoreload Watching for file changes with StatReloader
+INFO 2025-06-09 11:56:25,012 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-06-09 11:56:25,820 autoreload Watching for file changes with StatReloader
+INFO 2025-06-09 11:56:43,907 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-06-09 11:56:44,711 autoreload Watching for file changes with StatReloader
+INFO 2025-06-09 11:56:47,936 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-06-09 11:56:48,632 autoreload Watching for file changes with StatReloader
+INFO 2025-06-09 11:56:50,303 basehttp "GET /doctor/dashboard/?filter=30days&appointment_filter=30days HTTP/1.1" 200 43916
+INFO 2025-06-09 11:56:50,919 basehttp "GET /doctor/dashboard/?filter=30days&appointment_filter=30days HTTP/1.1" 200 43916
+INFO 2025-06-09 11:56:51,656 basehttp "GET /doctor/dashboard/?filter=30days&appointment_filter=30days HTTP/1.1" 200 43916
+INFO 2025-06-09 11:57:37,709 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-06-09 11:57:38,508 autoreload Watching for file changes with StatReloader
+INFO 2025-06-09 11:57:44,237 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-06-09 11:57:44,995 autoreload Watching for file changes with StatReloader
+INFO 2025-06-09 11:57:47,750 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-06-09 11:57:48,519 autoreload Watching for file changes with StatReloader
+INFO 2025-06-09 11:57:50,336 basehttp "GET /doctor/dashboard/?filter=30days&appointment_filter=30days HTTP/1.1" 200 43916
+INFO 2025-06-09 11:57:54,370 basehttp "GET /doctor/dashboard/?filter=today&ajax=1 HTTP/1.1" 200 42782
+INFO 2025-06-09 11:57:57,015 basehttp "GET /doctor/dashboard/?filter=7days&ajax=1 HTTP/1.1" 200 43318
+INFO 2025-06-09 11:58:01,554 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-06-09 11:58:02,598 autoreload Watching for file changes with StatReloader
+INFO 2025-06-09 11:59:01,756 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-06-09 11:59:02,608 autoreload Watching for file changes with StatReloader
+INFO 2025-06-09 11:59:10,178 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-06-09 11:59:10,976 autoreload Watching for file changes with StatReloader
+INFO 2025-06-09 11:59:15,392 basehttp "GET /admin/login/?next=/admin/ HTTP/1.1" 200 3696
+ERROR 2025-06-09 11:59:16,428 log Internal Server Error: /doctor/dashboard/
+Traceback (most recent call last):
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\hms\views.py", line 245, in doctor_dashboard
+    med_counter = Counter(med_types)
+                  ^^^^^^^
+NameError: name 'Counter' is not defined. Did you mean: 'Count'?
+ERROR 2025-06-09 11:59:16,435 basehttp "GET /doctor/dashboard/?filter=30days&appointment_filter=30days HTTP/1.1" 500 100029
+ERROR 2025-06-09 11:59:17,120 log Internal Server Error: /doctor/dashboard/
+Traceback (most recent call last):
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\hms\views.py", line 245, in doctor_dashboard
+    med_counter = Counter(med_types)
+                  ^^^^^^^
+NameError: name 'Counter' is not defined. Did you mean: 'Count'?
+ERROR 2025-06-09 11:59:17,126 basehttp "GET /doctor/dashboard/?filter=30days&appointment_filter=30days HTTP/1.1" 500 100029
+INFO 2025-06-09 11:59:23,584 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-06-09 11:59:24,559 autoreload Watching for file changes with StatReloader
+INFO 2025-06-09 11:59:29,982 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-06-09 11:59:30,821 autoreload Watching for file changes with StatReloader
+INFO 2025-06-09 11:59:34,184 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-06-09 11:59:34,987 autoreload Watching for file changes with StatReloader
+INFO 2025-06-09 12:00:56,554 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-06-09 12:00:57,301 autoreload Watching for file changes with StatReloader
+INFO 2025-06-09 12:00:59,034 basehttp "GET /doctor/dashboard/?filter=30days&appointment_filter=30days HTTP/1.1" 200 43916
+INFO 2025-06-09 12:01:03,929 basehttp "GET /doctor/dashboard/?filter=7days&ajax=1 HTTP/1.1" 200 332
+INFO 2025-06-09 12:01:06,786 basehttp "GET /doctor/dashboard/?filter=today&ajax=1 HTTP/1.1" 200 176
+INFO 2025-06-09 12:01:11,484 basehttp "GET /doctor/dashboard/?filter=30days&appointment_filter=30days HTTP/1.1" 200 43916
+INFO 2025-06-09 12:01:11,651 basehttp "GET /doctor/dashboard/?filter=30days&appointment_filter=30days HTTP/1.1" 200 43916
+INFO 2025-06-09 12:01:11,828 basehttp "GET /doctor/dashboard/?filter=30days&appointment_filter=30days HTTP/1.1" 200 43916
+INFO 2025-06-09 12:01:12,255 basehttp "GET /doctor/dashboard/?filter=30days&appointment_filter=30days HTTP/1.1" 200 43916
+INFO 2025-06-09 12:01:12,422 basehttp "GET /doctor/dashboard/?filter=30days&appointment_filter=30days HTTP/1.1" 200 43916
+INFO 2025-06-09 12:01:12,604 basehttp "GET /doctor/dashboard/?filter=30days&appointment_filter=30days HTTP/1.1" 200 43916
+INFO 2025-06-09 12:01:12,751 basehttp "GET /doctor/dashboard/?filter=30days&appointment_filter=30days HTTP/1.1" 200 43916
+INFO 2025-06-09 12:01:45,655 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-06-09 12:01:46,468 autoreload Watching for file changes with StatReloader
+ERROR 2025-06-09 12:01:47,990 log Internal Server Error: /doctor/dashboard/
+Traceback (most recent call last):
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\venv\Lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Hospital_Management\hospital_management\hms\views.py", line 250, in doctor_dashboard
+    count = next((item['count'] for item in appointments if item['day'] == day), 0)
+                                            ^^^^^^^^^^^^
+UnboundLocalError: cannot access local variable 'appointments' where it is not associated with a value
+ERROR 2025-06-09 12:01:47,993 basehttp "GET /doctor/dashboard/?filter=30days&appointment_filter=30days HTTP/1.1" 500 98691
+INFO 2025-06-09 12:02:03,567 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-06-09 12:02:04,414 autoreload Watching for file changes with StatReloader
+INFO 2025-06-09 12:03:15,824 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-06-09 12:03:16,686 autoreload Watching for file changes with StatReloader
+INFO 2025-06-09 12:03:18,558 basehttp "GET /doctor/dashboard/?filter=30days&appointment_filter=30days HTTP/1.1" 200 43916
+INFO 2025-06-09 12:03:34,101 basehttp "GET /doctor/dashboard/?filter=today&ajax=1 HTTP/1.1" 200 42782
+INFO 2025-06-09 12:04:08,161 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-06-09 12:04:08,916 autoreload Watching for file changes with StatReloader
+INFO 2025-06-09 12:05:45,787 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-06-09 12:05:46,622 autoreload Watching for file changes with StatReloader
+INFO 2025-06-09 12:05:48,904 basehttp "GET /doctor/dashboard/?filter=30days&appointment_filter=30days HTTP/1.1" 200 43916
+INFO 2025-06-09 12:05:49,238 basehttp "GET /doctor/dashboard/?filter=30days&appointment_filter=30days HTTP/1.1" 200 43916
+INFO 2025-06-09 12:05:52,667 basehttp "GET /doctor/dashboard/?filter=today&ajax=1 HTTP/1.1" 200 176
+INFO 2025-06-09 12:05:55,902 basehttp "GET /doctor/dashboard/?filter=7days&ajax=1 HTTP/1.1" 200 332
+INFO 2025-06-09 12:16:42,060 basehttp "GET /doctor/dashboard/?filter=30days&appointment_filter=30days HTTP/1.1" 200 43909
+INFO 2025-06-09 12:16:48,997 basehttp "GET /doctor/dashboard/?filter=today&ajax=1 HTTP/1.1" 200 176
+INFO 2025-06-09 12:16:52,777 basehttp "GET /doctor/dashboard/?filter=7days&ajax=1 HTTP/1.1" 200 332
+INFO 2025-06-09 12:17:48,312 basehttp "GET /doctor/dashboard/?filter=30days&appointment_filter=30days HTTP/1.1" 200 43909
+INFO 2025-06-09 12:17:48,868 basehttp "GET /doctor/dashboard/?filter=30days&appointment_filter=30days HTTP/1.1" 200 43909
+INFO 2025-06-09 12:17:53,310 basehttp "GET /doctor/dashboard/?filter=30days&appointment_filter=30days HTTP/1.1" 200 43909
+INFO 2025-06-09 12:17:53,824 basehttp "GET /doctor/dashboard/?filter=30days&appointment_filter=30days HTTP/1.1" 200 43909
+INFO 2025-06-09 12:17:54,257 basehttp "GET /doctor/dashboard/?filter=30days&appointment_filter=30days HTTP/1.1" 200 43909
+INFO 2025-06-09 12:18:25,226 basehttp "GET /doctor/dashboard/?filter=30days&appointment_filter=30days HTTP/1.1" 200 43909
+INFO 2025-06-09 12:18:25,669 basehttp "GET /doctor/dashboard/?filter=30days&appointment_filter=30days HTTP/1.1" 200 43909
+INFO 2025-06-09 12:18:26,183 basehttp "GET /doctor/dashboard/?filter=30days&appointment_filter=30days HTTP/1.1" 200 43909
+INFO 2025-06-09 12:18:26,355 basehttp "GET /doctor/dashboard/?filter=30days&appointment_filter=30days HTTP/1.1" 200 43909
+INFO 2025-06-09 12:18:26,502 basehttp "GET /doctor/dashboard/?filter=30days&appointment_filter=30days HTTP/1.1" 200 43909
+INFO 2025-06-09 12:18:26,799 basehttp - Broken pipe from ('127.0.0.1', 53586)
+INFO 2025-06-09 12:18:26,821 basehttp "GET /doctor/dashboard/?filter=30days&appointment_filter=30days HTTP/1.1" 200 43909
+INFO 2025-06-09 12:18:32,235 basehttp "GET /doctor/dashboard/?filter=30days&appointment_filter=30days HTTP/1.1" 200 43909
+INFO 2025-06-09 12:18:32,490 basehttp "GET /doctor/dashboard/?filter=30days&appointment_filter=30days HTTP/1.1" 200 43909
+INFO 2025-06-09 12:18:32,638 basehttp "GET /doctor/dashboard/?filter=30days&appointment_filter=30days HTTP/1.1" 200 43909
+INFO 2025-06-09 12:21:46,373 basehttp "GET /doctor/dashboard/?filter=30days&appointment_filter=30days HTTP/1.1" 200 43909
+INFO 2025-06-09 12:22:17,727 basehttp "GET /doctor/dashboard/?filter=today&ajax=1 HTTP/1.1" 200 176
+INFO 2025-06-09 12:22:20,706 basehttp "GET /doctor/dashboard/?filter=7days&ajax=1 HTTP/1.1" 200 332
+INFO 2025-06-09 12:25:29,480 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-06-09 12:25:30,383 autoreload Watching for file changes with StatReloader
+INFO 2025-06-09 12:25:43,280 autoreload D:\Hospital_Management\hospital_management\hms\views.py changed, reloading.
+INFO 2025-06-09 12:25:44,122 autoreload Watching for file changes with StatReloader
+INFO 2025-06-09 12:25:56,941 basehttp "GET / HTTP/1.1" 200 41154
+INFO 2025-06-09 12:26:56,776 basehttp "GET /doctor/dashboard/ HTTP/1.1" 200 43357
+INFO 2025-06-09 12:27:05,639 basehttp "GET /doctor/dashboard/?filter=today&ajax=1 HTTP/1.1" 200 176
+INFO 2025-06-09 12:27:17,283 basehttp "GET /patients/ HTTP/1.1" 200 32044
+INFO 2025-06-09 12:27:17,615 basehttp "GET /api/fetch-patients/ HTTP/1.1" 200 2307
+INFO 2025-06-09 12:27:22,516 basehttp "GET /api/fetch-patients/ HTTP/1.1" 200 2307
+INFO 2025-06-09 12:27:24,653 basehttp "GET // HTTP/1.1" 200 41154
+INFO 2025-06-09 12:27:31,606 basehttp "GET /patients/ HTTP/1.1" 200 32044
+INFO 2025-06-09 12:27:31,804 basehttp "GET /api/fetch-patients/ HTTP/1.1" 200 2307
+INFO 2025-06-09 12:27:33,153 basehttp "GET /doctor/dashboard/ HTTP/1.1" 200 43357

@@ -15,6 +15,7 @@ from django.views import View
 from django.db.models import Q
 from operator import attrgetter
 from django.http import Http404
+from collections import Counter
 from django.utils import timezone
 from collections import defaultdict
 from reportlab.pdfgen import canvas
@@ -187,72 +188,112 @@ def group_required(*group_names):
         return user.is_authenticated and (user.is_superuser or bool(user.groups.filter(name__in=group_names)))
     return user_passes_test(in_groups)
 
-# Example role-based views using the decorator:
-from django.utils import timezone
-from datetime import timedelta
-from collections import Counter
-from django.db.models.functions import TruncDate
-from django.db.models import Count
+
 @login_required
 @group_required('Doctor')
 def doctor_dashboard(request):
     doctor = request.user.doctor
-    # print("Doctor:", doctor)  # Debugging line
-    # IPD
-    ipd_patients = IPD.objects.filter(discharge_date__isnull=True).select_related('patient', 'room')
-    # Appointments Today
     today = timezone.localdate()
-    print("Today's date:", today)  # Debugging line
-    todays_appointments = Appointment.objects.filter(doctor=doctor,date=today)
 
-    # Last 7 days appointment stats
-    seven_days_ago = timezone.now().date() - timedelta(days=6)
+    filter_type = request.GET.get('filter', '7days')
 
-    appointments_last_7_days = (
-        Appointment.objects.filter(doctor=doctor, date__gte=seven_days_ago)
+    if filter_type == 'today':
+        start_date = today
+        end_date = today
+    elif filter_type == '30days':
+        start_date = today - timedelta(days=29)
+        end_date = today
+    else:
+        start_date = today - timedelta(days=6)
+        end_date = today
+
+    days_diff = (end_date - start_date).days + 1
+
+    # IPD Patients currently admitted
+    ipd_patients = IPD.objects.filter(discharge_date__isnull=True).select_related('patient', 'room')
+
+    # Today's Appointments
+    todays_appointments = Appointment.objects.filter(doctor=doctor, date=today)
+
+    # Appointments chart data
+    appointments = (
+        Appointment.objects.filter(doctor=doctor, date__range=(start_date, end_date))
         .annotate(day=TruncDate('date'))
         .values('day')
         .annotate(count=Count('id'))
         .order_by('day')
     )
-
-    # Prepare labels and counts for Chart.js
     appointment_chart_labels = []
     appointment_chart_counts = []
-    for i in range(7):
-        day = seven_days_ago + timedelta(days=i)
-        appointment_chart_labels.append(day.strftime('%a'))  # Mon, Tue, etc.
-        count = next((item['count'] for item in appointments_last_7_days if item['day'] == day), 0)
+    for i in range(days_diff):
+        day = start_date + timedelta(days=i)
+        appointment_chart_labels.append(day.strftime('%a %d'))
+        count = next((item['count'] for item in appointments if item['day'] == day), 0)
         appointment_chart_counts.append(count)
 
-    # Vitals
-    recent_vitals = NICUVitals.objects.filter(ipd__patient__assigned_doctor=doctor).order_by('-date', '-time')[:5]
+    # Recent Vitals
+    recent_vitals = NICUVitals.objects.filter(
+        ipd__patient__assigned_doctor=doctor
+    ).order_by('-date', '-time')[:5]
 
-    # Medications
-    active_medications = NICUMedicationRecord.objects.filter(patient__assigned_doctor=doctor).order_by('-timestamp')[:10]
+    # Active Medications for assigned patients
+    active_medications = NICUMedicationRecord.objects.filter(
+        patient__assigned_doctor=doctor
+    ).select_related('medicine', 'patient').order_by('-timestamp')[:10]
 
-    # Group medication types for chart
+    # Medication type chart
     med_types = [med.medicine.medicine_type if med.medicine else 'Unknown' for med in active_medications]
     med_counter = Counter(med_types)
     med_chart_labels = list(med_counter.keys())
     med_chart_counts = list(med_counter.values())
 
-    # Emergency
-    emergency_cases = EmergencyCase.objects.filter(Q(status='Pending') | Q(status='Admitted')).order_by('-admitted_on')
+    # Emergency Cases
+    emergency_cases = EmergencyCase.objects.filter(
+        Q(status='Pending') | Q(status='Admitted')
+    ).order_by('-admitted_on')
 
+    # Optional OPD filter (new/followup/emergency)
+    opd_query = OPD.objects.filter(doctor=doctor)
+    if filter_type == 'new':
+        opd_query = opd_query.filter(visit_type='new')
+    elif filter_type == 'followup':
+        opd_query = opd_query.filter(visit_type='followup')
+    elif filter_type == 'emergency':
+        opd_query = opd_query.filter(visit_type='emergency')
 
+    # OPD visits for 
+    recent_opd_visits = OPD.objects.filter(
+        doctor=doctor,
+        visit_date__date__range=(start_date, end_date)
+    ).select_related('patient__user').order_by('-visit_date')[:10]
 
-    print("Doctor:", doctor)
-    print("Today's Appointments:", todays_appointments)
-    print("IPD Patients:", ipd_patients)
-    print("Recent Vitals:", recent_vitals)
-    print("Active Medications:", active_medications)
-    print("Emergency Cases:", emergency_cases)
-    print("Appointment Chart Labels:", appointment_chart_labels)
-    print("Appointment Chart Counts:", appointment_chart_counts)
-    print("Medication Chart Labels:", med_chart_labels)
-    print("Medication Chart Counts:", med_chart_counts)
+    opd_visits = (
+        opd_query.filter(visit_date__date__range=(start_date, end_date))
+        .annotate(day=TruncDate('visit_date'))
+        .values('day')
+        .annotate(count=Count('id'))
+        .order_by('day')
+    )
+    opd_chart_labels = []
+    opd_chart_counts = []
+    for i in range(days_diff):
+        day = start_date + timedelta(days=i)
+        opd_chart_labels.append(day.strftime('%a %d'))
+        count = next((item['count'] for item in opd_visits if item['day'] == day), 0)
+        opd_chart_counts.append(count)
 
+    # AJAX response for chart update
+    if request.GET.get('ajax') == '1':
+        return JsonResponse({
+            'appointment_chart_labels': appointment_chart_labels,
+            'appointment_chart_counts': appointment_chart_counts,
+            'opd_chart_labels': opd_chart_labels,
+            'opd_chart_counts': opd_chart_counts,
+            'week_start': start_date.strftime('%b %d'),
+            'week_end': end_date.strftime('%b %d'),
+        })
+
+    # Full page render context
     context = {
         'doctor': doctor,
         'ipd_patients': ipd_patients,
@@ -264,9 +305,19 @@ def doctor_dashboard(request):
         'appointment_chart_counts': appointment_chart_counts,
         'med_chart_labels': med_chart_labels,
         'med_chart_counts': med_chart_counts,
+        'opd_visits': opd_visits,
+        'opd_visit_count': opd_visits.count(),
+        'opd_chart_labels': opd_chart_labels,
+        'opd_chart_counts': opd_chart_counts,
+        'current_filter': filter_type,
+        'week_start': start_date,
+        'week_end': end_date,
+        'recent_opd_visits': recent_opd_visits,
     }
 
-    return render(request, 'hms/doctor/doctor_dashboard.html', context)
+    return render(request, 'hms/doctor/doctor_dashboard.html', context) 
+
+
 
 
 @login_required
