@@ -67,18 +67,112 @@
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-100 text-sm">
-                    {% for medication in medications %}
+    {% for medication in medications %}
+        {% if medication.medicine.medicine_type != 'syrup' %}
+        <tr class="text-gray-700 hover:bg-blue-50 transition-colors group">
+            <td class="px-6 py-4 text-center font-medium">{{ forloop.counter }}</td>
+            <td class="px-6 py-4 font-medium text-blue-600">{{ medication.medicine }}</td>
+            <td class="px-6 py-4 text-center">{{ medication.calculated_dose_per_day|floatformat:2 }} mg</td>
+            <td class="px-6 py-4 text-center">{{ medication.calculated_dose_per_dose|floatformat:2 }} mg</td>
+            <td class="px-6 py-4 text-center">{{ medication.take_from_medicine_vial|floatformat:2 }} ml</td>
+            <td class="px-6 py-4 text-center">{{ medication.vial }}</td>
+            <td class="px-6 py-4 text-center">{{ medication.calculated_dose_per_dose_ml }} ml</td>
+            <td class="px-6 py-4 text-center">{{ medication.take }} ml</td>
+            <td class="px-6 py-4 text-center">{{ medication.dilution_volume }} ml</td>
+            <td class="px-6 py-4 text-center">{{ medication.diluent.name }}</td>
+            <td class="px-6 py-4">{{ medication.get_route_display }}</td>
+            <td class="px-6 py-4">
+                {% if medication.dose_frequency == "OTHER" %}
+                    <span class="badge-secondary">{{ medication.other_frequency }}</span>
+                {% else %}
+                    <span class="badge-primary">{{ medication.get_dose_frequency_display }}</span>
+                {% endif %}
+            </td>
+            <td class="px-6 py-4 text-center">{{ medication.calculated_ml|floatformat:2 }} ml</td>
+            <td class="px-6 py-4 text-center">{{ medication.calculated_infusion_rate }} ml/hr</td>
+            <td class="px-6 py-4 text-center">{{ medication.frequency_of_dose }} min</td>
+            <td class="px-6 py-4 text-center">{{ medication.frequency_of_dose_given|floatformat:2 }} ml/min</td>
+            <td class="px-6 py-4 text-center">{{ medication.set_in_mchine|floatformat:2 }} ml/hr</td>
+            <td class="px-6 py-4 font-medium whitespace-nowrap">{{ medication.sign }}</td>
+            <td class="px-6 py-4 text-center">
+                <a href="{% url 'nicu_medication_edit' medication.id %}"
+                   class="text-blue-600 hover:text-blue-800 transition duration-200" title="Edit">
+                   <i class="fas fa-edit"></i>
+                </a>
+                <form action="{% url 'nicu_medication_delete' medication.id %}" method="POST"
+                      onsubmit="return confirm('Are you sure?')" class="inline">
+                    {% csrf_token %}
+                    <button type="submit" class="text-red-600 hover:text-red-800 transition duration-200"
+                            title="Delete">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </form>
+            </td>
+        </tr>
+        {% endif %}
+    {% empty %}
+    <tr>
+        <td colspan="18" class="px-6 py-8 text-center text-gray-500">
+            <div class="flex flex-col items-center justify-center gap-2">
+                <i class="fas fa-pills text-3xl text-gray-300"></i>
+                <p>No medication records found</p>
+                <a href="{% url 'nicu_medication_add' ipd_id %}" class="btn-primary mt-2 inline-flex items-center gap-2">
+                    <i class="fas fa-plus"></i> Add First Medication
+                </a>
+            </div>
+        </td>
+    </tr>
+    {% endfor %}
+</tbody>
+
+            </table>
+        </div>
+    </div>
+    <!-- Syrup Medications Table -->
+<div class="flex items-center gap-3">
+    <h3 class="text-xl font-semibold text-gray-800">Syrup Medications</h3>
+    <span class="badge-primary">{{ medications|length }} record{{ medications|pluralize }}</span>
+</div>
+<div class="overflow-x-auto rounded-xl border border-gray-100 shadow-sm mb-6">
+    <table class="w-full min-w-max">
+        <thead class="bg-gradient-to-r from-blue-600 to-blue-700 text-white">
+            <tr class="text-xs font-semibold tracking-wider">
+                <th class="px-6 py-3 text-center">S.No.</th>
+                <th class="px-6 py-3 text-left">Medicine</th>
+                <th class="px-6 py-3 text-center">Dose (mg/kg/day)</th>
+                <th class="px-6 py-3 text-center">Per Dose (mg/kg/dose)</th>
+                {% comment %} <th class="px-6 py-3 text-center">Take from medicine vial</th> {% endcomment %}
+                {% comment %} <th class="px-6 py-3 text-center">Vial</th> {% endcomment %}
+                {% comment %} <th class="px-6 py-3 text-center">Dilute In</th> {% endcomment %}
+                {% comment %} <th class="px-6 py-3 text-center">Take from vial</th> {% endcomment %}
+                {% comment %} <th class="px-6 py-3 text-center">Dilution Volume</th> {% endcomment %}
+                {% comment %} <th class="px-6 py-3 text-center">Diluent</th> {% endcomment %}
+                <th class="px-6 py-3 text-left">Route</th>
+                <th class="px-6 py-3 text-left">Dose Frequency</th>
+                {% comment %} <th class="px-6 py-3 text-center">Total fluid given in 1 hour</th> {% endcomment %}
+                {% comment %} <th class="px-6 py-3 text-center">Infusion Rate</th> {% endcomment %}
+                {% comment %} <th class="px-6 py-3 text-center">Fluid given in</th> {% endcomment %}
+                {% comment %} <th class="px-6 py-3 text-center">Fluid given</th> {% endcomment %}
+                {% comment %} <th class="px-6 py-3 text-center">Set machine at</th> {% endcomment %}
+                <th class="px-6 py-3 text-left whitespace-nowrap">Notes</th>
+                <th class="px-6 py-3 text-center">Actions</th>
+            </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-100 text-sm">
+            {% with syrup_medications=medications|dictsort:"id" %}
+                {% for medication in syrup_medications %}
+                    {% if medication.medicine.medicine_type == 'syrup' %}
                     <tr class="text-gray-700 hover:bg-blue-50 transition-colors group">
                         <td class="px-6 py-4 text-center font-medium">{{ forloop.counter }}</td>
                         <td class="px-6 py-4 font-medium text-blue-600">{{ medication.medicine }}</td>
                         <td class="px-6 py-4 text-center">{{ medication.calculated_dose_per_day|floatformat:2 }} mg</td>
                         <td class="px-6 py-4 text-center">{{ medication.calculated_dose_per_dose|floatformat:2 }} mg</td>
-                        <td class="px-6 py-4 text-center">{{ medication.take_from_medicine_vial|floatformat:2 }} ml</td>
-                        <td class="px-6 py-4 text-center">{{ medication.vial }}</td>
-                        <td class="px-6 py-4 text-center">{{ medication.calculated_dose_per_dose_ml }} ml</td>
-                        <td class="px-6 py-4 text-center">{{ medication.take }} ml</td>
-                        <td class="px-6 py-4 text-center">{{ medication.dilution_volume }} ml</td>
-                        <td class="px-6 py-4 text-center">{{ medication.diluent.name }}</td>
+                        {% comment %} <td class="px-6 py-4 text-center">{{ medication.take_from_medicine_vial|floatformat:2 }} ml</td> {% endcomment %}
+                        {% comment %} <td class="px-6 py-4 text-center">{{ medication.vial }}</td> {% endcomment %}
+                        {% comment %} <td class="px-6 py-4 text-center">{{ medication.calculated_dose_per_dose_ml }} ml</td> {% endcomment %}
+                        {% comment %} <td class="px-6 py-4 text-center">{{ medication.take }} ml</td> {% endcomment %}
+                        {% comment %} <td class="px-6 py-4 text-center">{{ medication.dilution_volume }} ml</td> {% endcomment %}
+                        {% comment %} <td class="px-6 py-4 text-center">{{ medication.diluent.name }}</td> {% endcomment %}
                         <td class="px-6 py-4">{{ medication.get_route_display }}</td>
                         <td class="px-6 py-4">
                             {% if medication.dose_frequency == "OTHER" %}
@@ -87,11 +181,11 @@
                             <span class="badge-primary">{{ medication.get_dose_frequency_display }}</span>
                             {% endif %}
                         </td>
-                        <td class="px-6 py-4 text-center">{{ medication.calculated_ml|floatformat:2 }} ml</td>
-                        <td class="px-6 py-4 text-center">{{ medication.calculated_infusion_rate }} ml/hr</td>
-                        <td class="px-6 py-4 text-center">{{ medication.frequency_of_dose }} min</td>
-                        <td class="px-6 py-4 text-center">{{ medication.frequency_of_dose_given|floatformat:2 }} ml/min</td>
-                        <td class="px-6 py-4 text-center">{{ medication.set_in_mchine|floatformat:2 }} ml/hr</td>
+                        {% comment %} <td class="px-6 py-4 text-center">{{ medication.calculated_ml|floatformat:2 }} ml</td> {% endcomment %}
+                        {% comment %} <td class="px-6 py-4 text-center">{{ medication.calculated_infusion_rate }} ml/hr</td> {% endcomment %}
+                        {% comment %} <td class="px-6 py-4 text-center">{{ medication.frequency_of_dose }} min</td> {% endcomment %}
+                        {% comment %} <td class="px-6 py-4 text-center">{{ medication.frequency_of_dose_given|floatformat:2 }} ml/min</td> {% endcomment %}
+                        {% comment %} <td class="px-6 py-4 text-center">{{ medication.set_in_mchine|floatformat:2 }} ml/hr</td> {% endcomment %}
                         <td class="px-6 py-4 font-medium whitespace-nowrap">{{ medication.sign }}</td>
                         <td class="px-6 py-4 text-center">
                             <a href="{% url 'nicu_medication_edit' medication.id %}"
@@ -107,26 +201,22 @@
                                 </button>
                             </form>
                         </td>
-                        </td>
                     </tr>
-                    {% empty %}
-                    <tr>
-                        <td colspan="18" class="px-6 py-8 text-center text-gray-500">
-                            <div class="flex flex-col items-center justify-center gap-2">
-                                <i class="fas fa-pills text-3xl text-gray-300"></i>
-                                <p>No medication records found</p>
-                                <a href="{% url 'nicu_medication_add' ipd_id %}" class="btn-primary mt-2 inline-flex items-center gap-2">
-                                    <i class="fas fa-plus"></i> Add First Medication
-                                </a>
-                            </div>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    </div>
-
+                    {% endif %}
+                {% empty %}
+                <tr>
+                    <td colspan="18" class="px-6 py-8 text-center text-gray-500">
+                        <div class="flex flex-col items-center justify-center gap-2">
+                            <i class="fas fa-pills text-3xl text-gray-300"></i>
+                            <p>No syrup medication records found</p>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            {% endwith %}
+        </tbody>
+    </table>
+</div>
     <!-- Fluid Requirements Section -->
     <div>
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-3">

@@ -368,11 +368,7 @@ def register_patient(request):
                     date_of_birth=form.cleaned_data['date_of_birth'],
                     aadhar_number=form.cleaned_data['aadhar_number'],
                     blood_group=form.cleaned_data['blood_group'],
-<<<<<<< HEAD
                     weight=form.cleaned_data.get('weight'),
-=======
-                    weight=form.cleaned_data.get('weight'),  # ✅ Add this line
->>>>>>> 8def213117a19109122b0ebb92dbd88ac1082f45
                     allergies=form.cleaned_data.get('allergies', ''),
                     medical_history=form.cleaned_data.get('medical_history', ''),
                     current_medications=form.cleaned_data.get('current_medications', ''),
@@ -1208,11 +1204,8 @@ def admit_emergency_patient(request, emergency_id):
 # IPD Views
 @login_required
 def ipd(request):
-<<<<<<< HEAD
     ipds = IPD.objects.all().order_by('-admitted_on')
-=======
-    ipds = IPD.objects.all().order_by('-admitted_on')  # latest first
->>>>>>> 8def213117a19109122b0ebb92dbd88ac1082f45
+
     room = Room.objects.all()
     return render(request, 'hms/ipd/ipd.html', {'ipds': ipds, 'room': room})
 
