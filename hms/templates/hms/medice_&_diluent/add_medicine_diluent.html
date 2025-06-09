@@ -3,7 +3,7 @@
 {% block content %}
 <div class="container-fluid px-4 py-4">
     <div class="row justify-content-center">
-        <div class="col-xl-10 col-lg-12">
+        <div class="col-xl-20 col-lg-20">
             <!-- Header Section -->
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <div>
@@ -115,69 +115,713 @@
                                     <i class="fas fa-plus-circle me-2"></i>
                                     Add New Medicine
                                 </h5>
+
                             </div>
+                            <!-- Scrollable Button Group Container -->
+                            <div class="my-3" style="overflow-x: auto; white-space: nowrap;">
+                                <div class="btn-group" role="group" id="medicineTypeSelector" style="min-width: max-content;">
+                                    <button type="button" class="btn btn-outline-secondary me-1" data-type="injection">Injection</button>
+                                    <button type="button" class="btn btn-outline-secondary me-1" data-type="syrup">Syrup</button>
+                                    <button type="button" class="btn btn-outline-secondary me-1" data-type="tablet">Tablet</button>
+                                    <button type="button" class="btn btn-outline-secondary me-1" data-type="drop">Drop</button>
+                                    <button type="button" class="btn btn-outline-secondary me-1" data-type="suspension">Suspension</button>
+                                    <button type="button" class="btn btn-outline-secondary me-1" data-type="fluid">Fluid</button>
+                                    <button type="button" class="btn btn-outline-secondary me-1" data-type="oral">Oral</button>
+                                </div>
+                            </div>
+
                             <div class="card-body">
-                                <form method="post" class="needs-validation" novalidate>
-                                    {% csrf_token %}
-                                    <!-- Medicine Name -->
-                                    <div class="mb-3">
-                                        <label for="id_name" class="form-label fw-bold">Medicine Name</label>
-                                        <div class="input-group">
-                                            <span class="input-group-text bg-light">
-                                                <i class="fas fa-tag text-primary"></i>
-                                            </span>
-                                            <input type="text" class="form-control" id="id_name" name="name" 
-                                                   placeholder="e.g., Amoxicillin" required>
-                                        </div>
+                                <!-- Injection Card -->
+                                <div class="card shadow-sm mb-4 medicine-form-box" data-form-type="injection">
+                                    <div class="card-header bg-primary text-white fw-bold">Injection Form</div>
+                                    <div class="card-body">
+                                        <!-- Paste Injection Form Here -->
+                                         <form method="post" class="needs-validation" novalidate>
+                                                                    {% csrf_token %}
+                                                                    
+                                                                    <!-- Medicine Name -->
+                                                                    <div class="mb-3">
+                                                                        <label for="id_name" class="form-label fw-bold">Medicine Name</label>
+                                                                        <div class="input-group">
+                                                                            <span class="input-group-text bg-light">
+                                                                                <i class="fas fa-tag text-primary"></i>
+                                                                            </span>
+                                                                            <input type="text" class="form-control" id="id_name" name="name" 
+                                                                                value="{{ medicine_form.name.value|default_if_none:'' }}"
+                                                                                placeholder="e.g., Amoxicillin" required>
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <!-- Brand Name -->
+                                                                    <div class="mb-3">
+                                                                        <label for="id_brand" class="form-label fw-bold">Brand</label>
+                                                                        <input type="text" class="form-control" name="brand" id="id_brand"
+                                                                            value="{{ medicine_form.brand.value|default_if_none:'' }}"
+                                                                            placeholder="e.g., Cipla, Sun Pharma">
+                                                                    </div>
+                                                                    <input type="hidden" id="id_medicine_type" name="medicine_type" value="injection" required>
+
+                                                                    <!-- Medicine Type & Injection Option -->
+                                                                    <div class="row g-2">
+                                                                        {% comment %} <div class="col-md-6 mb-3">
+                                                                            <label for="id_medicine_type" class="form-label fw-bold">Type</label>
+                                                                            <select name="medicine_type" id="id_medicine_type" class="form-select" required>
+                                                                                {% for value, label in medicine_form.fields.medicine_type.choices %}
+                                                                                    <option value="{{ value }}" {% if medicine_form.medicine_type.value == value %}selected{% endif %}>
+                                                                                        {{ label }}
+                                                                                    </option>
+                                                                                {% endfor %}
+                                                                            </select>
+                                                                        </div> {% endcomment %}
+
+                                                                        <div class="col-md-6 mb-3">
+                                                                            <div class="form-check form-switch pt-4" id="liquid-injection-checkbox" style="display: none;">
+                                                                                <input type="checkbox" name="is_liquid_injection" id="id_is_liquid_injection" 
+                                                                                    class="form-check-input" role="switch"
+                                                                                    {% if medicine_form.is_liquid_injection.value %}checked{% endif %}>
+                                                                                <label for="id_is_liquid_injection" class="form-check-label fw-bold">Liquid Injection</label>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <!-- Route & Duration -->
+                                                                    <div class="row g-2">
+                                                                        <div class="col-md-6 mb-3">
+                                                                            <label for="id_route" class="form-label fw-bold">Route</label>
+                                                                            <select name="route" id="id_route" class="form-select">
+                                                                                {% for value, label in medicine_form.fields.route.choices %}
+                                                                                    <option value="{{ value }}" {% if medicine_form.route.value == value %}selected{% endif %}>
+                                                                                        {{ label }}
+                                                                                    </option>
+                                                                                {% endfor %}
+                                                                            </select>
+                                                                        </div>
+                                                                        <div class="col-md-6 mb-3">
+                                                                            <label for="id_duration" class="form-label fw-bold">Duration (days)</label>
+                                                                            <input type="number" min="1" name="duration" id="id_duration" 
+                                                                                class="form-control" value="{{ medicine_form.duration.value|default_if_none:'' }}"
+                                                                                placeholder="e.g., 5">
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <!-- Dose & Concentration -->
+                                                                    <div class="row g-2">
+                                                                        <div class="col-md-6 mb-3">
+                                                                            <label for="id_standard_dose_per_kg" class="form-label fw-bold">Standard Dose</label>
+                                                                            <div class="input-group">
+                                                                                <input type="number" step="0.01" name="standard_dose_per_kg" id="id_standard_dose_per_kg" 
+                                                                                    class="form-control" value="{{ medicine_form.standard_dose_per_kg.value|default_if_none:'' }}" required>
+                                                                                <span class="input-group-text bg-light">mg/kg</span>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="col-md-6 mb-3">
+                                                                            <label for="id_concentration_mg_per_ml" class="form-label fw-bold">Concentration</label>
+                                                                            <div class="input-group">
+                                                                                <input type="number" step="0.01" name="concentration_mg_per_ml" id="id_concentration_mg_per_ml" 
+                                                                                    class="form-control" value="{{ medicine_form.concentration_mg_per_ml.value|default_if_none:'' }}" required>
+                                                                                <span class="input-group-text bg-light">mg/mL</span>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <!-- Submit Button -->
+                                                                    <button type="submit" name="add_medicine" class="btn btn-primary w-100 mt-3 py-2 fw-bold">
+                                                                        <i class="fas fa-save me-2"></i> Save Medicine
+                                                                    </button>
+                                                                </form>
+                                    </div>
+                                </div>
+                                <!-- Syrup Card -->
+                                <div class="card shadow-sm mb-4 medicine-form-box" data-form-type="syrup">
+                                    <div class="card-header bg-info text-white fw-bold">Syrup Form</div>
+                                    <div class="card-body">
+                                        <!-- Paste Syrup Form Here -->
+                                         <form method="post" class="needs-validation" novalidate>
+                                                                    {% csrf_token %}
+                                                                    
+                                                                    <!-- Medicine Name -->
+                                                                    <div class="mb-3">
+                                                                        <label for="id_name" class="form-label fw-bold">Medicine Name</label>
+                                                                        <div class="input-group">
+                                                                            <span class="input-group-text bg-light">
+                                                                                <i class="fas fa-tag text-primary"></i>
+                                                                            </span>
+                                                                            <input type="text" class="form-control" id="id_name" name="name" 
+                                                                                value="{{ medicine_form.name.value|default_if_none:'' }}"
+                                                                                placeholder="e.g., Amoxicillin" required>
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <!-- Brand Name -->
+                                                                    <div class="mb-3">
+                                                                        <label for="id_brand" class="form-label fw-bold">Brand</label>
+                                                                        <input type="text" class="form-control" name="brand" id="id_brand"
+                                                                            value="{{ medicine_form.brand.value|default_if_none:'' }}"
+                                                                            placeholder="e.g., Cipla, Sun Pharma">
+                                                                    </div>
+                                                                    <input type="hidden" id="id_medicine_type" name="medicine_type" value="syrup" required>
+
+                                                                    <!-- Medicine Type & Injection Option -->
+                                                                    <div class="row g-2">
+                                                                        {% comment %} <div class="col-md-6 mb-3">
+                                                                            <label for="id_medicine_type" class="form-label fw-bold">Type</label>
+                                                                            <select name="medicine_type" id="id_medicine_type" class="form-select" required>
+                                                                                {% for value, label in medicine_form.fields.medicine_type.choices %}
+                                                                                    <option value="{{ value }}" {% if medicine_form.medicine_type.value == value %}selected{% endif %}>
+                                                                                        {{ label }}
+                                                                                    </option>
+                                                                                {% endfor %}
+                                                                            </select>
+                                                                        </div> {% endcomment %}
+
+                                                                        <div class="col-md-6 mb-3">
+                                                                            <div class="form-check form-switch pt-4" id="liquid-injection-checkbox" style="display: none;">
+                                                                                <input type="checkbox" name="is_liquid_injection" id="id_is_liquid_injection" 
+                                                                                    class="form-check-input" role="switch"
+                                                                                    {% if medicine_form.is_liquid_injection.value %}checked{% endif %}>
+                                                                                <label for="id_is_liquid_injection" class="form-check-label fw-bold">Liquid Injection</label>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <!-- Route & Duration -->
+                                                                    <div class="row g-2">
+                                                                        <div class="col-md-6 mb-3">
+                                                                            <label for="id_route" class="form-label fw-bold">Route</label>
+                                                                            <select name="route" id="id_route" class="form-select">
+                                                                                {% for value, label in medicine_form.fields.route.choices %}
+                                                                                    <option value="{{ value }}" {% if medicine_form.route.value == value %}selected{% endif %}>
+                                                                                        {{ label }}
+                                                                                    </option>
+                                                                                {% endfor %}
+                                                                            </select>
+                                                                        </div>
+                                                                        <div class="col-md-6 mb-3">
+                                                                            <label for="id_duration" class="form-label fw-bold">Duration (days)</label>
+                                                                            <input type="number" min="1" name="duration" id="id_duration" 
+                                                                                class="form-control" value="{{ medicine_form.duration.value|default_if_none:'' }}"
+                                                                                placeholder="e.g., 5">
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <!-- Dose & Concentration -->
+                                                                    <div class="row g-2">
+                                                                        <div class="col-md-6 mb-3">
+                                                                            <label for="id_standard_dose_per_kg" class="form-label fw-bold">Standard Dose</label>
+                                                                            <div class="input-group">
+                                                                                <input type="number" step="0.01" name="standard_dose_per_kg" id="id_standard_dose_per_kg" 
+                                                                                    class="form-control" value="{{ medicine_form.standard_dose_per_kg.value|default_if_none:'' }}" required>
+                                                                                <span class="input-group-text bg-light">mg/ml</span>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="col-md-6 mb-3">
+                                                                            <label for="id_concentration_mg_per_ml" class="form-label fw-bold">Concentration</label>
+                                                                            <div class="input-group">
+                                                                                <input type="number" step="0.01" name="concentration_mg_per_ml" id="id_concentration_mg_per_ml" 
+                                                                                    class="form-control" value="{{ medicine_form.concentration_mg_per_ml.value|default_if_none:'' }}" required>
+                                                                                <span class="input-group-text bg-light">mg/mL</span>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <!-- Submit Button -->
+                                                                    <button type="submit" name="add_medicine" class="btn btn-primary w-100 mt-3 py-2 fw-bold">
+                                                                        <i class="fas fa-save me-2"></i> Save Medicine
+                                                                    </button>
+                                                                </form>
                                     </div>
 
-                                    <!-- Medicine Type & Injection Option -->
-                                    <div class="row g-2">
-                                        <div class="col-md-6 mb-3">
-                                            <label for="id_medicine_type" class="form-label fw-bold">Type</label>
-                                            <select name="medicine_type" id="id_medicine_type" class="form-select" required>
-                                                {% for value, label in medicine_form.fields.medicine_type.choices %}
-                                                    <option value="{{ value }}"
-                                                        {% if medicine_form.medicine_type.value == value %}selected{% endif %}>
-                                                        {{ label }}
-                                                    </option>
-                                                {% endfor %}
-                                            </select>
-                                        </div>
-                                        <div class="col-md-6 mb-3">
-                                            <div class="form-check form-switch pt-4" id="liquid-injection-checkbox" style="display: none;">
-                                                <input type="checkbox" name="is_liquid_injection" id="id_is_liquid_injection" 
-                                                       class="form-check-input" role="switch">
-                                                <label for="id_is_liquid_injection" class="form-check-label fw-bold">Liquid Injection</label>
-                                            </div>
-                                        </div>
-                                    </div>
+                                </div>
+                                <!-- Tablet Card -->
+<div class="card shadow-sm mb-4 medicine-form-box" data-form-type="tablet" style="display: none;">
+    <div class="card-header bg-info text-white fw-bold">Tablet Form</div>
+    <div class="card-body">
+        <!-- Paste tablet Form Here -->
+         <form method="post" class="needs-validation" novalidate>
+                                                                    {% csrf_token %}
+                                                                    
+                                                                    <!-- Medicine Name -->
+                                                                    <div class="mb-3">
+                                                                        <label for="id_name" class="form-label fw-bold">Medicine Name</label>
+                                                                        <div class="input-group">
+                                                                            <span class="input-group-text bg-light">
+                                                                                <i class="fas fa-tag text-primary"></i>
+                                                                            </span>
+                                                                            <input type="text" class="form-control" id="id_name" name="name" 
+                                                                                value="{{ medicine_form.name.value|default_if_none:'' }}"
+                                                                                placeholder="e.g., Amoxicillin" required>
+                                                                        </div>
+                                                                    </div>
 
-                                    <!-- Dose & Concentration -->
-                                    <div class="row g-2">
-                                        <div class="col-md-6 mb-3">
-                                            <label for="id_standard_dose_per_kg" class="form-label fw-bold">Standard Dose</label>
-                                            <div class="input-group">
-                                                <input type="number" step="0.01" name="standard_dose_per_kg" id="id_standard_dose_per_kg" 
-                                                       class="form-control" value="{{ medicine_form.standard_dose_per_kg.value|default_if_none:'' }}" required>
-                                                <span class="input-group-text bg-light">mg/kg</span>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6 mb-3">
-                                            <label for="id_concentration_mg_per_ml" class="form-label fw-bold">Concentration</label>
-                                            <div class="input-group">
-                                                <input type="number" step="0.01" name="concentration_mg_per_ml" id="id_concentration_mg_per_ml" 
-                                                       class="form-control" value="{{ medicine_form.concentration_mg_per_ml.value|default_if_none:'' }}" required>
-                                                <span class="input-group-text bg-light">mg/mL</span>
-                                            </div>
-                                        </div>
-                                    </div>
+                                                                    <!-- Brand Name -->
+                                                                    <div class="mb-3">
+                                                                        <label for="id_brand" class="form-label fw-bold">Brand</label>
+                                                                        <input type="text" class="form-control" name="brand" id="id_brand"
+                                                                            value="{{ medicine_form.brand.value|default_if_none:'' }}"
+                                                                            placeholder="e.g., Cipla, Sun Pharma">
+                                                                    </div>
+                                                                    <input type="hidden" id="id_medicine_type" name="medicine_type" value="tablet" required>
 
-                                    <!-- Submit Button for Medicine -->
-                                    <button type="submit" name="add_medicine" class="btn btn-primary w-100 mt-3 py-2 fw-bold">
-                                        <i class="fas fa-save me-2"></i> Save Medicine
-                                    </button>
-                                </form>
+                                                                    <!-- Medicine Type & Injection Option -->
+                                                                    <div class="row g-2">
+                                                                        {% comment %} <div class="col-md-6 mb-3">
+                                                                            <label for="id_medicine_type" class="form-label fw-bold">Type</label>
+                                                                            <select name="medicine_type" id="id_medicine_type" class="form-select" required>
+                                                                                {% for value, label in medicine_form.fields.medicine_type.choices %}
+                                                                                    <option value="{{ value }}" {% if medicine_form.medicine_type.value == value %}selected{% endif %}>
+                                                                                        {{ label }}
+                                                                                    </option>
+                                                                                {% endfor %}
+                                                                            </select>
+                                                                        </div> {% endcomment %}
+
+                                                                        <div class="col-md-6 mb-3">
+                                                                            <div class="form-check form-switch pt-4" id="liquid-injection-checkbox" style="display: none;">
+                                                                                <input type="checkbox" name="is_liquid_injection" id="id_is_liquid_injection" 
+                                                                                    class="form-check-input" role="switch"
+                                                                                    {% if medicine_form.is_liquid_injection.value %}checked{% endif %}>
+                                                                                <label for="id_is_liquid_injection" class="form-check-label fw-bold">Liquid Injection</label>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <!-- Route & Duration -->
+                                                                    <div class="row g-2">
+                                                                        <div class="col-md-6 mb-3">
+                                                                            <label for="id_route" class="form-label fw-bold">Route</label>
+                                                                            <select name="route" id="id_route" class="form-select">
+                                                                                {% for value, label in medicine_form.fields.route.choices %}
+                                                                                    <option value="{{ value }}" {% if medicine_form.route.value == value %}selected{% endif %}>
+                                                                                        {{ label }}
+                                                                                    </option>
+                                                                                {% endfor %}
+                                                                            </select>
+                                                                        </div>
+                                                                        <div class="col-md-6 mb-3">
+                                                                            <label for="id_duration" class="form-label fw-bold">Duration (days)</label>
+                                                                            <input type="number" min="1" name="duration" id="id_duration" 
+                                                                                class="form-control" value="{{ medicine_form.duration.value|default_if_none:'' }}"
+                                                                                placeholder="e.g., 5">
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <!-- Dose & Concentration -->
+                                                                    <div class="row g-2">
+                                                                        <div class="col-md-6 mb-3">
+                                                                            <label for="id_standard_dose_per_kg" class="form-label fw-bold">Standard Dose</label>
+                                                                            <div class="input-group">
+                                                                                <input type="number" step="0.01" name="standard_dose_per_kg" id="id_standard_dose_per_kg" 
+                                                                                    class="form-control" value="{{ medicine_form.standard_dose_per_kg.value|default_if_none:'' }}" required>
+                                                                                <span class="input-group-text bg-light">mg/tablet</span>
+                                                                            </div>
+                                                                        </div>
+                                                                        {% comment %} <div class="col-md-6 mb-3">
+                                                                            <label for="id_concentration_mg_per_ml" class="form-label fw-bold">Concentration</label>
+                                                                            <div class="input-group">
+                                                                                <input type="number" step="0.01" name="concentration_mg_per_ml" id="id_concentration_mg_per_ml" 
+                                                                                    class="form-control" value="{{ medicine_form.concentration_mg_per_ml.value|default_if_none:'' }}" required>
+                                                                                <span class="input-group-text bg-light">mg/mL</span>
+                                                                            </div>
+                                                                        </div> {% endcomment %}
+                                                                    </div>
+
+                                                                    <!-- Submit Button -->
+                                                                    <button type="submit" name="add_medicine" class="btn btn-primary w-100 mt-3 py-2 fw-bold">
+                                                                        <i class="fas fa-save me-2"></i> Save Medicine
+                                                                    </button>
+                                                                </form>
+    </div>
+</div>
+<!-- Drop Card -->
+<div class="card shadow-sm mb-4 medicine-form-box" data-form-type="drop" style="display: none;">
+    <div class="card-header bg-info text-white fw-bold">Drop Form</div>
+    <div class="card-body">
+        <!-- Paste Drop Form Here -->
+         <form method="post" class="needs-validation" novalidate>
+                                                                    {% csrf_token %}
+                                                                    
+                                                                    <!-- Medicine Name -->
+                                                                    <div class="mb-3">
+                                                                        <label for="id_name" class="form-label fw-bold">Medicine Name</label>
+                                                                        <div class="input-group">
+                                                                            <span class="input-group-text bg-light">
+                                                                                <i class="fas fa-tag text-primary"></i>
+                                                                            </span>
+                                                                            <input type="text" class="form-control" id="id_name" name="name" 
+                                                                                value="{{ medicine_form.name.value|default_if_none:'' }}"
+                                                                                placeholder="e.g., Amoxicillin" required>
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <!-- Brand Name -->
+                                                                    <div class="mb-3">
+                                                                        <label for="id_brand" class="form-label fw-bold">Brand</label>
+                                                                        <input type="text" class="form-control" name="brand" id="id_brand"
+                                                                            value="{{ medicine_form.brand.value|default_if_none:'' }}"
+                                                                            placeholder="e.g., Cipla, Sun Pharma">
+                                                                    </div>
+                                                                    <input type="hidden" id="id_medicine_type" name="medicine_type" value="drop" required>
+
+                                                                    <!-- Medicine Type & Injection Option -->
+                                                                    <div class="row g-2">
+                                                                        {% comment %} <div class="col-md-6 mb-3">
+                                                                            <label for="id_medicine_type" class="form-label fw-bold">Type</label>
+                                                                            <select name="medicine_type" id="id_medicine_type" class="form-select" required>
+                                                                                {% for value, label in medicine_form.fields.medicine_type.choices %}
+                                                                                    <option value="{{ value }}" {% if medicine_form.medicine_type.value == value %}selected{% endif %}>
+                                                                                        {{ label }}
+                                                                                    </option>
+                                                                                {% endfor %}
+                                                                            </select>
+                                                                        </div> {% endcomment %}
+
+                                                                        <div class="col-md-6 mb-3">
+                                                                            <div class="form-check form-switch pt-4" id="liquid-injection-checkbox" style="display: none;">
+                                                                                <input type="checkbox" name="is_liquid_injection" id="id_is_liquid_injection" 
+                                                                                    class="form-check-input" role="switch"
+                                                                                    {% if medicine_form.is_liquid_injection.value %}checked{% endif %}>
+                                                                                <label for="id_is_liquid_injection" class="form-check-label fw-bold">Liquid Injection</label>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <!-- Route & Duration -->
+                                                                    <div class="row g-2">
+                                                                        <div class="col-md-6 mb-3">
+                                                                            <label for="id_route" class="form-label fw-bold">Route</label>
+                                                                            <select name="route" id="id_route" class="form-select">
+                                                                                {% for value, label in medicine_form.fields.route.choices %}
+                                                                                    <option value="{{ value }}" {% if medicine_form.route.value == value %}selected{% endif %}>
+                                                                                        {{ label }}
+                                                                                    </option>
+                                                                                {% endfor %}
+                                                                            </select>
+                                                                        </div>
+                                                                        <div class="col-md-6 mb-3">
+                                                                            <label for="id_duration" class="form-label fw-bold">Duration (days)</label>
+                                                                            <input type="number" min="1" name="duration" id="id_duration" 
+                                                                                class="form-control" value="{{ medicine_form.duration.value|default_if_none:'' }}"
+                                                                                placeholder="e.g., 5">
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <!-- Dose & Concentration -->
+                                                                    <div class="row g-2">
+                                                                        <div class="col-md-6 mb-3">
+                                                                            <label for="id_standard_dose_per_kg" class="form-label fw-bold">Standard Dose</label>
+                                                                            <div class="input-group">
+                                                                                <input type="number" step="0.01" name="standard_dose_per_kg" id="id_standard_dose_per_kg" 
+                                                                                    class="form-control" value="{{ medicine_form.standard_dose_per_kg.value|default_if_none:'' }}" required>
+                                                                                <span class="input-group-text bg-light">mg/drop</span>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="col-md-6 mb-3">
+                                                                            <label for="id_concentration_mg_per_ml" class="form-label fw-bold">Concentration</label>
+                                                                            <div class="input-group">
+                                                                                <input type="number" step="0.01" name="concentration_mg_per_ml" id="id_concentration_mg_per_ml" 
+                                                                                    class="form-control" value="{{ medicine_form.concentration_mg_per_ml.value|default_if_none:'' }}" required>
+                                                                                <span class="input-group-text bg-light">mg/drop</span>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <!-- Submit Button -->
+                                                                    <button type="submit" name="add_medicine" class="btn btn-primary w-100 mt-3 py-2 fw-bold">
+                                                                        <i class="fas fa-save me-2"></i> Save Medicine
+                                                                    </button>
+                                                                </form>
+    </div>
+</div>
+<!-- suspension Card -->
+<div class="card shadow-sm mb-4 medicine-form-box" data-form-type="suspension" style="display: none;">
+    <div class="card-header bg-info text-white fw-bold">Suspension Form</div>
+    <div class="card-body">
+        <!-- Paste suspension Form Here -->
+         <form method="post" class="needs-validation" novalidate>
+                                                                    {% csrf_token %}
+                                                                    
+                                                                    <!-- Medicine Name -->
+                                                                    <div class="mb-3">
+                                                                        <label for="id_name" class="form-label fw-bold">Susp Name</label>
+                                                                        <div class="input-group">
+                                                                            <span class="input-group-text bg-light">
+                                                                                <i class="fas fa-tag text-primary"></i>
+                                                                            </span>
+                                                                            <input type="text" class="form-control" id="id_name" name="name" 
+                                                                                value="{{ medicine_form.name.value|default_if_none:'' }}"
+                                                                                placeholder="e.g., Amoxicillin" required>
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <!-- Brand Name -->
+                                                                    <div class="mb-3">
+                                                                        <label for="id_brand" class="form-label fw-bold">Brand</label>
+                                                                        <input type="text" class="form-control" name="brand" id="id_brand"
+                                                                            value="{{ medicine_form.brand.value|default_if_none:'' }}"
+                                                                            placeholder="e.g., Cipla, Sun Pharma">
+                                                                    </div>
+                                                                    <input type="hidden" id="id_medicine_type" name="medicine_type" value="suspension" required>
+
+                                                                    <!-- Medicine Type & Injection Option -->
+                                                                    <div class="row g-2">
+                                                                        {% comment %} <div class="col-md-6 mb-3">
+                                                                            <label for="id_medicine_type" class="form-label fw-bold">Type</label>
+                                                                            <select name="medicine_type" id="id_medicine_type" class="form-select" required>
+                                                                                {% for value, label in medicine_form.fields.medicine_type.choices %}
+                                                                                    <option value="{{ value }}" {% if medicine_form.medicine_type.value == value %}selected{% endif %}>
+                                                                                        {{ label }}
+                                                                                    </option>
+                                                                                {% endfor %}
+                                                                            </select>
+                                                                        </div> {% endcomment %}
+
+                                                                        <div class="col-md-6 mb-3">
+                                                                            <div class="form-check form-switch pt-4" id="liquid-injection-checkbox" style="display: none;">
+                                                                                <input type="checkbox" name="is_liquid_injection" id="id_is_liquid_injection" 
+                                                                                    class="form-check-input" role="switch"
+                                                                                    {% if medicine_form.is_liquid_injection.value %}checked{% endif %}>
+                                                                                <label for="id_is_liquid_injection" class="form-check-label fw-bold">Liquid Injection</label>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <!-- Route & Duration -->
+                                                                    <div class="row g-2">
+                                                                        <div class="col-md-6 mb-3">
+                                                                            <label for="id_route" class="form-label fw-bold">Route</label>
+                                                                            <select name="route" id="id_route" class="form-select">
+                                                                                {% for value, label in medicine_form.fields.route.choices %}
+                                                                                    <option value="{{ value }}" {% if medicine_form.route.value == value %}selected{% endif %}>
+                                                                                        {{ label }}
+                                                                                    </option>
+                                                                                {% endfor %}
+                                                                            </select>
+                                                                        </div>
+                                                                        <div class="col-md-6 mb-3">
+                                                                            <label for="id_duration" class="form-label fw-bold">Duration (days)</label>
+                                                                            <input type="number" min="1" name="duration" id="id_duration" 
+                                                                                class="form-control" value="{{ medicine_form.duration.value|default_if_none:'' }}"
+                                                                                placeholder="e.g., 5">
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <!-- Dose & Concentration -->
+                                                                    <div class="row g-2">
+                                                                        <div class="col-md-6 mb-3">
+                                                                            <label for="id_standard_dose_per_kg" class="form-label fw-bold">Standard Dose</label>
+                                                                            <div class="input-group">
+                                                                                <input type="number" step="0.01" name="standard_dose_per_kg" id="id_standard_dose_per_kg" 
+                                                                                    class="form-control" value="{{ medicine_form.standard_dose_per_kg.value|default_if_none:'' }}" required>
+                                                                                <span class="input-group-text bg-light">mg/ml</span>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="col-md-6 mb-3">
+                                                                            <label for="id_concentration_mg_per_ml" class="form-label fw-bold">Concentration</label>
+                                                                            <div class="input-group">
+                                                                                <input type="number" step="0.01" name="concentration_mg_per_ml" id="id_concentration_mg_per_ml" 
+                                                                                    class="form-control" value="{{ medicine_form.concentration_mg_per_ml.value|default_if_none:'' }}" required>
+                                                                                <span class="input-group-text bg-light">mg/mL</span>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <!-- Submit Button -->
+                                                                    <button type="submit" name="add_medicine" class="btn btn-primary w-100 mt-3 py-2 fw-bold">
+                                                                        <i class="fas fa-save me-2"></i> Save Medicine
+                                                                    </button>
+                                                                </form>
+    </div>
+</div>
+<!-- fluid Card -->
+<div class="card shadow-sm mb-4 medicine-form-box" data-form-type="fluid" style="display: none;">
+    <div class="card-header bg-info text-white fw-bold">Fluid Form</div>
+    <div class="card-body">
+        <!-- Paste fluid Form Here -->
+         <form method="post" class="needs-validation" novalidate>
+                                                                    {% csrf_token %}
+                                                                    
+                                                                    <!-- Medicine Name -->
+                                                                    <div class="mb-3">
+                                                                        <label for="id_name" class="form-label fw-bold">Fluid Name</label>
+                                                                        <div class="input-group">
+                                                                            <span class="input-group-text bg-light">
+                                                                                <i class="fas fa-tag text-primary"></i>
+                                                                            </span>
+                                                                            <input type="text" class="form-control" id="id_name" name="name" 
+                                                                                value="{{ medicine_form.name.value|default_if_none:'' }}"
+                                                                                placeholder="e.g., Amoxicillin" required>
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <!-- Brand Name -->
+                                                                    <div class="mb-3">
+                                                                        <label for="id_brand" class="form-label fw-bold">Brand</label>
+                                                                        <input type="text" class="form-control" name="brand" id="id_brand"
+                                                                            value="{{ medicine_form.brand.value|default_if_none:'' }}"
+                                                                            placeholder="e.g., Cipla, Sun Pharma">
+                                                                    </div>
+                                                                    <input type="hidden" id="id_medicine_type" name="medicine_type" value="fluid" required>
+
+                                                                    <!-- Medicine Type & Injection Option -->
+                                                                    <div class="row g-2">
+                                                                        {% comment %} <div class="col-md-6 mb-3">
+                                                                            <label for="id_medicine_type" class="form-label fw-bold">Type</label>
+                                                                            <select name="medicine_type" id="id_medicine_type" class="form-select" required>
+                                                                                {% for value, label in medicine_form.fields.medicine_type.choices %}
+                                                                                    <option value="{{ value }}" {% if medicine_form.medicine_type.value == value %}selected{% endif %}>
+                                                                                        {{ label }}
+                                                                                    </option>
+                                                                                {% endfor %}
+                                                                            </select>
+                                                                        </div> {% endcomment %}
+
+                                                                        <div class="col-md-6 mb-3">
+                                                                            <div class="form-check form-switch pt-4" id="liquid-injection-checkbox" style="display: none;">
+                                                                                <input type="checkbox" name="is_liquid_injection" id="id_is_liquid_injection" 
+                                                                                    class="form-check-input" role="switch"
+                                                                                    {% if medicine_form.is_liquid_injection.value %}checked{% endif %}>
+                                                                                <label for="id_is_liquid_injection" class="form-check-label fw-bold">Liquid Injection</label>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <!-- Route & Duration -->
+                                                                    <div class="row g-2">
+                                                                        <div class="col-md-6 mb-3">
+                                                                            <label for="id_route" class="form-label fw-bold">Route</label>
+                                                                            <select name="route" id="id_route" class="form-select">
+                                                                                {% for value, label in medicine_form.fields.route.choices %}
+                                                                                    <option value="{{ value }}" {% if medicine_form.route.value == value %}selected{% endif %}>
+                                                                                        {{ label }}
+                                                                                    </option>
+                                                                                {% endfor %}
+                                                                            </select>
+                                                                        </div>
+                                                                        <div class="col-md-6 mb-3">
+                                                                            <label for="id_duration" class="form-label fw-bold">Duration (days)</label>
+                                                                            <input type="number" min="1" name="duration" id="id_duration" 
+                                                                                class="form-control" value="{{ medicine_form.duration.value|default_if_none:'' }}"
+                                                                                placeholder="e.g., 5">
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <!-- Dose & Concentration -->
+                                                                    <div class="row g-2">
+                                                                        <div class="col-md-6 mb-3">
+                                                                            <label for="id_standard_dose_per_kg" class="form-label fw-bold">Standard Dose</label>
+                                                                            <div class="input-group">
+                                                                                <input type="number" step="0.01" name="standard_dose_per_kg" id="id_standard_dose_per_kg" 
+                                                                                    class="form-control" value="{{ medicine_form.standard_dose_per_kg.value|default_if_none:'' }}" required>
+                                                                                <span class="input-group-text bg-light">mg/ml</span>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="col-md-6 mb-3">
+                                                                            <label for="id_concentration_mg_per_ml" class="form-label fw-bold">Concentration</label>
+                                                                            <div class="input-group">
+                                                                                <input type="number" step="0.01" name="concentration_mg_per_ml" id="id_concentration_mg_per_ml" 
+                                                                                    class="form-control" value="{{ medicine_form.concentration_mg_per_ml.value|default_if_none:'' }}" required>
+                                                                                <span class="input-group-text bg-light">mg/mL</span>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <!-- Submit Button -->
+                                                                    <button type="submit" name="add_medicine" class="btn btn-primary w-100 mt-3 py-2 fw-bold">
+                                                                        <i class="fas fa-save me-2"></i> Save Medicine
+                                                                    </button>
+                                                                </form>
+    </div>
+</div>
+                                                    <!-- oral Card -->
+                                                    <div class="card shadow-sm mb-4 medicine-form-box" data-form-type="oral" style="display: none;">
+                                                        <div class="card-header bg-info text-white fw-bold">Oral Form</div>
+                                                        <div class="card-body">
+                                                            <!-- Paste oral Form Here -->
+                                                                <form method="post" class="needs-validation" novalidate>
+                                                                    {% csrf_token %}
+                                                                    
+                                                                    <!-- Medicine Name -->
+                                                                    <div class="mb-3">
+                                                                        <label for="id_name" class="form-label fw-bold">Oral Medicine Name</label>
+                                                                        <div class="input-group">
+                                                                            <span class="input-group-text bg-light">
+                                                                                <i class="fas fa-tag text-primary"></i>
+                                                                            </span>
+                                                                            <input type="text" class="form-control" id="id_name" name="name" 
+                                                                                value="{{ medicine_form.name.value|default_if_none:'' }}"
+                                                                                placeholder="e.g., Amoxicillin" required>
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <!-- Brand Name -->
+                                                                    <div class="mb-3">
+                                                                        <label for="id_brand" class="form-label fw-bold">Brand</label>
+                                                                        <input type="text" class="form-control" name="brand" id="id_brand"
+                                                                            value="{{ medicine_form.brand.value|default_if_none:'' }}"
+                                                                            placeholder="e.g., Cipla, Sun Pharma">
+                                                                    </div>
+                                                                    <input type="hidden" id="id_medicine_type" name="medicine_type" value="oral" required>
+
+                                                                    <!-- Medicine Type & Injection Option -->
+                                                                    <div class="row g-2">
+
+                                                                        <div class="col-md-6 mb-3">
+                                                                            <div class="form-check form-switch pt-4" id="liquid-injection-checkbox" style="display: none;">
+                                                                                <input type="checkbox" name="is_liquid_injection" id="id_is_liquid_injection" 
+                                                                                    class="form-check-input" role="switch"
+                                                                                    {% if medicine_form.is_liquid_injection.value %}checked{% endif %}>
+                                                                                <label for="id_is_liquid_injection" class="form-check-label fw-bold">Liquid Injection</label>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <!-- Route & Duration -->
+                                                                    <div class="row g-2">
+                                                                        <div class="col-md-6 mb-3">
+                                                                            <label for="id_route" class="form-label fw-bold">Route</label>
+                                                                            <select name="route" id="id_route" class="form-select">
+                                                                                {% for value, label in medicine_form.fields.route.choices %}
+                                                                                    <option value="{{ value }}" {% if medicine_form.route.value == value %}selected{% endif %}>
+                                                                                        {{ label }}
+                                                                                    </option>
+                                                                                {% endfor %}
+                                                                            </select>
+                                                                        </div>
+                                                                        <div class="col-md-6 mb-3">
+                                                                            <label for="id_duration" class="form-label fw-bold">Duration (days)</label>
+                                                                            <input type="number" min="1" name="duration" id="id_duration" 
+                                                                                class="form-control" value="{{ medicine_form.duration.value|default_if_none:'' }}"
+                                                                                placeholder="e.g., 5">
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <!-- Dose & Concentration -->
+                                                                    <div class="row g-2">
+                                                                        <div class="col-md-6 mb-3">
+                                                                            <label for="id_standard_dose_per_kg" class="form-label fw-bold">Standard Dose</label>
+                                                                            <div class="input-group">
+                                                                                <input type="number" step="0.01" name="standard_dose_per_kg" id="id_standard_dose_per_kg" 
+                                                                                    class="form-control" value="{{ medicine_form.standard_dose_per_kg.value|default_if_none:'' }}" required>
+                                                                                <span class="input-group-text bg-light">mg/ml</span>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="col-md-6 mb-3">
+                                                                            <label for="id_concentration_mg_per_ml" class="form-label fw-bold">Concentration</label>
+                                                                            <div class="input-group">
+                                                                                <input type="number" step="0.01" name="concentration_mg_per_ml" id="id_concentration_mg_per_ml" 
+                                                                                    class="form-control" value="{{ medicine_form.concentration_mg_per_ml.value|default_if_none:'' }}" required>
+                                                                                <span class="input-group-text bg-light">mg/mL</span>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <!-- Submit Button -->
+                                                                    <button type="submit" name="add_medicine" class="btn btn-primary w-100 mt-3 py-2 fw-bold">
+                                                                        <i class="fas fa-save me-2"></i> Save Medicine
+                                                                    </button>
+                                                                </form>
+                                                            </div>
+                                                        </div>
                             </div>
                         </div>
                     </div>
@@ -267,34 +911,62 @@
                 </div>
 
                 <!-- Medicine List Section -->
-                <div class="card border-0 shadow-sm mt-4">
-                    <div class="card-header bg-white border-bottom">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <h5 class="mb-0 fw-bold">
-                                <i class="fas fa-list-ul text-primary me-2"></i>
-                                Medicine Inventory
+                <div class="card border-0  mt-10">
+                    <div class="card-header bg-white border-bottom px-4 py-3">
+                        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                            <h5 class="mb-0 fw-bold text-nowrap">
+                            <i class="fas fa-list-ul text-primary me-2"></i>
+                            Medicine Inventory
                             </h5>
-                            <div class="w-50">
-                                <div class="input-group">
-                                    <span class="input-group-text bg-light">
-                                        <i class="fas fa-search text-muted"></i>
-                                    </span>
-                                    <input type="text" id="medicineSearch" class="form-control" placeholder="Search medicines...">
+
+                            <div class="d-flex align-items-center flex-grow-1 flex-wrap gap-3" style="min-width: min(100%, 600px);">
+                            <!-- Search Input -->
+                            <div class="input-group flex-grow-1" style="min-width: 200px;">
+                                <span class="input-group-text bg-light border-end-0">
+                                <i class="fas fa-search text-muted"></i>
+                                </span>
+                                <input type="text" id="medicineSearch" class="form-control border-start-0" placeholder="Search medicines...">
+                            </div>
+
+                            <!-- Filter Controls -->
+                            <form method="get" class="d-flex align-items-center flex-wrap gap-2 mb-0 flex-grow-1 justify-content-end">
+                                <div class="d-flex align-items-center gap-2">
+                                <label for="sort" class="form-label mb-0 text-nowrap fw-semibold">Sort:</label>
+                                <select name="sort" id="sort" class="form-select form-select-sm" onchange="this.form.submit()" style="width: 140px;">
+                                    <option value="name" {% if sort_by == 'name' %}selected{% endif %}>A-Z</option>
+                                    <option value="latest" {% if sort_by == 'latest' %}selected{% endif %}>Latest</option>
+                                </select>
                                 </div>
+
+                                <div class="d-flex align-items-center gap-2">
+                                <label for="medicine_type" class="form-label mb-0 text-nowrap fw-semibold">Filter:</label>
+                                <select name="medicine_type" id="medicine_type" class="form-select form-select-sm" onchange="this.form.submit()" style="width: 140px;">
+                                    <option value="" {% if not medicine_type %}selected{% endif %}>All Types</option>
+                                    {% for key, value in medicine_type_choices %}
+                                    <option value="{{ key }}" {% if medicine_type == key %}selected{% endif %}>{{ value }}</option>
+                                    {% endfor %}
+                                </select>
+                                </div>
+                            </form>
                             </div>
                         </div>
-                    </div>
-                    <div class="card-body p-0">
+                        </div>
+
+
+                    <div class="">
                         <div class="table-responsive">
-                            <table class="table table-hover mb-0" id="medicineTable">
-                                <thead class="table-light">
+                            <table class="table table-hover mb-0" id="medicineTable" >
+                                <thead class="table-light bg-light">
                                     <tr>
-                                        <th class="ps-4">Name</th>
-                                        <th class="text-center">Type</th>
-                                        <th class="text-center">Dose</th>
-                                        <th class="text-center">Conc.</th>
-                                        <th>Vials</th>
-                                        <th class="text-end pe-4">Actions</th>
+                                        <th class="ps-4 py-3 fw-semibold text-dark" style="font-size: 0.95rem;">Name</th>
+                                        <th class="text-center py-3 fw-semibold text-dark" style="font-size: 0.95rem;">Type</th>
+                                        <th class="text-center py-3 fw-semibold text-dark" style="font-size: 0.95rem;">Dose</th>
+                                        <th class="text-center py-3 fw-semibold text-dark" style="font-size: 0.95rem;">Concentration</th>
+                                        <th class="text-center py-3 fw-semibold text-dark" style="font-size: 0.95rem;">Route</th>
+                                        <th class="text-center py-3 fw-semibold text-dark" style="font-size: 0.95rem;">Duration</th>
+                                        <th class="text-center py-3 fw-semibold text-dark" style="font-size: 0.95rem;">Vials</th>
+                                        <th class="text-center py-3 fw-semibold text-dark" style="font-size: 0.95rem;">Brand</th>
+                                        <th class="text-end pe-4 py-3 fw-semibold text-dark" style="font-size: 0.95rem;">Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -310,37 +982,63 @@
                                             </span>
                                         </td>
                                         <td class="text-center fw-bold">
-                                            {{ medicine.standard_dose_per_kg|floatformat:2 }}
-                                            <div class="small text-muted">mg/kg/day</div>
+                                            <span class="d-block">{{ medicine.standard_dose_per_kg|floatformat:2 }}</span>
+                                            <span class="small text-muted">mg/kg/day</span>
                                         </td>
                                         <td class="text-center fw-bold">
-                                            {{ medicine.concentration_mg_per_ml|floatformat:2 }}
-                                            <div class="small text-muted">mg/mL</div>
+                                            <span class="d-block">{{ medicine.concentration_mg_per_ml|floatformat:2 }}</span>
+                                            <span class="small text-muted">mg/mL</span>
                                         </td>
-                                        <td>
-                                            {% if medicine.vials.exists %}
-                                                <div class="d-flex flex-wrap gap-2">
-                                                    {% for vial in medicine.vials.all %}
-                                                    <span class="badge bg-info bg-opacity-10 text-dark border border-info border-opacity-25 px-3 py-2">
-                                                        <i class="fas fa-vial me-1"></i>
-                                                        {{ vial.strength_mg }}mg/{{ vial.volume_ml }}mL
-                                                    </span>
-                                                    {% endfor %}
-                                                </div>
-                                            {% else %}
-                                                <span class="badge bg-secondary bg-opacity-10 text-secondary px-3 py-2">
-                                                    No vials
-                                                </span>
-                                            {% endif %}
+                                        <td class="text-center">
+                                            <span class="badge bg-secondary bg-opacity-10 text-secondary px-3 py-2" style="font-size: 1.1rem;">
+                                                {{ medicine.get_route_display|default:"Not specified" }}
+                                            </span>
                                         </td>
+                                        <td class="text-center fw-bold">
+                                        {% if medicine.duration %}
+                                            <span class="badge bg-success bg-opacity-10 text-success px-3 py-2" style="font-size: 1.1rem;">
+                                            {{ medicine.duration }} days
+                                            </span>
+                                        {% else %}
+                                            <span class="badge bg-secondary bg-opacity-10 text-secondary px-3 py-2" style="font-size: 1.1rem;">
+                                            N/A
+                                            </span>
+                                        {% endif %}
+                                        </td>
+                                        <td class="text-center">
+                                        {% if medicine.vials.exists %}
+                                            <div class="d-flex flex-wrap gap-2 justify-content-center">
+                                            {% for vial in medicine.vials.all %}
+                                            <span class="badge bg-info bg-opacity-10 text-dark border border-info border-opacity-25 px-3 py-2" style="font-size: 1.1rem;">
+                                                <i class="fas fa-vial me-1"></i>
+                                                {{ vial.strength_mg }}mg/{{ vial.volume_ml }}mL
+                                            </span>
+                                            {% endfor %}
+                                            </div>
+                                        {% else %}
+                                            <span class="badge bg-secondary bg-opacity-10 text-secondary px-3 py-2" style="font-size: 1.1rem;">
+                                            No vials
+                                            </span>
+                                        {% endif %}
+                                        </td>
+                                        <td class="text-center">
+                                        {% if medicine.brand %}
+                                        <span class="badge bg-light text-dark px-3 py-2 border" style="font-size: 1.1rem;">
+                                            {{ medicine.brand }}
+                                        </span>
+                                        {% else %}
+                                        <span class="badge bg-secondary bg-opacity-10 text-secondary px-3 py-2" style="font-size: 1.1rem;">
+                                            Not specified
+                                        </span>
+                                        {% endif %}
+                                        </td>
+
                                         <td class="text-end pe-4">
                                             <div class="btn-group btn-group-sm" role="group">
-                                                <a href="#" class="btn btn-outline-primary rounded-start-2">
-                                                    <i class="fas fa-edit"></i>
-                                                </a>
+                                                
                                                 <a href="{% url 'delete_medicine' medicine.id %}" 
-                                                   class="btn btn-outline-danger rounded-end-2"
-                                                   data-bs-toggle="tooltip" title="Delete">
+                                                class="btn btn-outline-danger rounded-end-2"
+                                                data-bs-toggle="tooltip" title="Delete">
                                                     <i class="fas fa-trash-alt"></i>
                                                 </a>
                                             </div>
@@ -348,17 +1046,21 @@
                                     </tr>
                                     {% empty %}
                                     <tr>
-                                        <td colspan="6" class="text-center py-5">
+                                        <td colspan="9" class="text-center py-5">
                                             <div class="py-4">
                                                 <i class="fas fa-pills fa-3x mb-3 text-muted opacity-25"></i>
                                                 <h5 class="fw-bold text-muted">No Medicines Found</h5>
                                                 <p class="text-muted">Add your first medicine using the form above</p>
+                                                <a href="{% url 'add_medicine' %}" class="btn btn-primary mt-2">
+                                                    <i class="fas fa-plus me-2"></i>Add Medicine
+                                                </a>
                                             </div>
                                         </td>
                                     </tr>
                                     {% endfor %}
                                 </tbody>
                             </table>
+
                         </div>
                     </div>
                 </div>
@@ -623,7 +1325,7 @@
             newEntry.querySelectorAll('input').forEach(input => {
                 // Adjust names for proper formset management
                 let name = input.getAttribute('name');
-                if(name) {
+                if (name) {
                     const newIndex = vialEntries.length;
                     name = name.replace(/\-\d+\-/, `-${newIndex}-`);
                     input.setAttribute('name', name);
@@ -732,12 +1434,12 @@
         document.querySelectorAll(".vial-entry").forEach(entry => {
             const strengthInput = entry.querySelector('input[name$="strength_mg"]');
             const volumeInput = entry.querySelector('input[name$="volume_ml"]');
-            
+
             function calculateConcentration() {
                 const strength = parseFloat(strengthInput.value);
                 const volume = parseFloat(volumeInput.value);
                 const concentrationSpan = entry.querySelector('.fw-bold');
-                
+
                 if (!isNaN(strength) && !isNaN(volume) && volume > 0) {
                     concentrationSpan.textContent = (strength / volume).toFixed(2);
                 } else {
@@ -750,6 +1452,50 @@
         });
     });
 </script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const medicineTypeButtons = document.querySelectorAll("#medicineTypeSelector button");
+        const medicineForms = document.querySelectorAll(".medicine-form-box");
+        const hiddenTypeInput = document.getElementById("id_medicine_type");
+
+        function showForm(selectedType) {
+            // Show the correct form
+            medicineForms.forEach(form => {
+                form.style.display = (form.getAttribute("data-form-type") === selectedType) ? "block" : "none";
+            });
+
+            // Update hidden input
+            if (hiddenTypeInput) {
+                hiddenTypeInput.value = selectedType;
+            }
+        }
+
+        // Initialize: select injection by default
+        showForm("injection");
+        const defaultBtn = document.querySelector('#medicineTypeSelector button[data-type="injection"]');
+        if (defaultBtn) {
+            defaultBtn.classList.remove("btn-outline-secondary");
+            defaultBtn.classList.add("btn-primary");
+        }
+
+        medicineTypeButtons.forEach(button => {
+            button.addEventListener("click", function () {
+                const selectedType = this.getAttribute("data-type");
+
+                // Highlight selected button
+                medicineTypeButtons.forEach(btn => {
+                    btn.classList.remove("btn-primary");
+                    btn.classList.add("btn-outline-secondary");
+                });
+                this.classList.remove("btn-outline-secondary");
+                this.classList.add("btn-primary");
+
+                showForm(selectedType);
+            });
+        });
+    });
+</script>
+
 
 <style>
     body {
@@ -870,5 +1616,54 @@
         height: 1.25em;
         margin-left: -0.5em;
     }
+    /* Base padding for container */
+.container-fluid {
+  padding-left: 1.5rem;  /* px-4 = 1.5rem */
+  padding-right: 1.5rem;
+  padding-top: 1.5rem;   /* py-4 = 1.5rem */
+  padding-bottom: 1.5rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1200px) {
+  .container-fluid {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .container-fluid {
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+  }
+  .row.justify-content-center {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+  }
+}
+
+/* For very small screens like phones */
+@media (max-width: 480px) {
+  .container-fluid {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
+  }
+  .row.justify-content-center {
+    padding-left: 0.25rem;
+    padding-right: 0.25rem;
+  }
+}
+@media (max-width: 576px) {
+  .row.justify-content-center {
+    flex-direction: column;
+    align-items: center;
+  }
+}
+
 </style>
 {% endblock %}

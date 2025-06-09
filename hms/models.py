@@ -1026,11 +1026,27 @@ class Medicine(models.Model):
         ("other", "Other"),
     ]
 
+    ROUTE_CHOICES = [
+        ("oral", "Oral"),
+        ("iv", "Intravenous"),
+        ("im", "Intramuscular"),
+        ("sc", "Subcutaneous"),
+        ("topical", "Topical"),
+        ("inhalation", "Inhalation"),
+        ("nasal", "Nasal"),
+        ("rectal", "Rectal"),
+        ("other", "Other"),
+    ]
+
     name = models.CharField(max_length=100)
+    brand = models.CharField(max_length=100, blank=True, null=True)
     medicine_type = models.CharField(max_length=20, choices=MEDICINE_TYPE_CHOICES, default="other")
+    route = models.CharField(max_length=20, choices=ROUTE_CHOICES, blank=True, null=True)
+    duration = models.PositiveIntegerField(blank=True, null=True, help_text="Duration in days")
     is_liquid_injection = models.BooleanField(default=False, help_text="Only for injections: Check if this is a ready-to-use liquid injection")
     standard_dose_per_kg = models.FloatField(help_text="Standard dose per kg (mg/kg/day)", null=True, blank=True)
     concentration_mg_per_ml = models.FloatField(help_text="Concentration of the medicine (mg/mL)", null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f"{self.name} ({self.get_medicine_type_display()})"

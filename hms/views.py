@@ -154,7 +154,9 @@ def user_login(request):
             elif user.groups.filter(name='Patient').exists():
                 return redirect('patient_dashboard')
             else:
-                return redirect('hms/dashboard.html')
+                # return redirect('hms/dashboard.html')
+                messages.error(request, "No role assigned to your account. Please contact the administrator.")
+                return redirect('login') 
 
         messages.error(request, "Invalid username or password!")
 
@@ -2636,6 +2638,21 @@ def manage_medicine_diluent(request):
     vials = Vial.objects.all()
     vial_formset = None  # Initialized only if needed
 
+    # Sorting logic
+    sort_by = request.GET.get('sort', 'name')  # Default sort by name
+    if sort_by == 'latest':
+        medicines = Medicine.objects.all().order_by('-created_at')  # Assuming you have created_at field
+    else:
+        medicines = Medicine.objects.all().order_by('name')  # Alphabetical A-Z
+
+
+    # Filter by medicine type if selected
+    medicine_type = request.GET.get('medicine_type', '')
+    if medicine_type:
+        medicines = medicines.filter(medicine_type=medicine_type)
+
+    medicine_type_choices = Medicine.MEDICINE_TYPE_CHOICES
+
     if request.method == "POST":
         # Add Medicine
         if "add_medicine" in request.POST:
@@ -2693,6 +2710,9 @@ def manage_medicine_diluent(request):
         'medicines': medicines,
         'diluents': diluents,
         'vials': vials,
+        'sort_by': sort_by,
+        'medicine_type': medicine_type,
+        'medicine_type_choices': medicine_type_choices,
     }
     return render(request, 'hms/medice_&_diluent/add_medicine_diluent.html', context)
 
