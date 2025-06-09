@@ -1,0 +1,419 @@
+{% extends 'hms/base.html' %}
+
+{% block content %}
+<body style="margin:0; font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif; background: #f8fafc; color:#1e293b;">
+
+  <div style="max-width: 1400px; margin: 2rem auto; padding: 1rem 2rem;">
+
+    <!-- Header Section -->
+    <header style="margin-bottom: 2.5rem;">
+      <h1 style="font-weight: 700; font-size: 2.25rem; margin-bottom: 0.5rem; color: #0f172a;">Welcome Dr. {{ doctor.user.full_name }}</h1>
+      <p style="color: #64748b; font-size: 1rem; margin: 0;">{{ current_date|date:"l, F j, Y" }}</p>
+    </header>
+
+    <!-- Summary Cards -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.5rem; margin-bottom: 3rem;">
+      <div class="card summary" style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); color:#fff; border-radius:12px; padding:1.5rem; box-shadow:0 4px 6px -1px rgba(59, 130, 246, 0.2), 0 2px 4px -1px rgba(59, 130, 246, 0.06); border:none;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+          <div>
+            <p style="font-size: 0.875rem; font-weight: 500; opacity: 0.9; margin-bottom: 0.5rem;">ACTIVE IPD PATIENTS</p>
+            <p class="counter" id="ipdCount" style="font-size: 2.25rem; font-weight: 700; margin: 0;">{{ ipd_patients.count }}</p>
+          </div>
+          <div style="background: rgba(255,255,255,0.2); width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <div class="card summary" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color:#fff; border-radius:12px; padding:1.5rem; box-shadow:0 4px 6px -1px rgba(16, 185, 129, 0.2), 0 2px 4px -1px rgba(16, 185, 129, 0.06); border:none;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+          <div>
+            <p style="font-size: 0.875rem; font-weight: 500; opacity: 0.9; margin-bottom: 0.5rem;">TODAY'S APPOINTMENTS</p>
+            <p class="counter" id="apptCount" style="font-size: 2.25rem; font-weight: 700; margin: 0;">{{ todays_appointments.count }}</p>
+          </div>
+          <div style="background: rgba(255,255,255,0.2); width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <div class="card summary" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color:#fff; border-radius:12px; padding:1.5rem; box-shadow:0 4px 6px -1px rgba(245, 158, 11, 0.2), 0 2px 4px -1px rgba(245, 158, 11, 0.06); border:none;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+          <div>
+            <p style="font-size: 0.875rem; font-weight: 500; opacity: 0.9; margin-bottom: 0.5rem;">OPD VISITS</p>
+            <p class="counter" id="vitalsCount" style="font-size: 2.25rem; font-weight: 700; margin: 0;">{{ opd_visit_count }}</p>
+          </div>
+          <div style="background: rgba(255,255,255,0.2); width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <div class="card summary" style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color:#fff; border-radius:12px; padding:1.5rem; box-shadow:0 4px 6px -1px rgba(239, 68, 68, 0.2), 0 2px 4px -1px rgba(239, 68, 68, 0.06); border:none;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+          <div>
+            <p style="font-size: 0.875rem; font-weight: 500; opacity: 0.9; margin-bottom: 0.5rem;">EMERGENCY CASES</p>
+            <p class="counter" id="emergencyCount" style="font-size: 2.25rem; font-weight: 700; margin: 0;">{{ emergency_cases.count }}</p>
+          </div>
+          <div style="background: rgba(255,255,255,0.2); width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+
+      <!-- Charts Row -->
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 3rem; align-items: start;">
+  
+  <!-- Filter Selector -->
+  <div style="grid-column: span 2; display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+    <label for="filterSelect" style="font-weight: 600; color: #1e293b;">Select Date Range:</label>
+    <select id="filterSelect" name="filter" style="padding: 0.5rem 0.75rem; border-radius: 8px; border: 1px solid #cbd5e1; background: #f9fafb; font-size: 0.95rem;">
+      <option value="today" {% if current_filter == 'today' %}selected{% endif %}>Today</option>
+      <option value="7days" {% if current_filter == '7days' %}selected{% endif %}>Last 7 Days</option>
+      <option value="30days" {% if current_filter == '30days' %}selected{% endif %}>Last 30 Days</option>
+    </select>
+  </div>
+
+  <!-- Appointments Chart -->
+  <div style="background: white; padding: 1.5rem; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.05), 0 1px 2px rgba(0,0,0,0.1); border-top: 4px solid #3b82f6;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+      <h2 style="color:#1e293b; font-size: 1.25rem; font-weight: 600; margin: 0;">Appointments</h2>
+      <div style="color: #64748b; font-size: 0.875rem; font-weight: 500;">{{ week_start|date:"M d" }} - {{ week_end|date:"M d" }}</div>
+    </div>
+    <canvas id="appointmentsChart" style="width: 100%; height: 280px;"></canvas>
+  </div>
+
+  <!-- OPD Visits Chart -->
+  <div style="background: white; padding: 1.5rem; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.05), 0 1px 2px rgba(0,0,0,0.1); border-top: 4px solid #10b981;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+      <h2 style="color:#1e293b; font-size: 1.25rem; font-weight: 600; margin: 0;">OPD Visits</h2>
+      <div style="color: #64748b; font-size: 0.875rem; font-weight: 500;">{{ week_start|date:"M d" }} - {{ week_end|date:"M d" }}</div>
+    </div>
+    <canvas id="opdChart" style="width: 100%; height: 280px;"></canvas>
+  </div>
+</div>
+
+
+    <!-- Tables Row -->
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 3rem;">
+      <!-- Recent OPD Visits -->
+      <div style="background:white; padding:1.5rem; border-radius:12px; box-shadow: 0 1px 3px rgba(0,0,0,0.05), 0 1px 2px rgba(0,0,0,0.1); border-top: 4px solid #f59e0b;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+          <h3 style="color:#1e293b; font-size: 1.25rem; font-weight: 600; margin: 0;">Recent OPD Visits</h3>
+          <span style="background: #f1f5f9; color: #64748b; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.875rem; font-weight: 500;">{{ opd_visit_count }} total</span>
+        </div>
+        <div style="overflow-x: auto;">
+          <table style="width:100%; border-collapse:collapse; min-width: 600px;">
+            <thead style="background:#f8fafc; border-bottom: 1px solid #e2e8f0;">
+              <tr>
+                <th style="padding:0.75rem 1rem; text-align:left; font-size:0.75rem; font-weight:600; color:#64748b; text-transform:uppercase; letter-spacing:0.05em;">Patient</th>
+                <th style="padding:0.75rem 1rem; text-align:left; font-size:0.75rem; font-weight:600; color:#64748b; text-transform:uppercase; letter-spacing:0.05em;">Date</th>
+                <th style="padding:0.75rem 1rem; text-align:left; font-size:0.75rem; font-weight:600; color:#64748b; text-transform:uppercase; letter-spacing:0.05em;">Type</th>
+                <th style="padding:0.75rem 1rem; text-align:left; font-size:0.75rem; font-weight:600; color:#64748b; text-transform:uppercase; letter-spacing:0.05em;">Diagnosis</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for visit in recent_opd_visits  %}
+              <tr style="border-bottom: 1px solid #f1f5f9;">
+                <td style="padding:1rem; font-size:0.875rem; font-weight:500; color:#1e293b;">{{ visit.patient.user.full_name }}</td>
+                <td style="padding:1rem; font-size:0.875rem; color:#64748b;">{{ visit.visit_date|date:"d M Y H:i" }}</td>
+                <td style="padding:1rem;"><span style="background:#f0fdf4; color:#16a34a; padding:0.25rem 0.5rem; border-radius:9999px; font-size:0.75rem; font-weight:500;">{{ visit.get_visit_type_display }}</span></td>
+                <td style="padding:1rem; font-size:0.875rem; color:#475569;">{{ visit.diagnosis|truncatewords:8 }}</td>
+              </tr>
+              {% empty %}
+              <tr>
+                <td colspan="4" style="text-align:center; padding:2rem; color:#94a3b8;">No OPD visits found.</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- IPD Patients Table -->
+      <div style="background:white; padding:1.5rem; border-radius:12px; box-shadow: 0 1px 3px rgba(0,0,0,0.05), 0 1px 2px rgba(0,0,0,0.1); border-top: 4px solid #6366f1;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+          <h3 style="color:#1e293b; font-size: 1.25rem; font-weight: 600; margin: 0;">Active IPD Patients</h3>
+          <span style="background: #f1f5f9; color: #64748b; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.875rem; font-weight: 500;">{{ ipd_patients.count }} active</span>
+        </div>
+        {% if ipd_patients %}
+        <div style="overflow-x: auto;">
+          <table style="width:100%; border-collapse:collapse; min-width: 600px;">
+            <thead style="background:#f8fafc; border-bottom: 1px solid #e2e8f0;">
+              <tr>
+                <th style="padding:0.75rem 1rem; text-align:left; font-size:0.75rem; font-weight:600; color:#64748b; text-transform:uppercase; letter-spacing:0.05em;">Patient</th>
+                <th style="padding:0.75rem 1rem; text-align:left; font-size:0.75rem; font-weight:600; color:#64748b; text-transform:uppercase; letter-spacing:0.05em;">Room</th>
+                <th style="padding:0.75rem 1rem; text-align:left; font-size:0.75rem; font-weight:600; color:#64748b; text-transform:uppercase; letter-spacing:0.05em;">Bed</th>
+                <th style="padding:0.75rem 1rem; text-align:left; font-size:0.75rem; font-weight:600; color:#64748b; text-transform:uppercase; letter-spacing:0.05em;">Admission Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for ipd in ipd_patients %}
+              <tr style="border-bottom: 1px solid #f1f5f9;">
+                <td style="padding:1rem; font-size:0.875rem; font-weight:500; color:#1e293b;">{{ ipd.patient.user.full_name }}</td>
+                <td style="padding:1rem; font-size:0.875rem; color:#64748b;">{{ ipd.room }}</td>
+                <td style="padding:1rem;"><span style="background:#eef2ff; color:#6366f1; padding:0.25rem 0.5rem; border-radius:9999px; font-size:0.75rem; font-weight:500;">Bed {{ ipd.bed_number }}</span></td>
+                <td style="padding:1rem; font-size:0.875rem; color:#475569;">{{ ipd.admitted_on|date:"d M Y" }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% else %}
+          <div style="text-align: center; padding: 2rem; color: #94a3b8;">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="opacity: 0.5; margin-bottom: 1rem;">
+              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline>
+            </svg>
+            <p style="margin: 0;">No active IPD patients</p>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Emergency Cases Table -->
+    <div style="background:white; padding:1.5rem; border-radius:12px; box-shadow: 0 1px 3px rgba(0,0,0,0.05), 0 1px 2px rgba(0,0,0,0.1); border-top: 4px solid #ef4444; margin-bottom: 2rem;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+        <h3 style="color:#1e293b; font-size: 1.25rem; font-weight: 600; margin: 0;">Emergency Cases</h3>
+        <span style="background: #fef2f2; color: #dc2626; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.875rem; font-weight: 500;">{{ emergency_cases.count }} urgent</span>
+      </div>
+      {% if emergency_cases %}
+      <div style="overflow-x: auto;">
+        <table style="width:100%; border-collapse:collapse; min-width: 600px;">
+          <thead style="background:#f8fafc; border-bottom: 1px solid #e2e8f0;">
+            <tr>
+              <th style="padding:0.75rem 1rem; text-align:left; font-size:0.75rem; font-weight:600; color:#64748b; text-transform:uppercase; letter-spacing:0.05em;">Patient</th>
+              <th style="padding:0.75rem 1rem; text-align:left; font-size:0.75rem; font-weight:600; color:#64748b; text-transform:uppercase; letter-spacing:0.05em;">Emergency Type</th>
+              <th style="padding:0.75rem 1rem; text-align:left; font-size:0.75rem; font-weight:600; color:#64748b; text-transform:uppercase; letter-spacing:0.05em;">Reported At</th>
+              <th style="padding:0.75rem 1rem; text-align:left; font-size:0.75rem; font-weight:600; color:#64748b; text-transform:uppercase; letter-spacing:0.05em;">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for case in emergency_cases %}
+            <tr style="border-bottom: 1px solid #f1f5f9;">
+              <td style="padding:1rem; font-size:0.875rem; font-weight:500; color:#1e293b;">{{ case.patient.user.full_name }}</td>
+              <td style="padding:1rem;">
+                <span style="background:#fef2f2; color:#dc2626; padding:0.25rem 0.5rem; border-radius:9999px; font-size:0.75rem; font-weight:500; display:inline-flex; align-items:center;">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;">
+                    <circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line>
+                  </svg>
+                  {{ case.emergency_type }}
+                </span>
+              </td>
+              <td style="padding:1rem; font-size:0.875rem; color:#64748b;">{{ case.admitted_on|date:"d M Y H:i" }}</td>
+              <td style="padding:1rem;">
+                {% if case.status == 'Critical' %}
+                <span style="background:#fef2f2; color:#dc2626; padding:0.25rem 0.75rem; border-radius:9999px; font-size:0.75rem; font-weight:500;">{{ case.status }}</span>
+                {% elif case.status == 'Stable' %}
+                <span style="background:#f0fdf4; color:#16a34a; padding:0.25rem 0.75rem; border-radius:9999px; font-size:0.75rem; font-weight:500;">{{ case.status }}</span>
+                {% else %}
+                <span style="background:#f1f5f9; color:#64748b; padding:0.25rem 0.75rem; border-radius:9999px; font-size:0.75rem; font-weight:500;">{{ case.status }}</span>
+                {% endif %}
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+        <div style="text-align: center; padding: 2rem; color: #94a3b8;">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="opacity: 0.5; margin-bottom: 1rem;">
+            <circle cx="12" cy="12" r="10"></circle><path d="M12 8v4"></path><path d="M12 16h.01"></path>
+          </svg>
+          <p style="margin: 0;">No pending emergency cases</p>
+        </div>
+      {% endif %}
+    </div>
+
+  </div>
+
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Include Inter font -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    /* Smooth hover effects */
+    table tbody tr {
+      transition: all 0.2s ease;
+    }
+    table tbody tr:hover {
+      background-color: #f8fafc;
+      transform: translateY(-1px);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+    }
+
+    /* Counter animation */
+    .counter {
+      animation: countUp 1s ease-out forwards;
+      opacity: 0;
+      transform: translateY(10px);
+    }
+
+    @keyframes countUp {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Scrollbar styling */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #f1f5f9;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+  </style>
+<script>
+  // Initialize charts with initial data
+  let appointmentsChart, opdChart;
+
+  function initializeCharts() {
+    // Get initial data from Django context variables
+    const appointmentLabels = {{ appointment_chart_labels|safe }};
+    const appointmentData = {{ appointment_chart_counts|safe }};
+    const opdLabels = {{ opd_chart_labels|safe }};
+    const opdData = {{ opd_chart_counts|safe }};
+
+    // Appointments Chart
+    appointmentsChart = new Chart(document.getElementById('appointmentsChart'), {
+      type: 'bar',
+      data: {
+        labels: appointmentLabels,
+        datasets: [{
+          label: 'Appointments',
+          data: appointmentData,
+          backgroundColor: 'rgba(59, 130, 246, 0.7)',
+          borderColor: 'rgba(59, 130, 246, 1)',
+          borderWidth: 1,
+          borderRadius: 6,
+          hoverBackgroundColor: 'rgba(59, 130, 246, 0.9)',
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              label: function(context) {
+                return ` ${context.parsed.y} appointment${context.parsed.y !== 1 ? 's' : ''}`;
+              }
+            }
+          }
+        },
+        scales: {
+          y: { 
+            beginAtZero: true,
+            ticks: {
+              precision: 0
+            }
+          }
+        }
+      }
+    });
+
+    // OPD Visits Chart
+    opdChart = new Chart(document.getElementById('opdChart'), {
+      type: 'line',
+      data: {
+        labels: opdLabels,
+        datasets: [{
+          label: 'OPD Visits',
+          data: opdData,
+          borderColor: 'rgba(16, 185, 129, 1)',
+          backgroundColor: 'rgba(16, 185, 129, 0.1)',
+          borderWidth: 3,
+          pointRadius: 5,
+          pointHoverRadius: 7,
+          tension: 0.3,
+          fill: true
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              label: function(context) {
+                return ` ${context.parsed.y} visit${context.parsed.y !== 1 ? 's' : ''}`;
+              }
+            }
+          }
+        },
+        scales: {
+          y: { 
+            beginAtZero: true,
+            ticks: {
+              precision: 0
+            }
+          }
+        }
+      }
+    });
+  }
+
+  // Call the initialization function when the page loads
+  document.addEventListener('DOMContentLoaded', initializeCharts);
+
+  // AJAX filter functionality
+  document.getElementById('filterSelect').addEventListener('change', function() {
+    const selectedFilter = this.value;
+    
+    // Show loading state
+    const selectElement = this;
+    const originalValue = selectElement.value;
+    selectElement.disabled = true;
+    
+    // Make AJAX request
+    fetch(`?filter=${selectedFilter}&ajax=1`)
+      .then(response => response.json())
+      .then(data => {
+        // Update appointments chart
+        appointmentsChart.data.labels = data.appointment_chart_labels;
+        appointmentsChart.data.datasets[0].data = data.appointment_chart_counts;
+        appointmentsChart.update();
+        
+        // Update OPD chart
+        opdChart.data.labels = data.opd_chart_labels;
+        opdChart.data.datasets[0].data = data.opd_chart_counts;
+        opdChart.update();
+        
+        // Update date ranges
+        document.getElementById('appointmentsDateRange').textContent = 
+          `${data.week_start} - ${data.week_end}`;
+        document.getElementById('opdDateRange').textContent = 
+          `${data.week_start} - ${data.week_end}`;
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        // Revert the select value if there was an error
+        selectElement.value = originalValue;
+      })
+      .finally(() => {
+        selectElement.disabled = false;
+      });
+  });
+</script>
+
+</body>
+{% endblock %}

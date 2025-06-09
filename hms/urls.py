@@ -21,6 +21,14 @@ urlpatterns = [
     path('signup/', signup, name='signup'),
     path('login/', user_login, name='login'),
     path('logout/', user_logout, name='logout'),
+    path('redirect/', views.redirect_after_login, name='redirect_after_login'),
+    path('dashboard/', views.dashboard, name='dashboard'),
+    path('doctor/dashboard/', views.doctor_dashboard, name='doctor_dashboard'),
+    path('nurse/dashboard/', views.nurse_dashboard, name='nurse_dashboard'),
+    path('staff/dashboard/', views.staff_dashboard, name='staff_dashboard'),
+    path('api/patient-stats-staff/', views.patient_stats_api_staff, name='patient_stats_api_staff'),
+
+    path('admin/dashboard/', views.admin_dashboard, name='admin_dashboard'),
 
     # Patients
     path('patients/', views.patients, name='patients'),
@@ -76,17 +84,10 @@ urlpatterns = [
     path('emergency/admit/<int:emergency_id>/', admit_emergency_patient, name='admit_emergency_patient'),
 
     # Billing
-    # path('billing/', views.billing, name='billing'),
-    # path('billing/pay/<int:billing_id>/', views.pay_bill, name='pay_bill'),
-    # path('billing/generate/<str:patient_code>/', generate_bill, name='generate_bill'),
-    # path('billing/pdf/<str:patient_code>/', generate_bill_pdf, name='download_bill_pdf'),
-    # path('billing/add-expense/', add_expense, name='add_expense'),
-    # Billing URLs
     path('bills/', views.bill_list, name='bill_list'),
     path('bills/opd/create/', views.create_opd_bill, name='create_opd_bill'),
     path('bills/ipd/create/', views.create_ipd_bill, name='create_ipd_bill'),
     path('bills/<str:bill_number>/', views.view_bill, name='view_bill'),
-    #  path('billing/patient/<int:patient_id>/', patient_billing_summary, name='patient_billing_summary'),
     path('bills/<str:bill_number>/pdf/', views.view_bill_pdf, name='view_bill_pdf'),
     path('bills/<str:bill_number>/add-item/', views.add_billing_item, name='add_billing_item'),
     path('bills/<str:bill_number>/pay/', views.record_payment, name='record_payment'),

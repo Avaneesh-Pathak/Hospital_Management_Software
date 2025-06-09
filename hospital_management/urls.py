@@ -19,10 +19,15 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path,include
 from hms.admin import admin_site
+from hms import views as hms_views
 
 urlpatterns = [
     path("admin/", admin_site.urls),
     path('', include('hms.urls')),
+    path('dashboard/', hms_views.dashboard, name='dashboard'),
+    path('doctor/dashboard/', hms_views.doctor_dashboard, name='doctor_dashboard'),
+    path('nurse/dashboard/', hms_views.nurse_dashboard, name='nurse_dashboard'),
+    path('redirect/', hms_views.redirect_after_login, name='redirect_after_login'),
 ]
 
 if settings.DEBUG:

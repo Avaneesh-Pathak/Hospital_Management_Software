@@ -55,16 +55,6 @@ class PatientReportForm(forms.ModelForm):
             'description': forms.Textarea(attrs={'class': 'form-textarea', 'rows': 2, 'placeholder': 'Enter description'}),
         }
 
-        
-# class BillingForm(forms.ModelForm):
-#     class Meta:
-#         model = Billing
-#         fields = ['paid_amount']
-
-# class ExpenseForm(forms.ModelForm):
-#     class Meta:
-#         model = Expense
-        # fields = ['patient', 'category', 'description', 'cost']
 
 class IPDForm(forms.ModelForm):
     class Meta:
@@ -408,24 +398,34 @@ class NICUMedicationRecordForm(forms.ModelForm):
 class MedicineForm(forms.ModelForm):
     class Meta:
         model = Medicine
-        fields = ["name", "medicine_type", "standard_dose_per_kg","concentration_mg_per_ml", "is_liquid_injection"]
+        fields = [
+            "name", "brand", "medicine_type", "route", "duration",
+            "standard_dose_per_kg", "concentration_mg_per_ml", "is_liquid_injection"
+        ]
         widgets = {
             "medicine_type": forms.Select(choices=Medicine.MEDICINE_TYPE_CHOICES, attrs={"class": "form-control"}),
+            "route": forms.Select(choices=Medicine.ROUTE_CHOICES, attrs={"class": "form-control"}),
+            "brand": forms.TextInput(attrs={"class": "form-control"}),
+            "duration": forms.NumberInput(attrs={"class": "form-control", "min": "1"}),
             "standard_dose_per_kg": forms.NumberInput(attrs={"class": "form-control", "step": "0.01"}),
             "concentration_mg_per_ml": forms.NumberInput(attrs={"class": "form-control", "step": "0.01"}),
             "is_liquid_injection": forms.CheckboxInput(attrs={"class": "form-check-input", "id": "id_is_liquid_injection"}),
         }
         labels = {
             "name": "Medicine Name",
+            "brand": "Brand",
             "medicine_type": "Type of Medicine",
+            "route": "Route of Administration",
+            "duration": "Duration (days)",
             "standard_dose_per_kg": "Standard Dose (mg/kg/dose)",
             "concentration_mg_per_ml": "Concentration (mg/mL)",
             "is_liquid_injection": "Is it a Liquid Injection?",
         }
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        # Only show "is_liquid_injection" checkbox if type is "injection"
+        # Only show "is_liquid_injection" if type is "injection"
         if self.data.get("medicine_type") != "injection" and (
             not self.instance or self.instance.medicine_type != "injection"
         ):
