@@ -312,10 +312,6 @@ class Room(models.Model):
     ('icu', 'ICU'),
     ('emergency', 'Emergency Ward'),
     ('other', 'Other'),]
-<<<<<<< HEAD
-
-=======
->>>>>>> 9ca87c70db60a32fab0737c5830324a38c8a364f
     room_number = models.CharField(max_length=10, unique=True)
     room_type = models.CharField(max_length=20, choices=ROOM_TYPES)
     is_available = models.BooleanField(default=True)
