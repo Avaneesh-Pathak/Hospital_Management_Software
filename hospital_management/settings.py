@@ -55,6 +55,8 @@ INSTALLED_APPS = [
     'mathfilters',
     'widget_tweaks',
     'django.contrib.humanize',
+    'django_extensions', 
+    
 ]
 
 MIDDLEWARE = [

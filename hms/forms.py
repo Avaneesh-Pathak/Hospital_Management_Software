@@ -10,38 +10,53 @@ class ProfileUpdateForm(forms.ModelForm):
         fields = ["full_name", "email", "contact_number", "address"]
 
         
+from django import forms
+from .models import Patient
+from django.core.files.base import ContentFile
+import base64
+
 class PatientRegistrationForm(forms.ModelForm):
     full_name = forms.CharField(max_length=255, required=True)
     email = forms.EmailField(required=True)
     contact_number = forms.CharField(max_length=15, required=True)
     address = forms.CharField(widget=forms.Textarea, required=True)
     gender = forms.ChoiceField(choices=CustomUser.GENDER_CHOICES, required=True)
+    captured_image = forms.CharField(widget=forms.HiddenInput(), required=False)  # 👈 add this
+
     class Meta:
         model = Patient
         fields = [
-            'date_of_birth', 'aadhar_number','weight',
-            'blood_group', 'allergies', 'medical_history', 'current_medications', 'emergency_contact_name',
-            'emergency_contact_number', 'emergency_contact_relationship', 'accompanying_person_name',
-            'accompanying_person_contact', 'accompanying_person_relationship', 'accompanying_person_address',
+            'date_of_birth', 'aadhar_number', 'weight',
+            'blood_group', 'allergies',
+            'emergency_contact_name', 'emergency_contact_number',
+            'emergency_contact_relationship', 'accompanying_person_address',
             'profile_picture'
         ]
         exclude = ['user']
         widgets = {
             'date_of_birth': forms.DateInput(attrs={'type': 'date'}),
             'allergies': forms.Textarea(attrs={'rows': 3}),
-            'medical_history': forms.Textarea(attrs={'rows': 3}),
-            'current_medications': forms.Textarea(attrs={'rows': 3}),
             'accompanying_person_address': forms.Textarea(attrs={'rows': 3}),
         }
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        if 'user' in self.fields:  # Only filter if the user field exists
-            # Get all Doctor & Employee users
-            doctor_users = CustomUser.objects.filter(groups__name='Doctor').values_list('id', flat=True)
-            employee_users = CustomUser.objects.filter(groups__name='Employee').values_list('id', flat=True)
 
-            # Exclude Doctor & Employee from user selection
-            self.fields['user'].queryset = CustomUser.objects.exclude(id__in=doctor_users).exclude(id__in=employee_users)
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+
+        # Handle captured webcam image
+        image_data = self.cleaned_data.get('captured_image')
+        if image_data:
+            try:
+                format, imgstr = image_data.split(';base64,')
+                ext = format.split('/')[-1]
+                file_name = f"profile_{self.cleaned_data['full_name'].replace(' ', '_')}.{ext}"
+                instance.profile_picture = ContentFile(base64.b64decode(imgstr), name=file_name)
+            except Exception as e:
+                print("Image decoding error:", e)
+
+        if commit:
+            instance.save()
+        return instance
+
 
 
 
@@ -88,6 +103,22 @@ class IPDForm(forms.ModelForm):
             self.fields['bed_number'].choices = available
         else:
             self.fields['bed_number'].choices = []
+
+
+
+class OPDQuickForm(forms.ModelForm):
+    class Meta:
+        model = OPD
+        fields = ['patient', 'doctor', 'visit_type']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields.values():
+            field.widget.attrs.update({
+                'class': 'form-control',  # Let CSS handle layout
+                'style': 'margin-bottom: 10px;'  # Slight spacing between fields
+            })
+
 
 class OPDForm(forms.ModelForm):
     class Meta:
@@ -243,10 +274,6 @@ class PrescriptionForm(forms.ModelForm):
         }
 
 
-
-
-
-
 class LicenseForm(forms.ModelForm):
     class Meta:
         model = License
@@ -275,9 +302,6 @@ class MaintenanceForm(forms.ModelForm):
             'maintenance_date': forms.DateInput(attrs={'type': 'date'}),
             'next_due_date': forms.DateInput(attrs={'type': 'date'}),
         }
-
-
-
 
 
 class DaybookEntryForm(forms.ModelForm):
@@ -399,14 +423,14 @@ class MedicineForm(forms.ModelForm):
     class Meta:
         model = Medicine
         fields = [
-            "name", "brand", "medicine_type", "route", "duration",
+            "name", "brand", "medicine_type", "route", "duration","tablet_strength",
             "standard_dose_per_kg", "concentration_mg_per_ml", "is_liquid_injection"
         ]
         widgets = {
             "medicine_type": forms.Select(choices=Medicine.MEDICINE_TYPE_CHOICES, attrs={"class": "form-control"}),
             "route": forms.Select(choices=Medicine.ROUTE_CHOICES, attrs={"class": "form-control"}),
             "brand": forms.TextInput(attrs={"class": "form-control"}),
-            "duration": forms.NumberInput(attrs={"class": "form-control", "min": "1"}),
+            "duration": forms.Select(choices=Medicine.DURATION_FREQUENCY_CHOICES, attrs={"class": "form-control"}),
             "standard_dose_per_kg": forms.NumberInput(attrs={"class": "form-control", "step": "0.01"}),
             "concentration_mg_per_ml": forms.NumberInput(attrs={"class": "form-control", "step": "0.01"}),
             "is_liquid_injection": forms.CheckboxInput(attrs={"class": "form-check-input", "id": "id_is_liquid_injection"}),

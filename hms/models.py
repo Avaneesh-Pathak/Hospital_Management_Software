@@ -4,6 +4,7 @@ import logging
 from decimal import Decimal
 from django.http import Http404
 from django.db import models
+from django.conf import settings
 from django.utils import timezone
 from django.utils.timezone import now
 from datetime import datetime, timedelta
@@ -13,8 +14,10 @@ from django.core.exceptions import ValidationError
 from django.core.validators import MinLengthValidator
 from django.utils.translation import gettext_lazy as _
 from django.contrib.auth.models import AbstractUser, Group, Permission
-
+from django.contrib.auth import get_user_model
 logger = logging.getLogger('hms')
+
+
 
 
 # Custom User Model
@@ -55,6 +58,20 @@ class CustomUser(AbstractUser):
         return self.username
 
 
+# Notification Model
+class Notification(models.Model):
+    recipient = models.ForeignKey(
+        settings.AUTH_USER_MODEL, 
+        on_delete=models.CASCADE, 
+        related_name='notifications'
+    )
+    message = models.TextField()
+    is_read = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"To {self.recipient} - {self.message[:30]}"
+
 class Patient(models.Model):
     BLOOD_GROUP_CHOICES = [
         ('A+', 'A+'), ('A-', 'A-'), ('B+', 'B+'), ('B-', 'B-'),
@@ -87,19 +104,15 @@ class Patient(models.Model):
     assigned_doctor = models.ForeignKey('Doctor', on_delete=models.SET_NULL, null=True, blank=True, related_name='patients')
     # Medical Information
     allergies = models.TextField(blank=True, null=True)  # Known allergies
-    medical_history = models.TextField(blank=True, null=True)  # Past medical history
-    current_medications = models.TextField(blank=True, null=True)  # Current medications
+   
 
     # Emergency Contact Information
     emergency_contact_name = models.CharField(max_length=255, blank=True, null=True)
     emergency_contact_number = models.CharField(max_length=15, blank=True, null=True)
     emergency_contact_relationship = models.CharField(max_length=50, blank=True, null=True, choices=RELATIONSHIP_CHOICES)
+    accompanying_person_address = models.CharField(max_length=50,blank=True, null=True)
 
-    # Accompanying Person Details (Replaces Guarantor)
-    accompanying_person_name = models.CharField(max_length=255, blank=True, null=True)
-    accompanying_person_contact = models.CharField(max_length=15, blank=True, null=True)
-    accompanying_person_relationship = models.CharField(max_length=50, blank=True, null=True, choices=RELATIONSHIP_CHOICES)
-    accompanying_person_address = models.TextField(blank=True, null=True)
+  
 
     # Profile Picture
     profile_picture = models.ImageField(upload_to='patient_profiles/', blank=True, null=True)
@@ -494,27 +507,7 @@ class PatientTransfer(models.Model):
     def __str__(self):
         return f"{self.patient.user.full_name} transferred to {self.transferred_to_hospital}"
 
-
-
-class Prescription(models.Model):
-    DOSE_FREQUENCY_CHOICES = [
-        ("OD", "Once a day (OD)"),
-        ("BD", "Twice a day (BD)"),
-        ("TDS", "Three times a day (TDS)"),
-        ("QID", "Four times a day (QID)"),
-        ("SOS", "As needed (SOS)"),
-        ("STAT", "Immediately (STAT)"),
-        ("OTHER", "Other"),
-    ]
-    ipd = models.ForeignKey(IPD, on_delete=models.CASCADE, related_name="prescriptions")
-    dose_frequency = models.CharField(max_length=10, choices=DOSE_FREQUENCY_CHOICES, default="OD")
-    concentration_mg_per_ml = models.FloatField(help_text="Concentration of the medicine (mg/mL)", null=True, blank=True)
-    medication = models.CharField(max_length=255)
-    dosage = models.CharField(max_length=100)
-    timing = models.DateTimeField()
-
-    def __str__(self):
-        return f"Prescription for {self.ipd.patient.user.full_name} - {self.medication} ({self.dosage}) at {self.timing})"
+import json
 
 
 # OPD Model
@@ -537,6 +530,12 @@ class OPD(models.Model):
     ]
     visit_type = models.CharField(max_length=20, choices=VISIT_TYPE_CHOICES, default='new')  # Type of visit
 
+    def get_prescription_items(self):
+        try:
+            return json.loads(self.prescription) if self.prescription else []
+        except json.JSONDecodeError:
+            return []
+    
     def __str__(self):
         return f"OPD Visit - {self.patient.user.full_name} ({self.visit_date.strftime('%Y-%m-%d')})"
 
@@ -1038,19 +1037,55 @@ class Medicine(models.Model):
         ("other", "Other"),
     ]
 
+    DURATION_FREQUENCY_CHOICES = [
+    ("24H", "Once daily (Every 24 hours)"),
+    ("12H", "Twice daily (Every 12 hours)"),
+    ("8H", "Thrice daily (Every 8 hours)"),
+    ("6H", "Four times daily (Every 6 hours)"),
+    ("4H", "Every 4 hours"),
+    ("SOS", "As needed (SOS)"),
+    ("STAT", "Immediately (STAT)"),
+    ("PRN", "Pro re nata (As required)"),
+    ("OTHER", "Other (Specify)"),
+    ]
+
+
     name = models.CharField(max_length=100)
     brand = models.CharField(max_length=100, blank=True, null=True)
     medicine_type = models.CharField(max_length=20, choices=MEDICINE_TYPE_CHOICES, default="other")
     route = models.CharField(max_length=20, choices=ROUTE_CHOICES, blank=True, null=True)
-    duration = models.PositiveIntegerField(blank=True, null=True, help_text="Duration in days")
+    duration = models.CharField(blank=True, null=True, help_text="Duration in days",choices=DURATION_FREQUENCY_CHOICES)
     is_liquid_injection = models.BooleanField(default=False, help_text="Only for injections: Check if this is a ready-to-use liquid injection")
     standard_dose_per_kg = models.FloatField(help_text="Standard dose per kg (mg/kg/day)", null=True, blank=True)
+    tablet_strength= models.FloatField(help_text="Standard dose per kg (mg/kg/day)", null=True, blank=True)
     concentration_mg_per_ml = models.FloatField(help_text="Concentration of the medicine (mg/mL)", null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f"{self.name} ({self.get_medicine_type_display()})"
+    
 
+class Prescription(models.Model):
+    DOSE_FREQUENCY_CHOICES = [
+        ("OD", "Once a day (OD)"),
+        ("BD", "Twice a day (BD)"),
+        ("TDS", "Three times a day (TDS)"),
+        ("QID", "Four times a day (QID)"),
+        ("SOS", "As needed (SOS)"),
+        ("STAT", "Immediately (STAT)"),
+        ("OTHER", "Other"),
+    ]
+    ipd = models.ForeignKey(IPD, on_delete=models.CASCADE, related_name="prescriptions")
+    dose_frequency = models.CharField(max_length=10, choices=DOSE_FREQUENCY_CHOICES, default="OD")
+    concentration_mg_per_ml = models.FloatField(help_text="Concentration of the medicine (mg/mL)", null=True, blank=True)
+    medication = models.CharField(max_length=255)
+    dosage = models.CharField(max_length=100)
+    timing = models.DateTimeField()
+
+    def __str__(self):
+        return f"Prescription for {self.ipd.patient.user.full_name} - {self.medication} ({self.dosage}) at {self.timing})"
+    
+    
 class MedicineVial(models.Model):
     medicine = models.ForeignKey(Medicine, related_name='vials', on_delete=models.CASCADE)
     strength_mg = models.FloatField(help_text="Total mg in the vial (e.g., 500)")
@@ -1393,3 +1428,19 @@ class FluidRequirement(models.Model):
         return f"{patient_name} - Day {self.day_after_birth}"
 
 
+# FluidRequirement.objects.bulk_create([
+#     # For preterm neonates birth weight ≤1500g
+#     FluidRequirement(birth_weight_category="≤1500g", day_after_birth=1, fluid_ml_per_kg_per_day=80),
+#     FluidRequirement(birth_weight_category="≤1500g", day_after_birth=2, fluid_ml_per_kg_per_day=90),
+#     FluidRequirement(birth_weight_category="≤1500g", day_after_birth=3, fluid_ml_per_kg_per_day=100),
+#     FluidRequirement(birth_weight_category="≤1500g", day_after_birth=4, fluid_ml_per_kg_per_day=120),
+#     FluidRequirement(birth_weight_category="≤1500g", day_after_birth=5, fluid_ml_per_kg_per_day=140),
+#     FluidRequirement(birth_weight_category="≤1500g", day_after_birth=6, fluid_ml_per_kg_per_day=150),
+    
+#     # For term/preterm neonates birth weight >1500g
+#     FluidRequirement(birth_weight_category=">1500g", day_after_birth=1, fluid_ml_per_kg_per_day=60),
+#     FluidRequirement(birth_weight_category=">1500g", day_after_birth=2, fluid_ml_per_kg_per_day=80),
+#     FluidRequirement(birth_weight_category=">1500g", day_after_birth=3, fluid_ml_per_kg_per_day=100),
+#     FluidRequirement(birth_weight_category=">1500g", day_after_birth=4, fluid_ml_per_kg_per_day=120),
+#     FluidRequirement(birth_weight_category=">1500g", day_after_birth=5, fluid_ml_per_kg_per_day=140),
+#     FluidRequirement(birth_weight_category=">1500g", day_after_birth=6, fluid_ml_per_kg_per_day=160),

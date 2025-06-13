@@ -16,7 +16,7 @@ from .models import (
     AccountingRecord, EmergencyCase, IPD, OPD, BillingBase, 
     Room, Expense, Employee, PatientReport, Daybook, Balance, NICUVitals, 
     NICUMedicationRecord, Medicine, Diluent, Vial, FluidRequirement,
-    MedicineVial, IPDBilling, OPDBilling, Payment, CustomUser
+    MedicineVial, IPDBilling, OPDBilling, Payment, CustomUser,
 )
 
 # Get custom user model
@@ -42,6 +42,7 @@ admin_site.register(Doctor)
 admin_site.register(Appointment)
 admin_site.register(EmergencyCase)
 admin_site.register(IPD)
+
 admin_site.register(OPD)
 admin_site.register(OPDBilling)
 admin_site.register(IPDBilling)

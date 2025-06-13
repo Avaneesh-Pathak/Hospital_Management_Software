@@ -1,0 +1,11 @@
+<h2 class="text-lg font-bold mb-4">Your Notifications</h2>
+<ul>
+    {% for n in notifications %}
+        <li class="{% if not n.is_read %}font-bold{% endif %}">
+            {{ n.message }} - {{ n.created_at|naturaltime }}
+        </li>
+    {% empty %}
+        <li>No notifications.</li>
+    {% endfor %}
+</ul>
+

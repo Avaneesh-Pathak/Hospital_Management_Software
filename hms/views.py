@@ -48,24 +48,28 @@ from django.contrib.auth import authenticate, login, logout
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.views.generic import ListView, CreateView, UpdateView,DeleteView
+from django.views.decorators.http import require_POST
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
+from django.db import transaction
 
 # Import Models and Forms
 from .models import (
     CustomUser, Patient, Doctor, Appointment,
     BillingBase, OPDBilling, IPDBilling, BillingItem, Payment, Expense,
-    EmergencyCase, OPD, IPD, Employee, Room, PatientReport, Prescription,
+    EmergencyCase, OPD, IPD, Employee, Room, PatientReport,
     License, Asset, Maintenance, AccountingRecord, Daybook, Balance,
     PatientTransfer, NICUVitals, NICUMedicationRecord, Medicine, Diluent,
-    Vial, FluidRequirement, MedicineVial,Nurse, Staff
+    Vial, FluidRequirement, MedicineVial,Nurse, Staff,Notification,Prescription
 )
 
 from .forms import (
     PatientRegistrationForm, ExpenseForm, OPDBillingForm, IPDBillingForm,
     BillingItemForm, PaymentForm, OPDForm, DoctorForm, EmployeeForm,
     RoomForm, EmergencyCaseForm, ProfileUpdateForm, PatientReportForm,
-    PrescriptionForm, LicenseForm, AssetForm, MaintenanceForm,
+     LicenseForm, AssetForm, MaintenanceForm,
     BalanceUpdateForm, DaybookEntryForm, NICUVitalsForm, NICUMedicationRecordForm,
-    MedicineForm, DiluentForm, VialForm, NICUFluidForm, IPDForm, MedicineVialFormSet
+    MedicineForm, DiluentForm, VialForm, NICUFluidForm, IPDForm, MedicineVialFormSet,OPDQuickForm,PrescriptionForm
 )
 
 
@@ -181,7 +185,7 @@ def redirect_after_login(request):
     elif user.groups.filter(name='Patient').exists():
         return redirect('patient_dashboard')
     else:
-        return redirect('hms/dashboard.html')
+        return redirect('login')
     
 
 # Decorator factory for group-based access control
@@ -321,6 +325,9 @@ def doctor_dashboard(request):
 
 
 
+from django.utils import timezone
+from django.utils.timezone import make_aware  
+from django.db.models import F, ExpressionWrapper, DateTimeField
 
 @login_required
 @group_required('Nurse')
@@ -328,37 +335,38 @@ def nurse_dashboard(request):
     nurse = request.user.nurse_profile
     
     # Get assigned patients (IPD)
-    assigned_ipd_patients = IPD.objects.filter(
-        patient__assigned_doctor__isnull=False,
-        discharge_date__isnull=True
-    ).select_related('patient', 'room').order_by('-admitted_on')[:5]
-    
+    assigned_ipd_patients = IPD.objects.filter(discharge_date__isnull=True).select_related('patient', 'room').order_by('-admitted_on')[:5]    
     # Get recent OPD visits
-    recent_opd_visits = OPD.objects.select_related(
-        'patient', 'doctor'
-    ).order_by('-visit_date')[:5]
-    
+    recent_opd_visits = OPD.objects.select_related('patient', 'doctor').order_by('-visit_date')[:5]
     # Get emergency cases
-    emergency_cases = EmergencyCase.objects.filter(
-        status='Pending'
-    ).select_related('patient').order_by('-admitted_on')[:5]
-    
-    # Get vitals needing attention (last 4 hours)
+    emergency_cases = EmergencyCase.objects.filter(Q(status='Pending') | Q(status='Admitted')).order_by('-admitted_on')[:5]
+
+
+    # Get vitals in the last 4 hours
     four_hours_ago = timezone.now() - timedelta(hours=4)
     critical_vitals = NICUVitals.objects.filter(
         date__gte=four_hours_ago.date(),
         time__gte=four_hours_ago.time()
     ).select_related('ipd', 'ipd__patient').order_by('-date', '-time')[:5]
-    
+    for vital in critical_vitals:
+        vital.datetime_recorded = datetime.combine(vital.date, vital.time)
+
     # Get pending medications
     now = timezone.now()
     one_hour_from_now = now + timedelta(hours=1)
-    pending_medications = Prescription.objects.filter(
-        timing__gte=now,
-        timing__lte=one_hour_from_now,
-        # administered=False
-    ).select_related('ipd', 'ipd__patient').order_by('timing')[:10]
-    
+    pending_prescriptions = Prescription.objects.filter(
+    Q(timing__isnull=True) |  # No timing set
+    Q(timing__gte=now)        # Future timings
+    ).select_related('ipd', 'ipd__patient').order_by('timing')
+
+    # Get the 2 most recent past prescriptions
+    past_prescriptions = Prescription.objects.filter(
+        timing__lt=now
+    ).select_related('ipd', 'ipd__patient').order_by('-timing')[:2]
+
+    # Combine them manually into one list
+    prescriptions_to_show = list(past_prescriptions[::-1]) + list(pending_prescriptions[:10])  # Reverse past for chronological order
+        
     
     context = {
         'nurse': nurse,
@@ -366,7 +374,7 @@ def nurse_dashboard(request):
         'recent_opd_visits': recent_opd_visits,
         'emergency_cases': emergency_cases,
         'critical_vitals': critical_vitals,
-        'pending_medications': pending_medications,
+        'prescriptions_to_show': prescriptions_to_show,
         # 'recent_activities': recent_activities,
         'current_time': now,
     }
@@ -734,6 +742,9 @@ def upload_patient_report(request, patient_code):
     return render(request, 'hms/patient/upload_patient_report.html', context)
 
 
+import base64
+from django.core.files.base import ContentFile
+
 @login_required
 def register_patient(request):
     if request.method == "POST":
@@ -742,49 +753,62 @@ def register_patient(request):
 
         if form.is_valid():
             try:
-                # Create a new user with the provided details
+                # Step 1: Create a new user
                 user = CustomUser.objects.create(
                     full_name=form.cleaned_data['full_name'],
                     email=form.cleaned_data['email'],
                     contact_number=form.cleaned_data['contact_number'],
                     address=form.cleaned_data['address'],
                     gender=form.cleaned_data['gender'],
-                    username=form.cleaned_data['email'],  # Using email as username
+                    username=form.cleaned_data['email'],
                 )
-                user.set_password("pass123")  # You can generate a random password instead
+                user.set_password("pass123")
                 user.save()
                 logger.info(f"New user created: {user.full_name} ({user.email})")
 
-                # Create a new patient and link the newly created user
-                patient = Patient.objects.create(
-                    user=user,  # Linking newly created user
-                    date_of_birth=form.cleaned_data['date_of_birth'],
-                    aadhar_number=form.cleaned_data['aadhar_number'],
-                    blood_group=form.cleaned_data['blood_group'],
-                    weight=form.cleaned_data.get('weight'),  # ✅ Add this line
-                    allergies=form.cleaned_data.get('allergies', ''),
-                    medical_history=form.cleaned_data.get('medical_history', ''),
-                    current_medications=form.cleaned_data.get('current_medications', ''),
-                    emergency_contact_name=form.cleaned_data.get('emergency_contact_name', ''),
-                    emergency_contact_number=form.cleaned_data.get('emergency_contact_number', ''),
-                    emergency_contact_relationship=form.cleaned_data.get('emergency_contact_relationship', ''),
-                    accompanying_person_name=form.cleaned_data.get('accompanying_person_name', ''),
-                    accompanying_person_contact=form.cleaned_data.get('accompanying_person_contact', ''),
-                    accompanying_person_relationship=form.cleaned_data.get('accompanying_person_relationship', ''),
-                    accompanying_person_address=form.cleaned_data.get('accompanying_person_address', ''),
-                    profile_picture=form.cleaned_data.get('profile_picture', None),
-                    contact_number=form.cleaned_data['contact_number'],
-                    gender=form.cleaned_data['gender'],
-                    email=form.cleaned_data['email'],
-                )
-                logger.info(f"New patient registered: {patient.user.full_name} (Code: {patient.patient_code})")
+                # Step 2: Prepare patient fields
+                patient_data = {
+                    "user": user,
+                    "date_of_birth": form.cleaned_data['date_of_birth'],
+                    "aadhar_number": form.cleaned_data['aadhar_number'],
+                    "blood_group": form.cleaned_data['blood_group'],
+                    "weight": form.cleaned_data.get('weight'),
+                    "allergies": form.cleaned_data.get('allergies', ''),
+                    "emergency_contact_name": form.cleaned_data.get('emergency_contact_name', ''),
+                    "emergency_contact_number": form.cleaned_data.get('emergency_contact_number', ''),
+                    "emergency_contact_relationship": form.cleaned_data.get('emergency_contact_relationship', ''),
+                    "accompanying_person_address": form.cleaned_data.get('accompanying_person_address', ''),
+                    "contact_number": form.cleaned_data['contact_number'],
+                    "gender": form.cleaned_data['gender'],
+                    "email": form.cleaned_data['email'],
+                }
 
+                # Step 3: Handle webcam image if provided
+                captured_image = form.cleaned_data.get('captured_image')
+                print(captured_image)
+                if captured_image:
+                    try:
+                        format, imgstr = captured_image.split(';base64,')
+                        ext = format.split('/')[-1]
+                        file_name = f"profile_{user.full_name.replace(' ', '_')}.{ext}"
+                        patient_data["profile_picture"] = ContentFile(base64.b64decode(imgstr), name=file_name)
+                        logger.info("Webcam image processed and added to profile_picture.")
+                    except Exception as e:
+                        logger.error(f"Error decoding webcam image: {e}")
+                else:
+                    # Fall back to uploaded file input
+                    patient_data["profile_picture"] = form.cleaned_data.get('profile_picture')
+
+                # Step 4: Save patient
+                patient = Patient.objects.create(**patient_data)
+                logger.info(f"New patient registered: {patient.user.full_name} (Code: {patient.patient_code})")
                 messages.success(request, "Patient registered successfully!")
                 return redirect('patients')
 
             except Exception as e:
-                logger.error(f"Error occurred during patient registration: {e}")
+                logger.error(f"Error during patient registration: {e}")
                 messages.error(request, f"Error occurred: {str(e)}")
+
         else:
             logger.warning("Patient registration form is invalid.")
             logger.error(f"Form errors: {form.errors}")
@@ -794,6 +818,7 @@ def register_patient(request):
         form = PatientRegistrationForm()
 
     return render(request, 'hms/patient/register_patient.html', {'form': form})
+
 
 @login_required
 def fetch_patients(request):
@@ -851,20 +876,6 @@ def update_doctor(request, doctor_id):
     else:
         form = DoctorForm(instance=doctor)
     return render(request, 'hms/doctor/update_doctor.html', {'form': form, 'doctor': doctor})
-
-# @login_required
-# @user_passes_test(lambda u: u.groups.filter(name='Doctor').exists())
-# def doctor_dashboard(request):
-#     doctor = request.user.doctor  # ✅ Use related_name="doctor"
-#     patients = Patient.objects.filter(assigned_doctor=doctor)
-#     today = timezone.now().date()
-#     appointments_today = Appointment.objects.filter(doctor=doctor, date=today)
-
-#     return render(request, 'hms/doctor/doctor_dashboard.html', {
-#         'doctor': doctor,
-#         'patients': patients,
-#         'appointments_today': appointments_today
-#     })
 
 
 # Appointment Views
@@ -1584,8 +1595,13 @@ def view_ipd_report(request, ipd_id):
     ipd = get_object_or_404(IPD, id=ipd_id)
     rooms = Room.objects.all()
     prescriptions = Prescription.objects.filter(ipd=ipd).order_by('-timing')
-    reports = PatientReport.objects.filter(patient=ipd.patient).order_by('-uploaded_at')  # Fetch reports
-    return render(request, 'hms/ipd/view_ipd_report.html', {'ipd': ipd, 'rooms': rooms,'prescriptions':prescriptions,'reports': reports})
+    reports = PatientReport.objects.filter(patient=ipd.patient).order_by('-uploaded_at')
+    return render(request, 'hms/ipd/view_ipd_report.html', {
+        'ipd': ipd,
+        'rooms': rooms,
+        'prescriptions': prescriptions,
+        'reports': reports
+    })
 
 # Update IPD Room
 def update_ipd_room(request, ipd_id):
@@ -1679,7 +1695,7 @@ def transfer_summary_pdf(request, patient_code):
         "patient": patient,
         "opd_visits": OPD.objects.filter(patient=patient).order_by('-visit_date'),
         "ipd_records": IPD.objects.filter(patient=patient),
-        "prescriptions": Prescription.objects.filter(ipd__patient=patient).order_by('-timing'),
+        "prescriptions": IPDPrescription.objects.filter(ipd__patient=patient).order_by('-timing'),
         "transfer": PatientTransfer.objects.filter(patient=patient).order_by('-transfer_date').first(),
     }
 
@@ -1701,6 +1717,8 @@ def add_prescription(request, ipd_id):
         form = PrescriptionForm()
 
     return render(request, 'hms/opd/add_prescription.html', {'form': form, 'ipd': ipd})
+
+
 
 # OPD Views
 @login_required
@@ -1750,53 +1768,234 @@ def fetch_opd(request):
     except Exception as e:
         return JsonResponse({"error": str(e)}, status=500)
 
+
+
+@login_required
+def unread_notifications(request):
+    """Get unread notifications with optimized query"""
+    notifications = request.user.notifications.filter(
+        is_read=False
+    ).order_by('-created_at').values('id', 'message', 'created_at')[:20]  # Limit to 20
+    
+    return JsonResponse({
+        "notifications": list(notifications),
+        "unread_count": request.user.notifications.filter(is_read=False).count()
+    })
+
+@require_POST
+@login_required
+def mark_notification_read(request, notification_id):
+    """Mark single notification as read"""
+    try:
+        with transaction.atomic():
+            updated = request.user.notifications.filter(
+                id=notification_id,
+                is_read=False
+            ).update(is_read=True)
+            
+            if not updated:
+                return JsonResponse({"success": False}, status=404)
+                
+            return JsonResponse({"success": True})
+    except Exception as e:
+        return JsonResponse({"success": False, "error": str(e)}, status=500)
+
+@require_POST
+@login_required
+def mark_all_notifications_read(request):
+    """Mark all notifications as read in a single query"""
+    try:
+        updated = request.user.notifications.filter(
+            is_read=False
+        ).update(is_read=True)
+        
+        return JsonResponse({
+            "success": True,
+            "marked_count": updated
+        })
+    except Exception as e:
+        return JsonResponse({"success": False, "error": str(e)}, status=500)
+    
+
+@method_decorator(csrf_exempt, name='dispatch')
 @login_required
 def add_opd(request):
+    """Improved OPD creation with transaction and better error handling"""
+    if request.method != "POST":
+        return JsonResponse({"error": "Method not allowed"}, status=405)
+    
+    try:
+        with transaction.atomic():
+            patient_id = request.POST.get("patient")
+            doctor_id = request.POST.get("doctor")
+            diagnosis = request.POST.get("diagnosis", "").strip()
+            
+            if not all([patient_id, doctor_id]):
+                raise ValueError("Patient and Doctor are required")
+                
+            patient = Patient.objects.get(id=patient_id)
+            doctor = Doctor.objects.get(id=doctor_id)
+            
+            opd = OPD.objects.create(
+                patient=patient,
+                doctor=doctor,
+                diagnosis=diagnosis
+            )
+            
+            # Create notification
+            Notification.objects.create(
+                recipient=doctor.user,
+                message=f"New OPD visit: {patient.full_name} - {diagnosis[:50]}"
+            )
+            
+            return JsonResponse({
+                "success": True,
+                "message": "OPD created successfully",
+                "opd_id": opd.id
+            })
+            
+    except (Patient.DoesNotExist, Doctor.DoesNotExist) as e:
+        return JsonResponse({"success": False, "error": "Invalid patient or doctor"}, status=400)
+    except Exception as e:
+        return JsonResponse({"success": False, "error": str(e)}, status=400)
+
+
+@login_required
+def add_opd_quick(request):
     if request.method == "POST":
-        patient_id = request.POST.get("patient")
-        doctor_id = request.POST.get("doctor")
-        diagnosis = request.POST.get("diagnosis")
+        form = OPDQuickForm(request.POST)
+        if form.is_valid():
+            opd = form.save()
 
-        patient = Patient.objects.get(id=patient_id)
-        doctor = Doctor.objects.get(id=doctor_id)
+            # Create a notification for the doctor
+            Notification.objects.create(
+                recipient=opd.doctor.user,  # assuming Doctor has OneToOneField to CustomUser as `user`
+                message=f"New quick OPD added: Patient {opd.patient.user.full_name}"
+            )
 
-        OPD.objects.create(patient=patient, doctor=doctor, diagnosis=diagnosis)
-        messages.success(request, "OPD visit added successfully!")
-        return redirect("opd")  # Redirect to OPD list page
+            messages.success(request, "OPD visit added successfully!")
+            return redirect("opd")
+    else:
+        form = OPDQuickForm()
 
-    patients = Patient.objects.all()
-    doctors = Doctor.objects.all()
-    return render(request, "hms/opd/add_opd.html", {"patients": patients, "doctors": doctors})
+    return render(request, "hms/opd/add_opd_quick.html", {"form": form})
+
+def search_medicines(request):
+    term = request.GET.get('term', '')
+    medicines = Medicine.objects.filter(name__icontains=term).distinct()[:10]
+
+    results = []
+    for med in medicines:
+        results.append({
+            "id": med.id,
+            "name": med.name,
+            "brand": med.brand,
+            "type": med.get_medicine_type_display(),
+            "route": med.get_route_display() if med.route else "",
+            "duration": med.get_duration_display() if med.duration else "",
+            "dose_per_kg": med.standard_dose_per_kg or "",  # Needed for JS
+        })
+
+    return JsonResponse(results, safe=False)
+
+
+@login_required
+def doctor_notifications(request):
+    notifications = request.user.notifications.order_by('-created_at')
+    return render(request, "hms/notifications/doctor_notifications.html", {"notifications": notifications})
+
+
+@login_required
+def doctor_notifications(request):
+    notifications = request.user.notifications.order_by('-created_at')
+    return render(request, "hms/notifications/doctor_notifications.html", {"notifications": notifications})
+
+
+
+@login_required
+def unread_notifications(request):
+    notifications = request.user.notifications.filter(is_read=False).order_by('-created_at')
+    data = [{
+        "id": n.id,
+        "message": n.message,
+        "created_at": n.created_at.strftime('%Y-%m-%d %H:%M'),
+    } for n in notifications]
+    return JsonResponse({"notifications": data, "unread_count": notifications.count()})
+
+
+@login_required
+def mark_notification_read(request, notification_id):
+    try:
+        notification = Notification.objects.get(id=notification_id, recipient=request.user)
+        notification.is_read = True
+        notification.save()
+        return JsonResponse({"success": True})
+    except Notification.DoesNotExist:
+        return JsonResponse({"success": False}, status=404)
+
+
+@login_required
+def pending_opds_for_doctor(request):
+    try:
+        doctor = Doctor.objects.get(user=request.user)
+    except Doctor.DoesNotExist:
+        # TEMP: create a dummy doctor entry
+        doctor = Doctor.objects.create(user=request.user, specialization="General")
+
+    opds = OPD.objects.filter(doctor=doctor, diagnosis__isnull=True).order_by('-created_at')
+    return render(request, "hms/opd/pending_opds.html", {"opds": opds})
+
+
+
+from django.utils.dateparse import parse_date
+import json
 
 @login_required
 def update_opd(request, opd_id):
     opd = get_object_or_404(OPD, id=opd_id)
-
+    print("Updating OPD:", opd)
     if request.method == "POST":
         doctor_id = request.POST.get("doctor")
         diagnosis = request.POST.get("diagnosis")
         symptoms = request.POST.get("symptoms")
-        prescription = request.POST.get("prescription")
-        follow_up_date = request.POST.get("follow_up_date")
         visit_type = request.POST.get("visit_type")
-        # payment_status = request.POST.get("payment_status")
-        # payment_amount = request.POST.get("payment_amount")
+        follow_up_date = request.POST.get("follow_up_date")
+
+        # ✅ Get prescription JSON from form
+        prescription_data = request.POST.get("prescription_json")  # New: expects stringified JSON
+        print("Prescription Data:", prescription_data)
+        # Validate & save prescription
+        try:
+            prescription_list = json.loads(prescription_data)
+        except (json.JSONDecodeError, TypeError):
+            prescription_list = []
 
         opd.doctor = Doctor.objects.get(id=doctor_id)
         opd.diagnosis = diagnosis
         opd.symptoms = symptoms
-        opd.prescription = prescription
-        opd.follow_up_date = follow_up_date
         opd.visit_type = visit_type
-        # opd.payment_status = payment_status
-        # opd.payment_amount = payment_amount
+        opd.follow_up_date = parse_date(follow_up_date) if follow_up_date else None
+        opd.prescription = json.dumps(prescription_list)  # Save structured data as string
+
         opd.save()
 
         messages.success(request, "OPD visit updated successfully!")
         return redirect("opd")
 
     doctors = Doctor.objects.all()
-    return render(request, "hms/opd/update_opd.html", {"opd": opd, "doctors": doctors})
+
+    # ✅ Preload prescription JSON into readable structure
+    try:
+        prescription_list = json.loads(opd.prescription or "[]")
+    except json.JSONDecodeError:
+        prescription_list = []
+
+    return render(request, "hms/opd/update_opd.html", {
+        "opd": opd,
+        "doctors": doctors,
+        "prescriptions": prescription_list  # for frontend JS rendering
+    })
+
 
 
 
@@ -1819,33 +2018,38 @@ def calculate_age(date_of_birth):
 
 
 def opd_report_template(request, patient_id):
-    # Fetch the OPD record for the specific patient
     opd = get_object_or_404(OPD, id=patient_id)
     patient = opd.patient
-    
-    # Calculate age dynamically
+
+    # Calculate age
     patient_age = calculate_age(patient.date_of_birth)
 
-    # Prepare the context with all fields from the OPD model
+    # Parse prescription JSON
+    try:
+        prescription_items = json.loads(opd.prescription) if opd.prescription else []
+    except json.JSONDecodeError:
+        prescription_items = []
+
     opd_visits = [
         {
-            'created_at': opd.created_at.strftime("%Y-%m-%d %H:%M:%S"),  # Include time for precision
+            'created_at': opd.created_at.strftime("%Y-%m-%d %H:%M:%S"),
             'doctor': opd.doctor.user.full_name,
             'diagnosis': opd.diagnosis,
             'symptoms': opd.symptoms,
-            'prescription': opd.prescription,
-            'visit_type': opd.get_visit_type_display(),  # Get the display value for the choice field
-            'follow_up_date': opd.follow_up_date.strftime("%Y-%m-%d") if opd.follow_up_date else "N/A",  # Format date or show "N/A"
+            'prescription_items': prescription_items,  # ✅ Renamed key
+            'visit_type': opd.get_visit_type_display(),
+            'follow_up_date': opd.follow_up_date.strftime("%Y-%m-%d") if opd.follow_up_date else "N/A",
         },
     ]
-    
+
     context = {
-        'current_date': timezone.now().strftime("%Y-%m-%d %H:%M:%S"),  # Include time for precision
-        'patient_name': opd.patient.user.full_name,
-        'patient_gender': opd.patient.gender,
-        'patient_contact': opd.patient.contact_number,
+        'current_date': timezone.now().strftime("%Y-%m-%d %H:%M:%S"),
+        'patient_name': patient.user.full_name,
+        'patient_gender': patient.gender,
+        'patient_weight': patient.weight,
+        'patient_contact': patient.contact_number,
         'opd_visits': opd_visits,
-        'patient_age': patient_age,  # Pass dynamically calculated age
+        'patient_age': patient_age,
     }
     return render(request, 'hms/opd/opd_report_template.html', context)
 
@@ -1989,6 +2193,7 @@ def pay_salary(request, pk):
     return render(request, 'hms/salary/pay_salary.html', {'employee': employee})
 
 # License Views
+@login_required
 def license_list(request):
     licenses = License.objects.all()
     return render(request, 'hms/license/license_list.html', {'licenses': licenses})
@@ -2020,6 +2225,7 @@ def delete_license(request, id):
     return redirect('license_list')
 
 # Asset Views
+@login_required
 def asset_list(request):
     assets = Asset.objects.all()
     return render(request, 'hms/asset/asset_list.html', {'assets': assets})
@@ -2051,6 +2257,7 @@ def delete_asset(request, id):
     return redirect('asset_list')
 
 # Maintenance Views
+@login_required
 def maintenance_list(request):
     maintenance_records = Maintenance.objects.all()
     return render(request, 'hms/maintenance/maintenance_list.html', {'maintenance_records': maintenance_records})
@@ -2174,6 +2381,7 @@ def accounting_summary(request):
 
 
 # Daybook Views
+
 class DaybookCreateView(LoginRequiredMixin, View):
     login_url = '/login/'
     template_name = 'hms/daybook/daybook_form.html'
@@ -2504,6 +2712,7 @@ def calculate_total_fluids(vitals_list):
     return dict(date_wise_totals)  # Convert defaultdict to a regular dictionary
 
 # NICU Medication Views
+
 class NICUMedicationRecordListView(ListView):
     """View to list all medications for a specific IPD admission."""
     model = NICUMedicationRecord

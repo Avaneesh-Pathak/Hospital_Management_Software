@@ -19,37 +19,46 @@
     </div>
 
     <!-- Prescriptions Section -->
-    <div class="bg-white p-6 rounded-lg shadow-md mb-6">
-        <h3 class="text-xl font-semibold text-gray-700 mb-4">Prescriptions</h3>
-        {% if prescriptions %}
-            <div class="overflow-x-auto">
-                <table class="w-full border-collapse border border-gray-200">
-                    <thead>
-                        <tr class="bg-gray-100">
-                            <th class="border p-3 text-left text-gray-600">Medication</th>
-                            <th class="border p-3 text-left text-gray-600">Dosage</th>
-                            <th class="border p-3 text-left text-gray-600">Concentration</th>
-                            <th class="border p-3 text-left text-gray-600">Dose Frequency</th>
-                            <th class="border p-3 text-left text-gray-600">Timing</th>
+<div class="bg-white p-6 rounded-lg shadow-md mb-6">
+    <h3 class="text-xl font-semibold text-gray-700 mb-4">Prescriptions</h3>
+    {% if prescriptions %}
+        <div class="overflow-x-auto">
+            <table class="w-full border-collapse border border-gray-200 text-sm">
+                <thead>
+                    <tr class="bg-gray-100">
+                        <th class="border p-3 text-left text-gray-600">Medication</th>
+                        <th class="border p-3 text-left text-gray-600">Dosage</th>
+                        <th class="border p-3 text-left text-gray-600">Concentration (mg/mL)</th>
+                        <th class="border p-3 text-left text-gray-600">Dose Frequency</th>
+                        <th class="border p-3 text-left text-gray-600">Route</th>
+                        <th class="border p-3 text-left text-gray-600">Duration</th>
+                        <th class="border p-3 text-left text-gray-600">Timing</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for prescription in prescriptions %}
+                        <tr class="hover:bg-gray-50">
+                            <td class="border p-3 text-gray-700">{{ prescription.medication }}</td>
+                            <td class="border p-3 text-gray-700">{{ prescription.dosage }}</td>
+                            <td class="border p-3 text-gray-700">
+                                {{ prescription.concentration_mg_per_ml|default:"N/A" }}
+                            </td>
+                            <td class="border p-3 text-gray-700">{{ prescription.dose_frequency }}</td>
+                            <td class="border p-3 text-gray-700">{{ prescription.route|default:"Oral" }}</td>
+                            <td class="border p-3 text-gray-700">{{ prescription.duration|default:"5 days" }}</td>
+                            <td class="border p-3 text-gray-700">
+                                {{ prescription.timing|date:"d M Y, h:i A" }}
+                            </td>
                         </tr>
-                    </thead>
-                    <tbody>
-                        {% for prescription in prescriptions %}
-                            <tr class="hover:bg-gray-50">
-                                <td class="border p-3 text-gray-700">{{ prescription.medication }}</td>
-                                <td class="border p-3 text-gray-700">{{ prescription.dosage }}</td>
-                                <td class="border p-3 text-gray-700">{{ prescription.concentration_mg_per_ml }}</td>
-                                <td class="border p-3 text-gray-700">{{ prescription.dose_frequency }}</td>
-                                <td class="border p-3 text-gray-700">{{ prescription.timing|date:"d M Y, h:i A" }}</td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        {% else %}
-            <p class="text-gray-500">No prescriptions added yet.</p>
-        {% endif %}
-    </div>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <p class="text-gray-500">No prescriptions added yet.</p>
+    {% endif %}
+</div>
+
 
     <!-- Uploaded Reports Section -->
     <div class="bg-white p-6 rounded-lg shadow-md mb-6">

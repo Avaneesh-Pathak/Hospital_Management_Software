@@ -16,7 +16,7 @@
     {% endif %}
 
     <!-- OPD Form -->
-    <form method="post" class="space-y-6">
+    <form method="post" id="opdForm" class="space-y-6">
         {% csrf_token %}
 
         <!-- Patient Selection -->
@@ -52,10 +52,12 @@
         </div>
 
         <!-- Prescription -->
-        <div>
+       <div class="mb-4 relative">
             <label for="prescription" class="block text-sm font-medium text-gray-700 mb-2">Prescription:</label>
-            <textarea name="prescription" id="prescription" class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" rows="4"></textarea>
+            <input type="text" id="prescription_input" class="w-full p-2 border border-gray-300 rounded-md" placeholder="Type medicine name...">
+            <div id="suggestions" class="absolute bg-white border border-gray-300 rounded-md w-full z-10 hidden"></div>
         </div>
+
 
         <!-- Follow-up Date -->
         <div>
@@ -73,21 +75,6 @@
             </select>
         </div>
 
-        <!-- Payment Status -->
-        {% comment %} <div>
-            <label for="payment_status" class="block text-sm font-medium text-gray-700 mb-2">Payment Status:</label>
-            <select name="payment_status" id="payment_status" class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                <option value="pending">Pending</option>
-                <option value="paid">Paid</option>
-            </select>
-        </div> {% endcomment %}
-
-        <!-- Payment Amount -->
-        {% comment %} <div>
-            <label for="payment_amount" class="block text-sm font-medium text-gray-700 mb-2">Payment Amount:</label>
-            <input type="number" name="payment_amount" id="payment_amount" step="0.01" class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-        </div> {% endcomment %}
-
         <!-- Submit Button -->
         <button type="submit" class="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition duration-300">
             Add OPD Visit
@@ -99,4 +86,73 @@
         Back to OPD List
     </a>
 </div>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const input = document.getElementById('prescription_input');
+    const suggestions = document.getElementById('suggestions');
+
+    input.addEventListener('input', function () {
+        const query = input.value;
+        if (query.length < 1) {
+            suggestions.classList.add('hidden');
+            return;
+        }
+
+        fetch(`/ajax/search-medicines/?term=${encodeURIComponent(query)}`)
+            .then(response => response.json())
+            .then(data => {
+                suggestions.innerHTML = '';
+                if (data.length === 0) {
+                    suggestions.classList.add('hidden');
+                    return;
+                }
+                data.forEach(medicine => {
+                    const option = document.createElement('div');
+                    option.textContent = medicine;
+                    option.className = 'cursor-pointer px-2 py-1 hover:bg-blue-100';
+                    option.addEventListener('click', function () {
+                        input.value = medicine;
+                        suggestions.classList.add('hidden');
+                    });
+                    suggestions.appendChild(option);
+                });
+                suggestions.classList.remove('hidden');
+            });
+    });
+
+    document.addEventListener('click', function (event) {
+        if (!input.contains(event.target) && !suggestions.contains(event.target)) {
+            suggestions.classList.add('hidden');
+        }
+    });
+});
+</script>
+
+<script>
+document.getElementById("opdForm").addEventListener("submit", function (e) {
+    e.preventDefault();
+
+    const formData = new FormData(this);
+
+    fetch("{% url 'add_opd' %}", {
+        method: "POST",
+        headers: {
+            "X-CSRFToken": formData.get("csrfmiddlewaretoken"),
+            "X-Requested-With": "XMLHttpRequest"
+        },
+        body: formData
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            showToast(data.message || "OPD added!");
+            fetchNotifications();  // 👈 live notification update
+            this.reset(); // optional: reset form
+        } else {
+            showToast(data.error || "Failed to add OPD.");
+        }
+    });
+});
+</script>
+
 {% endblock %}

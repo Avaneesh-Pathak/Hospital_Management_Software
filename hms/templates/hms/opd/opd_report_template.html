@@ -3,193 +3,308 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OPD Report</title>
+    <title>OPD Report - {{ patient_name }}</title>
     <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f5f5f5;
+            padding: 20px 0;
+        }
+        
+        @page {
+            size: A4;
+            margin: 15mm;
+        }
         
         .report-container {
-            width: 210mm; /* A4 width */
-            {% comment %} min-height: 297mm; /* A4 height */ {% endcomment %}
+            width: 210mm;
+            max-width: 100%;
             margin: 0 auto;
-            {% comment %} padding: 20mm; {% endcomment %}
-            box-sizing: border-box;
             background-color: #fff;
+            box-sizing: border-box;
+            padding: 20mm;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
+        
         .header {
             text-align: center;
             margin-bottom: 30px;
             border-bottom: 2px solid #e5e7eb;
             padding-bottom: 20px;
         }
-        .header img {
-            width: 100px; /* Adjust logo size */
-            margin-bottom: 10px;
-        }
+        
         .header h1 {
             font-size: 28px;
-            margin: 0;
+            margin: 10px 0 5px;
             color: #1e3a8a;
+            font-weight: 700;
         }
+        
         .header p {
             font-size: 14px;
             color: #6b7280;
-            margin: 5px 0 0;
+            margin: 5px 0;
         }
+        
         .section {
             margin-bottom: 25px;
         }
-        .section h2 {
-            font-size: 20px;
+        
+        .section-title {
+            font-size: 18px;
             color: #1e3a8a;
-            margin-bottom: 10px;
             border-bottom: 1px solid #e5e7eb;
             padding-bottom: 5px;
+            margin-bottom: 15px;
         }
-        .section p {
-            font-size: 14px;
-            color: #374151;
-            margin: 5px 0;
+        
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
         }
-        .section p strong {
-            color: #111827;
+        
+        .info-label {
+            font-weight: 600;
+            color: #4b5563;
         }
-        table {
-            width: 100%;
-            border-collapse: collapse;
+        
+        .medical-section {
             margin-bottom: 20px;
         }
-        table th, table td {
-            border: 1px solid #e5e7eb;
-            padding: 10px;
-            text-align: left;
-            font-size: 14px;
-        }
-        table th {
-            background-color: #f3f4f6;
-            color: #111827;
+        
+        .section-subtitle {
             font-weight: 600;
+            background-color: #f3f4f6;
+            padding: 8px 12px;
+            border-radius: 4px;
+            margin-bottom: 10px;
         }
-        table td {
-            color: #374151;
+        
+        .content-box {
+            padding: 12px 15px;
+            border: 1px solid #e5e7eb;
+            border-radius: 4px;
+            background-color: #f9fafb;
+            margin-bottom: 15px;
         }
+        
+        .prescription-item {
+            margin-bottom: 10px;
+            border-bottom: 1px dashed #e5e7eb;
+            padding-bottom: 10px;
+        }
+        
+        .prescription-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        
+        .prescription-details {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+        
+        .signature {
+            text-align: center;
+            border-top: 1px solid #333;
+            width: 200px;
+            padding-top: 5px;
+            margin-top: 50px;
+            margin-left: auto;
+        }
+        
         .footer {
             text-align: center;
-            margin-top: 30px;
+            margin-top: 40px;
             padding-top: 20px;
             border-top: 2px solid #e5e7eb;
             font-size: 12px;
             color: #6b7280;
         }
+        
         .download-button {
-            display: flex;
-            justify-content: center;
-            margin-top: 20px;
+            text-align: center;
+            margin-top: 30px;
         }
-        .download-button button {
+        
+        .download-btn {
             background-color: #1e3a8a;
             color: white;
-            padding: 10px 15px;
+            padding: 12px 25px;
             border: none;
             border-radius: 5px;
-            cursor: pointer;
             font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
         }
-        .download-button button:hover {
-            background-color: #153e75;
+        
+        .download-btn:hover {
+            background-color: #1e40af;
+        }
+        
+        .download-btn:disabled {
+            background-color: #9ca3af;
+            cursor: not-allowed;
+        }
+        
+        @media print {
+            body {
+                background-color: transparent;
+                padding: 0;
+            }
+            
+            .report-container {
+                box-shadow: none;
+                padding: 0;
+            }
+            
+            .download-button {
+                display: none;
+            }
         }
     </style>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
 <body>
-    <div class="report-container" id="opd-report">
-        <!-- Header -->
-        <div class="header">
-            <img src="/path/to/hospital-logo.png" alt="Hospital Logo"> <!-- Ensure this image is accessible -->
-            <h1>PM Advertiser</h1>
-            <p>123 Hospital Road, City, State, ZIP Code</p>
-            <p>Phone: +123 456 7890 | Email: info@pmadvertiser.com</p>
-        </div>
+<div class="report-container" id="opd-report">
+    <div class="header">
+        <img src="static/logo/logo.png" alt="Hospital Logo" style="height: 80px;">
+        <h1>PM Advertiser</h1>
+        <p>123 Hospital Road, City, State, ZIP Code</p>
+        <p>Phone: +123 456 7890 | Email: info@pmadvertiser.com</p>
+    </div>
 
-        <!-- Visit Details -->
-        <div class="section visit-details">
-            <p><strong>Visit Date:</strong> {{ current_date }}</p>
-            <p><strong>Doctor:</strong> {{ opd_visits.0.doctor }}</p>
+    <!-- Visit Info -->
+    <div class="section">
+        <div class="grid-container">
+            <div><span class="info-label">Visit Date:</span> {{ current_date }}</div>
+            <div><span class="info-label">Doctor:</span> {{ opd_visits.0.doctor }}</div>
+            <div><span class="info-label">Visit Type:</span> {{ opd_visits.0.visit_type }}</div>
+            <div><span class="info-label">Follow-up:</span> {{ opd_visits.0.follow_up_date }}</div>
         </div>
+    </div>
 
-        <!-- Patient Details -->
-        <div class="section patient-details">
-            <h2>Patient Information</h2>
-            <p><strong>Name:</strong> {{ patient_name }}</p>
-            <p><strong>Age:</strong> {{ patient_age }}</p>
-            <p><strong>Gender:</strong> {{ patient_gender }}</p>
-            <p><strong>Contact:</strong> {{ patient_contact }}</p>
+    <!-- Patient Info -->
+    <div class="section">
+        <h2 class="section-title">Patient Information</h2>
+        <div class="grid-container">
+            <div><span class="info-label">Name:</span> {{ patient_name }}</div>
+            <div><span class="info-label">Age:</span> {{ patient_age }}</div>
+            <div><span class="info-label">Weight:</span> {{ patient_weight }} Kg</div>
+            <div><span class="info-label">Gender:</span> {{ patient_gender }}</div>
+            <div><span class="info-label">Contact:</span> {{ patient_contact }}</div>
         </div>
+    </div>
 
-        <!-- OPD Visit Details -->
-        <div class="section opd-details">
-            <h2>OPD Visit Details</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Diagnosis</th>
-                        <th>Symptoms</th>
-                        <th>Prescription</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for visit in opd_visits %}
-                    <tr>
-                        <td>{{ visit.diagnosis }}</td>
-                        <td>{{ visit.symptoms }}</td>
-                        <td>{{ visit.prescription }}</td>
-                    </tr>
+    <!-- Medical Report -->
+    <div class="section">
+        <h2 class="section-title">Medical Report</h2>
+        {% for visit in opd_visits %}
+        <div class="medical-section">
+            <div class="section-subtitle">History</div>
+            <div class="content-box">
+                {{ visit.diagnosis|default:"No history recorded" }}
+            </div>
+
+            <div class="section-subtitle">Symptoms</div>
+            <div class="content-box">
+                {{ visit.symptoms|default:"No symptoms recorded" }}
+            </div>
+
+            <div class="section-subtitle">Prescription</div>
+            <div class="content-box">
+                {% if visit.prescription_items %}
+                    {% for item in visit.prescription_items %}
+                    <div class="prescription-item">
+                        <div style="font-weight: 600;">{{ item.medicine }}</div>
+                        <div class="prescription-details">
+                            <div><span class="info-label">Dose:</span> {{ item.dose }}</div>
+                            <div><span class="info-label">Route:</span> {{ item.route }}</div>
+                            <div><span class="info-label">Duration:</span> {{ item.duration }}</div>
+                            {% if item.notes %}
+                            <div><span class="info-label">Notes:</span> {{ item.notes }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
                     {% endfor %}
-                </tbody>
-            </table>
+                {% else %}
+                <div>No medicines prescribed</div>
+                {% endif %}
+            </div>
         </div>
-
-        <!-- Visit Type and Follow-up Date -->
-        <div class="section visit-summary">
-            <p><strong>Visit Type:</strong> {{ opd_visits.0.visit_type }}</p>
-            <p><strong>Next Follow-up Date:</strong> {{ opd_visits.0.follow_up_date }}</p>
-        </div>
-
-        <!-- Footer -->
-        <div class="footer">
-            <p>Hospital Management System | &copy; 2025</p>
-            <p>This report is generated automatically. For any discrepancies, please contact the administration.</p>
-        </div>
+        {% endfor %}
     </div>
 
-    <!-- Download Button -->
-    <div class="download-button">
-        <button onclick="downloadPDF()">Download PDF</button>
+    <!-- Signature -->
+    <div class="signature">
+        <div>Dr. {{ opd_visits.0.doctor }}</div>
+        <div>Signature</div>
     </div>
 
-    <script>
-        function downloadPDF() {
-            const reportElement = document.getElementById("opd-report");
-            
-            // Ensure patient name is safe for filenames
-            const patientName = "{{ patient_name }}".replace(/\s+/g, '_').replace(/[^\w-]/g, '');
-            
-            html2pdf()
-                .from(reportElement)
-                .set({
-                    margin: 10,
-                    filename: `OPD_Report_${patientName}.pdf`,
-                    image: { type: 'jpeg', quality: 0.98 },
-                    html2canvas: { scale: 2 },
-                    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-                })
-                .toPdf()
-                .get('pdf')
-                .then(function (pdf) {
-                    pdf.autoPrint();
-                    window.open(pdf.output('bloburl'), '_blank'); // Open in new tab
-                })
-                .save();
-        }
-    </script>
+    <!-- Footer -->
+    <div class="footer">
+        <p>Hospital Management System | &copy; {% now "Y" %}</p>
+        <p>This report is generated automatically. For any discrepancies, please contact the administration.</p>
+    </div>
+</div>
+
+<!-- Download Button -->
+<div class="download-button">
+    <button onclick="downloadPDF()" class="download-btn">Download PDF Report</button>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script>
+function downloadPDF() {
+    const reportElement = document.getElementById("opd-report");
+    const patientName = "{{ patient_name }}".replace(/\s+/g, '_').replace(/[^\w-]/g, '');
+    const dateStr = "{{ current_date }}".replace(/\//g, '-');
+
+    const opt = {
+        margin: 10,
+        filename: `OPD_Report_${patientName}_${dateStr}.pdf`,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: {
+            scale: 2,
+            logging: true,
+            useCORS: true,
+            letterRendering: true,
+            scrollX: 0,
+            scrollY: 0
+        },
+        jsPDF: { 
+            unit: 'mm', 
+            format: 'a4', 
+            orientation: 'portrait',
+            hotfixes: ["px_scaling"]
+        },
+        pagebreak: { mode: ['avoid-all', 'css', 'legacy'] },
+    };
+
+    const button = document.querySelector('.download-button button');
+    const originalText = button.textContent;
+    button.textContent = 'Generating PDF...';
+    button.disabled = true;
+
+    html2pdf()
+        .set(opt)
+        .from(reportElement)
+        .save()
+        .then(() => {
+            button.textContent = originalText;
+            button.disabled = false;
+        })
+        .catch(() => {
+            button.textContent = 'Download Failed';
+            button.disabled = false;
+        });
+}
+</script>
 </body>
 </html>

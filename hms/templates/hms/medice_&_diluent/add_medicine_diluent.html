@@ -163,16 +163,7 @@
 
                                                                     <!-- Medicine Type & Injection Option -->
                                                                     <div class="row g-2">
-                                                                        {% comment %} <div class="col-md-6 mb-3">
-                                                                            <label for="id_medicine_type" class="form-label fw-bold">Type</label>
-                                                                            <select name="medicine_type" id="id_medicine_type" class="form-select" required>
-                                                                                {% for value, label in medicine_form.fields.medicine_type.choices %}
-                                                                                    <option value="{{ value }}" {% if medicine_form.medicine_type.value == value %}selected{% endif %}>
-                                                                                        {{ label }}
-                                                                                    </option>
-                                                                                {% endfor %}
-                                                                            </select>
-                                                                        </div> {% endcomment %}
+                                                                        
 
                                                                         <div class="col-md-6 mb-3">
                                                                             <div class="form-check form-switch pt-4" id="liquid-injection-checkbox" style="display: none;">
@@ -197,10 +188,8 @@
                                                                             </select>
                                                                         </div>
                                                                         <div class="col-md-6 mb-3">
-                                                                            <label for="id_duration" class="form-label fw-bold">Duration (days)</label>
-                                                                            <input type="number" min="1" name="duration" id="id_duration" 
-                                                                                class="form-control" value="{{ medicine_form.duration.value|default_if_none:'' }}"
-                                                                                placeholder="e.g., 5">
+                                                                            <label for="id_duration" class="form-label fw-bold">Duration (Hourly)</label>
+                                                                            {{ medicine_form.duration }}
                                                                         </div>
                                                                     </div>
 
@@ -297,10 +286,8 @@
                                                                             </select>
                                                                         </div>
                                                                         <div class="col-md-6 mb-3">
-                                                                            <label for="id_duration" class="form-label fw-bold">Duration (days)</label>
-                                                                            <input type="number" min="1" name="duration" id="id_duration" 
-                                                                                class="form-control" value="{{ medicine_form.duration.value|default_if_none:'' }}"
-                                                                                placeholder="e.g., 5">
+                                                                            <label for="id_duration" class="form-label fw-bold">Duration (Hourly)</label>
+                                                                            {{ medicine_form.duration }}
                                                                         </div>
                                                                     </div>
 
@@ -398,10 +385,8 @@
                                                                             </select>
                                                                         </div>
                                                                         <div class="col-md-6 mb-3">
-                                                                            <label for="id_duration" class="form-label fw-bold">Duration (days)</label>
-                                                                            <input type="number" min="1" name="duration" id="id_duration" 
-                                                                                class="form-control" value="{{ medicine_form.duration.value|default_if_none:'' }}"
-                                                                                placeholder="e.g., 5">
+                                                                            <label for="id_duration" class="form-label fw-bold">Duration (Hourly)</label>
+                                                                            {{ medicine_form.duration }}
                                                                         </div>
                                                                     </div>
 
@@ -412,17 +397,17 @@
                                                                             <div class="input-group">
                                                                                 <input type="number" step="0.01" name="standard_dose_per_kg" id="id_standard_dose_per_kg" 
                                                                                     class="form-control" value="{{ medicine_form.standard_dose_per_kg.value|default_if_none:'' }}" required>
+                                                                                <span class="input-group-text bg-light">mg/dose</span>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="col-md-6 mb-3">
+                                                                            <label for="id_tablet_strength" class="form-label fw-bold">Tablet Strength</label>
+                                                                            <div class="input-group">
+                                                                                <input type="number" step="0.01" name="tablet_strength" id="id_tablet_strength" 
+                                                                                    class="form-control" value="{{ medicine_form.tablet_strength.value|default_if_none:'' }}" required>
                                                                                 <span class="input-group-text bg-light">mg/tablet</span>
                                                                             </div>
                                                                         </div>
-                                                                        {% comment %} <div class="col-md-6 mb-3">
-                                                                            <label for="id_concentration_mg_per_ml" class="form-label fw-bold">Concentration</label>
-                                                                            <div class="input-group">
-                                                                                <input type="number" step="0.01" name="concentration_mg_per_ml" id="id_concentration_mg_per_ml" 
-                                                                                    class="form-control" value="{{ medicine_form.concentration_mg_per_ml.value|default_if_none:'' }}" required>
-                                                                                <span class="input-group-text bg-light">mg/mL</span>
-                                                                            </div>
-                                                                        </div> {% endcomment %}
                                                                     </div>
 
                                                                     <!-- Submit Button -->
@@ -498,10 +483,8 @@
                                                                             </select>
                                                                         </div>
                                                                         <div class="col-md-6 mb-3">
-                                                                            <label for="id_duration" class="form-label fw-bold">Duration (days)</label>
-                                                                            <input type="number" min="1" name="duration" id="id_duration" 
-                                                                                class="form-control" value="{{ medicine_form.duration.value|default_if_none:'' }}"
-                                                                                placeholder="e.g., 5">
+                                                                            <label for="id_duration" class="form-label fw-bold">Duration (Hourly)</label>
+                                                                            {{ medicine_form.duration }}
                                                                         </div>
                                                                     </div>
 
@@ -512,7 +495,7 @@
                                                                             <div class="input-group">
                                                                                 <input type="number" step="0.01" name="standard_dose_per_kg" id="id_standard_dose_per_kg" 
                                                                                     class="form-control" value="{{ medicine_form.standard_dose_per_kg.value|default_if_none:'' }}" required>
-                                                                                <span class="input-group-text bg-light">mg/drop</span>
+                                                                                <span class="input-group-text bg-light">mg/ml</span>
                                                                             </div>
                                                                         </div>
                                                                         <div class="col-md-6 mb-3">
@@ -598,10 +581,8 @@
                                                                             </select>
                                                                         </div>
                                                                         <div class="col-md-6 mb-3">
-                                                                            <label for="id_duration" class="form-label fw-bold">Duration (days)</label>
-                                                                            <input type="number" min="1" name="duration" id="id_duration" 
-                                                                                class="form-control" value="{{ medicine_form.duration.value|default_if_none:'' }}"
-                                                                                placeholder="e.g., 5">
+                                                                            <label for="id_duration" class="form-label fw-bold">Duration (Hourly)</label>
+                                                                            {{ medicine_form.duration }}
                                                                         </div>
                                                                     </div>
 
@@ -698,10 +679,8 @@
                                                                             </select>
                                                                         </div>
                                                                         <div class="col-md-6 mb-3">
-                                                                            <label for="id_duration" class="form-label fw-bold">Duration (days)</label>
-                                                                            <input type="number" min="1" name="duration" id="id_duration" 
-                                                                                class="form-control" value="{{ medicine_form.duration.value|default_if_none:'' }}"
-                                                                                placeholder="e.g., 5">
+                                                                            <label for="id_duration" class="form-label fw-bold">Duration (Hourly)</label>
+                                                                            {{ medicine_form.duration }}
                                                                         </div>
                                                                     </div>
 
@@ -734,7 +713,7 @@
 </div>
                                                     <!-- oral Card -->
                                                     <div class="card shadow-sm mb-4 medicine-form-box" data-form-type="oral" style="display: none;">
-                                                        <div class="card-header bg-info text-white fw-bold">Oral Form</div>
+                                                        <div class="card-header bg-info text-white fw-bold">Sachet Form</div>
                                                         <div class="card-body">
                                                             <!-- Paste oral Form Here -->
                                                                 <form method="post" class="needs-validation" novalidate>
@@ -788,10 +767,8 @@
                                                                             </select>
                                                                         </div>
                                                                         <div class="col-md-6 mb-3">
-                                                                            <label for="id_duration" class="form-label fw-bold">Duration (days)</label>
-                                                                            <input type="number" min="1" name="duration" id="id_duration" 
-                                                                                class="form-control" value="{{ medicine_form.duration.value|default_if_none:'' }}"
-                                                                                placeholder="e.g., 5">
+                                                                            <label for="id_duration" class="form-label fw-bold">Duration (Hourly)</label>
+                                                                            {{ medicine_form.duration }}
                                                                         </div>
                                                                     </div>
 
@@ -961,7 +938,7 @@
                                         <th class="ps-4 py-3 fw-semibold text-dark" style="font-size: 0.95rem;">Name</th>
                                         <th class="text-center py-3 fw-semibold text-dark" style="font-size: 0.95rem;">Type</th>
                                         <th class="text-center py-3 fw-semibold text-dark" style="font-size: 0.95rem;">Dose</th>
-                                        <th class="text-center py-3 fw-semibold text-dark" style="font-size: 0.95rem;">Concentration</th>
+                                        <th class="text-center py-3 fw-semibold text-dark" style="font-size: 0.95rem;">Concentration/Strength</th>
                                         <th class="text-center py-3 fw-semibold text-dark" style="font-size: 0.95rem;">Route</th>
                                         <th class="text-center py-3 fw-semibold text-dark" style="font-size: 0.95rem;">Duration</th>
                                         <th class="text-center py-3 fw-semibold text-dark" style="font-size: 0.95rem;">Vials</th>
@@ -986,9 +963,15 @@
                                             <span class="small text-muted">mg/kg/day</span>
                                         </td>
                                         <td class="text-center fw-bold">
-                                            <span class="d-block">{{ medicine.concentration_mg_per_ml|floatformat:2 }}</span>
-                                            <span class="small text-muted">mg/mL</span>
+                                            {% if medicine.tablet_strength %}
+                                                <span class="d-block">{{ medicine.tablet_strength|floatformat:2 }}</span>
+                                                <span class="small text-muted">mg/kg/day</span>
+                                            {% else %}
+                                                <span class="d-block">{{ medicine.concentration_mg_per_ml|floatformat:2 }}</span>
+                                                <span class="small text-muted">mg/mL</span>
+                                            {% endif %}
                                         </td>
+
                                         <td class="text-center">
                                             <span class="badge bg-secondary bg-opacity-10 text-secondary px-3 py-2" style="font-size: 1.1rem;">
                                                 {{ medicine.get_route_display|default:"Not specified" }}

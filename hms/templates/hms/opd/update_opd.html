@@ -2,7 +2,7 @@
 
 {% block content %}
 <div class="max-w-3xl mx-auto bg-white p-6 rounded-lg shadow-md">
-    <h2 class="text-2xl font-bold text-center mb-6">✏️ Update OPD Visit</h2>
+    <h2 class="text-2xl font-bold text-center mb-6">✏️  OPD Visit</h2>
 
     <!-- Messages -->
     {% if messages %}
@@ -20,12 +20,21 @@
         {% csrf_token %}
 
         <!-- Patient Information (Read-only) -->
-        <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Patient:</label>
-            <p class="w-full p-2 border border-gray-300 rounded-md bg-gray-100">
-                {{ opd.patient.user.full_name }} ({{ opd.patient.patient_code }})
-            </p>
-        </div>
+<div class="mb-4">
+    <label class="block text-sm font-medium text-gray-700 mb-1">Patient:</label>
+    <p class="w-full p-2 border border-gray-300 rounded-md bg-gray-100">
+        {{ opd.patient.user.full_name }} ({{ opd.patient.patient_code }})
+    </p>
+</div>
+
+<div class="mb-4">
+    <label class="block text-sm font-medium text-gray-700 mb-1">Details:</label>
+    <p class="w-full p-2 border border-gray-300 rounded-md bg-blue-50 text-blue-900">
+        <span class="font-semibold text-blue-700">Weight:</span> {{ opd.patient.weight }} kg |
+        <span class="font-semibold text-red-700">Blood Group:</span> {{ opd.patient.blood_group }} |
+        <span class="font-semibold text-green-700">Age:</span> {{ opd.patient.age }}
+    </p>
+</div>
 
         <!-- Doctor Selection -->
         <div>
@@ -41,7 +50,7 @@
 
         <!-- Diagnosis -->
         <div>
-            <label for="diagnosis" class="block text-sm font-medium text-gray-700 mb-2">Diagnosis:</label>
+            <label for="diagnosis" class="block text-sm font-medium text-gray-700 mb-2">History:</label>
             <textarea name="diagnosis" id="diagnosis" required class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" rows="4">{{ opd.diagnosis }}</textarea>
         </div>
 
@@ -50,13 +59,27 @@
             <label for="symptoms" class="block text-sm font-medium text-gray-700 mb-2">Symptoms:</label>
             <textarea name="symptoms" id="symptoms" class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" rows="4">{{ opd.symptoms }}</textarea>
         </div>
-
-        <!-- Prescription -->
-        <div>
-            <label for="prescription" class="block text-sm font-medium text-gray-700 mb-2">Prescription:</label>
-            <textarea name="prescription" id="prescription" class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" rows="4">{{ opd.prescription }}</textarea>
+        <!-- Prescription Input -->
+        <div class="mb-4 relative">
+            <label for="prescription_input" class="block text-sm font-medium text-gray-700 mb-2">Prescription:</label>
+            <input type="text" id="prescription_input" class="w-full p-2 border border-gray-300 rounded-md" placeholder="Type medicine name...">
+            <input type="hidden" name="prescription_json" id="prescription_json">
+            <div id="suggestions" class="absolute bg-white border border-gray-300 rounded-md w-full z-10 hidden"></div>
         </div>
 
+        <!-- Selected Medicines -->
+        <div id="prescription_list" class="space-y-2">
+            {% for item in opd.get_prescription_items %}
+            <div class="p-2 border border-gray-300 rounded-md flex justify-between items-center">
+                <div>
+                    <strong>{{ item.medicine }}</strong><br>
+                    <small>Dose: {{ item.dose }} | Route: {{ item.route }} | Duration: {{ item.duration }}</small>
+                </div>
+                <button type="button" class="text-red-500 font-bold remove-btn">✖</button>
+            </div>
+            {% endfor %}
+        </div>
+        
         <!-- Follow-up Date -->
         <div>
             <label for="follow_up_date" class="block text-sm font-medium text-gray-700 mb-2">Follow-up Date:</label>
@@ -73,20 +96,7 @@
             </select>
         </div>
 
-        <!-- Payment Status -->
-        {% comment %} <div>
-            <label for="payment_status" class="block text-sm font-medium text-gray-700 mb-2">Payment Status:</label>
-            <select name="payment_status" id="payment_status" class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                <option value="pending" {% if opd.payment_status == 'pending' %}selected{% endif %}>Pending</option>
-                <option value="paid" {% if opd.payment_status == 'paid' %}selected{% endif %}>Paid</option>
-            </select>
-        </div> {% endcomment %}
 
-        <!-- Payment Amount -->
-        {% comment %} <div>
-            <label for="payment_amount" class="block text-sm font-medium text-gray-700 mb-2">Payment Amount:</label>
-            <input type="number" name="payment_amount" id="payment_amount" step="0.01" value="{{ opd.payment_amount }}" class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-        </div> {% endcomment %}
 
         <!-- Submit Button -->
         <button type="submit" class="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition duration-300">
@@ -99,4 +109,100 @@
         Back to OPD List
     </a>
 </div>
+<script>
+let prescriptions = [];
+
+function updateHiddenInput() {
+    document.getElementById('prescription_json').value = JSON.stringify(prescriptions);
+}
+
+function renderPrescriptions() {
+    const list = document.getElementById('prescription_list');
+    list.innerHTML = "";
+
+    prescriptions.forEach((item, index) => {
+        const div = document.createElement('div');
+        div.className = "p-2 border border-gray-300 rounded-md flex justify-between items-center";
+
+        div.innerHTML = `
+            <div>
+                <strong>${item.medicine}</strong><br>
+                <small>Dose: ${item.dose} | Route: ${item.route} | Duration: ${item.duration}</small>
+            </div>
+            <button type="button" class="text-red-500 font-bold remove-btn" data-index="${index}">✖</button>
+        `;
+
+        list.appendChild(div);
+    });
+
+    updateHiddenInput();
+}
+
+// Remove on ✖
+document.addEventListener('click', function(e) {
+    if (e.target.classList.contains('remove-btn')) {
+        const index = e.target.getAttribute('data-index');
+        prescriptions.splice(index, 1);
+        renderPrescriptions();
+    }
+});
+
+// Autocomplete with selection
+document.getElementById('prescription_input').addEventListener('input', function () {
+    const query = this.value.trim();
+    const suggestions = document.getElementById('suggestions');
+    if (!query) {
+        suggestions.classList.add('hidden');
+        return;
+    }
+
+    fetch(`/ajax/search-medicines/?term=${encodeURIComponent(query)}`)
+        .then(response => response.json())
+        .then(data => {
+            suggestions.innerHTML = '';
+            if (data.length === 0) {
+                suggestions.classList.add('hidden');
+                return;
+            }
+
+            data.forEach(medicine => {
+                const option = document.createElement('div');
+                option.className = 'cursor-pointer px-2 py-1 hover:bg-blue-100';
+                option.innerHTML = `
+                    <strong>${medicine.name}</strong>
+                    <br><small>Route: ${medicine.route}, Duration: ${medicine.duration}</small>
+                `;
+                option.addEventListener('click', function () {
+                    prescriptions.push({
+                        medicine: medicine.name,
+                        dose: medicine.dose_per_kg || '1 tab',
+                        route: medicine.route || 'Oral',
+                        duration: medicine.duration || '5 days'
+                    });
+                    document.getElementById('prescription_input').value = '';
+                    suggestions.classList.add('hidden');
+                    renderPrescriptions();
+                });
+                suggestions.appendChild(option);
+            });
+
+            suggestions.classList.remove('hidden');
+        });
+});
+
+// Initialize from backend
+document.addEventListener('DOMContentLoaded', function () {
+    try {
+        prescriptions = {{ prescriptions|safe }};
+    } catch (e) {
+        prescriptions = [];
+    }
+    renderPrescriptions();
+
+    // Sync before form submit
+    document.querySelector('form').addEventListener('submit', updateHiddenInput);
+});
+</script>
+
+
 {% endblock %}

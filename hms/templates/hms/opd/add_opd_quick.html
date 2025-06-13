@@ -1,0 +1,92 @@
+{% extends 'hms/base.html' %}
+{% block content %}
+<div style="max-width: 800px; margin: 30px auto; padding: 30px; background-color: #ffffff; border-radius: 12px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);">
+    <h2 style="color: #2c3e50; margin-bottom: 25px; padding-bottom: 10px; border-bottom: 2px solid #3498db; font-weight: 600;">Add OPD Visit (Reception)</h2>
+    
+    <form method="post" action="">
+    {% csrf_token %}
+    
+    <div style="max-width: 500px; margin: 0 auto;">
+        <div style="margin-bottom: 16px;">
+            <label for="{{ form.patient.id_for_label }}">Patient</label><br>
+            {{ form.patient }}
+            <a href="{% url 'register_patient' %}" style="font-size: 13px; color: #3498db;">+ Add New Patient</a>
+        </div>
+
+        <div style="margin-bottom: 16px;">
+            <label for="{{ form.doctor.id_for_label }}">Doctor</label><br>
+            {{ form.doctor }}
+        </div>
+
+        <div style="margin-bottom: 16px;">
+            <label for="{{ form.visit_type.id_for_label }}">Visit Type</label><br>
+            {{ form.visit_type }}
+        </div>
+
+        <button type="submit" style="padding: 8px 16px; background-color: #2c3e50; color: #fff; border: none; border-radius: 4px;">
+            Submit
+        </button>
+    </div>
+</form>
+
+</div>
+
+<style>
+    .form-control {
+        width: 100%;
+        padding: 8px;
+        font-size: 14px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+    }
+
+    label {
+        font-weight: 600;
+        display: block;
+        margin-bottom: 4px;
+    }
+
+    form div {
+        margin-bottom: 16px;
+    }
+</style>
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add search functionality to select elements
+        const selects = document.querySelectorAll('select');
+        selects.forEach(select => {
+            select.addEventListener('focus', function() {
+                this.size = 5; // Show 5 options when focused
+            });
+            
+            select.addEventListener('blur', function() {
+                this.size = 1;
+            });
+            
+            select.addEventListener('keyup', function(e) {
+                const searchTerm = e.target.value.toLowerCase();
+                const options = this.options;
+                
+                for (let i = 0; i < options.length; i++) {
+                    const optionText = options[i].text.toLowerCase();
+                    if (optionText.includes(searchTerm)) {
+                        options[i].style.display = '';
+                    } else {
+                        options[i].style.display = 'none';
+                    }
+                }
+            });
+        });
+        
+        // Add quick patient search/add functionality
+        const patientAddLink = document.querySelector('a[href="#"]');
+        patientAddLink.addEventListener('click', function(e) {
+            e.preventDefault();
+            // This would typically open a modal in a real implementation
+            alert('Patient search/add modal would open here');
+        });
+    });
+</script>
+{% endblock %}

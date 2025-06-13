@@ -2,7 +2,7 @@ from django.urls import path
 # from . import api
 from . import views
 from .views import (
-    signup, upload_patient_report, add_prescription, get_available_beds, fetch_patients, fetch_opd, fetch_appointments,
+    signup, upload_patient_report, get_available_beds, fetch_patients, fetch_opd, fetch_appointments,
     user_login, get_ipd_data, book_appointment, update_appointment_status, appointment_success, available_doctors,
     profile_view, patient_profile, user_logout, add_emergency_case, admit_emergency_patient, patient_detail,
     doctor_detail,  add_opd, update_opd, admit_patient, add_doctor,
@@ -58,15 +58,23 @@ urlpatterns = [
     path('opd/', views.opd, name='opd'),
     path('opd/report/<int:patient_id>/', views.opd_report_template, name='opd_report_template'),
     path('api/opd/', fetch_opd, name='fetch_opd'),
+    path("opd/quick_add/", views.add_opd_quick, name="add_opd_quick"),
+    path("doctor/pending-opds/", views.pending_opds_for_doctor, name="pending_opds_for_doctor"),
     path('opd/add/', add_opd, name='add_opd'),
     path('opd/update/<int:opd_id>/', update_opd, name='update_opd'),
     path('opd/admit/<int:opd_id>/', admit_patient, name='admit_patient'),
+    path('ajax/search-medicines/', views.search_medicines, name='search_medicines'),
+    
+    # notifications
+    path("notifications/unread/", views.unread_notifications, name="unread_notifications"),
+    path("notifications/mark-read/<int:pk>/", views.mark_notification_read, name="mark_notification_read"),
+    # path("notifications/mark-all-read/", views.mark_all_read, name="mark_all_notifications_read"),
 
     # IPD
     path('ipd/', views.ipd, name='ipd'),
     path('ipd/add/', views.add_ipd, name='add_ipd'),
     path('get-ipd-data/', get_ipd_data, name='get_ipd_data'),
-    path('ipd/<int:ipd_id>/add_prescription/', add_prescription, name='add_prescription'),
+    path('ipd/<int:ipd_id>/add_prescription/', views.add_prescription, name='add_prescription'),
     path('ipd/<int:ipd_id>/', view_ipd_report, name='view_ipd_report'),
     path('ipd/<int:ipd_id>/update-room/', update_ipd_room, name='update_ipd_room'),
     path('ipd/discharge-summary/<str:patient_code>/', views.discharge_summary_view, name="discharge_summary_view"),

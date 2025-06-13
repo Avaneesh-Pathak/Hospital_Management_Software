@@ -269,6 +269,12 @@
                 </a>
             </li>
             <li>
+                <a href="{% url 'add_opd_quick' %}" class="flex items-center p-3 text-sm font-medium rounded-lg transition-all duration-200 hover:bg-gray-800 hover:text-white group">
+                    <i class="fas fa-plus-circle w-5 text-center text-gray-400 group-hover:text-teal-400"></i>
+                    <span class="ml-3">Quick OPD Add</span>
+                </a>
+            </li>
+            <li>
                 <a href="{% url 'opd' %}" class="flex items-center p-3 text-sm font-medium rounded-lg transition-all duration-200 hover:bg-gray-800 hover:text-white group">
                     <i class="fas fa-clinic-medical w-5 text-center text-gray-400 group-hover:text-teal-400"></i>
                     <span class="ml-3">OPD</span>
@@ -517,48 +523,36 @@
             </div>
         </footer>
     </div>
-
+    
     <!-- Notification Dropdown -->
-<div id="notificationDropdown" class="hidden absolute right-4 mt-2 w-80 bg-white rounded-md shadow-lg z-50 border border-gray-200 max-h-96 overflow-y-auto">
-    <div class="p-3 border-b border-gray-200 bg-blue-600 text-white rounded-t-md sticky top-0 z-10">
-        <div class="flex justify-between items-center">
-            <h3 class="font-semibold">Notifications</h3>
-            <button id="markAllAsRead" class="text-xs bg-blue-700 hover:bg-blue-800 px-2 py-1 rounded">Mark all as read</button>
-        </div>
-    </div>
-    
-    <div class="divide-y divide-gray-200">
-        <!-- System Alerts Section -->
-        <div class="p-2 bg-gray-50">
-            <h4 class="text-xs font-semibold text-gray-500 uppercase tracking-wider px-2 py-1">System Alerts</h4>
-            <div id="systemAlerts">
-                <!-- Will be populated by JavaScript -->
-            </div>
-        </div>
-        
-        <!-- Staff Updates Section -->
-        <div class="p-2 bg-gray-50">
-            <h4 class="text-xs font-semibold text-gray-500 uppercase tracking-wider px-2 py-1">Staff Updates</h4>
-            <div id="staffUpdates">
-                <!-- Will be populated by JavaScript -->
-            </div>
-        </div>
-        
-        <!-- Financial Alerts Section -->
-        <div class="p-2 bg-gray-50">
-            <h4 class="text-xs font-semibold text-gray-500 uppercase tracking-wider px-2 py-1">Financial Alerts</h4>
-            <div id="financialAlerts">
-                <!-- Will be populated by JavaScript -->
-            </div>
-        </div>
-    </div>
-    
-    <div class="p-2 bg-gray-50 rounded-b-md text-center sticky bottom-0 z-10">
-        <a href="/notifications" class="text-sm text-blue-600 hover:text-blue-800 font-medium">View all notifications</a>
-    </div>
-</div>
+        <!-- Toast Notification Container -->
+        <div id="toastContainer" class="fixed bottom-4 right-4 z-50 space-y-2 w-80 max-w-full"></div>
 
-    <script>
+        <!-- Notification Dropdown -->
+        <div id="notificationDropdown" class="hidden absolute right-0 mt-2 w-80 bg-white rounded-md shadow-lg z-50 border border-gray-200 max-h-96 overflow-y-auto">
+            <!-- Header -->
+            <div class="p-3 border-b border-gray-200 bg-blue-600 text-white rounded-t-md sticky top-0 z-10">
+                <div class="flex justify-between items-center">
+                    <h3 class="font-semibold">Notifications</h3>
+                    <button id="markAllAsRead" class="text-xs bg-blue-700 hover:bg-blue-800 px-2 py-1 rounded transition-colors duration-150">
+                        Mark all as read
+                    </button>
+                </div>
+            </div>
+
+            <!-- Notification List -->
+            <ul id="notifList" class="divide-y divide-gray-200">
+                <li class="text-center text-gray-500 py-4">Loading notifications...</li>
+            </ul>
+
+            <!-- Footer -->
+            <div class="p-2 bg-gray-50 rounded-b-md text-center sticky bottom-0 z-10 border-t border-gray-200">
+                <a href="/notifications" class="text-sm text-blue-600 hover:text-blue-800 font-medium transition-colors duration-150">
+                    View all notifications
+                </a>
+            </div>
+        </div>
+<script>
         // Wait for DOM to be fully loaded
         document.addEventListener('DOMContentLoaded', function() {
             // Get sidebar elements
@@ -693,8 +687,190 @@
                 });
             }
         });
-    </script>
+</script>
+<script>
+// Notification System
+class NotificationManager {
+    static BADGE_SELECTOR = "#notifBadge";
+    static LIST_SELECTOR = "#notifList";
+    static DROPDOWN_SELECTOR = "#notificationDropdown";
+    static TOAST_CONTAINER_SELECTOR = "#toastContainer";
+    static POLL_INTERVAL = 30000;
+    static DEBOUNCE_DELAY = 300;
 
+    constructor() {
+        this.isFetching = false;
+        this.lastFetchTime = 0;
+        this.initEventListeners();
+        this.pollNotifications();
+    }
 
+    initEventListeners() {
+        // Toggle dropdown and fetch notifications
+        document.getElementById("notifBtn").addEventListener("click", () => {
+            const dropdown = document.querySelector(NotificationManager.DROPDOWN_SELECTOR);
+            dropdown.classList.toggle("hidden");
+            if (!dropdown.classList.contains("hidden")) {
+                this.fetchNotifications();
+            }
+        });
+
+        // Mark all as read
+        document.getElementById("markAllAsRead").addEventListener("click", 
+            this.debounce(() => this.markAllAsRead(), NotificationManager.DEBOUNCE_DELAY)
+        );
+
+        // Close dropdown when clicking outside
+        document.addEventListener("click", (e) => {
+            const dropdown = document.querySelector(NotificationManager.DROPDOWN_SELECTOR);
+            const notifBtn = document.getElementById("notifBtn");
+            if (!dropdown.contains(e.target) && e.target !== notifBtn && !notifBtn.contains(e.target)) {
+                dropdown.classList.add("hidden");
+            }
+        });
+    }
+
+    async fetchNotifications() {
+        // Prevent duplicate requests
+        if (this.isFetching) return;
+        if (Date.now() - this.lastFetchTime < 1000) return; // Throttle to 1 request per second
+
+        this.isFetching = true;
+        try {
+            const response = await fetch("/notifications/unread/");
+            if (!response.ok) throw new Error("Network response was not ok");
+            
+            const data = await response.json();
+            this.updateBadge(data.unread_count);
+            this.renderNotifications(data.notifications);
+        } catch (error) {
+            console.error("Error fetching notifications:", error);
+            this.showToast("Failed to load notifications", "error");
+        } finally {
+            this.isFetching = false;
+            this.lastFetchTime = Date.now();
+        }
+    }
+
+    updateBadge(count) {
+        const badge = document.querySelector(NotificationManager.BADGE_SELECTOR);
+        if (!badge) return;
+
+        badge.textContent = count;
+        badge.classList.toggle("hidden", count === 0);
+    }
+
+    renderNotifications(notifications) {
+        const list = document.querySelector(NotificationManager.LIST_SELECTOR);
+        if (!list) return;
+
+        // Clear existing notifications
+        list.innerHTML = "";
+
+        if (notifications.length === 0) {
+            list.innerHTML = `<li class="text-center text-gray-500 py-4">No new notifications</li>`;
+            return;
+        }
+
+        notifications.forEach(notification => {
+            const li = document.createElement("li");
+            li.className = "py-2 px-3 hover:bg-gray-50 transition-colors duration-150 flex justify-between items-start";
+            li.innerHTML = `
+                <div class="flex-1">
+                    <div class="text-gray-700">${notification.message}</div>
+                    <div class="text-xs text-gray-400 mt-1">${notification.created_at}</div>
+                </div>
+                <button class="ml-2 text-sm text-blue-600 hover:underline whitespace-nowrap" 
+                        onclick="notificationManager.markAsRead(${notification.id}, this)">
+                    Mark as read
+                </button>
+            `;
+            list.appendChild(li);
+        });
+    }
+
+    async markAsRead(id, btn) {
+        try {
+            const response = await fetch(`/notifications/mark-read/${id}/`);
+            if (!response.ok) throw new Error("Failed to mark as read");
+            
+            const data = await response.json();
+            if (data.success) {
+                btn.closest("li").remove();
+                this.fetchNotifications();
+                this.showToast("Notification marked as read");
+            }
+        } catch (error) {
+            console.error("Error marking notification as read:", error);
+            this.showToast("Failed to mark as read", "error");
+        }
+    }
+
+    async markAllAsRead() {
+        try {
+            const response = await fetch("/notifications/mark-all-read/", {
+                method: "POST",
+                headers: {
+                    "X-CSRFToken": this.getCSRFToken(),
+                    "Content-Type": "application/json"
+                }
+            });
+            
+            if (!response.ok) throw new Error("Failed to mark all as read");
+            
+            const data = await response.json();
+            if (data.success) {
+                this.fetchNotifications();
+                this.showToast("All notifications marked as read");
+            }
+        } catch (error) {
+            console.error("Error marking all notifications as read:", error);
+            this.showToast("Failed to mark all as read", "error");
+        }
+    }
+
+    showToast(message, type = "success") {
+        const container = document.querySelector(NotificationManager.TOAST_CONTAINER_SELECTOR);
+        if (!container) return;
+
+        const toast = document.createElement("div");
+        const bgColor = type === "error" ? "bg-red-600" : "bg-green-600";
+        toast.className = `${bgColor} text-white px-4 py-2 rounded shadow-md animate-fadeInUp mb-2 flex justify-between items-center`;
+        toast.innerHTML = `
+            <span>${message}</span>
+            <button onclick="this.parentElement.remove()" class="ml-4 text-white hover:text-gray-200">
+                &times;
+            </button>
+        `;
+
+        container.appendChild(toast);
+        setTimeout(() => toast.remove(), 5000);
+    }
+
+    pollNotifications() {
+        setInterval(() => {
+            const dropdown = document.querySelector(NotificationManager.DROPDOWN_SELECTOR);
+            if (!dropdown || dropdown.classList.contains("hidden")) {
+                this.fetchNotifications();
+            }
+        }, NotificationManager.POLL_INTERVAL);
+    }
+
+    getCSRFToken() {
+        return document.querySelector("[name=csrfmiddlewaretoken]")?.value || "";
+    }
+
+    debounce(func, delay) {
+        let timeoutId;
+        return (...args) => {
+            clearTimeout(timeoutId);
+            timeoutId = setTimeout(() => func.apply(this, args), delay);
+        };
+    }
+}
+
+// Initialize the notification manager
+const notificationManager = new NotificationManager();
+</script>
 </body>
 </html>
