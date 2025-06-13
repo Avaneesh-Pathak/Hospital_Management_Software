@@ -248,14 +248,18 @@ class EmergencyCaseForm(forms.ModelForm):
 
 
 class PrescriptionForm(forms.ModelForm):
+    medication = forms.ModelChoiceField(
+        queryset=Medicine.objects.all().order_by('name'),
+        widget=forms.Select(attrs={
+            'class': 'w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500',
+        }),
+        empty_label="Select medicine"
+    )
+
     class Meta:
         model = Prescription
-        fields = ['medication','concentration_mg_per_ml', 'dosage','dose_frequency','timing']
+        fields = ['medication', 'concentration_mg_per_ml', 'dosage', 'dose_frequency', 'timing']
         widgets = {
-            'medication': forms.TextInput(attrs={
-                'class': 'w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500',
-                'placeholder': 'Enter medication',
-            }),
             'concentration_mg_per_ml': forms.TextInput(attrs={
                 'class': 'w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500',
                 'placeholder': 'Enter concentration',

@@ -1386,8 +1386,6 @@ def payment_receipt(request, pk):
     return response
 
 
-
-
 # Emergency Views
 @login_required
 def emergency(request):
@@ -1682,7 +1680,7 @@ def transfer_summary_pdf(request, patient_code):
         "patient": patient,
         "opd_visits": OPD.objects.filter(patient=patient).order_by('-visit_date'),
         "ipd_records": IPD.objects.filter(patient=patient),
-        "prescriptions": IPDPrescription.objects.filter(ipd__patient=patient).order_by('-timing'),
+        "prescriptions": Prescription.objects.filter(ipd__patient=patient).order_by('-timing'),
         "transfer": PatientTransfer.objects.filter(patient=patient).order_by('-transfer_date').first(),
     }
 
@@ -1963,7 +1961,6 @@ def update_opd(request, opd_id):
         opd.visit_type = visit_type
         opd.follow_up_date = parse_date(follow_up_date) if follow_up_date else None
         opd.prescription = json.dumps(prescription_list)  # Save structured data as string
-
         opd.save()
 
         messages.success(request, "OPD visit updated successfully!")
@@ -1982,8 +1979,6 @@ def update_opd(request, opd_id):
         "doctors": doctors,
         "prescriptions": prescription_list  # for frontend JS rendering
     })
-
-
 
 
 def calculate_age(date_of_birth):

@@ -1079,6 +1079,7 @@ class Prescription(models.Model):
     dose_frequency = models.CharField(max_length=10, choices=DOSE_FREQUENCY_CHOICES, default="OD")
     concentration_mg_per_ml = models.FloatField(help_text="Concentration of the medicine (mg/mL)", null=True, blank=True)
     medication = models.CharField(max_length=255)
+    medication_fk = models.ForeignKey(Medicine, on_delete=models.CASCADE, null=True, blank=True)
     dosage = models.CharField(max_length=100)
     timing = models.DateTimeField()
 
