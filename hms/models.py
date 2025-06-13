@@ -1075,12 +1075,23 @@ class Prescription(models.Model):
         ("STAT", "Immediately (STAT)"),
         ("OTHER", "Other"),
     ]
+    MEDICINE_TYPE_CHOICES = [
+        ("syrup", "Syrup"),
+        ("injection", "Injection"),
+        ("tablet", "Tablet"),
+        ("drop", "Drop"),
+        ("suspension", "Suspension"),
+        ("fluid", "Fluid"),
+        ("oral", "Oral"),
+        ("other", "Other"),
+    ]
     ipd = models.ForeignKey(IPD, on_delete=models.CASCADE, related_name="prescriptions")
     dose_frequency = models.CharField(max_length=10, choices=DOSE_FREQUENCY_CHOICES, default="OD")
     concentration_mg_per_ml = models.FloatField(help_text="Concentration of the medicine (mg/mL)", null=True, blank=True)
     medication = models.CharField(max_length=255)
     medication_fk = models.ForeignKey(Medicine, on_delete=models.CASCADE, null=True, blank=True)
-    dosage = models.CharField(max_length=100)
+    medicine_type = models.CharField(max_length=20, choices=MEDICINE_TYPE_CHOICES, default="other")  # ✅ Add this line
+    dosage = models.CharField(max_length=100, null=True, blank=True)
     timing = models.DateTimeField()
 
     def __str__(self):

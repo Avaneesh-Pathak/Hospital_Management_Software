@@ -774,14 +774,14 @@ def register_patient(request):
                     blood_group=form.cleaned_data['blood_group'],
                     weight=form.cleaned_data.get('weight'),  # ✅ Add this line
                     allergies=form.cleaned_data.get('allergies', ''),
-                    medical_history=form.cleaned_data.get('medical_history', ''),
-                    current_medications=form.cleaned_data.get('current_medications', ''),
+                    # medical_history=form.cleaned_data.get('medical_history', ''),
+                    # current_medications=form.cleaned_data.get('current_medications', ''),
                     emergency_contact_name=form.cleaned_data.get('emergency_contact_name', ''),
                     emergency_contact_number=form.cleaned_data.get('emergency_contact_number', ''),
                     emergency_contact_relationship=form.cleaned_data.get('emergency_contact_relationship', ''),
-                    accompanying_person_name=form.cleaned_data.get('accompanying_person_name', ''),
-                    accompanying_person_contact=form.cleaned_data.get('accompanying_person_contact', ''),
-                    accompanying_person_relationship=form.cleaned_data.get('accompanying_person_relationship', ''),
+                    # accompanying_person_name=form.cleaned_data.get('accompanying_person_name', ''),
+                    # accompanying_person_contact=form.cleaned_data.get('accompanying_person_contact', ''),
+                    # accompanying_person_relationship=form.cleaned_data.get('accompanying_person_relationship', ''),
                     accompanying_person_address=form.cleaned_data.get('accompanying_person_address', ''),
                     profile_picture=form.cleaned_data.get('profile_picture', None),
                     contact_number=form.cleaned_data['contact_number'],
@@ -1686,6 +1686,7 @@ def transfer_summary_pdf(request, patient_code):
 
     return render_to_pdf("hms/ipd/transfer_summary.html", context)
 
+
 def add_prescription(request, ipd_id):
     ipd = get_object_or_404(IPD, id=ipd_id)
 
@@ -1694,14 +1695,34 @@ def add_prescription(request, ipd_id):
         if form.is_valid():
             prescription = form.save(commit=False)
             prescription.ipd = ipd
+            # Store medicine name as a string in `medication`
+            prescription.medication = prescription.medication_fk.name
+            prescription.medicine_type = prescription.medication_fk.medicine_type
+            prescription.dosage = prescription.medication_fk.standard_dose_per_kg
             prescription.save()
             messages.success(request, "Prescription added successfully.")
             return redirect('view_ipd_report', ipd_id=ipd_id)
-
     else:
         form = PrescriptionForm()
 
     return render(request, 'hms/opd/add_prescription.html', {'form': form, 'ipd': ipd})
+
+def search_medicine_detail(request):
+    med_id = request.GET.get('id')
+    try:
+        med = Medicine.objects.get(id=med_id)
+        return JsonResponse({
+            'id': med.id,
+            'name': med.name,
+            'type': med.get_medicine_type_display(),
+            'standard_dose_per_kg': med.standard_dose_per_kg,
+            'concentration_mg_per_ml': med.concentration_mg_per_ml,
+            'route': med.get_route_display() if med.route else "",
+            'duration': med.get_duration_display() if med.duration else "",
+        })
+    except Medicine.DoesNotExist:
+        return JsonResponse({'error': 'Medicine not found'}, status=404)
+
 
 
 
@@ -1942,7 +1963,7 @@ def update_opd(request, opd_id):
     if request.method == "POST":
         doctor_id = request.POST.get("doctor")
         diagnosis = request.POST.get("diagnosis")
-        symptoms = request.POST.get("symptoms")
+        # symptoms = request.POST.get("symptoms")
         visit_type = request.POST.get("visit_type")
         follow_up_date = request.POST.get("follow_up_date")
 
@@ -1957,7 +1978,7 @@ def update_opd(request, opd_id):
 
         opd.doctor = Doctor.objects.get(id=doctor_id)
         opd.diagnosis = diagnosis
-        opd.symptoms = symptoms
+        # opd.symptoms = symptoms
         opd.visit_type = visit_type
         opd.follow_up_date = parse_date(follow_up_date) if follow_up_date else None
         opd.prescription = json.dumps(prescription_list)  # Save structured data as string

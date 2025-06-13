@@ -124,14 +124,14 @@ class OPDForm(forms.ModelForm):
     class Meta:
         model = OPD
         fields = [
-            'patient', 'doctor', 'diagnosis', 'symptoms', 'prescription', 
+            'patient', 'doctor', 'diagnosis', 'prescription', 
             'follow_up_date', 'visit_type',
         ]
         widgets = {
             'patient': forms.Select(attrs={'class': 'w-full p-2 border border-gray-300 rounded-md'}),
             'doctor': forms.Select(attrs={'class': 'w-full p-2 border border-gray-300 rounded-md'}),
             'diagnosis': forms.Textarea(attrs={'class': 'w-full p-2 border border-gray-300 rounded-md', 'rows': 3}),
-            'symptoms': forms.Textarea(attrs={'class': 'w-full p-2 border border-gray-300 rounded-md', 'rows': 3}),
+            # 'symptoms': forms.Textarea(attrs={'class': 'w-full p-2 border border-gray-300 rounded-md', 'rows': 3}),
             'prescription': forms.Textarea(attrs={'class': 'w-full p-2 border border-gray-300 rounded-md', 'rows': 3}),
             'follow_up_date': forms.DateInput(attrs={'type': 'date', 'class': 'w-full p-2 border border-gray-300 rounded-md'}),
             'visit_type': forms.Select(attrs={'class': 'w-full p-2 border border-gray-300 rounded-md'}),
@@ -248,34 +248,31 @@ class EmergencyCaseForm(forms.ModelForm):
 
 
 class PrescriptionForm(forms.ModelForm):
-    medication = forms.ModelChoiceField(
-        queryset=Medicine.objects.all().order_by('name'),
-        widget=forms.Select(attrs={
-            'class': 'w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500',
-        }),
-        empty_label="Select medicine"
-    )
-
     class Meta:
         model = Prescription
-        fields = ['medication', 'concentration_mg_per_ml', 'dosage', 'dose_frequency', 'timing']
+        fields = ['medication_fk', 'concentration_mg_per_ml', 'dosage', 'dose_frequency', 'timing']
         widgets = {
-            'concentration_mg_per_ml': forms.TextInput(attrs={
-                'class': 'w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500',
-                'placeholder': 'Enter concentration',
+            'medication_fk': forms.Select(attrs={
+                'class': 'w-full p-2 border border-gray-300 rounded-md medicine-select',
+            }),
+            'concentration_mg_per_ml': forms.NumberInput(attrs={
+                'class': 'w-full p-2 border border-gray-300 rounded-md',
+                'placeholder': 'Auto-filled',
+                'step': '0.01'
             }),
             'dosage': forms.TextInput(attrs={
-                'class': 'w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500',
+                'class': 'w-full p-2 border border-gray-300 rounded-md',
                 'placeholder': 'Enter dosage',
             }),
             'dose_frequency': forms.Select(attrs={
-                'class': 'w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500',
+                'class': 'w-full p-2 border border-gray-300 rounded-md',
             }),
             'timing': forms.DateTimeInput(attrs={
                 'type': 'datetime-local',
-                'class': 'w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500',
+                'class': 'w-full p-2 border border-gray-300 rounded-md',
             }),
         }
+
 
 
 class LicenseForm(forms.ModelForm):

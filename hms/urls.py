@@ -75,6 +75,7 @@ urlpatterns = [
     path('ipd/add/', views.add_ipd, name='add_ipd'),
     path('get-ipd-data/', get_ipd_data, name='get_ipd_data'),
     path('ipd/<int:ipd_id>/add_prescription/', views.add_prescription, name='add_prescription'),
+    path('search_medicine_detail/', views.search_medicine_detail, name='search_medicine_detail'),
     path('ipd/<int:ipd_id>/', view_ipd_report, name='view_ipd_report'),
     path('ipd/<int:ipd_id>/update-room/', update_ipd_room, name='update_ipd_room'),
     path('ipd/discharge-summary/<str:patient_code>/', views.discharge_summary_view, name="discharge_summary_view"),

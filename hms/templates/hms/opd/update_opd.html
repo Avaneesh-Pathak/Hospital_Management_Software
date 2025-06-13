@@ -1,7 +1,7 @@
 {% extends 'hms/base.html' %}
 
 {% block content %}
-<div class="max-w-3xl mx-auto bg-white p-6 rounded-lg shadow-md">
+<div class="max-w-3xl mx-auto bg-blue-100 p-6 rounded-lg shadow-md">
     <h2 class="text-2xl font-bold text-center mb-6">✏️  OPD Visit</h2>
 
     <!-- Messages -->
@@ -35,7 +35,15 @@
         <span class="font-semibold text-green-700">Age:</span> {{ opd.patient.age }}
     </p>
 </div>
-
+<!-- Visit Type -->
+        <div>
+            <label for="visit_type" class="block text-sm font-medium text-gray-700 mb-2">Visit Type:</label>
+            <select name="visit_type" id="visit_type" class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <option value="new" {% if opd.visit_type == 'new' %}selected{% endif %}>New Visit</option>
+                <option value="follow_up" {% if opd.visit_type == 'follow_up' %}selected{% endif %}>Follow-up Visit</option>
+                <option value="emergency" {% if opd.visit_type == 'emergency' %}selected{% endif %}>Emergency Visit</option>
+            </select>
+        </div>
         <!-- Doctor Selection -->
         <div>
             <label for="doctor" class="block text-sm font-medium text-gray-700 mb-2">Select Doctor:</label>
@@ -54,11 +62,11 @@
             <textarea name="diagnosis" id="diagnosis" required class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" rows="4">{{ opd.diagnosis }}</textarea>
         </div>
 
-        <!-- Symptoms -->
+        <!-- Symptoms
         <div>
             <label for="symptoms" class="block text-sm font-medium text-gray-700 mb-2">Symptoms:</label>
             <textarea name="symptoms" id="symptoms" class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" rows="4">{{ opd.symptoms }}</textarea>
-        </div>
+        </div> -->
         <!-- Prescription Input -->
         <div class="mb-4 relative">
             <label for="prescription_input" class="block text-sm font-medium text-gray-700 mb-2">Prescription:</label>
@@ -68,12 +76,12 @@
         </div>
 
         <!-- Selected Medicines -->
-        <div id="prescription_list" class="space-y-2">
+        <div id="prescription_list" class="bg-white space-y-2">
             {% for item in opd.get_prescription_items %}
             <div class="p-2 border border-gray-300 rounded-md flex justify-between items-center">
                 <div>
                     <strong>{{ item.medicine }}</strong><br>
-                    <small>Dose: {{ item.dose }} | Route: {{ item.route }} | Duration: {{ item.duration }}</small>
+                    <small>Type: {{ item.medicine_type }} | Dose: {{ item.dose }} | Route: {{ item.route }} | Duration: {{ item.duration }}</small>
                 </div>
                 <button type="button" class="text-red-500 font-bold remove-btn">✖</button>
             </div>
@@ -86,15 +94,7 @@
             <input type="date" name="follow_up_date" id="follow_up_date" value="{{ opd.follow_up_date|date:'Y-m-d' }}" class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" required>
         </div>
 
-        <!-- Visit Type -->
-        <div>
-            <label for="visit_type" class="block text-sm font-medium text-gray-700 mb-2">Visit Type:</label>
-            <select name="visit_type" id="visit_type" class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                <option value="new" {% if opd.visit_type == 'new' %}selected{% endif %}>New Visit</option>
-                <option value="follow_up" {% if opd.visit_type == 'follow_up' %}selected{% endif %}>Follow-up Visit</option>
-                <option value="emergency" {% if opd.visit_type == 'emergency' %}selected{% endif %}>Emergency Visit</option>
-            </select>
-        </div>
+        
 
 
 
@@ -127,7 +127,7 @@ function renderPrescriptions() {
         div.innerHTML = `
             <div>
                 <strong>${item.medicine}</strong><br>
-                <small>Dose: ${item.dose} | Route: ${item.route} | Duration: ${item.duration}</small>
+                <small>Type: ${item.medicine_type} | Dose: ${item.dose} | Route: ${item.route} | Duration: ${item.duration}</small>
             </div>
             <button type="button" class="text-red-500 font-bold remove-btn" data-index="${index}">✖</button>
         `;
@@ -170,14 +170,15 @@ document.getElementById('prescription_input').addEventListener('input', function
                 option.className = 'cursor-pointer px-2 py-1 hover:bg-blue-100';
                 option.innerHTML = `
                     <strong>${medicine.name}</strong>
-                    <br><small>Route: ${medicine.route}, Duration: ${medicine.duration}</small>
+                    <br><small>Type: ${medicine.type}, Route: ${medicine.route}, Duration: ${medicine.duration}</small>
                 `;
                 option.addEventListener('click', function () {
                     prescriptions.push({
                         medicine: medicine.name,
+                        medicine_type: medicine.type || 'Not specified',  // 🔄 use 'type' instead of 'medicine_type'
                         dose: medicine.dose_per_kg || '1 tab',
-                        route: medicine.route || 'Oral',
-                        duration: medicine.duration || '5 days'
+                        route: medicine.route || 'Not specified',
+                        duration: medicine.duration || 'Not specified'
                     });
                     document.getElementById('prescription_input').value = '';
                     suggestions.classList.add('hidden');

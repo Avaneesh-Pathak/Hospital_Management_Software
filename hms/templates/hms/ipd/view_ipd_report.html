@@ -27,17 +27,18 @@
                 <thead>
                     <tr class="bg-gray-100">
                         <th class="border p-3 text-left text-gray-600">Medication</th>
-                        <th class="border p-3 text-left text-gray-600">Dosage</th>
+                        <th class="border p-3 text-left text-gray-600">Dose</th>
                         <th class="border p-3 text-left text-gray-600">Concentration (mg/mL)</th>
                         <th class="border p-3 text-left text-gray-600">Dose Frequency</th>
                         <th class="border p-3 text-left text-gray-600">Route</th>
-                        <th class="border p-3 text-left text-gray-600">Duration</th>
+                        <!-- <th class="border p-3 text-left text-gray-600">Duration</th> -->
                         <th class="border p-3 text-left text-gray-600">Timing</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for prescription in prescriptions %}
                         <tr class="hover:bg-gray-50">
+                            <!-- <td class="border p-3 text-gray-700">{{ prescription.medication }}</td> -->
                             <td class="border p-3 text-gray-700">{{ prescription.medication }}</td>
                             <td class="border p-3 text-gray-700">{{ prescription.dosage }}</td>
                             <td class="border p-3 text-gray-700">
@@ -45,7 +46,7 @@
                             </td>
                             <td class="border p-3 text-gray-700">{{ prescription.dose_frequency }}</td>
                             <td class="border p-3 text-gray-700">{{ prescription.route|default:"Oral" }}</td>
-                            <td class="border p-3 text-gray-700">{{ prescription.duration|default:"5 days" }}</td>
+                            <!-- <td class="border p-3 text-gray-700">{{ prescription.duration|default:"5 days" }}</td> -->
                             <td class="border p-3 text-gray-700">
                                 {{ prescription.timing|date:"d M Y, h:i A" }}
                             </td>
