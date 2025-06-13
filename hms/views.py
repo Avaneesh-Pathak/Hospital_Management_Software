@@ -766,41 +766,28 @@ def register_patient(request):
                 user.save()
                 logger.info(f"New user created: {user.full_name} ({user.email})")
 
-                # Step 2: Prepare patient fields
-                patient_data = {
-                    "user": user,
-                    "date_of_birth": form.cleaned_data['date_of_birth'],
-                    "aadhar_number": form.cleaned_data['aadhar_number'],
-                    "blood_group": form.cleaned_data['blood_group'],
-                    "weight": form.cleaned_data.get('weight'),
-                    "allergies": form.cleaned_data.get('allergies', ''),
-                    "emergency_contact_name": form.cleaned_data.get('emergency_contact_name', ''),
-                    "emergency_contact_number": form.cleaned_data.get('emergency_contact_number', ''),
-                    "emergency_contact_relationship": form.cleaned_data.get('emergency_contact_relationship', ''),
-                    "accompanying_person_address": form.cleaned_data.get('accompanying_person_address', ''),
-                    "contact_number": form.cleaned_data['contact_number'],
-                    "gender": form.cleaned_data['gender'],
-                    "email": form.cleaned_data['email'],
-                }
-
-                # Step 3: Handle webcam image if provided
-                captured_image = form.cleaned_data.get('captured_image')
-                print(captured_image)
-                if captured_image:
-                    try:
-                        format, imgstr = captured_image.split(';base64,')
-                        ext = format.split('/')[-1]
-                        file_name = f"profile_{user.full_name.replace(' ', '_')}.{ext}"
-                        patient_data["profile_picture"] = ContentFile(base64.b64decode(imgstr), name=file_name)
-                        logger.info("Webcam image processed and added to profile_picture.")
-                    except Exception as e:
-                        logger.error(f"Error decoding webcam image: {e}")
-                else:
-                    # Fall back to uploaded file input
-                    patient_data["profile_picture"] = form.cleaned_data.get('profile_picture')
-
-                # Step 4: Save patient
-                patient = Patient.objects.create(**patient_data)
+                # Create a new patient and link the newly created user
+                patient = Patient.objects.create(
+                    user=user,  # Linking newly created user
+                    date_of_birth=form.cleaned_data['date_of_birth'],
+                    aadhar_number=form.cleaned_data['aadhar_number'],
+                    blood_group=form.cleaned_data['blood_group'],
+                    weight=form.cleaned_data.get('weight'),  # ✅ Add this line
+                    allergies=form.cleaned_data.get('allergies', ''),
+                    medical_history=form.cleaned_data.get('medical_history', ''),
+                    current_medications=form.cleaned_data.get('current_medications', ''),
+                    emergency_contact_name=form.cleaned_data.get('emergency_contact_name', ''),
+                    emergency_contact_number=form.cleaned_data.get('emergency_contact_number', ''),
+                    emergency_contact_relationship=form.cleaned_data.get('emergency_contact_relationship', ''),
+                    accompanying_person_name=form.cleaned_data.get('accompanying_person_name', ''),
+                    accompanying_person_contact=form.cleaned_data.get('accompanying_person_contact', ''),
+                    accompanying_person_relationship=form.cleaned_data.get('accompanying_person_relationship', ''),
+                    accompanying_person_address=form.cleaned_data.get('accompanying_person_address', ''),
+                    profile_picture=form.cleaned_data.get('profile_picture', None),
+                    contact_number=form.cleaned_data['contact_number'],
+                    gender=form.cleaned_data['gender'],
+                    email=form.cleaned_data['email'],
+                )
                 logger.info(f"New patient registered: {patient.user.full_name} (Code: {patient.patient_code})")
                 messages.success(request, "Patient registered successfully!")
                 return redirect('patients')

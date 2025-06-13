@@ -83,14 +83,20 @@
             <td class="px-6 py-4 font-medium text-blue-600">{{ medication.medicine }}</td>
             <td class="px-6 py-4 text-center">{{ medication.calculated_dose_per_day|floatformat:2 }} mg</td>
             <td class="px-6 py-4 text-center">{{ medication.calculated_dose_per_dose|floatformat:2 }} mg</td>
+<<<<<<< HEAD
+=======
             {% if is_nurse %}
+>>>>>>> 9ca87c70db60a32fab0737c5830324a38c8a364f
             <td class="px-6 py-4 text-center">{{ medication.take_from_medicine_vial|floatformat:2 }} ml</td>
             <td class="px-6 py-4 text-center">{{ medication.vial }}</td>
             <td class="px-6 py-4 text-center">{{ medication.calculated_dose_per_dose_ml }} ml</td>
             <td class="px-6 py-4 text-center">{{ medication.take }} ml</td>
             <td class="px-6 py-4 text-center">{{ medication.dilution_volume }} ml</td>
             <td class="px-6 py-4 text-center">{{ medication.diluent.name }}</td>
+<<<<<<< HEAD
+=======
             {% endif %}
+>>>>>>> 9ca87c70db60a32fab0737c5830324a38c8a364f
             <td class="px-6 py-4">{{ medication.get_route_display }}</td>
             <td class="px-6 py-4">
                 {% if medication.dose_frequency == "OTHER" %}
@@ -99,18 +105,24 @@
                     <span class="badge-primary">{{ medication.get_dose_frequency_display }}</span>
                 {% endif %}
             </td>
+<<<<<<< HEAD
+=======
             {% if is_nurse %}
+>>>>>>> 9ca87c70db60a32fab0737c5830324a38c8a364f
             <td class="px-6 py-4 text-center">{{ medication.calculated_ml|floatformat:2 }} ml</td>
             <td class="px-6 py-4 text-center">{{ medication.calculated_infusion_rate }} ml/hr</td>
             <td class="px-6 py-4 text-center">{{ medication.frequency_of_dose }} min</td>
             <td class="px-6 py-4 text-center">{{ medication.frequency_of_dose_given|floatformat:2 }} ml/min</td>
             <td class="px-6 py-4 text-center">{{ medication.set_in_mchine|floatformat:2 }} ml/hr</td>
             <td class="px-6 py-4 font-medium whitespace-nowrap">{{ medication.sign }}</td>
+<<<<<<< HEAD
+=======
             {% endif %}
             {% if is_doctor %}
             <td class="px-6 py-4 font-medium whitespace-nowrap">{{ medication.timestamp }}</td>
             {% endif %}
             
+>>>>>>> 9ca87c70db60a32fab0737c5830324a38c8a364f
             <td class="px-6 py-4 text-center">
                 <a href="{% url 'nicu_medication_edit' medication.id %}"
                    class="text-blue-600 hover:text-blue-800 transition duration-200" title="Edit">
@@ -158,8 +170,24 @@
                 <th class="px-6 py-3 text-left">Medicine</th>
                 <th class="px-6 py-3 text-center">Dose (mg/kg/day)</th>
                 <th class="px-6 py-3 text-center">Per Dose (mg/kg/dose)</th>
+<<<<<<< HEAD
+                {% comment %} <th class="px-6 py-3 text-center">Take from medicine vial</th> {% endcomment %}
+                {% comment %} <th class="px-6 py-3 text-center">Vial</th> {% endcomment %}
+                {% comment %} <th class="px-6 py-3 text-center">Dilute In</th> {% endcomment %}
+                {% comment %} <th class="px-6 py-3 text-center">Take from vial</th> {% endcomment %}
+                {% comment %} <th class="px-6 py-3 text-center">Dilution Volume</th> {% endcomment %}
+                {% comment %} <th class="px-6 py-3 text-center">Diluent</th> {% endcomment %}
                 <th class="px-6 py-3 text-left">Route</th>
                 <th class="px-6 py-3 text-left">Dose Frequency</th>
+                {% comment %} <th class="px-6 py-3 text-center">Total fluid given in 1 hour</th> {% endcomment %}
+                {% comment %} <th class="px-6 py-3 text-center">Infusion Rate</th> {% endcomment %}
+                {% comment %} <th class="px-6 py-3 text-center">Fluid given in</th> {% endcomment %}
+                {% comment %} <th class="px-6 py-3 text-center">Fluid given</th> {% endcomment %}
+                {% comment %} <th class="px-6 py-3 text-center">Set machine at</th> {% endcomment %}
+=======
+                <th class="px-6 py-3 text-left">Route</th>
+                <th class="px-6 py-3 text-left">Dose Frequency</th>
+>>>>>>> 9ca87c70db60a32fab0737c5830324a38c8a364f
                 <th class="px-6 py-3 text-left whitespace-nowrap">Notes</th>
                 <th class="px-6 py-3 text-center">Actions</th>
             </tr>
@@ -173,6 +201,15 @@
                         <td class="px-6 py-4 font-medium text-blue-600">{{ medication.medicine }}</td>
                         <td class="px-6 py-4 text-center">{{ medication.calculated_dose_per_day|floatformat:2 }} mg</td>
                         <td class="px-6 py-4 text-center">{{ medication.calculated_dose_per_dose|floatformat:2 }} mg</td>
+<<<<<<< HEAD
+                        {% comment %} <td class="px-6 py-4 text-center">{{ medication.take_from_medicine_vial|floatformat:2 }} ml</td> {% endcomment %}
+                        {% comment %} <td class="px-6 py-4 text-center">{{ medication.vial }}</td> {% endcomment %}
+                        {% comment %} <td class="px-6 py-4 text-center">{{ medication.calculated_dose_per_dose_ml }} ml</td> {% endcomment %}
+                        {% comment %} <td class="px-6 py-4 text-center">{{ medication.take }} ml</td> {% endcomment %}
+                        {% comment %} <td class="px-6 py-4 text-center">{{ medication.dilution_volume }} ml</td> {% endcomment %}
+                        {% comment %} <td class="px-6 py-4 text-center">{{ medication.diluent.name }}</td> {% endcomment %}
+=======
+>>>>>>> 9ca87c70db60a32fab0737c5830324a38c8a364f
                         <td class="px-6 py-4">{{ medication.get_route_display }}</td>
                         <td class="px-6 py-4">
                             {% if medication.dose_frequency == "OTHER" %}
@@ -181,6 +218,14 @@
                             <span class="badge-primary">{{ medication.get_dose_frequency_display }}</span>
                             {% endif %}
                         </td>
+<<<<<<< HEAD
+                        {% comment %} <td class="px-6 py-4 text-center">{{ medication.calculated_ml|floatformat:2 }} ml</td> {% endcomment %}
+                        {% comment %} <td class="px-6 py-4 text-center">{{ medication.calculated_infusion_rate }} ml/hr</td> {% endcomment %}
+                        {% comment %} <td class="px-6 py-4 text-center">{{ medication.frequency_of_dose }} min</td> {% endcomment %}
+                        {% comment %} <td class="px-6 py-4 text-center">{{ medication.frequency_of_dose_given|floatformat:2 }} ml/min</td> {% endcomment %}
+                        {% comment %} <td class="px-6 py-4 text-center">{{ medication.set_in_mchine|floatformat:2 }} ml/hr</td> {% endcomment %}
+=======
+>>>>>>> 9ca87c70db60a32fab0737c5830324a38c8a364f
                         <td class="px-6 py-4 font-medium whitespace-nowrap">{{ medication.sign }}</td>
                         <td class="px-6 py-4 text-center">
                             <a href="{% url 'nicu_medication_edit' medication.id %}"
