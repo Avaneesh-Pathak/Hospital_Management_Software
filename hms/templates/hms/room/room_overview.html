@@ -2,7 +2,6 @@
 {% load custom_filters %}
 
 {% block content %}
-
 <div class="container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="fw-bold text-primary mb-0">
@@ -17,8 +16,7 @@
         {% for room in rooms %}
         <div class="col-lg-6 mb-4">
             <div class="card shadow-lg border-0 h-100">
-                
-                <!-- Room Header with Status Indicator -->
+
                 <div class="card-header {% if room.available_beds == 0 %}bg-danger{% else %}bg-dark{% endif %} text-white d-flex justify-content-between align-items-center">
                     <div>
                         <h5 class="fw-bold m-0">
@@ -37,8 +35,7 @@
                         </span>
                     </div>
                 </div>
-                
-                <!-- Room Details -->
+
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <div>
@@ -50,61 +47,52 @@
                             <strong>{{ room.size }} sq.ft</strong>
                         </div>
                     </div>
-                    
+
                     <hr>
-                    
+
                     <h6 class="fw-bold text-center mb-3 text-muted">
                         <i class="fas fa-bed me-2"></i>Bed Status
                     </h6>
-                    
+
                     <div class="bed-container d-flex flex-wrap justify-content-center">
                         {% for bed_number in room.total_beds_list %}
-                            {% with patient_info=room.bed_patient_info|get_patient_info:bed_number %}
-                                {% if bed_number in room.occupied_beds %}
-                                    <div class="bed occupied position-relative" 
-                                         data-bs-toggle="popover" 
-                                         data-bs-html="true" 
-                                         title="<i class='fas fa-bed me-2'></i>Bed {{ bed_number }} - Occupied"
-                                         data-bs-content="
-                                            <div class='patient-info'>
-                                                <p class='mb-1'><i class='fas fa-user me-2'></i><strong>Patient:</strong> {{ patient_info.name|default:'Unknown' }}</p>
-                                                <p class='mb-1'><i class='fas fa-calendar-alt me-2'></i><strong>Admit Date:</strong> {{ patient_info.admit_date|default:'N/A' }}</p>
-                                                <p class='mb-0'><i class='fas fa-rupee-sign me-2'></i><strong>Cost:</strong> ₹{{ patient_info.cost|default:'N/A' }}</p>
-                                            </div>">
-                                        <span class="bed-number">Bed {{ bed_number }}</span>
-                                        <div class="bed-status occupied-status">
-                                            <i class="fas fa-user"></i>
-                                        </div>
+                            {% get_patient_info room.bed_patient_info bed_number as patient_info %}
+                            {% if bed_number in room.occupied_beds %}
+                                <div class="bed occupied position-relative" 
+                                     data-bs-toggle="popover" 
+                                     data-bs-html="true" 
+                                     title="<i class='fas fa-bed me-2'></i>Bed {{ bed_number }} - Occupied"
+                                     data-bs-content="
+                                        <div class='patient-info'>
+                                            <p class='mb-1'><i class='fas fa-user me-2'></i><strong>Patient:</strong> {{ patient_info.name|default:'Unknown' }}</p>
+                                            <p class='mb-1'><i class='fas fa-calendar-alt me-2'></i><strong>Admit Date:</strong> {{ patient_info.admit_date|default:'N/A' }}</p>
+                                            <p class='mb-0'><i class='fas fa-rupee-sign me-2'></i><strong>Cost:</strong> ₹{{ patient_info.cost|default:'N/A' }}</p>
+                                        </div>">
+                                    <span class="bed-number">Bed {{ bed_number }}</span>
+                                    <div class="bed-status occupied-status">
+                                        <i class="fas fa-user"></i>
                                     </div>
-                                {% else %}
-                                    <div class="bed available position-relative" 
-                                         data-bs-toggle="popover" 
-                                         title="<i class='fas fa-bed me-2'></i>Bed {{ bed_number }} - Available" 
-                                         data-bs-content="<i class='fas fa-check-circle me-2 text-success'></i>Ready for new patient">
-                                        <span class="bed-number">Bed {{ bed_number }}</span>
-                                        <div class="bed-status available-status">
-                                            <i class="fas fa-check"></i>
-                                        </div>
+                                </div>
+                            {% else %}
+                                <div class="bed available position-relative" 
+                                     data-bs-toggle="popover" 
+                                     title="<i class='fas fa-bed me-2'></i>Bed {{ bed_number }} - Available" 
+                                     data-bs-content="<i class='fas fa-check-circle me-2 text-success'></i>Ready for new patient">
+                                    <span class="bed-number">Bed {{ bed_number }}</span>
+                                    <div class="bed-status available-status">
+                                        <i class="fas fa-check"></i>
                                     </div>
-                                {% endif %}
-                            {% endwith %}
+                                </div>
+                            {% endif %}
                         {% endfor %}
                     </div>
                 </div>
-                
-                <!-- Card Footer with Actions -->
+
                 <div class="card-footer bg-light d-flex justify-content-between">
                     <small class="text-muted">
                         <i class="fas fa-info-circle me-1"></i>Last updated: {{ room.updated_at|date:"M d, Y H:i" }}
                     </small>
-                    <div>
-                        {% comment %} <a href="{% url 'edit_room' room.id %}" class="btn btn-sm btn-outline-primary me-1">
-                            <i class="fas fa-edit"></i>
-                        </a> {% endcomment %}
-                        {% comment %} <a href="{% url 'delete_room' room.id %}" class="btn btn-sm btn-outline-danger">
-                            <i class="fas fa-trash-alt"></i>
-                        </a> {% endcomment %}
-                    </div>
+                    <div></div>
                 </div>
             </div>
         </div>
@@ -112,7 +100,6 @@
     </div>
 </div>
 
-<!-- Enable Bootstrap Popovers -->
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'));
@@ -176,7 +163,7 @@
     }
 
     .available {
-        background-color: #e8f5e9; /* Light green background */
+        background-color: #e8f5e9;
         color: #2e7d32;
         border: 2px solid #a5d6a7;
     }
@@ -187,7 +174,7 @@
     }
 
     .occupied {
-        background-color: #ffebee; /* Light red background */
+        background-color: #ffebee;
         color: #c62828;
         border: 2px solid #ef9a9a;
     }
@@ -224,5 +211,4 @@
         border-radius: 50px;
     }
 </style>
-
 {% endblock %}

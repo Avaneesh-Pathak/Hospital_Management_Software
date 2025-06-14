@@ -17,6 +17,7 @@ from operator import attrgetter
 from django.http import Http404
 from collections import Counter
 from django.utils import timezone
+from django.db import transaction
 from collections import defaultdict
 from reportlab.pdfgen import canvas
 from django.http import JsonResponse
@@ -37,6 +38,7 @@ from django.contrib.auth.models import User
 from django.utils.timezone import localtime
 from django.contrib.auth.models import Group
 from django.urls import reverse_lazy, reverse
+from django.http import HttpResponseForbidden
 from django.utils.dateparse import parse_time
 from django.template.loader import get_template
 from django.db.models.functions import TruncDate
@@ -51,7 +53,6 @@ from django.views.generic import ListView, CreateView, UpdateView,DeleteView
 from django.views.decorators.http import require_POST
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
-from django.db import transaction
 
 # Import Models and Forms
 from .models import (
@@ -838,7 +839,7 @@ def doctor_detail(request, doctor_id):
     return render(request, 'hms/doctor/doctor_detail.html', {'doctor': doctor})
 
 @login_required
-@user_passes_test(lambda u: u.groups.filter(name='admin').exists())
+# @user_passes_test(lambda u: u.groups.filter(name='admin').exists())
 def add_doctor(request):
     if request.method == 'POST':
         form = DoctorForm(request.POST)

@@ -2,6 +2,8 @@ from django import template
 from ..models import Medicine
 register = template.Library()
 
+
+
 @register.filter
 def multiply(value, arg):
     """Multiplies the value by the argument."""
@@ -53,13 +55,12 @@ def subtract(value, arg):
         return 0  # Return 0 if conversion fails
     
 
-@register.filter
+@register.simple_tag
 def get_patient_info(bed_patient_info, bed_number):
-    """Returns patient details for the given bed number."""
     return bed_patient_info.get(bed_number, {})
 
 
-register = template.Library()
+# register = template.Library()
 @register.filter(name='add_class')
 def add_class(field, css):
     return field.as_widget(attrs={"class": css})
