@@ -31,14 +31,14 @@ SECRET_KEY = "django-insecure-%o3#m#(0v_6#&naw*sor0%u#jjsdr=owzqrbopl@46as4-aii8
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["*","69.62.80.210"]
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '0a47-152-59-190-80.ngrok-free.app']
+
 
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 CRISPY_TEMPLATE_PACK = "bootstrap5"
 CSRF_TRUSTED_ORIGINS = [
-    "https://91af-2409-40e3-1020-541b-fd9b-667b-9469-32f5.ngrok-free.app"
+    "https://0a47-152-59-190-80.ngrok-free.app",
 ]
-
 
 # Application definition
 

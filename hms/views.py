@@ -69,7 +69,8 @@ from .forms import (
     RoomForm, EmergencyCaseForm, ProfileUpdateForm, PatientReportForm,
      LicenseForm, AssetForm, MaintenanceForm,
     BalanceUpdateForm, DaybookEntryForm, NICUVitalsForm, NICUMedicationRecordForm,
-    MedicineForm, DiluentForm, VialForm, NICUFluidForm, IPDForm, MedicineVialFormSet,OPDQuickForm,PrescriptionForm
+    MedicineForm, DiluentForm, VialForm, NICUFluidForm, IPDForm, MedicineVialFormSet,OPDQuickForm,PrescriptionForm,
+    PatientSummaryForm
 )
 
 
@@ -1491,6 +1492,7 @@ def ipd(request):
     return render(request, 'hms/ipd/ipd.html', {'ipds': ipds, 'room': room})
 
 
+
 @login_required
 def add_ipd(request):
     available_rooms = Room.objects.filter(available_beds__gt=0)
@@ -1588,16 +1590,69 @@ def view_ipd_report(request, ipd_id):
         'reports': reports
     })
 
-# Update IPD Room
+
+def get_available_beds_ajax(request):
+    room_id = request.GET.get("room_id")
+    try:
+        room = Room.objects.get(id=room_id)
+        occupied = room.occupied_beds or []
+        available_beds = []
+
+        for i in range(1, room.total_beds + 1):
+            if i not in occupied:
+                available_beds.append({
+                    "id": i,
+                    "bed_number": f"Bed {i}"
+                })
+
+        return JsonResponse({"beds": available_beds})
+    except Room.DoesNotExist:
+        return JsonResponse({"beds": []})
+
+
 def update_ipd_room(request, ipd_id):
     ipd = get_object_or_404(IPD, id=ipd_id)
+
     if request.method == "POST":
-        room_id = request.POST.get("room")
-        bed_number = request.POST.get("bed_number")
-        ipd.room_id = room_id
-        ipd.bed_number = bed_number
+        new_room_id = request.POST.get("room")
+        new_bed_number = int(request.POST.get("bed_number"))
+
+        if not new_room_id or not new_bed_number:
+            messages.error(request, "Room and bed must be selected.")
+            return redirect('view_ipd_report', ipd_id=ipd.id)
+
+        new_room = get_object_or_404(Room, id=new_room_id)
+
+        # Check if the selected bed is already occupied
+        if new_bed_number in new_room.occupied_beds:
+            messages.error(request, f"Bed {new_bed_number} in Room {new_room.room_number} is already occupied.")
+            return redirect('view_ipd_report', ipd_id=ipd.id)
+
+        # Step 1: Free the old bed from the current room
+        if ipd.room:
+            ipd.room.discharge_patient_from_bed(ipd.bed_number)
+            ipd.room.update_availability()
+
+        # Step 2: Assign new room and bed
+        ipd.room = new_room
+        ipd.bed_number = new_bed_number
+
+        # Step 3: Mark the new bed as occupied
+        if new_bed_number not in new_room.occupied_beds:
+            new_room.occupied_beds.append(new_bed_number)
+        new_room.update_availability()
+
+        # Step 4: Update bed price from new room (optional)
+        ipd.bed_price_per_day = new_room.bed_price_per_day
+
+        # Save both records
+        new_room.save()
         ipd.save()
-        messages.success(request, "Room and bed updated successfully.")
+
+        messages.success(request, f"Room updated to {new_room.room_number}, Bed {new_bed_number}.")
+        return redirect('view_ipd_report', ipd_id=ipd.id)
+
+    messages.error(request, "Invalid request.")
     return redirect('view_ipd_report', ipd_id=ipd.id)
 
 
@@ -1616,6 +1671,22 @@ def discharge_summary_view(request, patient_code):
     }
 
     return render(request, "hms/ipd/discharge_summary.html", context)
+
+def add_patient_summary(request, ipd_id):
+    ipd = get_object_or_404(IPD, id=ipd_id)
+
+    if request.method == 'POST':
+        form = PatientSummaryForm(request.POST)
+        if form.is_valid():
+            summary = form.save(commit=False)
+            summary.ipd = ipd
+            summary.save()
+            messages.success(request, "Patient summary added successfully.")
+            return redirect('view_ipd_report', ipd_id=ipd.id)
+    else:
+        form = PatientSummaryForm()
+
+    return render(request, 'hms/ipd/add_patient_summary.html', {'form': form, 'ipd': ipd})
 
 
 def transfer_summary_view(request, patient_code):

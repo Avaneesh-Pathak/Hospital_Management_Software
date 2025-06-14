@@ -1,0 +1,180 @@
+{% extends 'hms/base.html' %}
+{% load static %}
+{% load custom_filters %}
+
+{% block content %}
+<div style="max-width: 1200px; margin: 0 auto; padding: 30px 20px; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
+  <h1 style="font-size: 2.25rem; font-weight: 700; color: #2d3748; margin-bottom: 1.5rem; text-align: center; position: relative; padding-bottom: 10px;">
+    Add Patient Summary
+    <span style="position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 80px; height: 4px; background: linear-gradient(90deg, #3b82f6, #8b5cf6); border-radius: 2px;"></span>
+  </h1>
+
+  <!-- Alert Messages -->
+  {% if messages %}
+    <div style="margin-bottom: 1.5rem; display: grid; gap: 0.5rem;">
+      {% for message in messages %}
+        <div style="padding: 0.75rem 1rem; border-radius: 0.5rem; font-size: 0.875rem; 
+                   {% if message.tags == 'error' %}background-color: #fee2e2; color: #b91c1c; border-left: 4px solid #dc2626;
+                   {% elif message.tags == 'success' %}background-color: #dcfce7; color: #166534; border-left: 4px solid #22c55e;
+                   {% else %}background-color: #dbeafe; color: #1e40af; border-left: 4px solid #3b82f6;{% endif %}">
+          {{ message }}
+        </div>
+      {% endfor %}
+    </div>
+    <script>
+      setTimeout(() => document.querySelectorAll('.px-4.py-3').forEach(el => el.remove()), 5000);
+    </script>
+  {% endif %}
+
+  <div style="background-color: white; border-radius: 12px; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); overflow: hidden;">
+    <form id="summaryForm" method="post" style="padding: 2rem; display: grid; gap: 1.5rem;">
+      {% csrf_token %}
+
+      <!-- Vitals Grid -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1rem;">
+        <div>
+          <label for="{{ form.temperature.id_for_label }}" style="display: block; font-size: 0.875rem; font-weight: 500; color: #4a5568; margin-bottom: 0.5rem;">Temperature (°C)</label>
+          <input type="number" name="{{ form.temperature.name }}" id="{{ form.temperature.id_for_label }}" 
+                 style="width: 100%; padding: 0.5rem 0.75rem; border: 1px solid #e2e8f0; border-radius: 0.375rem; transition: border-color 0.2s; 
+                        focus:border-blue-500 focus:ring focus:ring-blue-200 hover:border-gray-400"
+                 placeholder="36.5 - 37.5" step="0.1" min="30" max="45">
+        </div>
+        <div>
+          <label for="{{ form.pulse.id_for_label }}" style="display: block; font-size: 0.875rem; font-weight: 500; color: #4a5568; margin-bottom: 0.5rem;">Pulse (bpm)</label>
+          <input type="number" name="{{ form.pulse.name }}" id="{{ form.pulse.id_for_label }}" 
+                 style="width: 100%; padding: 0.5rem 0.75rem; border: 1px solid #e2e8f0; border-radius: 0.375rem; transition: border-color 0.2s; 
+                        focus:border-blue-500 focus:ring focus:ring-blue-200 hover:border-gray-400"
+                 placeholder="60 - 100" min="30" max="200">
+        </div>
+        <div>
+          <label for="{{ form.respiratory_rate.id_for_label }}" style="display: block; font-size: 0.875rem; font-weight: 500; color: #4a5568; margin-bottom: 0.5rem;">Resp Rate</label>
+          <input type="number" name="{{ form.respiratory_rate.name }}" id="{{ form.respiratory_rate.id_for_label }}" 
+                 style="width: 100%; padding: 0.5rem 0.75rem; border: 1px solid #e2e8f0; border-radius: 0.375rem; transition: border-color 0.2s; 
+                        focus:border-blue-500 focus:ring focus:ring-blue-200 hover:border-gray-400"
+                 placeholder="12 - 20" min="6" max="60">
+        </div>
+        <div>
+          <label for="{{ form.spo2.id_for_label }}" style="display: block; font-size: 0.875rem; font-weight: 500; color: #4a5568; margin-bottom: 0.5rem;">SpO₂ (%)</label>
+          <input type="number" name="{{ form.spo2.name }}" id="{{ form.spo2.id_for_label }}" 
+                 style="width: 100%; padding: 0.5rem 0.75rem; border: 1px solid #e2e8f0; border-radius: 0.375rem; transition: border-color 0.2s; 
+                        focus:border-blue-500 focus:ring focus:ring-blue-200 hover:border-gray-400"
+                 placeholder="95 - 100" min="70" max="100">
+        </div>
+        <div>
+          <label for="{{ form.blood_pressure_systolic.id_for_label }}" style="display: block; font-size: 0.875rem; font-weight: 500; color: #4a5568; margin-bottom: 0.5rem;">BP Systolic</label>
+          <input type="number" name="{{ form.blood_pressure_systolic.name }}" id="{{ form.blood_pressure_systolic.id_for_label }}" 
+                 style="width: 100%; padding: 0.5rem 0.75rem; border: 1px solid #e2e8f0; border-radius: 0.375rem; transition: border-color 0.2s; 
+                        focus:border-blue-500 focus:ring focus:ring-blue-200 hover:border-gray-400"
+                 placeholder="90 - 120" min="50" max="250">
+        </div>
+        <div>
+          <label for="{{ form.blood_pressure_diastolic.id_for_label }}" style="display: block; font-size: 0.875rem; font-weight: 500; color: #4a5568; margin-bottom: 0.5rem;">BP Diastolic</label>
+          <input type="number" name="{{ form.blood_pressure_diastolic.name }}" id="{{ form.blood_pressure_diastolic.id_for_label }}" 
+                 style="width: 100%; padding: 0.5rem 0.75rem; border: 1px solid #e2e8f0; border-radius: 0.375rem; transition: border-color 0.2s; 
+                        focus:border-blue-500 focus:ring focus:ring-blue-200 hover:border-gray-400"
+                 placeholder="60 - 80" min="30" max="150">
+        </div>
+        <div style="grid-column: span 2;">
+          <label for="{{ form.blood_sugar.id_for_label }}" style="display: block; font-size: 0.875rem; font-weight: 500; color: #4a5568; margin-bottom: 0.5rem;">Blood Sugar (mg/dL)</label>
+          <input type="number" name="{{ form.blood_sugar.name }}" id="{{ form.blood_sugar.id_for_label }}" 
+                 style="width: 50%; padding: 0.5rem 0.75rem; border: 1px solid #e2e8f0; border-radius: 0.375rem; transition: border-color 0.2s; 
+                        focus:border-blue-500 focus:ring focus:ring-blue-200 hover:border-gray-400"
+                 placeholder="70 - 140" min="30" max="600">
+        </div>
+      </div>
+
+      <!-- Clinical Notes -->
+      <div>
+        <label for="{{ form.clinical_notes.id_for_label }}" style="display: block; font-size: 0.875rem; font-weight: 500; color: #4a5568; margin-bottom: 0.5rem;">Clinical Notes</label>
+        <textarea name="{{ form.clinical_notes.name }}" id="{{ form.clinical_notes.id_for_label }}" 
+                  style="width: 100%; padding: 0.75rem; border: 1px solid #e2e8f0; border-radius: 0.5rem; min-height: 120px; transition: border-color 0.2s;
+                         focus:border-blue-500 focus:ring focus:ring-blue-200 hover:border-gray-400"></textarea>
+      </div>
+
+      <!-- recorded_by -->
+      <div>
+        <label for="{{ form.recorded_by.id_for_label }}" style="display: block; font-size: 0.875rem; font-weight: 500; color: #4a5568; margin-bottom: 0.5rem;">Recorded By</label>
+        <input type="text" name="{{ form.recorded_by.name }}" id="{{ form.recorded_by.id_for_label }}" 
+               style="width: 100%; padding: 0.5rem 0.75rem; border: 1px solid #e2e8f0; border-radius: 0.375rem; transition: border-color 0.2s; 
+                      focus:border-blue-500 focus:ring focus:ring-blue-200 hover:border-gray-400">
+      </div>
+      
+      <div style="display: flex; justify-content: flex-end;">
+        <button type="submit" style="display: inline-flex; align-items: center; padding: 0.5rem 1.5rem; background: linear-gradient(135deg, #3b82f6, #6366f1); border: none; border-radius: 0.5rem; font-weight: 600; color: white; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.3), 0 2px 4px -1px rgba(59, 130, 246, 0.1);"
+                onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 10px 15px -3px rgba(59, 130, 246, 0.3), 0 4px 6px -2px rgba(59, 130, 246, 0.1)';"
+                onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 6px -1px rgba(59, 130, 246, 0.3), 0 2px 4px -1px rgba(59, 130, 246, 0.1)';">
+          <svg style="height: 1.25rem; width: 1.25rem; margin-right: 0.5rem;" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+          </svg>
+          Save Summary
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Recent Summaries - Now properly showing data -->
+  {% if recent_summaries %}
+  <div style="margin-top: 2rem;">
+    <h2 style="font-size: 1.5rem; font-weight: 600; color: #2d3748; margin-bottom: 1rem; position: relative; padding-left: 1rem;">
+      Recent Summaries
+      <span style="position: absolute; left: 0; top: 0; height: 100%; width: 4px; background: linear-gradient(to bottom, #3b82f6, #8b5cf6); border-radius: 2px;"></span>
+    </h2>
+    <div style="display: grid; gap: 1rem;">
+      {% for summary in recent_summaries %}
+        <div style="background-color: white; padding: 1.25rem; border-radius: 0.75rem; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); border-left: 4px solid #3b82f6;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+            <span style="font-weight: 500; color: #4a5568;">{{ summary.timestamp|date:"Y-m-d H:i" }}</span>
+            {% if summary.recorded_by %}
+              <span style="font-size: 0.75rem; color: #718096; background-color: #f7fafc; padding: 0.25rem 0.5rem; border-radius: 9999px;">by {{ summary.recorded_by }}</span>
+            {% endif %}
+          </div>
+          <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 0.5rem; font-size: 0.875rem; color: #4a5568;">
+            <div><span style="font-weight: 500; color: #2d3748;">Temp:</span> {{ summary.temperature|default:"--" }}°C</div>
+            <div><span style="font-weight: 500; color: #2d3748;">Pulse:</span> {{ summary.pulse|default:"--" }} bpm</div>
+            <div><span style="font-weight: 500; color: #2d3748;">RR:</span> {{ summary.respiratory_rate|default:"--" }}</div>
+            <div><span style="font-weight: 500; color: #2d3748;">BP:</span> 
+              {{ summary.blood_pressure_systolic|default:"--" }}/{{ summary.blood_pressure_diastolic|default:"--" }}</div>
+            <div><span style="font-weight: 500; color: #2d3748;">SpO₂:</span> {{ summary.spo2|default:"--" }}%</div>
+            <div><span style="font-weight: 500; color: #2d3748;">Sugar:</span> {{ summary.blood_sugar|default:"--" }} mg/dL</div>
+          </div>
+          {% if summary.clinical_notes %}
+            <p style="margin-top: 0.75rem; color: #4a5568; font-style: italic; padding: 0.75rem; background-color: #f8fafc; border-radius: 0.5rem; border-left: 3px solid #cbd5e0;">
+              {{ summary.clinical_notes }}
+            </p>
+          {% endif %}
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% else %}
+    <div style="margin-top: 2rem; background-color: #f8fafc; padding: 1.5rem; border-radius: 0.5rem; text-align: center;">
+      <p style="color: #718096;">No summaries recorded yet for this patient.</p>
+    </div>
+  {% endif %}
+</div>
+
+<script>
+  // Add focus and hover effects to all input fields
+  document.querySelectorAll('input, textarea').forEach(input => {
+    input.addEventListener('focus', function() {
+      this.style.borderColor = '#3b82f6';
+      this.style.boxShadow = '0 0 0 3px rgba(59, 130, 246, 0.1)';
+    });
+    
+    input.addEventListener('blur', function() {
+      this.style.borderColor = '#e2e8f0';
+      this.style.boxShadow = 'none';
+    });
+    
+    input.addEventListener('mouseenter', function() {
+      this.style.borderColor = '#a0aec0';
+    });
+    
+    input.addEventListener('mouseleave', function() {
+      if (document.activeElement !== this) {
+        this.style.borderColor = '#e2e8f0';
+      }
+    });
+  });
+</script>
+{% endblock %}

@@ -73,6 +73,7 @@ urlpatterns = [
     # IPD
     path('ipd/', views.ipd, name='ipd'),
     path('ipd/add/', views.add_ipd, name='add_ipd'),
+    path('ipd/<int:ipd_id>/add-summary/', views.add_patient_summary, name='add_patient_summary'),
     path('get-ipd-data/', get_ipd_data, name='get_ipd_data'),
     path('ipd/<int:ipd_id>/add_prescription/', views.add_prescription, name='add_prescription'),
     path('search_medicine_detail/', views.search_medicine_detail, name='search_medicine_detail'),
@@ -115,6 +116,7 @@ urlpatterns = [
 
     # Rooms and Beds
     path('add-room/', add_room, name='add_room'),
+    path("get-available-beds/", views.get_available_beds_ajax, name="get_available_beds_ajax"),
     path('ajax/get-beds/', views.get_available_beds, name='get_available_beds'),
     path('room-overview/', views.room_overview, name='room_overview'),
     path('get_available_beds/', get_available_beds, name='get_available_beds'),

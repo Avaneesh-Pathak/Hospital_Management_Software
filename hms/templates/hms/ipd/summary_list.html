@@ -1,0 +1,106 @@
+<!-- hms/partials/summary_form.html -->
+<div class="bg-blue-50 p-4 rounded-lg">
+    <h3 class="text-lg font-medium text-blue-800 mb-4">Record New Vital Signs</h3>
+    <form id="summaryForm" method="post" class="space-y-4">
+        {% csrf_token %}
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Temperature -->
+            <div class="form-group">
+                <label for="{{ form.temperature.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                    Temperature
+                </label>
+                <input type="number" name="temperature" id="id_temperature" step="0.1" 
+                       class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                       placeholder="36.5">
+                <p class="text-xs text-gray-500 mt-1">°C (Normal: 36.5-37.5)</p>
+            </div>
+            
+            <!-- Pulse -->
+            <div class="form-group">
+                <label for="{{ form.pulse.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                    Pulse
+                </label>
+                <input type="number" name="pulse" id="id_pulse" 
+                       class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                       placeholder="72">
+                <p class="text-xs text-gray-500 mt-1">Beats per minute (Normal: 60-100)</p>
+            </div>
+            
+            <!-- Respiratory Rate -->
+            <div class="form-group">
+                <label for="{{ form.respiratory_rate.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                    Respiratory Rate
+                </label>
+                <input type="number" name="respiratory_rate" id="id_respiratory_rate" 
+                       class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                       placeholder="16">
+                <p class="text-xs text-gray-500 mt-1">Breaths per minute (Normal: 12-20)</p>
+            </div>
+            
+            <!-- Blood Pressure - Systolic -->
+            <div class="form-group">
+                <label for="{{ form.blood_pressure_systolic.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                    Systolic BP
+                </label>
+                <input type="number" name="blood_pressure_systolic" id="id_blood_pressure_systolic" 
+                       class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                       placeholder="120">
+            </div>
+            
+            <!-- Blood Pressure - Diastolic -->
+            <div class="form-group">
+                <label for="{{ form.blood_pressure_diastolic.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                    Diastolic BP
+                </label>
+                <input type="number" name="blood_pressure_diastolic" id="id_blood_pressure_diastolic" 
+                       class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                       placeholder="80">
+            </div>
+            
+            <!-- SpO2 -->
+            <div class="form-group">
+                <label for="{{ form.spo2.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                    SpO₂
+                </label>
+                <input type="number" name="spo2" id="id_spo2" 
+                       class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                       placeholder="98">
+                <p class="text-xs text-gray-500 mt-1">Oxygen Saturation % (Normal: ≥95%)</p>
+            </div>
+            
+            <!-- Blood Sugar -->
+            <div class="form-group">
+                <label for="{{ form.blood_sugar.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                    Blood Sugar
+                </label>
+                <input type="number" name="blood_sugar" id="id_blood_sugar" step="0.1" 
+                       class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                       placeholder="90">
+                <p class="text-xs text-gray-500 mt-1">mg/dL (Normal fasting: 70-100)</p>
+            </div>
+        </div>
+        
+        <!-- Clinical Notes -->
+        <div class="form-group">
+            <label for="{{ form.clinical_notes.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                Clinical Assessment
+            </label>
+            <textarea name="clinical_notes" id="id_clinical_notes" rows="3"
+                      class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                      placeholder="Enter clinical findings and instructions..."></textarea>
+        </div>
+        
+        <!-- Hidden recorded_by field -->
+        <input type="hidden" name="recorded_by" id="id_recorded_by" value="{{ request.user.id }}">
+        
+        <div class="flex justify-end space-x-3">
+            <button type="reset" class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50">
+                Reset
+            </button>
+            <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+                Save Vital Signs
+            </button>
+        </div>
+    </form>
+</div>

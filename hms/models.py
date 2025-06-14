@@ -166,7 +166,27 @@ class Patient(models.Model):
     def __str__(self):
         return f"{self.user.full_name} ({self.patient_code})"
 
+class PatientSummary(models.Model):
+    ipd = models.ForeignKey('IPD', on_delete=models.CASCADE, related_name="summaries")
+    timestamp = models.DateTimeField(default=timezone.now)
 
+    # Vitals
+    temperature = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True, help_text="°C")
+    pulse = models.IntegerField(null=True, blank=True, help_text="Beats per minute")
+    respiratory_rate = models.IntegerField(null=True, blank=True, help_text="Breaths per minute")
+    blood_pressure_systolic = models.IntegerField(null=True, blank=True)
+    blood_pressure_diastolic = models.IntegerField(null=True, blank=True)
+    spo2 = models.IntegerField(null=True, blank=True, help_text="Oxygen Saturation %")
+    blood_sugar = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True, help_text="mg/dL")
+
+    # Clinical Notes
+    clinical_notes = models.TextField(blank=True, help_text="Observations or instructions")
+
+    # Nurse/Doctor recording the vitals
+    recorded_by = models.CharField(max_length=100, blank=True)
+
+    def __str__(self):
+        return f"Summary for {self.ipd.patient} at {self.timestamp.strftime('%Y-%m-%d %H:%M')}"
 
 class PatientReport(models.Model):
     patient = models.ForeignKey('hms.Patient', on_delete=models.CASCADE, related_name="reports")
@@ -370,6 +390,14 @@ class IPD(models.Model):
         self.calculate_total_cost()
 
         super().save(*args, **kwargs)
+
+    @property
+    def stay_duration_days(self):
+        """Returns the number of days the patient stayed in the hospital."""
+        end_date = self.discharge_date or timezone.now()
+        duration = (end_date - self.admitted_on).days
+        return max(1, duration)  # Minimum 1 day
+
 
     def calculate_total_cost(self):
         """Calculate the total cost based on the duration and bed price."""
@@ -728,7 +756,6 @@ class OPDBilling(BillingBase):
             )
 
 class IPDBilling(BillingBase):
-    """Billing model for Inpatient Department"""
     ipd_admission = models.ForeignKey("IPD", on_delete=models.PROTECT)
     room_charges = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     nursing_charges = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
@@ -736,7 +763,7 @@ class IPDBilling(BillingBase):
     medication_charges = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     lab_charges = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     other_charges = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
-    
+
     def calculate_subtotal(self):
         return (
             self.room_charges +
@@ -746,18 +773,42 @@ class IPDBilling(BillingBase):
             self.lab_charges +
             self.other_charges
         )
+
     @property
     def bill_type(self):
         return 'IPD'
-    
+
     def save(self, *args, **kwargs):
-        # Calculate room charges based on IPD stay duration
         if not self.room_charges and self.ipd_admission:
             self.room_charges = self.ipd_admission.calculate_total_cost()
+
         super().save(*args, **kwargs)
 
+        # Record income in AccountingRecord if not already recorded
+        from .models import AccountingRecord  # Avoid circular import
+
+        total = self.calculate_subtotal()
+        if total > 0:
+            existing_record = AccountingRecord.objects.filter(
+                transaction_type='income',
+                source='ipd',
+                amount=total,
+                patient=self.ipd_admission.patient,
+                room=self.ipd_admission.room,
+                date__date=now().date()
+            ).exists()
+
+            if not existing_record:
+                AccountingRecord.objects.create(
+                    transaction_type='income',
+                    source='ipd',
+                    amount=total,
+                    description=f"IPD Billing for {self.ipd_admission.patient.user.full_name}",
+                    patient=self.ipd_admission.patient,
+                    room=self.ipd_admission.room
+                )
+
 class BillingItem(models.Model):
-    """Line items for detailed billing"""
     BILLING_TYPE_CHOICES = [
         ('opd', 'OPD'),
         ('ipd', 'IPD'),
@@ -770,35 +821,67 @@ class BillingItem(models.Model):
     quantity = models.PositiveIntegerField(default=1)
     unit_price = models.DecimalField(max_digits=10, decimal_places=2)
     discount = models.DecimalField(max_digits=5, decimal_places=2, default=0.00)
-    tax_rate = models.DecimalField(max_digits=5, decimal_places=2, default=0.00)  # 5% default tax
+    tax_rate = models.DecimalField(max_digits=5, decimal_places=2, default=0.00)
     amount = models.DecimalField(max_digits=10, decimal_places=2, editable=False)
-    
-    def save(self, *args, **kwargs):
-        subtotal = self.unit_price * self.quantity
 
+    def save(self, *args, **kwargs):
+        from .models import AccountingRecord  # Avoid circular import
+
+        subtotal = self.unit_price * self.quantity
         discount_amount = subtotal * (self.discount / Decimal('100'))
         discounted_total = subtotal - discount_amount
-
         tax_amount = discounted_total * (self.tax_rate / Decimal('100'))
         final_amount = discounted_total + tax_amount
-
-        # Round to 2 decimal places
         self.amount = final_amount.quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
 
         super().save(*args, **kwargs)
 
         # Update parent billing totals
         if self.opd_billing:
-            self.opd_billing.calculate_totals()
             self.billing_type = 'opd'
+            self.opd_billing.calculate_totals()
             self.opd_billing.save()
         elif self.ipd_billing:
-            self.ipd_billing.calculate_totals()
             self.billing_type = 'ipd'
+            self.ipd_billing.calculate_totals()
             self.ipd_billing.save()
 
+        # Record income in AccountingRecord if not already recorded
+        patient = None
+        room = None
+        source = None
+
+        if self.billing_type == 'opd' and self.opd_billing:
+            source = 'opd'
+            patient = self.opd_billing.opd_visit.patient
+        elif self.billing_type == 'ipd' and self.ipd_billing:
+            source = 'ipd'
+            patient = self.ipd_billing.ipd_admission.patient
+            room = self.ipd_billing.ipd_admission.room
+
+        if source and self.amount > 0:
+            exists = AccountingRecord.objects.filter(
+                transaction_type='income',
+                source=source,
+                amount=self.amount,
+                description=self.description,
+                patient=patient,
+                room=room,
+                date__date=now().date()
+            ).exists()
+
+            if not exists:
+                AccountingRecord.objects.create(
+                    transaction_type='income',
+                    source=source,
+                    amount=self.amount,
+                    description=self.description,
+                    patient=patient,
+                    room=room
+                )
+
     def __str__(self):
-        return f"{self.description} - {self.amount}"
+        return f"{self.description} - ₹{self.amount}"
 
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType

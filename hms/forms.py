@@ -2,7 +2,7 @@ from django import forms
 from django.utils import timezone
 from django.forms import inlineformset_factory
 from django.core.exceptions import ValidationError
-from .models import CustomUser,NICUVitals, Patient,OPDBilling, IPDBilling, BillingItem, Payment, Expense,OPD,Room, Doctor, Employee,EmergencyCase,PatientReport,Prescription,License,Asset,Maintenance,Daybook,NICUMedicationRecord,Medicine, Diluent,Vial,FluidRequirement,IPD,MedicineVial,AdviceSuggestion,InvestigationSuggestion
+from .models import CustomUser,NICUVitals, Patient,OPDBilling, IPDBilling, BillingItem, Payment, Expense,OPD,Room, Doctor, Employee,EmergencyCase,PatientReport,Prescription,License,Asset,Maintenance,Daybook,NICUMedicationRecord,Medicine, Diluent,Vial,FluidRequirement,IPD,MedicineVial,AdviceSuggestion,InvestigationSuggestion,PatientSummary
 
 class ProfileUpdateForm(forms.ModelForm):
     class Meta:
@@ -58,7 +58,18 @@ class PatientRegistrationForm(forms.ModelForm):
         return instance
 
 
-
+class PatientSummaryForm(forms.ModelForm):
+    class Meta:
+        model = PatientSummary
+        fields = [
+            'temperature', 'pulse', 'respiratory_rate',
+            'blood_pressure_systolic', 'blood_pressure_diastolic',
+            'spo2', 'blood_sugar', 'clinical_notes', 'recorded_by'
+        ]
+        widgets = {
+            'timestamp': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
+            'clinical_notes': forms.Textarea(attrs={'rows': 3}),
+        }
 
 
 class PatientReportForm(forms.ModelForm):

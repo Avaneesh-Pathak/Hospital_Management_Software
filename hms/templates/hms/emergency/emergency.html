@@ -70,7 +70,8 @@
                                         {% else %}bg-danger
                                         {% endif %}" 
                                         role="progressbar" 
-                                        style="width: {{ emergency.severity|multiply:20 }}%" 
+                                        style="width: {{ emergency.severity|add:'0'|floatformat:0|add:'0' }}0%"
+
                                         aria-valuenow="{{ emergency.severity }}" 
                                         aria-valuemin="1" 
                                         aria-valuemax="5">
@@ -135,36 +136,37 @@
                                         emergency.status === 'Admitted' ? 'bg-success' : 'bg-secondary';
 
                     const row = `
-                        <tr>
-                            <td>${emergency.patient__full_name}</td>
-                            <td>${emergency.emergency_type}</td>
-                            <td><span class="badge ${statusBadge}">${emergency.status}</span></td>
-                            <td>${emergency.case_description.substring(0, 50)}</td>
-                            <td>
-                                <div class="progress">
-                                    <div class="progress-bar ${severityClass}" role="progressbar"
-                                        style="width: ${emergency.severity * 20}%" 
-                                        aria-valuenow="${emergency.severity}" 
-                                        aria-valuemin="1" 
-                                        aria-valuemax="5">
-                                        ${emergency.severity}
-                                    </div>
-                                </div>
-                            </td>
-                            <td>
-                                <a href="/emergency/edit/${emergency.id}/" class="btn btn-sm btn-warning">
-                                    <i class="fas fa-edit"></i> Edit
-                                </a>
-                                <a href="/emergency/delete/${emergency.id}/" class="btn btn-sm btn-danger">
-                                    <i class="fas fa-trash"></i> Delete
-                                </a>
-                                ${emergency.status === 'Pending' ? `
-                                <a href="/emergency/admit/${emergency.id}/" class="btn btn-sm btn-success">
-                                    <i class="fas fa-hospital"></i> Admit
-                                </a>` : ''}
-                            </td>
-                        </tr>
-                    `;
+    <tr>
+        <td>${emergency.patient__full_name}</td>
+        <td>${emergency.emergency_type}</td>
+        <td><span class="badge ${statusBadge}">${emergency.status}</span></td>
+        <td>
+            <div class="progress">
+                <div class="progress-bar ${severityClass}" role="progressbar"
+                    style="width: ${emergency.severity * 20}%" 
+                    aria-valuenow="${emergency.severity}" 
+                    aria-valuemin="1" 
+                    aria-valuemax="5">
+                    ${emergency.severity}
+                </div>
+            </div>
+        </td>
+        <td>${emergency.case_description.substring(0, 50)}</td>
+        <td>
+            <a href="/emergency/edit/${emergency.id}/" class="btn btn-sm btn-warning">
+                <i class="fas fa-edit"></i> Edit
+            </a>
+            <a href="/emergency/delete/${emergency.id}/" class="btn btn-sm btn-danger">
+                <i class="fas fa-trash"></i> Delete
+            </a>
+            ${emergency.status === 'Pending' ? `
+            <a href="/emergency/admit/${emergency.id}/" class="btn btn-sm btn-success">
+                <i class="fas fa-hospital"></i> Admit
+            </a>` : ''}
+        </td>
+    </tr>
+`;
+
                     tableBody.insertAdjacentHTML('beforeend', row);
                 });
             } catch (error) {

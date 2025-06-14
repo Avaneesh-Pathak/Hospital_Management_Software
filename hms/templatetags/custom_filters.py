@@ -5,11 +5,10 @@ register = template.Library()
 @register.filter
 def multiply(value, arg):
     """Multiplies the value by the argument."""
-    return value * arg
-
-
-
-
+    try:
+        return float(value) * float(arg)
+    except (ValueError, TypeError):
+        return ''
 
 @register.filter
 def get_value(vitals, field_name):
@@ -58,3 +57,9 @@ def subtract(value, arg):
 def get_patient_info(bed_patient_info, bed_number):
     """Returns patient details for the given bed number."""
     return bed_patient_info.get(bed_number, {})
+
+
+register = template.Library()
+@register.filter(name='add_class')
+def add_class(field, css):
+    return field.as_widget(attrs={"class": css})
