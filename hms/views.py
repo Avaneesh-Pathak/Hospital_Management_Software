@@ -60,7 +60,7 @@ from .models import (
     EmergencyCase, OPD, IPD, Employee, Room, PatientReport,
     License, Asset, Maintenance, AccountingRecord, Daybook, Balance,
     PatientTransfer, NICUVitals, NICUMedicationRecord, Medicine, Diluent,
-    Vial, FluidRequirement, MedicineVial,Nurse, Staff,Notification,Prescription
+    Vial, FluidRequirement, MedicineVial,Nurse, Staff,Notification,Prescription,AdviceSuggestion,InvestigationSuggestion
 )
 
 from .forms import (
@@ -1956,50 +1956,78 @@ def pending_opds_for_doctor(request):
 from django.utils.dateparse import parse_date
 import json
 
+from .forms import OPDForm  # make sure it's imported
+
 @login_required
 def update_opd(request, opd_id):
+    # ✅ 1. Get the existing OPD visit
     opd = get_object_or_404(OPD, id=opd_id)
-    print("Updating OPD:", opd)
+    print("Fetched OPD:", opd)
+
     if request.method == "POST":
-        doctor_id = request.POST.get("doctor")
-        diagnosis = request.POST.get("diagnosis")
-        # symptoms = request.POST.get("symptoms")
-        visit_type = request.POST.get("visit_type")
-        follow_up_date = request.POST.get("follow_up_date")
+        # ✅ 2. Bind the submitted POST data to the OPDForm (with instance to update)
+        form = OPDForm(request.POST, instance=opd)
+        print("Form POST data:", request.POST)
 
-        # ✅ Get prescription JSON from form
-        prescription_data = request.POST.get("prescription_json")  # New: expects stringified JSON
-        print("Prescription Data:", prescription_data)
-        # Validate & save prescription
-        try:
-            prescription_list = json.loads(prescription_data)
-        except (json.JSONDecodeError, TypeError):
-            prescription_list = []
+        # ✅ 3. Check if the form is valid
+        if form.is_valid():
+            print("Form is valid")
 
-        opd.doctor = Doctor.objects.get(id=doctor_id)
-        opd.diagnosis = diagnosis
-        # opd.symptoms = symptoms
-        opd.visit_type = visit_type
-        opd.follow_up_date = parse_date(follow_up_date) if follow_up_date else None
-        opd.prescription = json.dumps(prescription_list)  # Save structured data as string
-        opd.save()
+            # ✅ 4. Get prescription JSON string from hidden input
+            prescription_data = request.POST.get("prescription_json")
+            print("Raw Prescription JSON:", prescription_data)
 
-        messages.success(request, "OPD visit updated successfully!")
-        return redirect("opd")
+            try:
+                # ✅ 5. Try to load JSON string into a Python list
+                prescription_list = json.loads(prescription_data)
+                print("Parsed Prescription List:", prescription_list)
 
+                # ✅ 6. Store JSON string into the form instance before saving
+                form.instance.prescription = json.dumps(prescription_list)
+            except (json.JSONDecodeError, TypeError) as e:
+                # ❌ Handle malformed JSON safely
+                print("Prescription JSON error:", str(e))
+                form.instance.prescription = "[]"
+
+            # ✅ 7. Save OPD record (updates the DB)
+            form.instance.patient = opd.patient
+            form.save()
+            print("OPD record saved")
+
+            messages.success(request, "OPD visit updated successfully!")
+            return redirect("opd")
+        else:
+            # ❌ 8. If validation fails, log the errors
+            print("Form validation errors:", form.errors)
+            messages.error(request, "Form validation failed.")
+    else:
+        # ✅ 9. If GET request, instantiate the form with existing OPD data
+        form = OPDForm(instance=opd)
+        print("GET request: Form initialized with OPD instance")
+
+    # ✅ 10. Fetch all doctors for the doctor dropdown
     doctors = Doctor.objects.all()
+    print("Loaded doctors:", doctors)
 
-    # ✅ Preload prescription JSON into readable structure
+    # ✅ 11. Try to parse existing prescription JSON into Python list (for JS)
     try:
         prescription_list = json.loads(opd.prescription or "[]")
-    except json.JSONDecodeError:
+    except json.JSONDecodeError as e:
+        print("Prescription load error:", str(e))
         prescription_list = []
-
+    advice_list = AdviceSuggestion.objects.all()
+    investigation_list = InvestigationSuggestion.objects.all()
+    # ✅ 12. Render the template with required context
     return render(request, "hms/opd/update_opd.html", {
-        "opd": opd,
+        "form": form,  # Contains bound data or instance data
+        "opd": opd,  # For read-only patient display
         "doctors": doctors,
-        "prescriptions": prescription_list  # for frontend JS rendering
+        "prescriptions": prescription_list,  # For JS rendering in template
+        "advice_list": advice_list,               # 🔧 Add this
+        "investigation_list": investigation_list 
     })
+
+
 
 
 def calculate_age(date_of_birth):
@@ -2042,6 +2070,8 @@ def opd_report_template(request, patient_id):
             'prescription_items': prescription_items,  # ✅ Renamed key
             'visit_type': opd.get_visit_type_display(),
             'follow_up_date': opd.follow_up_date.strftime("%Y-%m-%d") if opd.follow_up_date else "N/A",
+            'advice': opd.advice or "N/A",  # ✅ Add this
+            'investigation': opd.investigation or "N/A",    
         },
     ]
 

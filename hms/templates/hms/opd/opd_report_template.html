@@ -209,34 +209,38 @@
             <div class="medical-section mb-6 p-4 border border-gray-300 rounded-md bg-white shadow-sm">
 
                 <!-- History in One Row -->
-        <div class="flex items-start mb-2">
-            <div class="section-subtitle font-semibold text-gray-700 mb-1">History: <span>{{ visit.diagnosis|default:"No history recorded" }}</span></div>
-            <div class="text-gray-800 flex-1"></div>
-        </div>
-        <!-- Treatment Section -->
-        <div class="section-subtitle font-bold bg-blue-800 text-gray-700 mb-1">Treatment</div>
-        <div class="content-box">
-            {% if visit.prescription_items %}
-                {% for item in visit.prescription_items %}
-                <div class="prescription-item mb-4 p-3 border border-gray-600 rounded">
-                    <div class="font-bold text-blue-900">{{ item.medicine }}</div>
-                    <div class="prescription-details text-large text-gray-900 mt-1">
-                        <div><span class="info-label font-large">Type:</span> {{ item.medicine_type|title }}</div>
-                        <div><span class="info-label font-medium">Dose:</span> {{ item.dose }} Mg</div>
-                        <div><span class="info-label font-medium">Route:</span> {{ item.route }}</div>
-                        <div><span class="info-label font-medium">Duration:</span> {{ item.duration }}</div>
-                        {% if item.notes %}
-                        <div><span class="info-label font-medium">Notes:</span> {{ item.notes }}</div>
-                        {% endif %}
+            <div class="flex items-start mb-2">
+                <div class="section-subtitle font-semibold text-gray-700 mb-1">History: <span>{{ visit.diagnosis|default:"No history recorded" }}</span></div>
+                <div class="text-gray-800 flex-1"></div>
+                
+            </div>
+            <!-- Treatment Section -->
+            <!-- <h2 class="section-title">Treatment</h2> -->
+            <h2 class="section-title">Treatment</h2>
+            <div class="content-box">
+                {% if visit.prescription_items %}
+                    {% for item in visit.prescription_items %}
+                    <div class="prescription-item mb-4 p-3 border border-gray-600 rounded">
+                        <div class="font-bold text-blue-900">{{ item.medicine }}</div>
+                        <div class="prescription-details text-large text-gray-900 mt-1">
+                            <div><span class="info-label font-large">Type:</span> {{ item.medicine_type|title }}</div>
+                            <div><span class="info-label font-medium">Dose:</span> {{ item.dose }} Mg</div>
+                            <div><span class="info-label font-medium">Route:</span> {{ item.route }}</div>
+                            <div><span class="info-label font-medium">Duration:</span> {{ item.duration }}</div>
+                            {% if item.notes %}
+                            <div><span class="info-label font-medium">Notes:</span> {{ item.notes }}</div>
+                            {% endif %}
+                        </div>
                     </div>
-                </div>
-                {% endfor %}
-            {% else %}
-            <div class="text-gray-600">No medicines prescribed</div>
-            {% endif %}
+                    {% endfor %}
+                {% else %}
+                <div class="text-gray-600">No medicines prescribed</div>
+                {% endif %}
         </div>
 
     </div>
+    <p><strong>Advice:</strong> {{ visit.advice }}</p> <!-- ✅ New -->
+                <p><strong>Investigation:</strong> {{ visit.investigation }}</p> <!-- ✅ New -->
     {% endfor %}
 </div>
 

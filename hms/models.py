@@ -529,7 +529,8 @@ class OPD(models.Model):
         ('emergency', 'Emergency Visit'),
     ]
     visit_type = models.CharField(max_length=20, choices=VISIT_TYPE_CHOICES, default='new')  # Type of visit
-
+    advice = models.CharField(max_length=255, blank=True, null=True)
+    investigation = models.CharField(max_length=255, blank=True, null=True)
     def get_prescription_items(self):
         try:
             return json.loads(self.prescription) if self.prescription else []
@@ -538,6 +539,19 @@ class OPD(models.Model):
     
     def __str__(self):
         return f"OPD Visit - {self.patient.user.full_name} ({self.visit_date.strftime('%Y-%m-%d')})"
+
+class AdviceSuggestion(models.Model):
+    value = models.CharField(max_length=255, unique=True)
+
+    def __str__(self):
+        return self.value
+
+class InvestigationSuggestion(models.Model):
+    value = models.CharField(max_length=255, unique=True)
+
+    def __str__(self):
+        return self.value
+
 
 
 from django.contrib.auth import get_user_model

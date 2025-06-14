@@ -2,7 +2,7 @@ from django import forms
 from django.utils import timezone
 from django.forms import inlineformset_factory
 from django.core.exceptions import ValidationError
-from .models import CustomUser,NICUVitals, Patient,OPDBilling, IPDBilling, BillingItem, Payment, Expense,OPD,Room, Doctor, Employee,EmergencyCase,PatientReport,Prescription,License,Asset,Maintenance,Daybook,NICUMedicationRecord,Medicine, Diluent,Vial,FluidRequirement,IPD,MedicineVial
+from .models import CustomUser,NICUVitals, Patient,OPDBilling, IPDBilling, BillingItem, Payment, Expense,OPD,Room, Doctor, Employee,EmergencyCase,PatientReport,Prescription,License,Asset,Maintenance,Daybook,NICUMedicationRecord,Medicine, Diluent,Vial,FluidRequirement,IPD,MedicineVial,AdviceSuggestion,InvestigationSuggestion
 
 class ProfileUpdateForm(forms.ModelForm):
     class Meta:
@@ -120,36 +120,102 @@ class OPDQuickForm(forms.ModelForm):
             })
 
 
+# class OPDForm(forms.ModelForm):
+#     class Meta:
+#         model = OPD
+#         fields = [
+#             'patient', 'doctor', 'diagnosis', 'prescription', 
+#             'follow_up_date', 'visit_type',
+#         ]
+#         widgets = {
+#             'patient': forms.Select(attrs={'class': 'w-full p-2 border border-gray-300 rounded-md'}),
+#             'doctor': forms.Select(attrs={'class': 'w-full p-2 border border-gray-300 rounded-md'}),
+#             'diagnosis': forms.Textarea(attrs={'class': 'w-full p-2 border border-gray-300 rounded-md', 'rows': 3}),
+#             # 'symptoms': forms.Textarea(attrs={'class': 'w-full p-2 border border-gray-300 rounded-md', 'rows': 3}),
+#             'prescription': forms.Textarea(attrs={'class': 'w-full p-2 border border-gray-300 rounded-md', 'rows': 3}),
+#             'follow_up_date': forms.DateInput(attrs={'type': 'date', 'class': 'w-full p-2 border border-gray-300 rounded-md'}),
+#             'visit_type': forms.Select(attrs={'class': 'w-full p-2 border border-gray-300 rounded-md'}),
+#         }
+
+#     def clean_follow_up_date(self):
+#         follow_up_date = self.cleaned_data.get('follow_up_date')
+
+#         if follow_up_date in ["", None]:
+#             return None  # Ensure None instead of an empty string
+        
+#         if isinstance(follow_up_date, str):
+#             try:
+#                 follow_up_date = timezone.datetime.strptime(follow_up_date, "%Y-%m-%d").date()
+#             except ValueError:
+#                 raise ValidationError("Invalid date format. Use YYYY-MM-DD.")
+        
+#         return follow_up_date
+
+
 class OPDForm(forms.ModelForm):
+    advice_input = forms.CharField(
+        label="Advice (select or type new)", required=False,
+        widget=forms.TextInput(attrs={'class': 'w-full p-2 border border-gray-300 rounded-md'})
+    )
+    investigation_input = forms.CharField(
+        label="Investigation (select or type new)", required=False,
+        widget=forms.TextInput(attrs={'class': 'w-full p-2 border border-gray-300 rounded-md'})
+    )
+
     class Meta:
         model = OPD
+        exclude = ['patient']
         fields = [
-            'patient', 'doctor', 'diagnosis', 'prescription', 
-            'follow_up_date', 'visit_type',
+             'doctor', 'diagnosis', 'prescription',
+            'follow_up_date', 'visit_type', 'advice', 'investigation'
         ]
         widgets = {
-            'patient': forms.Select(attrs={'class': 'w-full p-2 border border-gray-300 rounded-md'}),
+            # 'patient': forms.Select(attrs={'class': 'w-full p-2 border border-gray-300 rounded-md'}),
             'doctor': forms.Select(attrs={'class': 'w-full p-2 border border-gray-300 rounded-md'}),
             'diagnosis': forms.Textarea(attrs={'class': 'w-full p-2 border border-gray-300 rounded-md', 'rows': 3}),
-            # 'symptoms': forms.Textarea(attrs={'class': 'w-full p-2 border border-gray-300 rounded-md', 'rows': 3}),
             'prescription': forms.Textarea(attrs={'class': 'w-full p-2 border border-gray-300 rounded-md', 'rows': 3}),
             'follow_up_date': forms.DateInput(attrs={'type': 'date', 'class': 'w-full p-2 border border-gray-300 rounded-md'}),
             'visit_type': forms.Select(attrs={'class': 'w-full p-2 border border-gray-300 rounded-md'}),
         }
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.fields['advice'].widget = forms.Select(
+            choices=[('', '--- Select Advice ---')] + [(a.value, a.value) for a in AdviceSuggestion.objects.all()],
+            attrs={'class': 'w-full p-2 border border-gray-300 rounded-md'}
+        )
+        self.fields['investigation'].widget = forms.Select(
+            choices=[('', '--- Select Investigation ---')] + [(i.value, i.value) for i in InvestigationSuggestion.objects.all()],
+            attrs={'class': 'w-full p-2 border border-gray-300 rounded-md'}
+        )
+
+    def clean(self):
+        cleaned_data = super().clean()
+        advice_input = cleaned_data.get("advice_input")
+        investigation_input = cleaned_data.get("investigation_input")
+
+        if advice_input:
+            cleaned_data["advice"] = advice_input
+            AdviceSuggestion.objects.get_or_create(value=advice_input)
+
+        if investigation_input:
+            cleaned_data["investigation"] = investigation_input
+            InvestigationSuggestion.objects.get_or_create(value=investigation_input)
+
+        return cleaned_data
+
     def clean_follow_up_date(self):
         follow_up_date = self.cleaned_data.get('follow_up_date')
-
         if follow_up_date in ["", None]:
-            return None  # Ensure None instead of an empty string
-        
+            return None
         if isinstance(follow_up_date, str):
             try:
                 follow_up_date = timezone.datetime.strptime(follow_up_date, "%Y-%m-%d").date()
             except ValueError:
                 raise ValidationError("Invalid date format. Use YYYY-MM-DD.")
-        
         return follow_up_date
+
 
 
 class RoomForm(forms.ModelForm):
