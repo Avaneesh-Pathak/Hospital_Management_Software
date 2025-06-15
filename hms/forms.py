@@ -641,3 +641,8 @@ class ExpenseForm(forms.ModelForm):
             'description': forms.TextInput(attrs={'class': 'form-control'}),
             'cost': forms.NumberInput(attrs={'class': 'form-control'}),
         }
+
+
+
+class MedicineUploadForm(forms.Form):
+    file = forms.FileField(label="Upload Excel File")

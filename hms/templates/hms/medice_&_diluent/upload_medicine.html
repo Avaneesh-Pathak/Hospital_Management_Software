@@ -1,0 +1,143 @@
+{% extends 'hms/base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="card shadow-sm border-primary">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">
+                <i class="fas fa-file-excel me-2"></i> Upload Medicine Excel File
+            </h5>
+        </div>
+
+        <div class="card-body">
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label for="id_file" class="form-label fw-semibold">Select Excel File</label>
+                    {{ form.file }}
+                    <div class="form-text">Only .xlsx or .csv files are accepted</div>
+                </div>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-upload me-1"></i> Upload
+                </button>
+                
+            </form>
+        </div>
+    </div>
+
+    <div class="mt-5">
+        <h6 class="fw-bold text-secondary mb-3">
+            <i class="fas fa-table me-2"></i>Example of Correct Excel Format:
+        </h6>
+        <div class="table-responsive border rounded" style="box-shadow: 0 0 10px rgba(0,0,0,0.05);">
+            <table class="table table-sm table-bordered align-middle mb-0 excel-theme" style="font-size: 0.85rem;">
+                <thead>
+                    <tr style="background-color: #f2f2f2;">
+                        <th style="background-color: #e6e6e6; border: 1px solid #d9d9d9; padding: 8px 12px;">Name</th>
+                        <th style="background-color: #e6e6e6; border: 1px solid #d9d9d9; padding: 8px 12px;">Brand</th>
+                        <th style="background-color: #e6e6e6; border: 1px solid #d9d9d9; padding: 8px 12px;">Medicine Type</th>
+                        <th style="background-color: #e6e6e6; border: 1px solid #d9d9d9; padding: 8px 12px;">Route</th>
+                        <th style="background-color: #e6e6e6; border: 1px solid #d9d9d9; padding: 8px 12px;">Duration</th>
+                        <th style="background-color: #e6e6e6; border: 1px solid #d9d9d9; padding: 8px 12px;">Is Liquid Injection</th>
+                        <th style="background-color: #e6e6e6; border: 1px solid #d9d9d9; padding: 8px 12px;">Standard Dose/kg</th>
+                        <th style="background-color: #e6e6e6; border: 1px solid #d9d9d9; padding: 8px 12px;">Tablet Strength</th>
+                        <th style="background-color: #e6e6e6; border: 1px solid #d9d9d9; padding: 8px 12px;">Concentration (mg/mL)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="border: 1px solid #e0e0e0; padding: 8px 12px; background-color: #ffffff;">Paracetamol</td>
+                        <td style="border: 1px solid #e0e0e0; padding: 8px 12px; background-color: #ffffff;">Crocin</td>
+                        <td style="border: 1px solid #e0e0e0; padding: 8px 12px; background-color: #ffffff;">tablet</td>
+                        <td style="border: 1px solid #e0e0e0; padding: 8px 12px; background-color: #ffffff;">oral</td>
+                        <td style="border: 1px solid #e0e0e0; padding: 8px 12px; background-color: #ffffff;">24H</td>
+                        <td style="border: 1px solid #e0e0e0; padding: 8px 12px; background-color: #ffffff; color: #e74c3c;">FALSE</td>
+                        <td style="border: 1px solid #e0e0e0; padding: 8px 12px; background-color: #ffffff;">15</td>
+                        <td style="border: 1px solid #e0e0e0; padding: 8px 12px; background-color: #ffffff; color: #3498db;">500</td>
+                        <td style="border: 1px solid #e0e0e0; padding: 8px 12px; background-color: #ffffff;"></td>
+                    </tr>
+                    <tr>
+                        <td style="border: 1px solid #e0e0e0; padding: 8px 12px; background-color: #f9f9f9;">Amoxicillin</td>
+                        <td style="border: 1px solid #e0e0e0; padding: 8px 12px; background-color: #f9f9f9;">Mox</td>
+                        <td style="border: 1px solid #e0e0e0; padding: 8px 12px; background-color: #f9f9f9;">syrup</td>
+                        <td style="border: 1px solid #e0e0e0; padding: 8px 12px; background-color: #f9f9f9;">oral</td>
+                        <td style="border: 1px solid #e0e0e0; padding: 8px 12px; background-color: #f9f9f9;">8H</td>
+                        <td style="border: 1px solid #e0e0e0; padding: 8px 12px; background-color: #f9f9f9; color: #e74c3c;">FALSE</td>
+                        <td style="border: 1px solid #e0e0e0; padding: 8px 12px; background-color: #f9f9f9;">25</td>
+                        <td style="border: 1px solid #e0e0e0; padding: 8px 12px; background-color: #f9f9f9;"></td>
+                        <td style="border: 1px solid #e0e0e0; padding: 8px 12px; background-color: #f9f9f9; color: #3498db;">250</td>
+                    </tr>
+                    <tr>
+                        <td style="border: 1px solid #e0e0e0; padding: 8px 12px; background-color: #ffffff;">Ceftriaxone</td>
+                        <td style="border: 1px solid #e0e0e0; padding: 8px 12px; background-color: #ffffff;">Rocephin</td>
+                        <td style="border: 1px solid #e0e0e0; padding: 8px 12px; background-color: #ffffff;">injection</td>
+                        <td style="border: 1px solid #e0e0e0; padding: 8px 12px; background-color: #ffffff;">iv</td>
+                        <td style="border: 1px solid #e0e0e0; padding: 8px 12px; background-color: #ffffff;">24H</td>
+                        <td style="border: 1px solid #e0e0e0; padding: 8px 12px; background-color: #ffffff; color: #27ae60;">TRUE</td>
+                        <td style="border: 1px solid #e0e0e0; padding: 8px 12px; background-color: #ffffff;">50</td>
+                        <td style="border: 1px solid #e0e0e0; padding: 8px 12px; background-color: #ffffff;"></td>
+                        <td style="border: 1px solid #e0e0e0; padding: 8px 12px; background-color: #ffffff; color: #3498db;">1000</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="alert alert-info mt-3" style="font-size: 0.85rem;">
+            <div class="d-flex align-items-center">
+                <i class="fas fa-info-circle me-2"></i>
+                <div>
+                    <strong>Important Notes:</strong>
+                    <ul class="mb-0 mt-1">
+                        <li>Column headers must match exactly (case-sensitive)</li>
+                        <li>For boolean fields (Is Liquid Injection), use TRUE/FALSE values</li>
+                        <li>Leave fields empty when not applicable (e.g., Tablet Strength for liquid medicines)</li>
+                        <li>Duration format should be in hours (e.g., 8H, 12H, 24H)</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Download Template Modal -->
+<div class="modal fade" id="downloadTemplate" tabindex="-1" aria-labelledby="downloadTemplateLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="downloadTemplateLabel">Download Excel Template</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Download a pre-formatted Excel template with all required columns and sample data.</p>
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    Using the template ensures your file will be formatted correctly.
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary">
+                    <i class="fas fa-download me-1"></i> Download Template
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .excel-theme {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        color: #333;
+    }
+    .excel-theme th {
+        font-weight: 600;
+        color: #333;
+    }
+    .excel-theme tr:nth-child(even) {
+        background-color: #f9f9f9;
+    }
+    .excel-theme tr:hover {
+        background-color: #f1f1f1;
+    }
+</style>
+{% endblock %}

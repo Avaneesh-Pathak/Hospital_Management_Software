@@ -228,11 +228,66 @@
                 </a>
             </li>
             {% endif %}
+            <!-- Reception service -->
+            {% if user.is_superuser or user.role == 'admin' or  user|has_group:'Staff'  %}
+            <li class="mb-4 mt-6">
+                <span class="text-xs font-semibold uppercase text-gray-400 tracking-wider">Reception Services</span>
+            </li>
+            <li>
+                <a href="{% url 'register_patient' %}" 
+                class="flex items-center p-3 text-sm font-medium rounded-lg transition-all duration-200 hover:bg-gray-800 hover:text-white group">
+                    <i class="fas fa-user-plus w-5 text-center text-gray-400 group-hover:text-red-400"></i>
+                    <span class="ml-3  group-hover:text-white">Add New Patient</span>
+                </a>
+            </li>
+             <li>
+                <a href="{% url 'add_opd_quick' %}" class="flex items-center p-3 text-sm font-medium rounded-lg transition-all duration-200 hover:bg-gray-800 hover:text-white group">
+                    <i class="fas fa-plus-circle w-5 text-center text-gray-400 group-hover:text-teal-400"></i>
+                    <span class="ml-3">Add OPD</span>
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'add_ipd' %}" 
+                class="flex items-center p-3 text-sm font-medium rounded-lg transition-all duration-200 hover:bg-gray-800 hover:text-white group">
+                    <i class="fas fa-hospital-user w-5 text-center text-gray-400 group-hover:text-green-400"></i>
+                    <span class="ml-3 group-hover:text-white">Add IPD</span>
+                </a>
+            </li>
+            {% endif %}
+            <!-- Medical Services -->
+            <li class="mb-4 mt-6">
+                <span class="text-xs font-semibold uppercase text-gray-400 tracking-wider">Medical Services</span>
+            </li>
+            {% if user.is_superuser or user.role == 'admin' or user|has_group:"Doctor" or user|has_group:"Nurse" %}
+            
+            <li>
+                <a href="{% url 'opd' %}" class="flex items-center p-3 text-sm font-medium rounded-lg transition-all duration-200 hover:bg-gray-800 hover:text-white group">
+                    <i class="fas fa-clinic-medical w-5 text-center text-gray-400 group-hover:text-teal-400"></i>
+                    <span class="ml-3">OPD</span>
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'ipd' %}" class="flex items-center p-3 text-sm font-medium rounded-lg transition-all duration-200 hover:bg-gray-800 hover:text-white group">
+                    <i class="fas fa-bed w-5 text-center text-gray-400 group-hover:text-indigo-400"></i>
+                    <span class="ml-3">IPD</span>
+                </a>
+            </li>
+            {% endif %}
+            {% if user.is_superuser or user.role == 'admin'  or user|has_group:"Nurse"   or user|has_group:"Doctor"%}
+            <li>
+                <a href="{% url 'manage_medicine_diluent' %}" class="flex items-center p-3 text-sm font-medium rounded-lg transition-all duration-200 hover:bg-gray-800 hover:text-white group">
+                    <i class="fas fa-pills w-5 text-center text-gray-400 group-hover:text-blue-400"></i>
+                    <span class="ml-3">Medicine & Diluent</span>
+                </a>
+            </li>
+            {% endif %}
             <!-- Patient Management -->
             <li class="mb-4 mt-6">
                 <span class="text-xs font-semibold uppercase text-gray-400 tracking-wider">Patient Management</span>
             </li>
             {% if user.is_superuser or user.role == 'admin' or user|has_group:"Doctor" or user|has_group:"Nurse" or user|has_group:'Staff'  %}
+            
+
             <li>
                 <a href="{% url 'patients' %}" class="flex items-center p-3 text-sm font-medium rounded-lg transition-all duration-200 hover:bg-gray-800 hover:text-white group">
                     <i class="fas fa-procedures w-5 text-center text-gray-400 group-hover:text-green-400"></i>
@@ -257,38 +312,7 @@
             </li>
             {% endif %}
 
-            <!-- Medical Services -->
-            <li class="mb-4 mt-6">
-                <span class="text-xs font-semibold uppercase text-gray-400 tracking-wider">Medical Services</span>
-            </li>
-            {% if user.is_superuser or user.role == 'admin' or user|has_group:"Doctor" or user|has_group:"Nurse" %}
-            <li>
-                <a href="{% url 'ipd' %}" class="flex items-center p-3 text-sm font-medium rounded-lg transition-all duration-200 hover:bg-gray-800 hover:text-white group">
-                    <i class="fas fa-bed w-5 text-center text-gray-400 group-hover:text-indigo-400"></i>
-                    <span class="ml-3">IPD</span>
-                </a>
-            </li>
-            <li>
-                <a href="{% url 'add_opd_quick' %}" class="flex items-center p-3 text-sm font-medium rounded-lg transition-all duration-200 hover:bg-gray-800 hover:text-white group">
-                    <i class="fas fa-plus-circle w-5 text-center text-gray-400 group-hover:text-teal-400"></i>
-                    <span class="ml-3">Quick OPD Add</span>
-                </a>
-            </li>
-            <li>
-                <a href="{% url 'opd' %}" class="flex items-center p-3 text-sm font-medium rounded-lg transition-all duration-200 hover:bg-gray-800 hover:text-white group">
-                    <i class="fas fa-clinic-medical w-5 text-center text-gray-400 group-hover:text-teal-400"></i>
-                    <span class="ml-3">OPD</span>
-                </a>
-            </li>
-            {% endif %}
-            {% if user.is_superuser or user.role == 'admin'  or user|has_group:"Nurse"   or user|has_group:"Doctor"%}
-            <li>
-                <a href="{% url 'manage_medicine_diluent' %}" class="flex items-center p-3 text-sm font-medium rounded-lg transition-all duration-200 hover:bg-gray-800 hover:text-white group">
-                    <i class="fas fa-pills w-5 text-center text-gray-400 group-hover:text-blue-400"></i>
-                    <span class="ml-3">Medicine & Diluent</span>
-                </a>
-            </li>
-            {% endif %}
+            
 
             <!-- Staff Management -->
              {% if user.is_superuser or user.role == 'admin' or user|has_group:"Staff" %}

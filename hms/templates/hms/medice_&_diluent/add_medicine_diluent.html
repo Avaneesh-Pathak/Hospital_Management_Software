@@ -6,13 +6,17 @@
         <div class="col-xl-20 col-lg-20">
             <!-- Header Section -->
             <div class="d-flex justify-content-between align-items-center mb-4">
-                <div>
-                    <h2 class="mb-1 fw-bold">
-                        <i class="fas fa-pills me-2 text-primary"></i>
-                        Pharmacy Management
-                    </h2>
-                    <p class="text-muted mb-0">Manage medicines, diluents, and vial configurations</p>
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <div>
+                        <h2 class="mb-1 fw-bold">
+                            <i class="fas fa-pills me-2 text-primary"></i>
+                            Pharmacy Management
+                        </h2>
+                        <p class="text-muted mb-0">Manage medicines, diluents, and vial configurations</p>
+                    </div>
+                    
                 </div>
+
                 <div class="btn-group" role="group">
                     <button type="button" class="btn btn-outline-primary active" id="medicineBtn">
                         <i class="fas fa-pills me-1"></i> Medicines
@@ -110,13 +114,16 @@
                     <!-- Add New Medicine Section -->
                     <div class="col-lg-6">
                         <div class="card border-0 shadow-sm h-100">
-                            <div class="card-header bg-primary bg-opacity-10 border-bottom border-primary border-opacity-25">
+                            <div class="card-header bg-primary bg-opacity-10 border-bottom border-primary border-opacity-25 d-flex justify-content-between align-items-center">
                                 <h5 class="mb-0 fw-bold text-primary">
                                     <i class="fas fa-plus-circle me-2"></i>
                                     Add New Medicine
                                 </h5>
-
+                                <a href="{% url 'upload_medicine' %}" class="btn btn-sm btn-outline-primary">
+                                    <i class="fas fa-file-upload me-1"></i> Upload Medicine Excel
+                                </a>
                             </div>
+
                             <!-- Scrollable Button Group Container -->
                             <div class="my-3" style="overflow-x: auto; white-space: nowrap;">
                                 <div class="btn-group" role="group" id="medicineTypeSelector" style="min-width: max-content;">
@@ -200,7 +207,7 @@
                                                                             <div class="input-group">
                                                                                 <input type="number" step="0.01" name="standard_dose_per_kg" id="id_standard_dose_per_kg" 
                                                                                     class="form-control" value="{{ medicine_form.standard_dose_per_kg.value|default_if_none:'' }}" required>
-                                                                                <span class="input-group-text bg-light">mg/kg</span>
+                                                                                <span class="input-group-text bg-light">mg/kg/dose</span>
                                                                             </div>
                                                                         </div>
                                                                         <div class="col-md-6 mb-3">
@@ -298,7 +305,7 @@
                                                                             <div class="input-group">
                                                                                 <input type="number" step="0.01" name="standard_dose_per_kg" id="id_standard_dose_per_kg" 
                                                                                     class="form-control" value="{{ medicine_form.standard_dose_per_kg.value|default_if_none:'' }}" required>
-                                                                                <span class="input-group-text bg-light">mg/ml</span>
+                                                                                <span class="input-group-text bg-light">mg/kg/ml</span>
                                                                             </div>
                                                                         </div>
                                                                         <div class="col-md-6 mb-3">
@@ -960,7 +967,7 @@
                                         </td>
                                         <td class="text-center fw-bold">
                                             <span class="d-block">{{ medicine.standard_dose_per_kg|floatformat:2 }}</span>
-                                            <span class="small text-muted">mg/kg/day</span>
+                                            <span class="small text-muted">mg/kg/dose</span>
                                         </td>
                                         <td class="text-center fw-bold">
                                             {% if medicine.tablet_strength %}

@@ -175,6 +175,7 @@ urlpatterns = [
     path('delete_vial/<int:pk>/', views.delete_vial, name='delete_vial'),
     path('api/medicines/', views.medicine_list_api, name='medicine-list-api'),
     path('api/medicines/<int:pk>/', views.medicine_detail_api, name='medicine-detail-api'),
+    path('upload-medicine/', views.upload_medicine_excel, name='upload_medicine'),
 
     #Fluid Form
     path("ipd/<int:ipd_id>/fluid/add/", NICUFluidAddView.as_view(), name="add_nicu_fluid"),

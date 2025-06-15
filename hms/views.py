@@ -71,7 +71,7 @@ from .forms import (
      LicenseForm, AssetForm, MaintenanceForm,
     BalanceUpdateForm, DaybookEntryForm, NICUVitalsForm, NICUMedicationRecordForm,
     MedicineForm, DiluentForm, VialForm, NICUFluidForm, IPDForm, MedicineVialFormSet,OPDQuickForm,PrescriptionForm,
-    PatientSummaryForm
+    PatientSummaryForm,MedicineUploadForm
 )
 
 
@@ -1776,7 +1776,7 @@ def add_prescription(request, ipd_id):
             return redirect('view_ipd_report', ipd_id=ipd_id)
     else:
         form = PrescriptionForm()
-
+        form.fields['medication_fk'].queryset = list(Medicine.objects.all())
     return render(request, 'hms/opd/add_prescription.html', {'form': form, 'ipd': ipd})
 
 def search_medicine_detail(request):
@@ -3157,3 +3157,28 @@ class NICUFluidDeleteView(DeleteView):
         return reverse_lazy("nicu_medication_list", kwargs={"ipd_id": ipd_id})
 
 
+
+import pandas as pd
+def upload_medicine_excel(request):
+    if request.method == "POST":
+        form = MedicineUploadForm(request.POST, request.FILES)
+        if form.is_valid():
+            excel_file = request.FILES['file']
+            df = pd.read_excel(excel_file)
+
+            for _, row in df.iterrows():
+                Medicine.objects.create(
+                    name=row.get('name'),
+                    brand=row.get('brand'),
+                    medicine_type=row.get('medicine_type'),
+                    route=row.get('route'),
+                    duration=row.get('duration'),
+                    is_liquid_injection=row.get('is_liquid_injection') in ['TRUE', 'True', True, 1],
+                    standard_dose_per_kg=row.get('standard_dose_per_kg'),
+                    tablet_strength=row.get('tablet_strength'),
+                    concentration_mg_per_ml=row.get('concentration_mg_per_ml'),
+                )
+            return redirect('manage_medicine_diluent')  # or success page
+    else:
+        form = MedicineUploadForm()
+    return render(request, 'hms/medice_&_diluent/upload_medicine.html', {'form': form})
