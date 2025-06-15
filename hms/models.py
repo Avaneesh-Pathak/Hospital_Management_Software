@@ -1121,7 +1121,7 @@ class Medicine(models.Model):
         ("oral", "Oral"),
         ("other", "Other"),
     ]
-
+ 
     ROUTE_CHOICES = [
         ("oral", "Oral"),
         ("iv", "Intravenous"),

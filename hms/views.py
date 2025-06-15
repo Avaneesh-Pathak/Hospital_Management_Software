@@ -5,6 +5,7 @@ import base64
 import qrcode
 import datetime
 import logging
+import pandas as pd
 from io import BytesIO
 from datetime import date
 from xhtml2pdf import pisa
@@ -42,6 +43,9 @@ from django.http import HttpResponseForbidden
 from django.utils.dateparse import parse_time
 from django.template.loader import get_template
 from django.db.models.functions import TruncDate
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
+from django.views.decorators.http import require_POST
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.files.storage import default_storage
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -50,27 +54,25 @@ from django.contrib.auth import authenticate, login, logout
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.views.generic import ListView, CreateView, UpdateView,DeleteView
-from django.views.decorators.http import require_POST
-from django.views.decorators.csrf import csrf_exempt
-from django.utils.decorators import method_decorator
 
 # Import Models and Forms
 from .models import (
     CustomUser, Patient, Doctor, Appointment,
     BillingBase, OPDBilling, IPDBilling, BillingItem, Payment, Expense,
-    EmergencyCase, OPD, IPD, Employee, Room, PatientReport,
-    License, Asset, Maintenance, AccountingRecord, Daybook, Balance,
-    PatientTransfer, NICUVitals, NICUMedicationRecord, Medicine, Diluent,
-    Vial, FluidRequirement, MedicineVial,Nurse, Staff,Notification,Prescription,AdviceSuggestion,InvestigationSuggestion
+    EmergencyCase, OPD, IPD, Employee,Room,PatientReport,License,Asset,
+    Maintenance,AccountingRecord,Daybook,Balance,PatientTransfer,NICUVitals,
+    NICUMedicationRecord, Medicine, Diluent,Vial,FluidRequirement,MedicineVial,
+    Nurse,Staff,Notification,Prescription,AdviceSuggestion,InvestigationSuggestion
 )
 
 from .forms import (
     PatientRegistrationForm, ExpenseForm, OPDBillingForm, IPDBillingForm,
     BillingItemForm, PaymentForm, OPDForm, DoctorForm, EmployeeForm,
     RoomForm, EmergencyCaseForm, ProfileUpdateForm, PatientReportForm,
-     LicenseForm, AssetForm, MaintenanceForm,
-    BalanceUpdateForm, DaybookEntryForm, NICUVitalsForm, NICUMedicationRecordForm,
-    MedicineForm, DiluentForm, VialForm, NICUFluidForm, IPDForm, MedicineVialFormSet,OPDQuickForm,PrescriptionForm,
+    LicenseForm, AssetForm, MaintenanceForm,BalanceUpdateForm,
+    DaybookEntryForm, NICUVitalsForm, NICUMedicationRecordForm,
+    MedicineForm, DiluentForm, VialForm, NICUFluidForm, IPDForm,
+    MedicineVialFormSet,OPDQuickForm,PrescriptionForm,
     PatientSummaryForm,MedicineUploadForm
 )
 
@@ -2119,6 +2121,35 @@ def calculate_age(date_of_birth):
         years = delta.days // 365
         return f"{years} year(s) old"
 
+def get_dose_split(freq_code):
+    mapping = {
+        "24H": 1,
+        "12H": 2,
+        "8H": 3,
+        "6H": 4,
+        "4H": 6,
+        "SOS": 0,
+        "STAT": 0,
+        "PRN": 0,
+        "OTHER": 0,
+    }
+    return mapping.get(freq_code, 0)
+
+
+def normalize_duration(duration_text):
+    mapping = {
+        "Once daily (Every 24 hours)": "24H",
+        "Twice daily (Every 12 hours)": "12H",
+        "Thrice daily (Every 8 hours)": "8H",
+        "Four times daily (Every 6 hours)": "6H",
+        "Every 4 hours": "4H",
+        "As needed (SOS)": "SOS",
+        "Immediately (STAT)": "STAT",
+        "Pro re nata (As required)": "PRN",
+        "Other (Specify)": "OTHER",
+    }
+    return mapping.get(duration_text.strip(), "24H")
+
 
 def opd_report_template(request, patient_id):
     opd = get_object_or_404(OPD, id=patient_id)
@@ -2133,17 +2164,75 @@ def opd_report_template(request, patient_id):
     except json.JSONDecodeError:
         prescription_items = []
 
+    def get_dose_split(freq_code):
+        freq_map = {
+            "24H": 1,
+            "12H": 2,
+            "8H": 3,
+            "6H": 4,
+            "4H": 6,
+        }
+        return freq_map.get(freq_code, None)
+
+    def normalize_duration(duration_text):
+        """
+        Converts human-readable duration back to frequency code.
+        Example: "Thrice daily (Every 8 hours)" → "8H"
+        """
+        duration_map = {
+            "Once daily (Every 24 hours)": "24H",
+            "Twice daily (Every 12 hours)": "12H",
+            "Thrice daily (Every 8 hours)": "8H",
+            "Four times daily (Every 6 hours)": "6H",
+            "Every 4 hours": "4H",
+            "As needed (SOS)": "SOS",
+            "Immediately (STAT)": "STAT",
+            "Pro re nata (As required)": "PRN",
+            "Other (Specify)": "OTHER",
+        }
+        return duration_map.get(duration_text.strip(), duration_text.strip())
+
+    patient_weight = float(patient.weight or 0)
+
+    for item in prescription_items:
+        try:
+            dose = float(item.get("dose", 0))  # Ensure numeric
+            freq_code = normalize_duration(item.get("duration", "24H"))
+            dose_split = get_dose_split(freq_code)
+
+            
+
+            if patient_weight and dose:
+                total_dose_per_day = round(dose * patient_weight, 2)
+                if dose_split:
+                    dose_per_dose = round(total_dose_per_day / dose_split, 2)
+                else:
+                    dose_per_dose = "As needed"
+            else:
+                total_dose_per_day = "Incomplete"
+                dose_per_dose = "Incomplete"
+
+            item["calculated_total_dose_per_day"] = total_dose_per_day
+            item["calculated_dose_per_dose"] = dose_per_dose
+            item["dose_split"] = dose_split
+
+        except Exception as e:
+            print("Error calculating dose for", item.get("medicine"), ":", str(e))
+            item["calculated_total_dose_per_day"] = "Error"
+            item["calculated_dose_per_dose"] = "Error"
+            item["dose_split"] = "?"
+
     opd_visits = [
         {
             'created_at': opd.created_at.strftime("%Y-%m-%d %H:%M:%S"),
             'doctor': opd.doctor.user.full_name,
             'diagnosis': opd.diagnosis,
             'symptoms': opd.symptoms,
-            'prescription_items': prescription_items,  # ✅ Renamed key
+            'prescription_items': prescription_items,
             'visit_type': opd.get_visit_type_display(),
             'follow_up_date': opd.follow_up_date.strftime("%Y-%m-%d") if opd.follow_up_date else "N/A",
-            'advice': opd.advice or "N/A",  # ✅ Add this
-            'investigation': opd.investigation or "N/A",    
+            'advice': opd.advice or "N/A",
+            'investigation': opd.investigation or "N/A",
         },
     ]
 
@@ -2157,6 +2246,7 @@ def opd_report_template(request, patient_id):
         'patient_age': patient_age,
     }
     return render(request, 'hms/opd/opd_report_template.html', context)
+
 
 @login_required
 def admit_patient(request, opd_id):
@@ -3158,7 +3248,7 @@ class NICUFluidDeleteView(DeleteView):
 
 
 
-import pandas as pd
+
 def upload_medicine_excel(request):
     if request.method == "POST":
         form = MedicineUploadForm(request.POST, request.FILES)

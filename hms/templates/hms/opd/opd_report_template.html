@@ -241,16 +241,27 @@
                 {% if visit.prescription_items %}
                     {% for item in visit.prescription_items %}
                     <div class="prescription-item mb-4 p-3 border border-gray-600 rounded">
-                        <div class="font-bold text-blue-900">{{ item.medicine }}</div>
-                        <div class="prescription-details text-large text-gray-900 mt-1">
-                            <div><span class="info-label font-large">Type:</span> {{ item.medicine_type|title }}</div>
-                            <div><span class="info-label font-medium">Dose:</span> {{ item.dose }} Mg</div>
-                            <div><span class="info-label font-medium">Route:</span> {{ item.route }}</div>
-                            <div><span class="info-label font-medium">Duration:</span> {{ item.duration }}</div>
+                        <h3 class="text-lg font-extrabold text-black-900 mb-2">{{ item.medicine }}</h3>
+                        <div class="prescription-details text-gray-900 mt-2" style="font-size: 15px; line-height: 1.6;">
+                            <div><strong>Type:</strong> {{ item.medicine_type|title }}</div>
+                            <div><strong>Dose:</strong> {{ item.dose }} mg</div>
+                            <div><strong>Route:</strong> {{ item.route }}</div>
+                            <div><strong>Frequency:</strong> {{ item.duration }}</div>
+                            <div><strong>Total per Day:</strong>
+                                <span style="color: #059669; font-weight: 600;">
+                                    {{ item.calculated_total_dose_per_day }} mg/day
+                                </span>
+                            </div>
+                            <div><strong>Per Dose:</strong>
+                                <span style="color: #059669; font-weight: 600;">
+                                    {{ item.calculated_dose_per_dose }} mg/dose
+                                </span>
+                            </div>
                             {% if item.notes %}
-                            <div><span class="info-label font-medium">Notes:</span> {{ item.notes }}</div>
+                            <div><strong>Notes:</strong> {{ item.notes }}</div>
                             {% endif %}
                         </div>
+
                     </div>
                     {% endfor %}
                 {% else %}
